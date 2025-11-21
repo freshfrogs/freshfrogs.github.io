@@ -1,4 +1,4 @@
-// assets/site.js
+// assets/site.js (optimized)
 
 // ------------------------
 // Config
@@ -28,148 +28,17 @@ let FF_POND_RENDERED   = 0;
 const FF_POND_PAGE_SIZE = 36;
 
 // Caches
-const FF_OWNER_CACHE = new Map();  // tokenId -> address | null
 const FF_SALE_CACHE  = new Map();  // tokenId -> price string | null
+
+// Web3 handles
+let ffWeb3          = null;  // wallet / write-capable web3
+let ffCurrentAccount = null;
 
 // Read-only Web3 for staking lookups (Alchemy HTTP, no wallet needed)
 let ffReadWeb3       = null;
 let ffReadCollection = null;
 let ffReadController = null;
 
-function ffEnsureReadContracts() {
-  if (typeof Web3 === 'undefined') {
-    console.warn('[FF] Web3.js not loaded; staking lookups disabled.');
-    return false;
-  }
-
-  if (!ffReadWeb3) {
-    try {
-      ffReadWeb3 = new Web3(`https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`);
-    } catch (err) {
-      console.warn('[FF] Failed to init read-only Web3:', err);
-      return false;
-    }
-  }
-
-  if (!ffReadCollection) {
-    if (typeof COLLECTION_ABI === 'undefined') {
-      console.warn('[FF] COLLECTION_ABI missing; staking lookups disabled.');
-      return false;
-    }
-    ffReadCollection = new ffReadWeb3.eth.Contract(COLLECTION_ABI, FF_COLLECTION_ADDRESS);
-  }
-
-  if (!ffReadController) {
-    if (typeof CONTROLLER_ABI === 'undefined') {
-      console.warn('[FF] CONTROLLER_ABI missing; staking lookups disabled.');
-      return false;
-    }
-    ffReadController = new ffReadWeb3.eth.Contract(CONTROLLER_ABI, FF_CONTROLLER_ADDRESS);
-  }
-
-  return true;
-}
-
-// Override old stakingValues() with a read-only, Alchemy-based version.
-// Returns:
-//   [ stakedDays, stakedLevelRoman, daysToNextLevel, flyzEarned, formattedDate ]
-// OR [] if the frog is not currently staked.
-async function stakingValues(tokenId) {
-  // Normalize tokenId
-  tokenId = parseTokenId(tokenId);
-  if (tokenId == null) {
-    return [];
-  }
-
-  // Ensure read-only contracts are ready
-  if (!ffEnsureReadContracts()) {
-    return [];
-  }
-
-  const web3       = ffReadWeb3;
-  const collection = ffReadCollection;
-  const controller = ffReadController;
-
-  try {
-    // 1) Check if frog is actually staked
-    const staker = await controller.methods.stakerAddress(tokenId).call();
-    if (!staker || staker === ZERO_ADDRESS) {
-      // Not staked -> no staking info
-      return [];
-    }
-
-    // 2) Find the most recent Transfer TO the controller for this token
-    const tokenIdStr = String(tokenId);
-
-    const events = await collection.getPastEvents('Transfer', {
-      filter: {
-        to: FF_CONTROLLER_ADDRESS,
-        tokenId: tokenIdStr
-      },
-      fromBlock: 0,
-      toBlock: 'latest'
-    });
-
-    if (!events || !events.length) {
-      // Shouldn't happen if it's staked, but bail safely
-      return [];
-    }
-
-    const lastEvt = events[events.length - 1];
-    const block   = await web3.eth.getBlock(lastEvt.blockNumber);
-
-    if (!block || !block.timestamp) {
-      return [];
-    }
-
-    // 3) Compute stake duration + level, exactly like the old ethereum-dapp logic
-    const stakedTimestampMs = Number(block.timestamp) * 1000;
-    const stakedDate        = new Date(stakedTimestampMs);
-
-    const durationMs   = Date.now() - stakedTimestampMs;
-    const stakedHours  = Math.floor(durationMs / 1000 / 60 / 60);
-    if (!Number.isFinite(stakedHours) || stakedHours < 0) {
-      return [];
-    }
-
-    // Level increases every 1000 hours, starting at level 1
-    const stakedLevelInt = Math.floor(stakedHours / 1000) + 1;
-
-    const stakedTimeDays = Math.floor(stakedHours / 24); // total days staked
-    const stakedNextDays = Math.round(((stakedLevelInt * 1000) - stakedHours) / 24);
-    const stakedEarned   = (stakedHours / 1000).toFixed(3); // FLYZ earned
-
-    // Format date as mm/dd/yy
-    const mm = String(stakedDate.getMonth() + 1).padStart(2, '0');
-    const dd = String(stakedDate.getDate()).padStart(2, '0');
-    const yy = String(stakedDate.getFullYear()).slice(-2);
-    const formattedDate = `${mm}/${dd}/${yy}`;
-
-    // Use the same roman numeral function as the old dapp, if present
-    let stakedLevelRoman = String(stakedLevelInt);
-    if (typeof romanize === 'function') {
-      try {
-        stakedLevelRoman = romanize(stakedLevelInt);
-      } catch (e) {
-        // fall back to plain number if romanize fails
-        stakedLevelRoman = String(stakedLevelInt);
-      }
-    }
-
-    // [ Time Staked (days), Staked Level (roman), Next Level (days),
-    //   Flyz Earned, Date Staked ]
-    return [
-      stakedTimeDays,
-      stakedLevelRoman,
-      stakedNextDays,
-      Number(stakedEarned),
-      formattedDate
-    ];
-  } catch (err) {
-    console.warn('[FF] stakingValues() failed for token', tokenId, err);
-    return [];
-  }
-}
 
 // ===================================================
 // Entry
@@ -180,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ffInitWalletOnLoad();
   ffInitNav();
   ffInitHeroButtons();
+  ffSetupStakingObserver();
 
   // Load more: Recent Activity
   const loadMoreActivityBtn = document.getElementById('load-more-activity');
@@ -352,7 +222,6 @@ async function loadRecentActivity() {
 
       if (FF_ACTIVITY_MODE === 'mints') {
         headerLeft = truncateAddress(item.to);
-        // leaving headerRight blank here; we’ll try to fill sale price later
       } else {
         const ownerAddress =
           item.buyerAddress || item.to || item.ownerAddress || item.sellerAddress;
@@ -360,26 +229,7 @@ async function loadRecentActivity() {
         headerRight = formatSalePrice(item);
       }
 
-      const actionHtml = `
-        <div class="recent_sale_links">
-          <a
-            class="sale_link_btn opensea"
-            href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            OpenSea
-          </a>
-          <a
-            class="sale_link_btn etherscan"
-            href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Etherscan
-          </a>
-        </div>
-      `;
+      const actionHtml = buildMarketLinksHtml(tokenId);
 
       const card = createFrogCard({
         tokenId,
@@ -391,9 +241,6 @@ async function loadRecentActivity() {
       });
 
       container.appendChild(card);
-
-      // Attach staking stats ONLY if actually staked
-      ffAttachStakeMetaIfStaked(card, tokenId);
 
       // For mints or missing price, try to fill last sale price
       if (!headerRight || headerRight === '--') {
@@ -611,30 +458,10 @@ async function loadRarityGrid() {
 
     const metadata = await fetchFrogMetadata(tokenId);
 
-    // NOTE: per your request, we do NOT show owner on rarity cards for now.
     const headerLeft  = '';
     const headerRight = '';
 
-    const actionHtml = `
-      <div class="recent_sale_links">
-        <a
-          class="sale_link_btn opensea"
-          href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          OpenSea
-        </a>
-        <a
-          class="sale_link_btn etherscan"
-          href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Etherscan
-        </a>
-      </div>
-    `;
+    const actionHtml = buildMarketLinksHtml(tokenId);
 
     const card = createFrogCard({
       tokenId,
@@ -655,9 +482,6 @@ async function loadRarityGrid() {
     }
 
     container.appendChild(card);
-
-    // Attach staking stats only if frog is staked
-    ffAttachStakeMetaIfStaked(card, tokenId);
 
     // Top-right = last sale price if available
     ffEnsureCardHasSalePrice(card, tokenId);
@@ -747,19 +571,25 @@ function createFrogCard({
   return card;
 }
 
-function ffStakeMetaHtml(tokenId) {
+function buildMarketLinksHtml(tokenId) {
   return `
-    <div class="stake-meta">
-      <div class="stake-meta-row">
-        <span id="stake-level-${tokenId}" class="stake-level-label">Staked Lvl. —</span>
-      </div>
-      <div class="stake-meta-row stake-meta-subrow">
-        <span id="stake-date-${tokenId}">Staked: —</span>
-        <span id="stake-next-${tokenId}"></span>
-      </div>
-      <div class="stake-progress">
-        <div id="stake-progress-bar-${tokenId}" class="stake-progress-bar"></div>
-      </div>
+    <div class="recent_sale_links">
+      <a
+        class="sale_link_btn opensea"
+        href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        OpenSea
+      </a>
+      <a
+        class="sale_link_btn etherscan"
+        href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Etherscan
+      </a>
     </div>
   `;
 }
@@ -1075,7 +905,7 @@ async function renderOwnedAndStakedFrogs(address) {
       })
     ]);
 
-    // Owned frogs (no staking stats here)
+    // Owned frogs
     if (ownedStatus) {
       ownedStatus.textContent = ownedNfts.length
         ? ''
@@ -1105,24 +935,7 @@ async function renderOwnedAndStakedFrogs(address) {
               Transfer
             </button>
           </div>
-          <div class="recent_sale_links">
-            <a
-              class="sale_link_btn opensea"
-              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              OpenSea
-            </a>
-            <a
-              class="sale_link_btn etherscan"
-              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </a>
-          </div>
+          ${buildMarketLinksHtml(tokenId)}
         `;
 
         const card = createFrogCard({
@@ -1151,32 +964,13 @@ async function renderOwnedAndStakedFrogs(address) {
       for (const tokenId of stakedIds) {
         const metadata = await fetchFrogMetadata(tokenId);
 
-        const footerHtml = ffStakeMetaHtml(tokenId);
-
         const actionHtml = `
           <div class="recent_sale_links">
             <button class="sale_link_btn" onclick="ffUnstakeFrog(${tokenId})">
               Unstake
             </button>
           </div>
-          <div class="recent_sale_links">
-            <a
-              class="sale_link_btn opensea"
-              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              OpenSea
-            </a>
-            <a
-              class="sale_link_btn etherscan"
-              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </a>
-          </div>
+          ${buildMarketLinksHtml(tokenId)}
         `;
 
         const card = createFrogCard({
@@ -1184,13 +978,13 @@ async function renderOwnedAndStakedFrogs(address) {
           metadata,
           headerLeft: truncateAddress(address || ffCurrentAccount) || '--',
           headerRight: '',
-          footerHtml,
+          footerHtml: '',
           actionHtml
         });
 
         stakedGrid.appendChild(card);
-        ffDecorateStakedFrogCard(tokenId);
         ffEnsureCardHasSalePrice(card, tokenId);
+        // Staking stats will be injected by the observer
       }
     }
   } catch (err) {
@@ -1302,43 +1096,20 @@ async function loadPond() {
         }
       }
 
-      const footerHtml = ffStakeMetaHtml(tokenId);
-
-      const actionHtml = `
-        <div class="recent_sale_links">
-          <a
-            class="sale_link_btn opensea"
-            href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            OpenSea
-          </a>
-          <a
-            class="sale_link_btn etherscan"
-            href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Etherscan
-          </a>
-        </div>
-      `;
+      const actionHtml = buildMarketLinksHtml(tokenId);
 
       const card = createFrogCard({
         tokenId,
         metadata,
         headerLeft: ownerLabel,
         headerRight: '',
-        footerHtml,
+        footerHtml: '',
         actionHtml
       });
 
       container.appendChild(card);
-
-      // Fill staking stats + last sale price
-      ffDecorateStakedFrogCard(tokenId);
       ffEnsureCardHasSalePrice(card, tokenId);
+      // staking stats injected by observer
     }
 
     FF_POND_RENDERED = end;
@@ -1356,45 +1127,6 @@ async function loadPond() {
   } catch (err) {
     console.error('loadPond failed:', err);
     if (statusEl) statusEl.textContent = 'Unable to load the Pond right now.';
-  }
-}
-
-
-// ===================================================
-// Staking decorations (for cards that ARE staked)
-// ===================================================
-async function ffDecorateStakedFrogCard(tokenId) {
-  if (typeof stakingValues !== 'function') {
-    console.warn('stakingValues() not available; skipping staking details');
-    return;
-  }
-  if (!ffEnsureController()) return;
-
-  try {
-    const values = await stakingValues(tokenId);
-    if (!values || values.length < 5) return;
-
-    const [stakedDays, stakedLevel, daysToNext, flyzEarned, stakedDate] = values;
-    const levelNum = ffRomanToArabic(stakedLevel) ?? stakedLevel;
-
-    const lvlEl  = document.getElementById(`stake-level-${tokenId}`);
-    const dateEl = document.getElementById(`stake-date-${tokenId}`);
-    const nextEl = document.getElementById(`stake-next-${tokenId}`);
-    const barEl  = document.getElementById(`stake-progress-bar-${tokenId}`);
-
-    if (lvlEl)  lvlEl.textContent  = `Staked Lvl. ${levelNum}`;
-    if (dateEl) dateEl.textContent = `Staked: ${stakedDate}`;
-    if (nextEl) nextEl.textContent = `Next level in ~${daysToNext} days`;
-
-    const MAX_DAYS  = 41.7;
-    const remaining = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
-    const pct       = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
-
-    if (barEl) {
-      barEl.style.width = `${pct}%`;
-    }
-  } catch (err) {
-    console.warn(`ffDecorateStakedFrogCard failed for token ${tokenId}`, err);
   }
 }
 
@@ -1530,18 +1262,6 @@ function ffEnsureWeb3() {
     console.warn('Failed to init Web3 HTTP provider', err);
     return null;
   }
-}
-
-function ffEnsureController() {
-  const web3 = ffEnsureWeb3();
-  if (!web3 || typeof CONTROLLER_ABI === 'undefined') {
-    console.warn('Cannot init controller: missing Web3 or CONTROLLER_ABI');
-    return null;
-  }
-  if (!window.controller) {
-    window.controller = new web3.eth.Contract(CONTROLLER_ABI, FF_CONTROLLER_ADDRESS);
-  }
-  return window.controller;
 }
 
 async function ffTryContractCall(contract, names, args = []) {
@@ -1703,21 +1423,10 @@ function ffRomanToArabic(roman) {
   return total || null;
 }
 
-// ===================================================
-//  STAKING STATS FIX (drop-in patch)
-//  - Kills old ffAttachStakeMetaIfStaked that used ffWeb3
-//  - Uses read-only Web3 via Alchemy
-//  - Applies correct staking stats to all frog cards
-// ===================================================
 
-// 1) Override the old helper so it no longer touches ffWeb3 / ffEnsureWeb3.
-//    loadRecentActivity will call THIS version instead of the old one.
-async function ffAttachStakeMetaIfStaked(card, tokenId) {
-  // We now attach staking metadata via the observer below.
-  // Keep this as a no-op so it never throws.
-  return;
-}
-
+// ===================================================
+//  Read-only staking helpers (Alchemy HTTP)
+// ===================================================
 async function ffEnsureReadContracts() {
   if (ffReadWeb3 && ffReadCollection && ffReadController) {
     return {
@@ -1750,7 +1459,7 @@ async function ffEnsureReadContracts() {
   };
 }
 
-// 3) New staking values helper (replaces the old ethereum-dapp.js math)
+// Returns normalized staking info or null if not staked
 async function ffGetStakingValues(tokenId) {
   const { web3, collection, controller } = await ffEnsureReadContracts();
   if (!web3 || !collection || !controller) return null;
@@ -1794,7 +1503,7 @@ async function ffGetStakingValues(tokenId) {
 
   const stakedDate = new Date(Number(block.timestamp) * 1000);
 
-  // ---- Match the old ethereum-dapp staking math ----
+  // Match the old ethereum-dapp staking math
   const now = Date.now();
   const stakedHours = Math.floor((now - stakedDate.getTime()) / (1000 * 60 * 60)); // hours
 
@@ -1817,7 +1526,7 @@ async function ffGetStakingValues(tokenId) {
   };
 }
 
-// 4) Insert staking block into a card so it matches the wallet "staked frogs" style
+// Insert staking block into a card so it matches the site style
 function ffInsertStakeMetaIntoCard(card, info) {
   // Remove any previous staking block from this card
   card.querySelectorAll('.stake-meta, .staking-sale-stats').forEach((el) => el.remove());
@@ -1827,7 +1536,7 @@ function ffInsertStakeMetaIntoCard(card, info) {
     return;
   }
 
-  const { stakedTimeDays, levelInt, stakedNext, stakedEarned, formattedDate } = info;
+  const { stakedTimeDays, levelInt, stakedNext, formattedDate } = info;
 
   const propsBlock =
     card.querySelector('.recent_sale_properties') ||
@@ -1837,7 +1546,6 @@ function ffInsertStakeMetaIntoCard(card, info) {
   const wrapper = document.createElement('div');
   wrapper.className = 'stake-meta';
 
-  // Same basic layout as wallet staked frogs: level, dates, progress bar
   const MAX_DAYS   = 41.7;
   const remaining  = Math.max(0, Math.min(MAX_DAYS, Number(stakedNext)));
   const pct        = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
@@ -1858,7 +1566,7 @@ function ffInsertStakeMetaIntoCard(card, info) {
   propsBlock.appendChild(wrapper);
 }
 
-// 5) Patch staking info on any frog cards that appear, using a MutationObserver
+// Patch staking info into a frog card
 async function ffPatchCardStaking(card) {
   if (!card || !(card instanceof HTMLElement)) return;
   if (card.dataset.stakePatched === '1') return;
@@ -1886,6 +1594,8 @@ function ffSetupStakingObserver() {
     document.getElementById('staked-frogs-grid')
   ].filter(Boolean);
 
+  if (!targets.length) return;
+
   const observer = new MutationObserver((mutations) => {
     for (const m of mutations) {
       m.addedNodes &&
@@ -1907,15 +1617,11 @@ function ffSetupStakingObserver() {
   });
 }
 
-// Run the observer once the DOM is ready
-document.addEventListener('DOMContentLoaded', ffSetupStakingObserver);
-
-// Also expose the new staking helper globally so legacy code can use it if needed
+// Expose the new staking helper globally so legacy code can use it if needed
 window.stakingValues = async function (tokenId) {
   const info = await ffGetStakingValues(tokenId);
   if (!info) return [0, 0, 0, 0, ''];
   // Match old return signature: [timeDays, level(roman/int), nextDays, flyz, dateStr]
-  // We return numeric level here; your card code already converts to display text.
   return [
     info.stakedTimeDays,
     info.levelInt,
