@@ -12,27 +12,15 @@
     <!-- HEADER -->
     <header class="site-header">
       <nav class="nav">
-        <!-- Views controlled by JS -->
         <a href="index.html" data-view="collection">Collection</a>
         <a href="index.html" data-view="rarity">Rarity</a>
         <a href="index.html" data-view="pond">Pond</a>
-
-        <!-- NEW Morph tab -->
         <a href="morph.html" data-view="morph" class="active">Morph</a>
-
-        <!-- Wallet tab appears AFTER connect, shows shortened address -->
-        <a
-          href="index.html"
-          data-view="wallet"
-          id="wallet-nav-link"
-          style="display: none;"
-        ></a>
+        <a href="index.html" data-view="wallet" id="wallet-nav-link" style="display: none;"></a>
       </nav>
-
-      <!-- 🔹 Top-right connect button removed (matches index) -->
     </header>
 
-    <!-- DASHBOARD HERO (copied 1:1 from your index) -->
+    <!-- HERO -->
     <section class="hero">
       <div class="hero-main">
         <div class="hero-media">
@@ -50,20 +38,16 @@
           more! All secondary sales are entitled to a <b>5%</b> royalty.
         </p>
         <div class="hero-actions">
-          <button class="btn primary" id="hero-view-collection-btn">
-            View Collection
-          </button>
-          <!-- 🔹 This is now the ONLY connect button -->
-          <button class="btn secondary" id="hero-connect-wallet-btn">
-            Connect Wallet
-          </button>
+          <button class="btn primary" id="hero-view-collection-btn">View Collection</button>
+          <button class="btn secondary" id="hero-connect-wallet-btn">Connect Wallet</button>
         </div>
       </div>
     </section>
 
-    <!-- MAIN DASHBOARD LAYOUT -->
+    <!-- MAIN -->
     <main class="dashboard-main">
-      <!-- MORPH PANEL (same panel structure & styling style as your other views) -->
+
+      <!-- MORPH PANEL -->
       <section
         class="panel dashboard-section"
         id="morph-panel"
@@ -91,10 +75,9 @@
           </div>
         </div>
 
-        <div class="morph-preview-wrap">
-          <div id="morph-preview" class="frog_img_cont"></div>
-          <pre id="morph-json" class="morph-json">// morphed attributes will appear here</pre>
-        </div>
+        <!-- PREVIEW CARD SLOT -->
+        <div id="morph-card-slot" style="margin-top:16px;"></div>
+
       </section>
     </main>
 
@@ -106,18 +89,18 @@
     </footer>
   </div>
 
-  <!-- Web3 for wallet / staking functions -->
+  <!-- Web3 -->
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 
-  <!-- ABIs + legacy staking helpers (used for staking level / progress) -->
+  <!-- ABIs + legacy helpers -->
   <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
   <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
   <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
 
-  <!-- Rarity rankings (must load before site.js) -->
+  <!-- Rarity rankings -->
   <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
 
-  <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
+  <!-- Main site logic -->
   <script src="https://freshfrogs.github.io/assets/site.js"></script>
 
   <!-- Morph logic -->
