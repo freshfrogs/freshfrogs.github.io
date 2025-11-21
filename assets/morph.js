@@ -1,18 +1,4 @@
-/* assets/morph.js — minimal + unbreakable */
-
-// run after DOM
 document.addEventListener("DOMContentLoaded", () => {
-
-  const MAX_SUPPLY = 4040;
-
-  // smart SOURCE_PATH:
-  // - on your live site -> absolute
-  // - locally / custom host -> relative
-  const isGitHubHost = location.hostname.includes("freshfrogs.github.io");
-  window.SOURCE_PATH = window.SOURCE_PATH || (isGitHubHost ? "https://freshfrogs.github.io/assets" : "./assets");
-  const SOURCE_PATH = window.SOURCE_PATH;
-
-  const BUILD_BASE = `${SOURCE_PATH}/frog/build_files`;
 
   const gridEl     = document.getElementById("morph-grid");
   const slotAEl    = document.getElementById("slot-a");
@@ -30,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedB = null;
   let currentCards = [];
 
-  // utils
+  // ---------- utils
   const randInt = (min, max) => Math.floor(Math.random()*(max-min+1))+min;
 
   function pickUnique(count, min, max){
@@ -39,42 +25,107 @@ document.addEventListener("DOMContentLoaded", () => {
     return [...s];
   }
 
-  const frogImgUrl = id => `${SOURCE_PATH}/frog/${id}.png`;
-
   async function fetchMetadata(id){
-    const url = `${SOURCE_PATH}/frog/json/${id}.json`;
-    const res = await fetch(url);
+    const res = await fetch(`/frog/json/${id}.json`);
     if(!res.ok) throw new Error(`Metadata ${id} not found`);
     return res.json();
   }
 
-  // forced-visible cards
-  function createCard(id){
+  function normalizeMetadata(metadata){
+    if (!metadata || typeof metadata !== "object") return { attributes: [] };
+    const attrs = Array.isArray(metadata.attributes) ? metadata.attributes : [];
+    return { attributes: attrs };
+  }
+
+  function hasUsableMetadata(metadata){
+    return Array.isArray(metadata?.attributes) && metadata.attributes.length;
+  }
+
+  function escapeHtml(str){
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function buildTraitsHtml(metadata){
+    const attributes = Array.isArray(metadata?.attributes) ? metadata.attributes : [];
+    if (!attributes.length) return '<p class="frog-attr-text">Metadata unavailable</p>';
+
+    return attributes.map((attr) => {
+      if (!attr?.trait_type) return '';
+      const type  = String(attr.trait_type);
+      const value = attr.value != null ? String(attr.value) : '';
+      return `
+        <p class="frog-attr-text"
+           data-trait-type="${escapeHtml(type)}"
+           data-trait-value="${escapeHtml(value)}">
+          ${escapeHtml(type)}: ${escapeHtml(value)}
+        </p>`;
+    }).filter(Boolean).join('');
+  }
+
+  // ---------- FrogCard clone (matches your createFrogCard look)
+  function createMorphCard(tokenId, metadata){
+    const frogName = `Frog #${tokenId}`;
+    const traitsHtml = buildTraitsHtml(metadata);
+    const imgContainerId = `frog-img-${tokenId}-${Math.random().toString(16).slice(2)}`;
+
     const card = document.createElement("div");
-    card.className = "panel morph-card";
-    card.dataset.tokenId = id;
+    card.className = "recent_sale_card";
+    card.dataset.tokenId = tokenId;
+    card.dataset.imgContainerId = imgContainerId;
+
     card.innerHTML = `
-      <img src="${frogImgUrl(id)}" alt="Frog #${id}" loading="lazy">
-      <div class="title">Frog #${id}</div>
-      <div class="tiny-muted">Click to select</div>
+      <strong class="sale_card_title">--</strong>
+      <strong class="sale_card_price">--</strong>
+      <div style="clear: both;"></div>
+
+      <div id="${imgContainerId}" class="frog_img_cont">
+        <img
+          src="/frog/${tokenId}.png"
+          class="recent_sale_img"
+          alt="Frog #${tokenId}"
+          loading="lazy"
+        />
+      </div>
+
+      <div class="recent_sale_traits">
+        <strong class="sale_card_title">${frogName}</strong><br>
+        <div class="recent_sale_properties">
+          ${traitsHtml}
+        </div>
+      </div>
     `;
-    card.addEventListener("click", () => onSelect(id));
+
+    card.addEventListener("click", () => onSelect(tokenId));
     return card;
   }
 
-  function renderGrid(){
+  // ---------- grid render
+  async function renderGrid(){
     gridEl.innerHTML = "";
     currentCards = [];
 
-    pickUnique(20, 1, MAX_SUPPLY).forEach(id => {
-      const card = createCard(id);
+    const ids = pickUnique(20, 1, 4040);
+
+    for (const id of ids){
+      let md = {};
+      try {
+        md = normalizeMetadata(await fetchMetadata(id));
+      } catch (e){
+        md = { attributes: [] };
+      }
+
+      const card = createMorphCard(id, md);
       currentCards.push(card);
       gridEl.appendChild(card);
-    });
+    }
 
     syncUI();
   }
 
+  // ---------- selection
   function onSelect(id){
     if (selectedA === id) selectedA = null;
     else if (selectedB === id) selectedB = null;
@@ -95,35 +146,35 @@ document.addEventListener("DOMContentLoaded", () => {
     slotBTxt.textContent = selectedB ? `Frog #${selectedB}` : "None selected";
 
     slotAEl.innerHTML = selectedA
-      ? `<img src="${frogImgUrl(selectedA)}" alt="Alpha"><div>Alpha – #${selectedA}</div>`
+      ? `<img src="/frog/${selectedA}.png" alt="Alpha"><div>Alpha – #${selectedA}</div>`
       : `<div><div class="tiny-muted">Alpha</div><div>None selected</div></div>`;
 
     slotBEl.innerHTML = selectedB
-      ? `<img src="${frogImgUrl(selectedB)}" alt="Bravo"><div>Bravo – #${selectedB}</div>`
+      ? `<img src="/frog/${selectedB}.png" alt="Bravo"><div>Bravo – #${selectedB}</div>`
       : `<div><div class="tiny-muted">Bravo</div><div>None selected</div></div>`;
 
     morphBtn.disabled = !(selectedA && selectedB);
   }
 
-  // preview
+  // ---------- preview helpers
   function clearPreview(){
     previewEl.innerHTML = `<div class="tiny-muted">Select two frogs to preview</div>`;
   }
 
-  function showFallback(a, b){
+  function showFallback(a,b){
     previewEl.innerHTML = `
       <div class="preview-fallback">
-        <img src="${frogImgUrl(a)}" alt="Alpha">
-        <img src="${frogImgUrl(b)}" alt="Bravo">
+        <img src="/frog/${a}.png" alt="Alpha">
+        <img src="/frog/${b}.png" alt="Bravo">
       </div>
       <div class="tiny-muted" style="margin-top:6px;text-align:center;">
-        (Layers missing — showing bases)
+        (Some layers missing — showing bases)
       </div>
     `;
   }
 
   function loadImg(url){
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.onload = () => resolve(img);
@@ -132,12 +183,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  async function resolveTraitLayer(type, val){
+  async function resolveLayer(type, value){
     const safeType = String(type).replace(/^\/+/, "");
-    const safeVal  = String(val).replace(/^\/+/, "");
-    const url = `${BUILD_BASE}/${safeType}/${safeVal}.png`;
+    const safeVal  = String(value).replace(/^\/+/, "");
+    const url = `/frog/build_files/${safeType}/${safeVal}.png`;
     const img = await loadImg(url);
-    return img ? {url, img} : null;
+    return img ? { url, img } : null;
   }
 
   async function renderComposite(layers){
@@ -159,92 +210,130 @@ document.addEventListener("DOMContentLoaded", () => {
     previewEl.innerHTML = "";
     canvas.className = "preview-canvas";
     previewEl.appendChild(canvas);
+
     return true;
   }
 
-  // metamorph rules
-  async function metamorph_build(a, b){
+  // ---------- metamorph rules (from your old function)
+  async function metamorph_build(token_a, token_b){
     clearPreview();
     jsonEl.textContent = "";
 
-    const ma = {Frog:"",SpecialFrog:"",Trait:"",Accessory:"",Eyes:"",Hat:"",Mouth:""};
-    const mb = {Frog:"",SpecialFrog:"",Trait:"",Accessory:"",Eyes:"",Hat:"",Mouth:""};
-    const mc = {Frog:"",SpecialFrog:"",Subset:"",Trait:"",Accessory:"",Eyes:"",Hat:"",Mouth:""};
+    const metadata_a = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
+    const metadata_b = { Frog:"", SpecialFrog:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
+    const metadata_c = { Frog:"", SpecialFrog:"", Subset:"", Trait:"", Accessory:"", Eyes:"", Hat:"", Mouth:"" };
 
     let aRaw, bRaw;
     try {
-      aRaw = await fetchMetadata(a);
-      bRaw = await fetchMetadata(b);
+      aRaw = await fetchMetadata(token_a);
+      bRaw = await fetchMetadata(token_b);
     } catch (e){
       console.error(e);
-      showFallback(a,b);
+      showFallback(token_a, token_b);
       return;
     }
 
-    aRaw.attributes.forEach(x => ma[x.trait_type]=x.value);
-    bRaw.attributes.forEach(x => mb[x.trait_type]=x.value);
+    aRaw.attributes.forEach(attr => metadata_a[attr.trait_type] = attr.value);
+    bRaw.attributes.forEach(attr => metadata_b[attr.trait_type] = attr.value);
 
-    if (ma.SpecialFrog!=="" || mb.SpecialFrog!==""){
-      if (ma.SpecialFrog!=="" && mb.SpecialFrog!==""){
-        mb.SpecialFrog = ma.SpecialFrog+"/SpecialFrog/"+mb.SpecialFrog;
-        mb.Trait="";
-      } else if (mb.Frog!==""){
-        mb.Trait=`SpecialFrog/${ma.SpecialFrog}/${mb.Trait}`;
-        mb.SpecialFrog=`${ma.SpecialFrog}/${mb.Frog}`;
-        mb.Frog="";
-      } else if (ma.Frog!==""){
-        mb.Trait=`SpecialFrog/${mb.SpecialFrog}/${ma.Trait}`;
-        ma.SpecialFrog=mb.SpecialFrog;
-        mb.SpecialFrog=`${mb.SpecialFrog}/${ma.Frog}`;
-        ma.Frog="";
+    // Special frogs merge logic
+    if (metadata_a.SpecialFrog !== "" || metadata_b.SpecialFrog !== "") {
+      if (metadata_a.SpecialFrog !== "" && metadata_b.SpecialFrog !== "") {
+        metadata_b.SpecialFrog = metadata_a.SpecialFrog + "/SpecialFrog/" + metadata_b.SpecialFrog;
+        metadata_b.Trait = "";
+      } else if (metadata_b.Frog !== "") {
+        metadata_b.Trait = "SpecialFrog/" + metadata_a.SpecialFrog + "/" + metadata_b.Trait;
+        metadata_b.SpecialFrog = metadata_a.SpecialFrog + "/" + metadata_b.Frog;
+        metadata_b.Frog = "";
+      } else if (metadata_a.Frog !== "") {
+        metadata_b.Trait = "SpecialFrog/" + metadata_b.SpecialFrog + "/" + metadata_a.Trait;
+        metadata_a.SpecialFrog = metadata_b.SpecialFrog;
+        metadata_b.SpecialFrog = metadata_b.SpecialFrog + "/" + metadata_a.Frog;
+        metadata_a.Frog = "";
       }
     }
 
-    if (ma.Frog!=="") mc.Frog=mb.Frog;
-    else if (ma.SpecialFrog!=="") mc.SpecialFrog="/bottom/"+ma.SpecialFrog;
+    if (metadata_a.Frog !== "") metadata_c.Frog = metadata_b.Frog;
+    else if (metadata_a.SpecialFrog !== "") metadata_c.SpecialFrog = "/bottom/" + metadata_a.SpecialFrog;
 
-    if (mb.Frog!=="") mc.Subset=ma.Frog;
-    else if (mb.SpecialFrog!=="") mc.SpecialFrog=mb.SpecialFrog;
+    if (metadata_b.Frog !== "") metadata_c.Subset = metadata_a.Frog;
+    else if (metadata_b.SpecialFrog !== "") metadata_c.SpecialFrog = metadata_b.SpecialFrog;
 
-    mc.Trait = mb.Trait || ma.Trait || "";
-    mc.Accessory = ma.Accessory || mb.Accessory || "";
-    mc.Eyes = ma.Eyes || mb.Eyes || "";
-    mc.Hat = ma.Hat || mb.Hat || "";
-    mc.Mouth = ma.Mouth || mb.Mouth || "";
+    metadata_c.Trait     = metadata_b.Trait     || metadata_a.Trait     || "";
+    metadata_c.Accessory = metadata_a.Accessory || metadata_b.Accessory || "";
+    metadata_c.Eyes      = metadata_a.Eyes      || metadata_b.Eyes      || "";
+    metadata_c.Hat       = metadata_a.Hat       || metadata_b.Hat       || "";
+    metadata_c.Mouth     = metadata_a.Mouth     || metadata_b.Mouth     || "";
 
-    const out={attributes:[]};
-    const q=[];
+    const out = { attributes: [] };
+    const traitQueue = [];
 
-    if (mc.Frog!==""){ out.attributes.push({trait_type:"Frog",value:mc.Frog}); q.push(["Frog",mc.Frog]); }
-    else if (mc.SpecialFrog!==""){ out.attributes.push({trait_type:"SpecialFrog",value:mc.SpecialFrog}); q.push(["SpecialFrog",mc.SpecialFrog]); }
+    // Order matches your build_trait stacking
+    if (metadata_c.Frog !== "") {
+      out.attributes.push({ trait_type:"Frog", value: metadata_c.Frog });
+      traitQueue.push(["Frog", metadata_c.Frog]);
+    } else if (metadata_c.SpecialFrog !== "") {
+      out.attributes.push({ trait_type:"SpecialFrog", value: metadata_c.SpecialFrog });
+      traitQueue.push(["SpecialFrog", metadata_c.SpecialFrog]);
+    }
 
-    if (mc.Subset!==""){ out.attributes.push({trait_type:"Subset",value:mc.Subset}); q.push(["Frog/subset",mc.Subset]); }
-    if (mc.Trait!==""){ out.attributes.push({trait_type:"Trait",value:mc.Trait}); q.push(["Trait",mc.Trait]); }
-    if (mc.Accessory!==""){ out.attributes.push({trait_type:"Accessory",value:mc.Accessory}); q.push(["Accessory",mc.Accessory]); }
-    if (mc.Eyes!==""){ out.attributes.push({trait_type:"Eyes",value:mc.Eyes}); q.push(["Eyes",mc.Eyes]); }
-    if (mc.Hat!==""){ out.attributes.push({trait_type:"Hat",value:mc.Hat}); q.push(["Hat",mc.Hat]); }
-    if (mc.Mouth!==""){ out.attributes.push({trait_type:"Mouth",value:mc.Mouth}); q.push(["Mouth",mc.Mouth]); }
+    if (metadata_c.Subset !== "") {
+      out.attributes.push({ trait_type:"Subset", value: metadata_c.Subset });
+      // NOTE: your folder is Frog/subSet/ (capital S)
+      traitQueue.push(["Frog/subSet", metadata_c.Subset]);
+    }
+
+    if (metadata_c.Trait !== "") {
+      out.attributes.push({ trait_type:"Trait", value: metadata_c.Trait });
+      traitQueue.push(["Trait", metadata_c.Trait]);
+    }
+    if (metadata_c.Accessory !== "") {
+      out.attributes.push({ trait_type:"Accessory", value: metadata_c.Accessory });
+      traitQueue.push(["Accessory", metadata_c.Accessory]);
+    }
+    if (metadata_c.Eyes !== "") {
+      out.attributes.push({ trait_type:"Eyes", value: metadata_c.Eyes });
+      traitQueue.push(["Eyes", metadata_c.Eyes]);
+    }
+    if (metadata_c.Hat !== "") {
+      out.attributes.push({ trait_type:"Hat", value: metadata_c.Hat });
+      traitQueue.push(["Hat", metadata_c.Hat]);
+    }
+    if (metadata_c.Mouth !== "") {
+      out.attributes.push({ trait_type:"Mouth", value: metadata_c.Mouth });
+      traitQueue.push(["Mouth", metadata_c.Mouth]);
+    }
 
     jsonEl.textContent = JSON.stringify(out.attributes, null, 2);
 
-    const layers=[];
-    for (const [t,v] of q) layers.push(await resolveTraitLayer(t,v));
+    const layers = [];
+    for (const [type,val] of traitQueue){
+      layers.push(await resolveLayer(type, val));
+    }
 
     const ok = await renderComposite(layers);
-    if (!ok) showFallback(a,b);
+    if (!ok) showFallback(token_a, token_b);
+
+    return out;
   }
 
-  // buttons
+  // ---------- buttons
   morphBtn.addEventListener("click", () => {
     if (selectedA && selectedB) metamorph_build(selectedA, selectedB);
   });
+
   shuffleBtn.addEventListener("click", () => {
-    selectedA=null; selectedB=null;
-    renderGrid(); clearPreview(); jsonEl.textContent="";
+    selectedA = null; selectedB = null;
+    renderGrid();
+    clearPreview();
+    jsonEl.textContent = "";
   });
+
   clearBtn.addEventListener("click", () => {
-    selectedA=null; selectedB=null;
-    syncUI(); clearPreview(); jsonEl.textContent="";
+    selectedA = null; selectedB = null;
+    syncUI();
+    clearPreview();
+    jsonEl.textContent = "";
   });
 
   // init

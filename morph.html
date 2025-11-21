@@ -8,7 +8,7 @@
   <link rel="shortcut icon" type="image/x-icon" href="https://freshfrogs.github.io/assets/blackWhite.png">
 
   <style>
-    /* HARD FORCED VISIBILITY so your CSS can't collapse it */
+    /* Only morph-page-specific layout. Does not touch main site. */
     .morph-root { max-width: 1250px; margin: 0 auto; padding: 10px; }
     .morph-page {
       display:grid;
@@ -17,8 +17,6 @@
       align-items:start;
     }
     @media (max-width: 1000px){ .morph-page{ grid-template-columns:1fr; } }
-
-    .panel { border-radius:12px; padding:10px; } /* uses your panel look if defined */
 
     .morph-slots{
       display:grid;
@@ -41,31 +39,12 @@
 
     .morph-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(165px, 1fr));
+      grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
       gap:10px;
       margin-top:6px;
     }
 
-    /* forced-visible cards */
-    .morph-card{
-      padding:6px;
-      border-radius:12px;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      cursor:pointer;
-      user-select:none;
-      min-height:180px;
-    }
-    .morph-card img{
-      width:100%;
-      height:auto;
-      image-rendering:pixelated;
-      display:block;
-      border-radius:8px;
-    }
-    .morph-card .title{ font-weight:700; }
-    .morph-card.morph-selected{
+    .morph-selected{
       outline:3px solid currentColor;
       outline-offset:2px;
       transform: translateY(-1px);
@@ -96,7 +75,6 @@
 </head>
 
 <body class="layout-4">
-
   <div class="morph-root">
     <section class="panel">
       <div style="display:flex;align-items:end;justify-content:space-between;gap:10px;">
@@ -148,6 +126,8 @@
         <section>
           <h3 style="margin:0;">Random Frogs</h3>
           <div class="tiny-muted">Click two cards to fuse.</div>
+
+          <!-- uses same card class names as site.js -->
           <div id="morph-grid" class="morph-grid"></div>
         </section>
 
