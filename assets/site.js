@@ -257,7 +257,6 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
   if (!card) return;
 
   // Try to make sure read-only contracts & helpers exist
-  // (no-op if they are already initialised)
   try {
     await ffEnsureReadContracts();
   } catch (e) {
@@ -345,8 +344,28 @@ function ffProcessPendingStakeMeta() {
   }
 }
 
-// Try a few times on startup to initialise read-only contracts
-// and then decorate ALL existing cards (including any that were queued)
+// Refresh staking info on all already-rendered frog cards (single implementation)
+async function ffRefreshAllStakeMeta() {
+  if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
+
+  const cards = document.querySelectorAll('.recent_sale_card');
+  for (const card of cards) {
+    const rawId = card.dataset.tokenId;
+    const tokenId = parseTokenId(rawId);
+    if (tokenId == null) continue;
+
+    // Fire and forget; no need to await every single one serially
+    ffAttachStakeMetaIfStaked(card, tokenId);
+  }
+}
+
+// Backwards-compatible alias used in connectWallet()
+function ffRefreshStakeMetaForAllCards() {
+  ffRefreshAllStakeMeta();
+}
+
+// Boot-time watcher that tries a few times to set up read-only contracts
+// and then decorates all cards + flushes any queued ones.
 function ffBootStakeMetaWatcher() {
   let attempts = 0;
   const maxAttempts = 5;
@@ -377,27 +396,6 @@ function ffBootStakeMetaWatcher() {
 
   tick();
 }
-
-// Refresh staking info on all already-rendered frog cards (single implementation)
-async function ffRefreshAllStakeMeta() {
-  if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
-
-  const cards = document.querySelectorAll('.recent_sale_card');
-  for (const card of cards) {
-    const rawId = card.dataset.tokenId;
-    const tokenId = parseTokenId(rawId);
-    if (tokenId == null) continue;
-
-    // Fire and forget; no need to await every single one serially
-    ffAttachStakeMetaIfStaked(card, tokenId);
-  }
-}
-
-// Backwards-compatible alias used in connectWallet()
-function ffRefreshStakeMetaForAllCards() {
-  ffRefreshAllStakeMeta();
-}
-
 
 // ------------------------
 // Token / rarity helpers
@@ -532,7 +530,7 @@ function createFrogCard({
       ${footerHtml || ''}
       ${actionHtml || ''}
     </div>
-  `;
+  ";
 
   if (typeof ffBuildLayeredFrogImage === 'function') {
     ffBuildLayeredFrogImage(tokenId, imgContainerId).catch((err) => {
@@ -1516,7 +1514,6 @@ async function ffEnsureReadContracts() {
         ffWeb3 = new Web3(window.ethereum);
       } else if (typeof Web3 !== 'undefined') {
         // Optional: fallback RPC for read-only access when no wallet is present.
-        // If you REALLY don't want to use Alchemy here, you can delete this branch.
         ffWeb3 = new Web3(`https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`);
       }
       if (!ffWeb3) {
