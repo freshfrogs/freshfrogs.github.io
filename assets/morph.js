@@ -59,8 +59,8 @@
         const address = getConnectedAddress();
 
         // ✅ Call the test helper ONLY when we have real args
-        if (typeof SaveFrogMorphTest === "function") {
-            SaveFrogMorphTest({
+        if (typeof saveCurrentMorph === "function") {
+            saveCurrentMorph({
             address,
             frogA: tokenA,
             frogB: tokenB,
