@@ -301,8 +301,8 @@
     signature = null    // optional signature string
     } = {}) {
     // Basic guards so you notice missing stuff in console
-    if (!address) console.warn("[SaveFrogMorphTest] Missing address");
-    if (frogA == null || frogB == null) console.warn("[SaveFrogMorphTest] Missing frogA/frogB");
+    if (!address) console.warn("[saveCurrentMorph] Missing address");
+    if (frogA == null || frogB == null) console.warn("[saveCurrentMorph] Missing frogA/frogB");
 
     // Normalize traits into attributes[] your FrogCards expect
     const attributes = (newTraits || []).map(t => ({
