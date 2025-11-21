@@ -24,7 +24,7 @@ const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 // Morph storage Worker (Cloudflare Worker KV)
-const FF_MORPH_WORKER_URL = 'https://freshfrogs-morphs.danielssouthworth.workers.dev/';
+const FF_MORPH_WORKER_URL = 'https://freshfrogs-morphs.danielssouthworth.workers.dev';
 
 // Activity mode (sales vs mints) for "Collection" panel
 let FF_ACTIVITY_MODE = 'sales'; // 'sales' or 'mints'
