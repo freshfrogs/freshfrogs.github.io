@@ -1,195 +1,265 @@
 /* assets/morph.js
    FreshFrogs Morph / Metamorph logic
-   - Buttons live at bottom of preview card
-   - Generate = randomize A/B + preview
-   - Morph = sign + save current preview via SaveFrogMorph()
-   - Auto-generate+preview on page load
+   - Preview inside FrogCard
+   - NO JSON output
+   - Name line bottom-left with "/"
+   - Parent A background zoomed
+   - Preview button can either:
+       A) use manual inputs (default)
+       B) randomize owned+staked frogs if button says "Generate"
+   - Morph button (if labeled / data-mode = "morph") saves via saveCurrentMorph()
+     using parameters exactly as required (function not edited)
 */
 
 (function () {
-  // stash last build so Morph button can save it
-  let LAST_MORPH = null;
+  // ------------------------
+  // Module state
+  // ------------------------
+  let LAST_PAIR = null;      // { tokenA, tokenB }
+  let LAST_BUILD = null;     // { newTraits, previewUrl }
+  let ELIGIBLE_IDS = [];     // owned + staked for user
 
   document.addEventListener('DOMContentLoaded', () => {
-    ffWireButtons();
-    ffAutoGenerateOnLoad();
+    ffInitMorphPanel();
 
     const connectBtn = document.getElementById('hero-connect-wallet-btn');
     if (connectBtn && typeof connectWallet === 'function') {
-      connectBtn.addEventListener('click', connectWallet);
+      connectBtn.addEventListener('click', async () => {
+        await connectWallet();
+        // refresh eligible list after connect
+        ELIGIBLE_IDS = await ffGetEligibleTokenIds();
+      });
     }
+
+    // preload eligible list if already connected
+    ffGetEligibleTokenIds().then(ids => {
+      ELIGIBLE_IDS = ids;
+
+      // Auto-generate on load IF we have >= 2 eligible frogs
+      if (ids.length >= 2) {
+        ffGenerateRandomMorph();
+      } else {
+        const statusEl = document.getElementById('morph-status');
+        if (statusEl) {
+          statusEl.textContent =
+            'Connect wallet to generate a morph from your owned/staked frogs.';
+        }
+      }
+    });
   });
 
-  function ffWireButtons() {
-    const genBtn  = document.getElementById('morph-generate-btn');
-    const saveBtn = document.getElementById('morph-save-btn');
-
-    genBtn?.addEventListener('click', async () => {
-      const { a, b } = ffPickTwoRandomTokens();
-      ffSetInputs(a, b);
-      LAST_MORPH = await ffMetamorphBuild(a, b);
-    });
-
-    saveBtn?.addEventListener('click', async () => {
-      await FrogMorph();
-    });
-  }
-
-  function ffAutoGenerateOnLoad() {
-    const { a, b } = ffPickTwoRandomTokens();
-    ffSetInputs(a, b);
-    ffMetamorphBuild(a, b).then(res => {
-      LAST_MORPH = res;
-    });
-  }
-
-  // ------------------------
-  // FrogMorph = SIGN + SAVE wrapper
-  // ------------------------
-  async function FrogMorph() {
+  function ffInitMorphPanel() {
+    const aInput   = document.getElementById('morph-a-input');
+    const bInput   = document.getElementById('morph-b-input');
+    const runBtn   = document.getElementById('morph-run-btn');
+    const clearBtn = document.getElementById('morph-clear-btn');
     const statusEl = document.getElementById('morph-status');
 
-    if (!LAST_MORPH) {
-      if (statusEl) statusEl.textContent = 'Nothing to save yet — click Generate first.';
-      return;
-    }
+    if (!runBtn) return;
 
-    if (typeof SaveFrogMorph !== 'function') {
-      console.warn('SaveFrogMorph() not found on window. Preview built but not saved.');
-      if (statusEl) statusEl.textContent = 'Save function not loaded.';
-      return;
-    }
+    runBtn.addEventListener('click', async () => {
+      // Decide mode based on data-mode or visible label
+      const mode =
+        (runBtn.dataset.mode || runBtn.textContent || '').trim().toLowerCase();
 
-    const { tokenA, tokenB, newTraits, previewUrl } = LAST_MORPH;
-
-    // Ensure numeric token IDs
-    const frogA = (typeof parseTokenId === 'function') ? parseTokenId(tokenA) : Number(tokenA);
-    const frogB = (typeof parseTokenId === 'function') ? parseTokenId(tokenB) : Number(tokenB);
-
-    if (frogA == null || frogB == null || !Number.isFinite(frogA) || !Number.isFinite(frogB)) {
-      console.warn('Bad morph token IDs:', tokenA, tokenB);
-      if (statusEl) statusEl.textContent = 'Invalid token IDs for morph.';
-      return;
-    }
-
-    const address = ffGetConnectedAddress();
-    if (!address) {
-      console.warn('No connected wallet address found.');
-      if (statusEl) statusEl.textContent = 'Connect your wallet to save a morph.';
-      return;
-    }
-
-    // ---- Ask user to sign intent ----
-    if (statusEl) statusEl.textContent = 'Please sign the morph request in your wallet…';
-
-    let signed = null;
-    try {
-      signed = await ffSignMorphIntent(address, frogA, frogB);
-      if (!signed?.signature) throw new Error('Signature missing');
-    } catch (err) {
-      console.warn('Morph signature cancelled/failed:', err);
-      if (statusEl) statusEl.textContent = 'Signature cancelled. Morph not saved.';
-      return; // require signature for save
-    }
-
-    // ---- Save to Worker/KV ----
-    if (statusEl) statusEl.textContent = `Saving morph for #${frogA} / #${frogB}…`;
-
-    try {
-      await SaveFrogMorph({
-        address,
-        frogA,
-        frogB,
-        newTraits,
-        previewUrl,
-        value: signed.value,
-        signature: signed.signature
-      });
-
-      if (statusEl) {
-        statusEl.textContent =
-          `✅ Morph saved! It will show up with your owned frogs the next time you open Wallet.`;
+      if (mode === 'generate') {
+        await ffGenerateRandomMorph();
+        return;
       }
-    } catch (err) {
-      console.error('FrogMorph save failed:', err);
-      if (statusEl) statusEl.textContent = 'Save failed. Check console.';
+
+      // Default: manual preview from inputs
+      const tokenA = parseInt(aInput?.value, 10);
+      const tokenB = parseInt(bInput?.value, 10);
+
+      if (!Number.isInteger(tokenA) || !Number.isInteger(tokenB)) {
+        if (statusEl) statusEl.textContent = 'Enter two valid token IDs.';
+        return;
+      }
+      if (tokenA === tokenB) {
+        if (statusEl) statusEl.textContent = 'Pick two different frogs.';
+        return;
+      }
+
+      LAST_PAIR = { tokenA, tokenB };
+      LAST_BUILD = await ffMetamorphBuild(tokenA, tokenB);
+    });
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', async () => {
+        const mode =
+          (clearBtn.dataset.mode || clearBtn.textContent || '').trim().toLowerCase();
+
+        // If this button is acting as "Morph", then save current preview
+        if (mode === 'morph') {
+          await ffSaveLastMorph();
+          return;
+        }
+
+        // Default: clear UI
+        if (aInput) aInput.value = '';
+        if (bInput) bInput.value = '';
+
+        const slot = document.getElementById('morph-card-slot');
+        if (slot) slot.innerHTML = '';
+
+        LAST_PAIR = null;
+        LAST_BUILD = null;
+
+        if (statusEl) {
+          statusEl.textContent =
+            'Pick two Frogs to preview a metamorph. This does not mint — it only builds the combo preview + metadata list.';
+        }
+      });
     }
   }
 
-  window.FrogMorph = FrogMorph;
+  // ------------------------
+  // Randomize from owned+staked
+  // ------------------------
 
-  // ------------------------
-  // Wallet signature (EIP-712 typed data)
-  // ------------------------
-  async function ffSignMorphIntent(address, frogA, frogB) {
-    if (!window.ethereum?.request) {
-      throw new Error('No wallet found');
+  async function ffGenerateRandomMorph() {
+    const statusEl = document.getElementById('morph-status');
+
+    // refresh eligible list each time in case wallet changed
+    ELIGIBLE_IDS = await ffGetEligibleTokenIds();
+
+    if (ELIGIBLE_IDS.length < 2) {
+      if (statusEl) {
+        statusEl.textContent =
+          'You need at least 2 owned or staked frogs to generate a morph.';
+      }
+      return;
     }
 
-    // chainId for domain
-    let chainId = 1;
+    const { tokenA, tokenB } = ffPickRandomPair(ELIGIBLE_IDS);
+    LAST_PAIR = { tokenA, tokenB };
+
+    // If you still have inputs, keep them in sync visually
+    const aInput = document.getElementById('morph-a-input');
+    const bInput = document.getElementById('morph-b-input');
+    if (aInput) aInput.value = tokenA;
+    if (bInput) bInput.value = tokenB;
+
+    LAST_BUILD = await ffMetamorphBuild(tokenA, tokenB);
+  }
+
+  function ffPickRandomPair(ids) {
+    const aIdx = Math.floor(Math.random() * ids.length);
+    let bIdx = Math.floor(Math.random() * ids.length);
+    if (ids.length > 1) {
+      while (bIdx === aIdx) bIdx = Math.floor(Math.random() * ids.length);
+    }
+    return { tokenA: ids[aIdx], tokenB: ids[bIdx] };
+  }
+
+  async function ffGetEligibleTokenIds() {
+    const address = ffGetConnectedAddress();
+    if (!address) return [];
+
+    let ownedIds = [];
+    let stakedIds = [];
+
     try {
-      const chainHex = await ethereum.request({ method: 'eth_chainId' });
-      chainId = parseInt(chainHex, 16) || 1;
-    } catch {}
+      if (typeof ffFetchOwnedFrogs === 'function') {
+        const ownedNfts = await ffFetchOwnedFrogs(address);
+        ownedIds = ownedNfts
+          .map(n => ffParseTokenId(n.tokenId || n.id?.tokenId))
+          .filter(v => v != null);
+      }
+    } catch (e) {
+      console.warn('ffGetEligibleTokenIds: owned fetch failed', e);
+    }
 
-    const nonce = Math.floor(Math.random() * 1e9);
-    const timestamp = Math.floor(Date.now() / 1000);
+    try {
+      if (typeof ffFetchStakedTokenIds === 'function') {
+        stakedIds = (await ffFetchStakedTokenIds(address))
+          .map(v => ffParseTokenId(v))
+          .filter(v => v != null);
+      }
+    } catch (e) {
+      console.warn('ffGetEligibleTokenIds: staked fetch failed', e);
+    }
 
-    const domain = {
-      name: "FreshFrogs Morph Test",
-      version: "1",
-      chainId,
-      verifyingContract: (typeof FF_COLLECTION_ADDRESS !== 'undefined')
-        ? FF_COLLECTION_ADDRESS
-        : "0x0000000000000000000000000000000000000000"
-    };
+    const set = new Set([...ownedIds, ...stakedIds]);
+    return Array.from(set).sort((a, b) => a - b);
+  }
 
-    const types = {
-      EIP712Domain: [
-        { name: "name", type: "string" },
-        { name: "version", type: "string" },
-        { name: "chainId", type: "uint256" },
-        { name: "verifyingContract", type: "address" }
-      ],
-      MorphIntent: [
-        { name: "user", type: "address" },
-        { name: "frogA", type: "uint256" },
-        { name: "frogB", type: "uint256" },
-        { name: "nonce", type: "uint256" },
-        { name: "timestamp", type: "uint256" }
-      ]
-    };
+  function ffParseTokenId(raw) {
+    if (raw == null) return null;
+    if (typeof raw === 'number') return raw;
 
-    const value = {
-      user: address,
-      frogA,
-      frogB,
-      nonce,
-      timestamp
-    };
+    // prefer your global parseTokenId if it exists
+    if (typeof parseTokenId === 'function') {
+      const v = parseTokenId(raw);
+      if (v != null) return v;
+    }
 
-    const typedData = JSON.stringify({
-      domain,
-      types,
-      primaryType: "MorphIntent",
-      message: value
-    });
+    // hex string -> int
+    if (typeof raw === 'string') {
+      const s = raw.startsWith('0x') ? raw : `0x${raw}`;
+      try {
+        const v = parseInt(s, 16);
+        return Number.isFinite(v) ? v : null;
+      } catch {}
+      try {
+        const v2 = parseInt(raw, 10);
+        return Number.isFinite(v2) ? v2 : null;
+      } catch {}
+    }
 
-    const signature = await ethereum.request({
-      method: 'eth_signTypedData_v4',
-      params: [address, typedData]
-    });
+    // object w tokenId
+    if (typeof raw === 'object') {
+      return ffParseTokenId(raw.tokenId ?? raw.id?.tokenId);
+    }
 
-    return { value, signature };
+    return null;
+  }
+
+  // ------------------------
+  // Save wrapper (uses LAST_PAIR)
+  // ------------------------
+
+  async function ffSaveLastMorph() {
+    const statusEl = document.getElementById('morph-status');
+
+    if (!LAST_PAIR?.tokenA || !LAST_PAIR?.tokenB || !LAST_BUILD) {
+      if (statusEl) statusEl.textContent = 'Nothing to save yet. Generate a preview first.';
+      return;
+    }
+
+    const { tokenA, tokenB } = LAST_PAIR;
+    const { newTraits, previewUrl } = LAST_BUILD;
+    const address = ffGetConnectedAddress();
+
+    if (typeof saveCurrentMorph === 'function') {
+      try {
+        await saveCurrentMorph(
+          address,
+          tokenA,
+          tokenB,
+          newTraits,
+          previewUrl,
+          null,
+          null
+        );
+        if (statusEl) statusEl.textContent = `Saved morph for #${tokenA} / #${tokenB}`;
+      } catch (e) {
+        console.error('saveCurrentMorph failed:', e);
+        if (statusEl) statusEl.textContent = `Preview ready (save failed — check console)`;
+      }
+    } else {
+      console.warn('saveCurrentMorph() not found on window. Preview built but not saved.');
+      if (statusEl) statusEl.textContent = `Preview ready (save function not loaded)`;
+    }
   }
 
   // ------------------------
   // Morph Core Logic
   // ------------------------
+
   async function ffMetamorphBuild(tokenA, tokenB) {
     const statusEl = document.getElementById('morph-status');
-    const card = document.querySelector('#morph-card-slot .recent_sale_card');
+    const slot = document.getElementById('morph-card-slot');
 
     try {
       const basePath =
@@ -199,13 +269,24 @@
       if (typeof build_trait !== 'function') {
         throw new Error('build_trait() missing. Make sure ethereum-dapp.js loads before morph.js.');
       }
-      if (!card) throw new Error('Preview card not found.');
+
+      if (statusEl) statusEl.textContent = `Morphing Frog #${tokenA} / Frog #${tokenB}…`;
+      if (!slot) throw new Error('morph-card-slot not found');
+
+      // Ensure card exists
+      let card = slot.querySelector('.recent_sale_card');
+      if (!card) {
+        card = ffCreateMorphCard(tokenA, tokenB);
+        slot.innerHTML = '';
+        slot.appendChild(card);
+      } else {
+        // update title line if card already there
+        const nameLine = card.querySelector('.frog_name');
+        if (nameLine) nameLine.textContent = `Morphed Preview #${tokenA} / #${tokenB}`;
+      }
 
       const previewCont = card.querySelector('#morph-preview');
       const traitsEl    = card.querySelector('#morph-traits');
-      const nameEl      = card.querySelector('#morph-name');
-
-      if (statusEl) statusEl.textContent = `Morphing Frog #${tokenA} / Frog #${tokenB}…`;
 
       // Apply Parent A background (removes black)
       ffApplyParentBackground(previewCont, tokenA);
@@ -229,6 +310,7 @@
 
       // ----- Legacy special frog rules -----
       if (metadataA.SpecialFrog !== '' || metadataB.SpecialFrog !== '') {
+
         if (metadataA.SpecialFrog !== '' && metadataB.SpecialFrog !== '') {
           metadataB.SpecialFrog = `${metadataA.SpecialFrog}/SpecialFrog/${metadataB.SpecialFrog}`;
           metadataB.Trait = '';
@@ -253,24 +335,25 @@
 
       metadataC.Trait     = metadataB.Trait     || metadataA.Trait     || '';
       metadataC.Accessory = metadataA.Accessory || metadataB.Accessory || '';
-      metadataC.Eyes      = metadataA.Eyes      || metadataB.Eeyes     || '';
+      metadataC.Eyes      = metadataA.Eyes      || metadataB.Eyes      || '';
       metadataC.Hat       = metadataA.Hat       || metadataB.Hat       || '';
       metadataC.Mouth     = metadataA.Mouth     || metadataB.Mouth     || '';
 
       // ----- Build layers + metadata list -----
       previewCont.innerHTML = '';
       traitsEl.innerHTML = '';
+
       const newTraits = [];
 
       function addTrait(type, val, layerKey) {
         if (!val) return;
         newTraits.push({ trait_type: type, value: val });
-
-        const p = document.createElement('p');
-        p.className = 'frog-attr-text';
-        p.textContent = `${type}: ${val}`;
-        traitsEl.appendChild(p);
-
+        if (traitsEl) {
+          const p = document.createElement('p');
+          p.className = 'frog-attr-text';
+          p.textContent = `${type}: ${val}`;
+          traitsEl.appendChild(p);
+        }
         if (layerKey) build_trait(layerKey, val, 'morph-preview');
       }
 
@@ -287,15 +370,14 @@
       addTrait('Hat', metadataC.Hat, 'Hat');
       addTrait('Mouth', metadataC.Mouth, 'Mouth');
 
-      // Update bottom-left name line
-      if (nameEl) nameEl.textContent = `Morphed Preview #${tokenA} / #${tokenB}`;
-
-      // Capture preview to PNG dataURL for save
+      // Capture preview to a PNG dataURL for previewUrl param
       const previewUrl = await ffCapturePreviewDataUrl('morph-preview', tokenA);
 
       if (statusEl) statusEl.textContent = `Preview ready: #${tokenA} / #${tokenB}`;
 
-      return { tokenA, tokenB, newTraits, previewUrl };
+      const out = { newTraits, previewUrl };
+      LAST_BUILD = out;
+      return out;
 
     } catch (err) {
       console.error('ffMetamorphBuild error:', err);
@@ -305,32 +387,48 @@
   }
 
   // ------------------------
-  // Helpers
+  // UI Helpers
   // ------------------------
-  function ffPickTwoRandomTokens() {
-    const max = 4040;
-    let a = Math.floor(Math.random() * max) + 1;
-    let b = Math.floor(Math.random() * max) + 1;
-    while (b === a) b = Math.floor(Math.random() * max) + 1;
-    return { a, b };
-  }
 
-  function ffSetInputs(a, b) {
-    const aInput = document.getElementById('morph-a-input');
-    const bInput = document.getElementById('morph-b-input');
-    if (aInput) aInput.value = a;
-    if (bInput) bInput.value = b;
+  function ffCreateMorphCard(tokenA, tokenB) {
+    const card = document.createElement('div');
+    card.className = 'recent_sale_card';
+    card.style.margin = '0 auto';
+
+    card.innerHTML = `
+      <div class="recent_sale_header">
+        <div class="sale_card_title">Morphed Preview</div>
+      </div>
+
+      <div id="morph-preview" class="frog_img_cont"></div>
+
+      <div class="frog_name" style="margin: 6px 8px 2px; text-align:left;">
+        Morphed Preview #${tokenA} / #${tokenB}
+      </div>
+
+      <div class="recent_sale_properties" id="morph-traits"></div>
+
+      <!-- Buttons slot at bottom of the card (if your HTML injects buttons in here) -->
+      <div class="recent_sale_links" id="morph-card-buttons"></div>
+    `;
+    return card;
   }
 
   function ffApplyParentBackground(container, tokenA) {
     if (!container) return;
+
     const imgUrl = `https://freshfrogs.github.io/frog/${tokenA}.png`;
+
     container.style.backgroundImage = `url("${imgUrl}")`;
     container.style.backgroundRepeat = 'no-repeat';
     container.style.backgroundSize = '500% 500%';
     container.style.backgroundPosition = 'bottom right';
     container.style.backgroundColor = 'transparent';
   }
+
+  // ------------------------
+  // Preview Capture (dataURL)
+  // ------------------------
 
   async function ffCapturePreviewDataUrl(containerId, tokenA) {
     const cont = document.getElementById(containerId);
@@ -359,89 +457,32 @@
     return new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      img.onload = () => { ctx.drawImage(img, 0, 0, size, size); resolve(); };
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, size, size);
+        resolve();
+      };
       img.onerror = () => resolve();
       img.src = src;
     });
   }
 
+  // ------------------------
+  // Address Helper
+  // ------------------------
+
   function ffGetConnectedAddress() {
     if (window.FF_CONNECTED_ADDRESS) return window.FF_CONNECTED_ADDRESS;
-    if (window.user_address) return window.user_address;      // connectWallet sets this
     if (window.currentAccount) return window.currentAccount;
     if (window.userAddress) return window.userAddress;
     if (window.ethereum?.selectedAddress) return window.ethereum.selectedAddress;
-    if (window.web3?.currentProvider?.selectedAddress) return window.web3.currentProvider.selectedAddress;
+    if (window.web3?.currentProvider?.selectedAddress) {
+      return window.web3.currentProvider.selectedAddress;
+    }
     return null;
   }
 
-  // ---------------------------------------------------
-  // REAL SAVE — sends morphed metadata to your Worker KV
-  // (unchanged from your version)
-  // ---------------------------------------------------
-  async function SaveFrogMorph({
-    address,
-    frogA,
-    frogB,
-    newTraits = [],
-    previewUrl = null,
-    value = null,
-    signature = null
-  } = {}) {
-    if (typeof FF_MORPH_WORKER_URL === 'undefined' || !FF_MORPH_WORKER_URL) {
-      console.warn("[SaveFrogMorph] Missing FF_MORPH_WORKER_URL");
-      return null;
-    }
-    if (!address || frogA == null || frogB == null) {
-      console.warn("[SaveFrogMorph] Missing address/frogA/frogB");
-      return null;
-    }
-
-    const attributes = (newTraits || []).map(t => ({
-      trait_type: t.trait_type || t.type || t.trait || "Unknown",
-      value: t.value ?? t.val ?? ""
-    }));
-
-    const morphedMeta = {
-      name: `Morphed Frog (${frogA} + ${frogB})`,
-      image: previewUrl,
-      attributes,
-      frogA,
-      frogB,
-      createdBy: address
-    };
-
-    const payload = {
-      address,
-      frogA,
-      frogB,
-      morphedMeta,
-      value,
-      signature
-    };
-
-    try {
-      const res = await fetch(FF_MORPH_WORKER_URL + "/saveMorph", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      const out = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        console.error("[SaveFrogMorph] Worker error:", res.status, out);
-        throw new Error(out.error || "SaveMorph failed");
-      }
-
-      console.log("✅ SaveFrogMorph saved:", out);
-      return out;
-    } catch (err) {
-      console.error("❌ SaveFrogMorph failed:", err);
-      return null;
-    }
-  }
-
-  window.SaveFrogMorph = SaveFrogMorph;
-
+  // Expose helpers just in case you want console access
+  window.ffGenerateRandomMorph = ffGenerateRandomMorph;
+  window.ffSaveLastMorph = ffSaveLastMorph;
+  window.ffMetamorphBuild = ffMetamorphBuild;
 })();
