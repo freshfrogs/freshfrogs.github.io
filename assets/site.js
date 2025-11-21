@@ -249,40 +249,43 @@ async function loadRecentActivity() {
 }
 
 // Attach staking block to any card (recent, pond, rarity, etc.)
+// Attach staking block to any card (recent, pond, rarity, etc.)
 // Uses ethereum-dapp.js helpers: stakerAddress() + stakingValues()
+// Only runs once wallet + controller are initialised.
 async function ffAttachStakeMetaIfStaked(card, tokenId) {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
   if (!card) return;
 
-  // Need staking helpers from ethereum-dapp.js
-  if (typeof stakerAddress !== 'function' || typeof stakingValues !== 'function') {
+  // Require wallet/web3 + controller + helper functions
+  if (!ffWeb3 || !window.controller || typeof stakerAddress !== 'function' || typeof stakingValues !== 'function') {
+    // Wallet not connected yet OR staking helpers not available → skip quietly
     return;
   }
 
   try {
     const staker = await stakerAddress(tokenId);
-    if (!staker) {
-      // Not staked → no staking block
-      return;
-    }
+    // Not staked or explicitly zero-address → no staking block
+    if (!staker || staker === ZERO_ADDRESS) return;
 
     const values = await stakingValues(tokenId);
     if (!Array.isArray(values) || values.length < 5) return;
 
     const [stakedDays, rawLevel, daysToNext, flyzEarned, stakedDate] = values;
 
+    // Convert roman numerals if needed (e.g., "XII" -> 12)
     const levelNum = ffRomanToArabic(rawLevel) ?? rawLevel;
 
-    const MAX_DAYS   = 41.7;
-    const remaining  = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
-    const pct        = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
+    const MAX_DAYS  = 41.7;
+    const remaining = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
+    const pct       = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
 
+    // Where to inject the staking block
     const propsBlock =
       card.querySelector('.recent_sale_properties') ||
       card.querySelector('.recent_sale_traits') ||
       card;
 
-    // Remove any previous staking block on this card
+    // Remove any previous staking block so we don't double-render
     propsBlock.querySelectorAll('.stake-meta, .staking-sale-stats').forEach((el) => el.remove());
 
     const wrapper = document.createElement('div');
@@ -1174,9 +1177,11 @@ async function renderOwnedAndStakedFrogs(address) {
 }
 
 // Use stakingValues() from ethereum-dapp.js to decorate wallet-staked cards
+// Use stakingValues() from ethereum-dapp.js to decorate wallet-staked cards
 async function ffDecorateStakedFrogCard(tokenId) {
-  if (typeof stakingValues !== 'function') {
-    console.warn('stakingValues() not available; skipping staking details');
+  // Require wallet/web3 + controller + helper function
+  if (!ffWeb3 || !window.controller || typeof stakingValues !== 'function') {
+    console.warn('stakingValues/controller not ready; skipping staking details for token', tokenId);
     return;
   }
 
@@ -1187,18 +1192,18 @@ async function ffDecorateStakedFrogCard(tokenId) {
     const [stakedDays, stakedLevel, daysToNext, flyzEarned, stakedDate] = values;
     const levelNum = ffRomanToArabic(stakedLevel) ?? stakedLevel;
 
-    const lvlEl   = document.getElementById(`stake-level-${tokenId}`);
-    const dateEl  = document.getElementById(`stake-date-${tokenId}`);
-    const nextEl  = document.getElementById(`stake-next-${tokenId}`);
-    const barEl   = document.getElementById(`stake-progress-bar-${tokenId}`);
+    const lvlEl  = document.getElementById(`stake-level-${tokenId}`);
+    const dateEl = document.getElementById(`stake-date-${tokenId}`);
+    const nextEl = document.getElementById(`stake-next-${tokenId}`);
+    const barEl  = document.getElementById(`stake-progress-bar-${tokenId}`);
 
     if (lvlEl)  lvlEl.textContent  = `Staked Lvl. ${levelNum}`;
     if (dateEl) dateEl.textContent = `Staked: ${stakedDate}`;
     if (nextEl) nextEl.textContent = `Next level in ~${daysToNext} days`;
 
-    const MAX_DAYS   = 41.7;
-    const remaining  = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
-    const pct        = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
+    const MAX_DAYS  = 41.7;
+    const remaining = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
+    const pct       = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
 
     if (barEl) {
       barEl.style.width = `${pct}%`;
@@ -1207,6 +1212,7 @@ async function ffDecorateStakedFrogCard(tokenId) {
     console.warn(`ffDecorateStakedFrogCard failed for token ${tokenId}`, err);
   }
 }
+
 
 // ---- Card actions: Stake / Unstake / Transfer ----
 async function ffStakeFrog(tokenId) {
