@@ -28,6 +28,9 @@ const FF_RARITY_BATCH = 24;
 // Pond paging
 let FF_POND_PAGE_KEY = null;
 
+// Cache of last sale prices: tokenId -> priceText (e.g. "0.042 ETH")
+const FF_LAST_SALE_BY_TOKEN = {};
+
 // ------------------------
 // Global wallet / web3 state
 // ------------------------
@@ -201,7 +204,13 @@ async function loadRecentActivity() {
       } else {
         ownerAddress =
           item.buyerAddress || item.to || item.ownerAddress || item.sellerAddress;
-        headerRight  = formatSalePrice(item);
+        const priceText = formatSalePrice(item);
+        headerRight = priceText;
+
+        // 🔹 Cache last sale price for this token
+        if (priceText) {
+          FF_LAST_SALE_BY_TOKEN[tokenId] = priceText;
+        }
       }
 
       const headerLeft = ownerAddress ? truncateAddress(ownerAddress) : '';
@@ -252,20 +261,16 @@ async function loadRecentActivity() {
 }
 
 // Attach staking block to any card (recent, pond, rarity, etc.)
-// Uses ethereum-dapp.js helpers: stakerAddress() + stakingValues()
-// If staking infra isn't ready yet, we queue the card and decorate later.
 async function ffAttachStakeMetaIfStaked(card, tokenId) {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
   if (!card) return;
 
-  // Try to make sure read-only contracts & helpers exist
   try {
     await ffEnsureReadContracts();
   } catch (e) {
     console.warn('ffAttachStakeMetaIfStaked: ffEnsureReadContracts failed', e);
   }
 
-  // If staking helpers or controller still aren't ready yet, queue for later
   if (
     typeof window.stakerAddress !== 'function' ||
     typeof window.stakingValues !== 'function' ||
@@ -277,22 +282,19 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
 
   try {
     const staker = await stakerAddress(tokenId);
-    // Not staked or explicitly zero-address → no staking block
     if (!staker || staker === ZERO_ADDRESS) return;
 
     const values = await stakingValues(tokenId);
     if (!Array.isArray(values) || values.length < 5) return;
 
-    const [stakedDays, rawLevel, daysToNext, flyzEarned, stakedDate] = values;
+    const [stakedDays, rawLevel, daysToNext] = values;
 
-    // Convert roman numerals if needed (e.g., "XII" -> 12)
     const levelNum = ffRomanToArabic(rawLevel) ?? rawLevel;
 
     const MAX_DAYS  = 41.7;
     const remaining = Math.max(0, Math.min(MAX_DAYS, Number(daysToNext)));
     const pct       = Math.max(0, Math.min(100, ((MAX_DAYS - remaining) / MAX_DAYS) * 100));
 
-    // Find the traits block, then attach staking *after* it, not inside
     const propsBlock =
       card.querySelector('.recent_sale_properties') ||
       card.querySelector('.recent_sale_traits') ||
@@ -300,7 +302,6 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
 
     const parent = propsBlock.parentElement || card;
 
-    // Remove any previous staking block so we don't double-render
     parent.querySelectorAll('.stake-meta, .staking-sale-stats').forEach((el) => el.remove());
 
     const wrapper = document.createElement('div');
@@ -310,14 +311,13 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
         <span class="stake-level-label">Staked Lvl. ${levelNum}</span>
       </div>
       <div class="stake-meta-row stake-meta-subrow">
-        <span>Staked: ${stakedDate} (${stakedDays}d)</span>
+        <span>Staked: ${stakedDays}d</span>
       </div>
       <div class="stake-progress">
         <div class="stake-progress-bar" style="width:${pct}%;"></div>
       </div>
     `;
 
-    // Insert staking block right after the traits, but before any action buttons
     const firstAction = parent.querySelector('.recent_sale_links');
     if (firstAction) {
       parent.insertBefore(wrapper, firstAction);
@@ -329,7 +329,6 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
   }
 }
 
-// Process any cards that were queued before staking helpers were ready
 function ffProcessPendingStakeMeta() {
   if (
     typeof window.stakerAddress !== 'function' ||
@@ -345,7 +344,6 @@ function ffProcessPendingStakeMeta() {
   }
 }
 
-// Refresh staking info on all already-rendered frog cards (single implementation)
 async function ffRefreshAllStakeMeta() {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
 
@@ -358,13 +356,10 @@ async function ffRefreshAllStakeMeta() {
   }
 }
 
-// Backwards-compatible alias used in connectWallet()
 function ffRefreshStakeMetaForAllCards() {
   ffRefreshAllStakeMeta();
 }
 
-// Boot-time watcher that tries a few times to set up read-only contracts
-// and then decorates all cards + flushes any queued ones.
 function ffBootStakeMetaWatcher() {
   let attempts = 0;
   const maxAttempts = 5;
@@ -379,15 +374,13 @@ function ffBootStakeMetaWatcher() {
       typeof window.stakerAddress === 'function' &&
       typeof window.stakingValues === 'function'
     ) {
-      // First flush anything that was queued while helpers were missing
       ffProcessPendingStakeMeta();
-      // Then re-scan all cards so nothing slips through
       ffRefreshAllStakeMeta();
       return;
     }
 
     if (attempts < maxAttempts) {
-      setTimeout(tick, 1500); // retry after 1.5s
+      setTimeout(tick, 1500);
     } else {
       console.warn('[FreshFrogs] staking helpers not ready after retries; some stake badges may be missing.');
     }
@@ -569,7 +562,6 @@ function createFrogCard({
   return card;
 }
 
-// Build layered frog image (uses metadata from /frog/json and build_trait from ethereum-dapp.js)
 async function ffBuildLayeredFrogImage(tokenId, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -879,7 +871,6 @@ async function ffResolveFrogOwner(tokenId) {
   });
   if (!ok) return null;
 
-  // 1) Prefer the staking contract (true owner while staked)
   if (typeof stakerAddress === 'function' && window.controller) {
     try {
       const staker = await stakerAddress(tokenId);
@@ -891,7 +882,6 @@ async function ffResolveFrogOwner(tokenId) {
     }
   }
 
-  // 2) Fallback to ERC-721 ownerOf
   if (!window.collection || !window.collection.methods || !window.collection.methods.ownerOf) {
     return null;
   }
@@ -986,7 +976,7 @@ async function ffLoadMoreRarity() {
 }
 
 // ===================================================
-// Pond panel (frogs owned by controller = staked by community)
+// Pond panel
 // ===================================================
 async function ffFetchPondFrogs(limit = 24, pageKey = null) {
   const params = new URLSearchParams({
@@ -1184,7 +1174,7 @@ async function ffFetchStakedTokenIds(address) {
   return result;
 }
 
-// options.readOnly === true is used by 404 wallet viewer (no stake/unstake/transfer, no clickable owner link)
+// options.readOnly === true is used by 404 wallet viewer
 async function renderOwnedAndStakedFrogs(address, options = {}) {
   const readOnly = !!options.readOnly;
 
@@ -1222,6 +1212,10 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
         if (!hasUsableMetadata(metadata)) {
           metadata = await fetchFrogMetadata(tokenId);
         }
+
+        // 🔹 Use cached last sale price if available
+        const salePriceText = FF_LAST_SALE_BY_TOKEN[tokenId];
+        const headerRight   = salePriceText || 'Owned';
 
         const actionHtml = readOnly
           ? `
@@ -1277,7 +1271,7 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
           tokenId,
           metadata,
           headerLeft: truncateAddress(address),
-          headerRight: 'Owned',
+          headerRight,
           footerHtml: '',
           actionHtml,
           ownerAddress: readOnly ? null : address
@@ -1296,8 +1290,15 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
     if (stakedGrid) stakedGrid.innerHTML = '';
 
     if (stakedGrid && stakedIds.length) {
-      for (const tokenId of stakedIds) {
+      for (const tokenIdRaw of stakedIds) {
+        const tokenId = parseTokenId(tokenIdRaw);
+        if (tokenId == null) continue;
+
         let metadata = await fetchFrogMetadata(tokenId);
+
+        // 🔹 Use cached last sale price if available
+        const salePriceText = FF_LAST_SALE_BY_TOKEN[tokenId];
+        const headerRight   = salePriceText || 'Staked';
 
         const footerHtml = `
           <div class="stake-meta">
@@ -1367,7 +1368,7 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
           tokenId,
           metadata,
           headerLeft: truncateAddress(ownerLabelAddress) || 'Pond',
-          headerRight: 'Staked',
+          headerRight,
           footerHtml,
           actionHtml,
           ownerAddress: readOnly ? null : ownerLabelAddress
@@ -1385,7 +1386,7 @@ async function renderOwnedAndStakedFrogs(address, options = {}) {
   }
 }
 
-// Use stakingValues() from ethereum-dapp.js to decorate wallet-staked cards
+// Decorate wallet-staked cards with richer staking info
 async function ffDecorateStakedFrogCard(tokenId) {
   const ok = await ffEnsureReadContracts();
   if (!ok || typeof stakingValues !== 'function') {
