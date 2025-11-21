@@ -2,7 +2,7 @@
    FreshFrogs Morph / Metamorph logic
    - Buttons live at bottom of preview card
    - Generate = randomize A/B + preview
-   - Morph = save current preview via saveCurrentMorph()
+   - Morph = save current preview via SaveFrogMorph()
    - Auto-generate+preview on page load
 */
 
@@ -59,8 +59,8 @@
         const address = ffGetConnectedAddress();
 
         // ✅ Call the test helper ONLY when we have real args
-        if (typeof saveCurrentMorph === "function") {
-            saveCurrentMorph({
+        if (typeof SaveFrogMorph === "function") {
+            SaveFrogMorph({
             address,
             frogA: tokenA,
             frogB: tokenB,
@@ -71,8 +71,8 @@
             });
         }
 
-        if (typeof saveCurrentMorph !== 'function') {
-            console.warn('saveCurrentMorph() not found on window. Preview built but not saved.');
+        if (typeof SaveFrogMorph !== 'function') {
+            console.warn('SaveFrogMorph() not found on window. Preview built but not saved.');
             if (statusEl) statusEl.textContent = 'Save function not loaded.';
             return;
         }
@@ -273,22 +273,26 @@
     return null;
   }
 
-  // TESTING ONLY — does NOT call the Worker yet.
-    // Builds the payload you *will* send and logs it.
-    function saveCurrentMorph({
+    // REAL SAVE — sends morphed metadata to your Cloudflare Worker KV
+    async function SaveFrogMorph({
     address,
     frogA,
     frogB,
-    newTraits = [],     // array of {trait_type,value} OR {type,value}
-    previewUrl = null,  // image URL or base64
+    newTraits = [],
+    previewUrl = null,  // can be base64 or normal url
     value = null,       // optional EIP-712 value object
-    signature = null    // optional signature string
+    signature = null    // optional signature
     } = {}) {
-    // Basic guards so you notice missing stuff in console
-    if (!address) console.warn("[saveCurrentMorph] Missing address");
-    if (frogA == null || frogB == null) console.warn("[saveCurrentMorph] Missing frogA/frogB");
+    if (!FF_MORPH_WORKER_URL) {
+        console.warn("[SaveFrogMorph] Missing FF_MORPH_WORKER_URL");
+        return null;
+    }
+    if (!address || frogA == null || frogB == null) {
+        console.warn("[SaveFrogMorph] Missing address/frogA/frogB");
+        return null;
+    }
 
-    // Normalize traits into attributes[] your FrogCards expect
+    // Normalize traits into `attributes` array your FrogCards expect
     const attributes = (newTraits || []).map(t => ({
         trait_type: t.trait_type || t.type || t.trait || "Unknown",
         value: t.value ?? t.val ?? ""
@@ -312,11 +316,30 @@
         signature
     };
 
-    console.log("🧪 SaveFrogMorph TEST payload:", payload);
-    console.log("🧪 morphedMeta:", morphedMeta);
-    console.table(attributes);
+    try {
+        const res = await fetch(FF_MORPH_WORKER_URL + "/saveMorph", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+        });
 
-    return payload; // handy for quick inspection / unit tests
+        const out = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+        console.error("[SaveFrogMorph] Worker error:", res.status, out);
+        throw new Error(out.error || "SaveMorph failed");
+        }
+
+        console.log("✅ SaveFrogMorph saved:", out);
+        return out;
+    } catch (err) {
+        console.error("❌ SaveFrogMorph failed:", err);
+        return null;
     }
+    }
+
+// expose globally if you want to call from console / buttons
+window.SaveFrogMorph = SaveFrogMorph;
+
 
 })();
