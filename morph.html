@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FreshFrogs – Metamorph Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+
+  <link rel="shortcut icon" type="image/x-icon" href="https://freshfrogs.github.io/assets/blackWhite.png">
+
+  <!-- Your usual global scripts (keep / remove as needed) -->
+  <script src="assets/controller_abi.js"></script>
+  <script src="assets/collection_abi.js"></script>
+  <script src="assets/ethereum-dapp.js"></script>
+  <script src="assets/site.js"></script>
+
+  <!-- Tiny page-specific styling only -->
+  <style>
+    /* Layout wrapper matches your "panel + grid" vibe */
+    .morph-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .morph-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Morph panel uses your existing card/panel look via generic classes */
+    .morph-panel {
+      position: sticky;
+      top: 10px;
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .morph-slot-row {
+      display: grid;
+      grid-template-columns: 1fr 40px 1fr;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .morph-slot {
+      min-height: 130px;
+      border-radius: 10px;
+      padding: 8px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+    .morph-slot img {
+      width: 96px;
+      height: 96px;
+      image-rendering: pixelated;
+    }
+
+    .morph-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .morph-preview {
+      width: 100%;
+      min-height: 220px;
+      border-radius: 12px;
+      padding: 10px;
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .morph-preview .layer {
+      position: absolute;
+      inset: 0;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      image-rendering: pixelated;
+      pointer-events: none;
+    }
+
+    /* Selection highlight without fighting your theme */
+    .morph-selected {
+      outline: 3px solid currentColor;
+      outline-offset: 2px;
+      transform: translateY(-1px);
+    }
+
+    /* Grid */
+    .morph-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    /* Light JSON box */
+    #morph-json {
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.35;
+      padding: 8px;
+      border-radius: 8px;
+      max-height: 220px;
+      overflow: auto;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body class="layout-4">
+
+  <!-- ======= HEADER =======
+       If your site header is different, paste your current header here.
+       This one is a safe minimal version that won’t break your CSS.
+  -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="brand">
+        <img src="assets/blackWhite.png" alt="FreshFrogs" style="width:28px;height:28px;image-rendering:pixelated;">
+        <span>FreshFrogs</span>
+      </a>
+    </div>
+    <nav class="topbar-right">
+      <a href="collection.html">Collection</a>
+      <a href="rarity.html">Rarity</a>
+      <a href="pond.html">Pond</a>
+      <a href="morph.html" class="active">Metamorph</a>
+    </nav>
+  </header>
+
+  <main class="page-wrap" style="padding: 10px;">
+    <div class="morph-layout">
+
+      <!-- LEFT: MORPH PANEL -->
+      <section class="panel morph-panel">
+        <h2 style="margin: 4px 0 8px 0;">Metamorph Lab</h2>
+        <p style="margin:0 0 10px 0; opacity:.8;">
+          Pick two frogs from the grid. Their traits will fuse into a preview.
+        </p>
+
+        <div class="morph-slot-row">
+          <div id="slot-a" class="panel morph-slot">
+            <div>
+              <div style="opacity:.7;">Alpha</div>
+              <div id="slot-a-text">None selected</div>
+            </div>
+          </div>
+
+          <div style="text-align:center; font-weight:bold;">+</div>
+
+          <div id="slot-b" class="panel morph-slot">
+            <div>
+              <div style="opacity:.7;">Bravo</div>
+              <div id="slot-b-text">None selected</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="morph-actions">
+          <button id="morph-btn" class="btn primary" disabled>Morph</button>
+          <button id="shuffle-btn" class="btn">Shuffle 20</button>
+          <button id="clear-btn" class="btn">Clear</button>
+        </div>
+
+        <h3 style="margin:12px 0 6px;">Preview</h3>
+        <div id="morph-preview" class="panel morph-preview">
+          <div style="opacity:.6;">Choose two frogs to preview</div>
+        </div>
+
+        <h3 style="margin:12px 0 6px;">Morph JSON</h3>
+        <div id="morph-json" class="panel" style="opacity:.85;"></div>
+      </section>
+
+
+      <!-- RIGHT: RANDOM FROG GRID -->
+      <section>
+        <h2 style="margin: 4px 0 8px 0;">Random Frogs</h2>
+        <div id="morph-grid" class="morph-grid"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Page script -->
+  <script src="assets/morph.js"></script>
+</body>
+</html>
