@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <title>FreshFrogs – Wallet Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Adjust this path if your CSS lives elsewhere -->
+  <!-- CSS is at /style.css in the repo root -->
   <link rel="stylesheet" href="style.css" />
   <link
     rel="shortcut icon"
-   type="image/x-icon"
+    type="image/x-icon"
     href="https://freshfrogs.github.io/assets/blackWhite.png"
   />
 </head>
@@ -17,7 +17,7 @@
     <!-- HEADER -->
     <header class="site-header">
       <nav class="nav">
-        <!-- Views controlled by JS -->
+        <!-- Views controlled by site.js -->
         <a href="#" data-view="collection">Collection</a>
         <a href="#" data-view="rarity">Rarity</a>
         <a href="#" data-view="pond">Pond</a>
@@ -52,7 +52,7 @@
           <button class="btn primary" id="hero-view-collection-btn">
             View Collection
           </button>
-          <!-- This is the main connect button (normal wallet connect still works) -->
+          <!-- Normal connect still works if user wants to connect their own wallet -->
           <button class="btn secondary" id="hero-connect-wallet-btn">
             Connect Wallet
           </button>
@@ -124,7 +124,7 @@
       >
         <h2>Owned Frogs</h2>
         <p class="dashboard-note" id="owned-frogs-status">
-          These are Frogs currently held in your wallet.
+          These are Frogs currently held in this wallet.
         </p>
 
         <div id="owned-frogs-grid" class="nft-grid"></div>
@@ -167,7 +167,7 @@
   <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
   <script src="https://freshfrogs.github.io/assets/site.js"></script>
 
-  <!-- 404-specific: use URL wallet + existing wallet functions -->
+  <!-- 404-specific: use URL wallet + existing wallet functions (READ-ONLY) -->
   <script>
     (function () {
       'use strict';
@@ -176,8 +176,8 @@
         return /^0x[a-fA-F0-9]{40}$/.test(addr);
       }
 
+      // e.g. /0xabc..., /0xabc.../something
       function getWalletFromPath() {
-        // e.g. /0xabc..., /0xabc.../something
         var raw = window.location.pathname.replace(/^\/+|\/+$/g, '');
         if (!raw) return null;
         var first = raw.split('/')[0];
@@ -188,16 +188,12 @@
       document.addEventListener('DOMContentLoaded', async function () {
         var wallet = getWalletFromPath();
         if (!wallet) {
-          // No wallet in URL -> behave exactly like normal homepage
+          // No wallet in URL -> behave like normal homepage
           return;
         }
 
         try {
-          // Reuse global wallet state from site.js
-          // (ffCurrentAccount is defined there)
-          ffCurrentAccount = wallet;
-
-          // Make sure read-only contracts are available for staking stats
+          // Optional: make sure read-only contracts are available
           if (typeof ffEnsureReadContracts === 'function') {
             try {
               await ffEnsureReadContracts();
@@ -206,26 +202,26 @@
             }
           }
 
-          // Use the same data pipeline as connectWallet(), but
-          // for the address from the URL (no MetaMask needed).
-          var ownedCount = null;
-          var stakingStats = null;
-          var profile = null;
+          // Do NOT call ffApplyDashboardUpdates here:
+          // - We don't want to change the connected wallet UI / nav address.
+          // - This page is just a read-only viewer for the URL wallet.
 
-          if (typeof ffApplyDashboardUpdates === 'function') {
-            ffApplyDashboardUpdates(wallet, ownedCount, stakingStats, profile);
-          }
-
-          // Show the wallet view
+          // Switch to the wallet view layout
           if (typeof ffShowView === 'function') {
             ffShowView('wallet');
           }
 
-          // Render frogs in READ-ONLY mode (no stake/unstake/transfer buttons)
+          // Render this wallet's frogs in READ-ONLY mode:
+          // - No stake / unstake / transfer buttons
+          // - Top-left label on cards is controlled by site.js, but
+          //   readOnly mode should avoid overriding it for this viewer.
           if (typeof renderOwnedAndStakedFrogs === 'function') {
-            renderOwnedAndStakedFrogs(wallet, { readOnly: true });
+            try {
+              renderOwnedAndStakedFrogs(wallet, { readOnly: true });
+            } catch (e) {
+              console.warn('[404 wallet] renderOwnedAndStakedFrogs failed', e);
+            }
           }
-
         } catch (err) {
           console.warn('[404 wallet] Failed to init wallet view from URL:', err);
         }
