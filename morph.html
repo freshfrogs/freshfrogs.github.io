@@ -20,7 +20,7 @@
       </nav>
     </header>
 
-    <!-- HERO -->
+    <!-- HERO (copied 1:1) -->
     <section class="hero">
       <div class="hero-main">
         <div class="hero-media">
@@ -46,8 +46,6 @@
 
     <!-- MAIN -->
     <main class="dashboard-main">
-
-      <!-- MORPH PANEL -->
       <section
         class="panel dashboard-section"
         id="morph-panel"
@@ -55,9 +53,10 @@
       >
         <h2>Morph Lab</h2>
         <p class="dashboard-note" id="morph-status">
-          Pick two Frogs to preview a metamorph. This does not mint — it only builds the combo preview + JSON.
+          Pick two Frogs to preview a metamorph. This does not mint — it only builds the combo preview + metadata list.
         </p>
 
+        <!-- INPUTS + BUTTONS (same row, matching your layout) -->
         <div class="morph-row">
           <div class="morph-col">
             <label class="morph-label">Parent A Token ID</label>
@@ -75,8 +74,30 @@
           </div>
         </div>
 
-        <!-- PREVIEW CARD SLOT -->
-        <div id="morph-card-slot" style="margin-top:16px;"></div>
+        <!-- ✅ PRE-GENERATED MORPH FROGCARD -->
+        <div id="morph-card-slot" style="margin-top:16px;">
+          <div class="recent_sale_card" style="margin:0 auto;">
+
+            <div class="recent_sale_header">
+              <div class="sale_card_title">Morphed Preview</div>
+            </div>
+
+            <!-- layered preview goes here -->
+            <div id="morph-preview" class="frog_img_cont"></div>
+
+            <!-- ✅ name moved down, bottom-left, slash format -->
+            <div
+              class="frog_name"
+              id="morph-name"
+              style="margin: 6px 8px 2px; text-align:left;"
+            >
+              Morphed Preview #— / #—
+            </div>
+
+            <!-- metadata list injected here -->
+            <div class="recent_sale_properties" id="morph-traits"></div>
+          </div>
+        </div>
 
       </section>
     </main>
