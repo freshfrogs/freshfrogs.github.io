@@ -764,36 +764,6 @@ function ffStakeMetaHtml(tokenId) {
   `;
 }
 
-// 🔑 Only attach staking stats when frog is actually staked
-async function ffAttachStakeMetaIfStaked(card, tokenId) {
-  if (!card) return;
-  if (typeof stakingValues !== 'function' || typeof stakerAddress !== 'function') {
-    return;
-  }
-  if (!ffEnsureController()) return;
-
-  // If we already added stake meta for this card, skip
-  if (card.querySelector(`#stake-level-${tokenId}`)) return;
-
-  try {
-    const addr = await stakerAddress(tokenId);
-    if (!addr || addr === ZERO_ADDRESS) {
-      return; // not staked -> DO NOT call stakingValues, avoids bogus "Lvl 490"
-    }
-
-    const slot =
-      card.querySelector('.stake-meta-slot') ||
-      card.querySelector('.recent_sale_traits');
-    if (!slot) return;
-
-    slot.insertAdjacentHTML('beforeend', ffStakeMetaHtml(tokenId));
-    ffDecorateStakedFrogCard(tokenId);
-  } catch (err) {
-    console.warn('ffAttachStakeMetaIfStaked failed for token', tokenId, err);
-  }
-}
-
-
 // Layered image (using github metadata + build_trait)
 async function ffBuildLayeredFrogImage(tokenId, containerId) {
   const container = document.getElementById(containerId);
@@ -1732,6 +1702,7 @@ function ffRomanToArabic(roman) {
 
   return total || null;
 }
+
 // ===================================================
 //  STAKING STATS FIX (drop-in patch)
 //  - Kills old ffAttachStakeMetaIfStaked that used ffWeb3
@@ -1746,11 +1717,6 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
   // Keep this as a no-op so it never throws.
   return;
 }
-
-// 2) Read-only Web3 + contracts using your Alchemy key
-let ffReadWeb3 = null;
-let ffReadCollection = null;
-let ffReadController = null;
 
 async function ffEnsureReadContracts() {
   if (ffReadWeb3 && ffReadCollection && ffReadController) {
