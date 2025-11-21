@@ -21,7 +21,7 @@
   });
 
   function ffWireButtons() {
-    const genBtn = document.getElementById('morph-generate-btn');
+    const genBtn  = document.getElementById('morph-generate-btn');
     const saveBtn = document.getElementById('morph-save-btn');
 
     genBtn?.addEventListener('click', async () => {
@@ -46,45 +46,64 @@
   // ------------------------
   // FrogMorph = SAVE wrapper
   // ------------------------
+  async function FrogMorph() {
+    const statusEl = document.getElementById('morph-status');
 
-    async function FrogMorph() {
-        const statusEl = document.getElementById('morph-status');
-
-        if (!LAST_MORPH) {
-            if (statusEl) statusEl.textContent = 'Nothing to save yet — click Generate first.';
-            return;
-        }
-
-        const { tokenA, tokenB, newTraits, previewUrl } = LAST_MORPH;
-        const address = ffGetConnectedAddress();
-
-        // ✅ Call the test helper ONLY when we have real args
-        if (typeof SaveFrogMorph === "function") {
-            SaveFrogMorph({
-            address,
-            frogA: tokenA,
-            frogB: tokenB,
-            newTraits,
-            previewUrl,
-            value: null,
-            signature: null
-            });
-        }
-
-        if (typeof SaveFrogMorph !== 'function') {
-            console.warn('SaveFrogMorph() not found on window. Preview built but not saved.');
-            if (statusEl) statusEl.textContent = 'Save function not loaded.';
-            return;
-        }
-
+    if (!LAST_MORPH) {
+      if (statusEl) statusEl.textContent = 'Nothing to save yet — click Generate first.';
+      return;
     }
+
+    if (typeof SaveFrogMorph !== 'function') {
+      console.warn('SaveFrogMorph() not found on window. Preview built but not saved.');
+      if (statusEl) statusEl.textContent = 'Save function not loaded.';
+      return;
+    }
+
+    const { tokenA, tokenB, newTraits, previewUrl } = LAST_MORPH;
+
+    // Make sure token ids are numbers (and valid)
+    const frogA = (typeof parseTokenId === 'function') ? parseTokenId(tokenA) : Number(tokenA);
+    const frogB = (typeof parseTokenId === 'function') ? parseTokenId(tokenB) : Number(tokenB);
+
+    if (frogA == null || frogB == null || !Number.isFinite(frogA) || !Number.isFinite(frogB)) {
+      console.warn('Bad morph token IDs:', tokenA, tokenB);
+      if (statusEl) statusEl.textContent = 'Invalid token IDs for morph.';
+      return;
+    }
+
+    const address = ffGetConnectedAddress();
+    if (!address) {
+      console.warn('No connected wallet address found.');
+      if (statusEl) statusEl.textContent = 'Connect your wallet to save a morph.';
+      return;
+    }
+
+    if (statusEl) statusEl.textContent = `Saving morph for #${frogA} / #${frogB}…`;
+
+    try {
+      await SaveFrogMorph({
+        address,
+        frogA,
+        frogB,
+        newTraits,
+        previewUrl,
+        value: null,
+        signature: null
+      });
+
+      if (statusEl) statusEl.textContent = `Saved morph: #${frogA} / #${frogB}`;
+    } catch (err) {
+      console.error('FrogMorph save failed:', err);
+      if (statusEl) statusEl.textContent = 'Save failed. Check console.';
+    }
+  }
 
   window.FrogMorph = FrogMorph;
 
   // ------------------------
   // Morph Core Logic
   // ------------------------
-
   async function ffMetamorphBuild(tokenA, tokenB) {
     const statusEl = document.getElementById('morph-status');
     const card = document.querySelector('#morph-card-slot .recent_sale_card');
@@ -205,7 +224,6 @@
   // ------------------------
   // Helpers
   // ------------------------
-
   function ffPickTwoRandomTokens() {
     const max = 4040;
     let a = Math.floor(Math.random() * max) + 1;
@@ -266,6 +284,7 @@
 
   function ffGetConnectedAddress() {
     if (window.FF_CONNECTED_ADDRESS) return window.FF_CONNECTED_ADDRESS;
+    if (window.user_address) return window.user_address;      // <-- connectWallet sets this
     if (window.currentAccount) return window.currentAccount;
     if (window.userAddress) return window.userAddress;
     if (window.ethereum?.selectedAddress) return window.ethereum.selectedAddress;
@@ -273,8 +292,10 @@
     return null;
   }
 
-    // REAL SAVE — sends morphed metadata to your Cloudflare Worker KV
-    async function SaveFrogMorph({
+  // ---------------------------------------------------
+  // REAL SAVE — sends morphed metadata to your Worker KV
+  // ---------------------------------------------------
+  async function SaveFrogMorph({
     address,
     frogA,
     frogB,
@@ -282,64 +303,64 @@
     previewUrl = null,  // can be base64 or normal url
     value = null,       // optional EIP-712 value object
     signature = null    // optional signature
-    } = {}) {
-    if (!FF_MORPH_WORKER_URL) {
-        console.warn("[SaveFrogMorph] Missing FF_MORPH_WORKER_URL");
-        return null;
+  } = {}) {
+    // This constant should live in site.js and load before morph.js
+    if (typeof FF_MORPH_WORKER_URL === 'undefined' || !FF_MORPH_WORKER_URL) {
+      console.warn("[SaveFrogMorph] Missing FF_MORPH_WORKER_URL");
+      return null;
     }
     if (!address || frogA == null || frogB == null) {
-        console.warn("[SaveFrogMorph] Missing address/frogA/frogB");
-        return null;
+      console.warn("[SaveFrogMorph] Missing address/frogA/frogB");
+      return null;
     }
 
     // Normalize traits into `attributes` array your FrogCards expect
     const attributes = (newTraits || []).map(t => ({
-        trait_type: t.trait_type || t.type || t.trait || "Unknown",
-        value: t.value ?? t.val ?? ""
+      trait_type: t.trait_type || t.type || t.trait || "Unknown",
+      value: t.value ?? t.val ?? ""
     }));
 
     const morphedMeta = {
-        name: `Morphed Frog (${frogA} + ${frogB})`,
-        image: previewUrl,
-        attributes,
-        frogA,
-        frogB,
-        createdBy: address
+      name: `Morphed Frog (${frogA} + ${frogB})`,
+      image: previewUrl,
+      attributes,
+      frogA,
+      frogB,
+      createdBy: address
     };
 
     const payload = {
-        address,
-        frogA,
-        frogB,
-        morphedMeta,
-        value,
-        signature
+      address,
+      frogA,
+      frogB,
+      morphedMeta,
+      value,
+      signature
     };
 
     try {
-        const res = await fetch(FF_MORPH_WORKER_URL + "/saveMorph", {
+      const res = await fetch(FF_MORPH_WORKER_URL + "/saveMorph", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
-        });
+      });
 
-        const out = await res.json().catch(() => ({}));
+      const out = await res.json().catch(() => ({}));
 
-        if (!res.ok) {
+      if (!res.ok) {
         console.error("[SaveFrogMorph] Worker error:", res.status, out);
         throw new Error(out.error || "SaveMorph failed");
-        }
+      }
 
-        console.log("✅ SaveFrogMorph saved:", out);
-        return out;
+      console.log("✅ SaveFrogMorph saved:", out);
+      return out;
     } catch (err) {
-        console.error("❌ SaveFrogMorph failed:", err);
-        return null;
+      console.error("❌ SaveFrogMorph failed:", err);
+      return null;
     }
-    }
+  }
 
-// expose globally if you want to call from console / buttons
-window.SaveFrogMorph = SaveFrogMorph;
-
+  // expose globally if you want to call from console / buttons
+  window.SaveFrogMorph = SaveFrogMorph;
 
 })();
