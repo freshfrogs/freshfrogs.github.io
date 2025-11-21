@@ -184,8 +184,8 @@ a {
     transform 140ms ease-out;
 }
 
-.btn.primary {
-  padding: 0.55rem 1.2rem;
+.btn.primary {  
+padding: 0.55rem 1.2rem;
   border-radius: 0px;
   border: none;
   color: #022c22;
@@ -193,14 +193,14 @@ a {
   font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
-  background: lightblue;
-  color: darkslateblue;
+  background: #2081e2;
+  color: white;
   box-shadow: 2px 2px darkslateblue;
 }
 
 .btn.secondary {
-  padding: 0.55rem 1.2rem;
-  border-radius: 5px;
+padding: 0.55rem 1.2rem;
+  border-radius: 0px;
   border: none;
   color: #022c22;
   font-weight: 600;
@@ -209,6 +209,7 @@ a {
   white-space: nowrap;
   background: lightcoral;
   color: white;
+  box-shadow: 2px 2px darkslateblue;
 }
 
 .btn:hover {
