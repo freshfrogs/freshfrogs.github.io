@@ -690,9 +690,12 @@ a {
 /* Make cards a bit slimmer and stop stretching them to full row height */
 .recent_sale_card {
   width: 100%;
-  max-width: 260px;       /* adjust up/down until it feels right */
-  margin: 8px auto;       /* center in the column */
-  align-self: flex-start; /* do NOT stretch to row height in CSS grid */
+  max-width: 260px;
+  margin: 8px auto;
+  align-self: flex-start;
+  background: lightseagreen;
+  padding: 8px;
+  box-shadow: 2px 2px darkslateblue;
 }
 
 
