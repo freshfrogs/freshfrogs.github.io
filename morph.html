@@ -53,28 +53,27 @@
       >
         <h2>Morph Lab</h2>
         <p class="dashboard-note" id="morph-status">
-          Pick two Frogs to preview a metamorph. This does not mint — it only builds the combo preview + metadata list.
+          Page loads with a random morph preview. Click Generate to roll again, Morph to save.
         </p>
 
-        <!-- INPUTS + BUTTONS (same row, matching your layout) -->
+        <!-- INPUTS only (no buttons here now) -->
         <div class="morph-row">
           <div class="morph-col">
             <label class="morph-label">Parent A Token ID</label>
-            <input id="morph-a-input" class="morph-input" type="number" min="1" max="4040" placeholder="e.g. 12" />
+            <input id="morph-a-input" class="morph-input" type="number" min="1" max="4040" placeholder="auto-random" />
           </div>
 
           <div class="morph-col">
             <label class="morph-label">Parent B Token ID</label>
-            <input id="morph-b-input" class="morph-input" type="number" min="1" max="4040" placeholder="e.g. 987" />
+            <input id="morph-b-input" class="morph-input" type="number" min="1" max="4040" placeholder="auto-random" />
           </div>
 
-          <div class="morph-col morph-actions">
-            <button id="morph-run-btn" class="btn primary" type="button">Preview Morph</button>
-            <button id="morph-clear-btn" class="btn secondary" type="button">Clear</button>
+          <div class="morph-col">
+            <!-- empty spacer column to keep grid look -->
           </div>
         </div>
 
-        <!-- ✅ PRE-GENERATED MORPH FROGCARD -->
+        <!-- PRE-GENERATED MORPH FROGCARD -->
         <div id="morph-card-slot" style="margin-top:16px;">
           <div class="recent_sale_card" style="margin:0 auto;">
 
@@ -85,7 +84,7 @@
             <!-- layered preview goes here -->
             <div id="morph-preview" class="frog_img_cont"></div>
 
-            <!-- ✅ name moved down, bottom-left, slash format -->
+            <!-- name bottom-left, slash format -->
             <div
               class="frog_name"
               id="morph-name"
@@ -96,6 +95,13 @@
 
             <!-- metadata list injected here -->
             <div class="recent_sale_properties" id="morph-traits"></div>
+
+            <!-- ✅ Buttons moved to bottom of card -->
+            <div style="display:flex; gap:8px; padding:8px; justify-content:flex-end;">
+              <button id="morph-generate-btn" class="btn primary" type="button">Generate</button>
+              <button id="morph-save-btn" class="btn secondary" type="button">Morph</button>
+            </div>
+
           </div>
         </div>
 
