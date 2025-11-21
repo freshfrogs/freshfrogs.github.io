@@ -647,9 +647,10 @@ async function ffBuildLayeredMorphedImage(metadata, containerId, baseTokenId = n
       ? `https://freshfrogs.github.io/frog/${baseId}.png`
       : null;
 
+    // clear whatever fallback <img> is there
     container.innerHTML = '';
 
-    // Same background trick as ffBuildLayeredFrogImage (uses Parent A)
+    // Parent A background (same trick as normal frogs)
     if (baseUrl) {
       container.style.backgroundImage    = `url("${baseUrl}")`;
       container.style.backgroundRepeat   = 'no-repeat';
@@ -658,7 +659,7 @@ async function ffBuildLayeredMorphedImage(metadata, containerId, baseTokenId = n
       container.style.backgroundColor    = 'transparent';
     }
 
-    // If build_trait is ready, layer everything
+    // if build_trait is ready, layer it up
     if (typeof build_trait === 'function' && attrs.length) {
       for (const attr of attrs) {
         if (!attr?.trait_type || !attr?.value) continue;
@@ -667,8 +668,7 @@ async function ffBuildLayeredMorphedImage(metadata, containerId, baseTokenId = n
       return;
     }
 
-    // Fallback if build_trait isn't loaded yet:
-    // show saved preview image if present, else base frog png
+    // fallback if build_trait missing
     const fallbackImg =
       metadata?.image ||
       metadata?.image_url ||
@@ -1329,6 +1329,12 @@ async function renderOwnedAndStakedFrogs(address) {
         });
 
         ownedGrid?.appendChild(morphCard);
+
+        // NOW the container exists in DOM, so layering works
+        const contId = morphCard.dataset.imgContainerId;
+        const baseId = parseTokenId(meta?.frogA ?? meta?.tokenA ?? null);
+        ffBuildLayeredMorphedImage(meta, contId, baseId);
+
       }
     }
 
