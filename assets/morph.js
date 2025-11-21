@@ -56,7 +56,7 @@
         }
 
         const { tokenA, tokenB, newTraits, previewUrl } = LAST_MORPH;
-        const address = getConnectedAddress();
+        const address = ffGetConnectedAddress();
 
         // ✅ Call the test helper ONLY when we have real args
         if (typeof saveCurrentMorph === "function") {
