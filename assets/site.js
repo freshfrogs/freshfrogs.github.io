@@ -31,10 +31,145 @@ const FF_POND_PAGE_SIZE = 36;
 const FF_OWNER_CACHE = new Map();  // tokenId -> address | null
 const FF_SALE_CACHE  = new Map();  // tokenId -> price string | null
 
-// Web3 / wallet
-let ffWeb3          = null;
-let ffCurrentAccount = null;
+// Read-only Web3 for staking lookups (Alchemy HTTP, no wallet needed)
+let ffReadWeb3       = null;
+let ffReadCollection = null;
+let ffReadController = null;
 
+function ffEnsureReadContracts() {
+  if (typeof Web3 === 'undefined') {
+    console.warn('[FF] Web3.js not loaded; staking lookups disabled.');
+    return false;
+  }
+
+  if (!ffReadWeb3) {
+    try {
+      ffReadWeb3 = new Web3(`https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`);
+    } catch (err) {
+      console.warn('[FF] Failed to init read-only Web3:', err);
+      return false;
+    }
+  }
+
+  if (!ffReadCollection) {
+    if (typeof COLLECTION_ABI === 'undefined') {
+      console.warn('[FF] COLLECTION_ABI missing; staking lookups disabled.');
+      return false;
+    }
+    ffReadCollection = new ffReadWeb3.eth.Contract(COLLECTION_ABI, FF_COLLECTION_ADDRESS);
+  }
+
+  if (!ffReadController) {
+    if (typeof CONTROLLER_ABI === 'undefined') {
+      console.warn('[FF] CONTROLLER_ABI missing; staking lookups disabled.');
+      return false;
+    }
+    ffReadController = new ffReadWeb3.eth.Contract(CONTROLLER_ABI, FF_CONTROLLER_ADDRESS);
+  }
+
+  return true;
+}
+
+// Override old stakingValues() with a read-only, Alchemy-based version.
+// Returns:
+//   [ stakedDays, stakedLevelRoman, daysToNextLevel, flyzEarned, formattedDate ]
+// OR [] if the frog is not currently staked.
+async function stakingValues(tokenId) {
+  // Normalize tokenId
+  tokenId = parseTokenId(tokenId);
+  if (tokenId == null) {
+    return [];
+  }
+
+  // Ensure read-only contracts are ready
+  if (!ffEnsureReadContracts()) {
+    return [];
+  }
+
+  const web3       = ffReadWeb3;
+  const collection = ffReadCollection;
+  const controller = ffReadController;
+
+  try {
+    // 1) Check if frog is actually staked
+    const staker = await controller.methods.stakerAddress(tokenId).call();
+    if (!staker || staker === ZERO_ADDRESS) {
+      // Not staked -> no staking info
+      return [];
+    }
+
+    // 2) Find the most recent Transfer TO the controller for this token
+    const tokenIdStr = String(tokenId);
+
+    const events = await collection.getPastEvents('Transfer', {
+      filter: {
+        to: FF_CONTROLLER_ADDRESS,
+        tokenId: tokenIdStr
+      },
+      fromBlock: 0,
+      toBlock: 'latest'
+    });
+
+    if (!events || !events.length) {
+      // Shouldn't happen if it's staked, but bail safely
+      return [];
+    }
+
+    const lastEvt = events[events.length - 1];
+    const block   = await web3.eth.getBlock(lastEvt.blockNumber);
+
+    if (!block || !block.timestamp) {
+      return [];
+    }
+
+    // 3) Compute stake duration + level, exactly like the old ethereum-dapp logic
+    const stakedTimestampMs = Number(block.timestamp) * 1000;
+    const stakedDate        = new Date(stakedTimestampMs);
+
+    const durationMs   = Date.now() - stakedTimestampMs;
+    const stakedHours  = Math.floor(durationMs / 1000 / 60 / 60);
+    if (!Number.isFinite(stakedHours) || stakedHours < 0) {
+      return [];
+    }
+
+    // Level increases every 1000 hours, starting at level 1
+    const stakedLevelInt = Math.floor(stakedHours / 1000) + 1;
+
+    const stakedTimeDays = Math.floor(stakedHours / 24); // total days staked
+    const stakedNextDays = Math.round(((stakedLevelInt * 1000) - stakedHours) / 24);
+    const stakedEarned   = (stakedHours / 1000).toFixed(3); // FLYZ earned
+
+    // Format date as mm/dd/yy
+    const mm = String(stakedDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(stakedDate.getDate()).padStart(2, '0');
+    const yy = String(stakedDate.getFullYear()).slice(-2);
+    const formattedDate = `${mm}/${dd}/${yy}`;
+
+    // Use the same roman numeral function as the old dapp, if present
+    let stakedLevelRoman = String(stakedLevelInt);
+    if (typeof romanize === 'function') {
+      try {
+        stakedLevelRoman = romanize(stakedLevelInt);
+      } catch (e) {
+        // fall back to plain number if romanize fails
+        stakedLevelRoman = String(stakedLevelInt);
+      }
+    }
+
+    // [ Time Staked (days), Staked Level (roman), Next Level (days),
+    //   Flyz Earned, Date Staked ]
+    return [
+      stakedTimeDays,
+      stakedLevelRoman,
+      stakedNextDays,
+      Number(stakedEarned),
+      formattedDate
+    ];
+  } catch (err) {
+    console.warn('[FF] stakingValues() failed for token', tokenId, err);
+    return [];
+  }
+}
 
 // ===================================================
 // Entry
