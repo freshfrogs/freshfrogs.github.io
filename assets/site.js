@@ -1191,7 +1191,8 @@ async function ffFetchStakedTokenIds(address) {
   return result;
 }
 
-async function renderOwnedAndStakedFrogs(address) {
+async function renderOwnedAndStakedFrogs(address, options = {}) {
+  const readOnly = !!options.readOnly;
   const ownedGrid   = document.getElementById('owned-frogs-grid');
   const ownedStatus = document.getElementById('owned-frogs-status');
   const stakedGrid   = document.getElementById('staked-frogs-grid');
@@ -1227,34 +1228,56 @@ async function renderOwnedAndStakedFrogs(address) {
           metadata = await fetchFrogMetadata(tokenId);
         }
 
-        const actionHtml = `
-          <div class="recent_sale_links">
-            <button class="sale_link_btn" onclick="ffStakeFrog(${tokenId})">
-              Stake
-            </button>
-            <button class="sale_link_btn" onclick="ffTransferFrog(${tokenId})">
-              Transfer
-            </button>
-          </div>
-          <div class="recent_sale_links">
-            <a
-              class="sale_link_btn opensea"
-              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              OpenSea
-            </a>
-            <a
-              class="sale_link_btn etherscan"
-              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </a>
-          </div>
-        `;
+        // Read-only mode (404 wallet viewer): NO stake/transfer buttons
+        const actionHtml = readOnly
+          ? `
+            <div class="recent_sale_links">
+              <a
+                class="sale_link_btn opensea"
+                href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                OpenSea
+              </a>
+              <a
+                class="sale_link_btn etherscan"
+                href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Etherscan
+              </a>
+            </div>
+          `
+          : `
+            <div class="recent_sale_links">
+              <button class="sale_link_btn" onclick="ffStakeFrog(${tokenId})">
+                Stake
+              </button>
+              <button class="sale_link_btn" onclick="ffTransferFrog(${tokenId})">
+                Transfer
+              </button>
+            </div>
+            <div class="recent_sale_links">
+              <a
+                class="sale_link_btn opensea"
+                href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                OpenSea
+              </a>
+              <a
+                class="sale_link_btn etherscan"
+                href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Etherscan
+              </a>
+            </div>
+          `;
 
         const card = createFrogCard({
           tokenId,
@@ -1263,7 +1286,9 @@ async function renderOwnedAndStakedFrogs(address) {
           headerRight: 'Owned',
           footerHtml: '',
           actionHtml,
-          ownerAddress: address
+          // In read-only mode we DON'T pass ownerAddress,
+          // so the top-left stays plain text (no clickable change)
+          ownerAddress: readOnly ? null : address
         });
 
         ownedGrid.appendChild(card);
@@ -1297,40 +1322,64 @@ async function renderOwnedAndStakedFrogs(address) {
           </div>
         `;
 
-        const actionHtml = `
-          <div class="recent_sale_links">
-            <button class="sale_link_btn" onclick="ffUnstakeFrog(${tokenId})">
-              Unstake
-            </button>
-          </div>
-          <div class="recent_sale_links">
-            <a
-              class="sale_link_btn opensea"
-              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              OpenSea
-            </a>
-            <a
-              class="sale_link_btn etherscan"
-              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </a>
-          </div>
-        `;
+        const actionHtml = readOnly
+          ? `
+            <div class="recent_sale_links">
+              <a
+                class="sale_link_btn opensea"
+                href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                OpenSea
+              </a>
+              <a
+                class="sale_link_btn etherscan"
+                href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Etherscan
+              </a>
+            </div>
+          `
+          : `
+            <div class="recent_sale_links">
+              <button class="sale_link_btn" onclick="ffUnstakeFrog(${tokenId})">
+                Unstake
+              </button>
+            </div>
+            <div class="recent_sale_links">
+              <a
+                class="sale_link_btn opensea"
+                href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                OpenSea
+              </a>
+              <a
+                class="sale_link_btn etherscan"
+                href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Etherscan
+              </a>
+            </div>
+          `;
+
+        const ownerLabelAddress = address || ffCurrentAccount;
 
         const card = createFrogCard({
           tokenId,
           metadata,
-          headerLeft: truncateAddress(address || ffCurrentAccount) || 'Pond',
+          headerLeft: truncateAddress(ownerLabelAddress) || 'Pond',
           headerRight: 'Staked',
           footerHtml,
           actionHtml,
-          ownerAddress: address || ffCurrentAccount
+          // Again: in read-only mode, don't wire the clickable owner link
+          ownerAddress: readOnly ? null : ownerLabelAddress
         });
 
         stakedGrid.appendChild(card);

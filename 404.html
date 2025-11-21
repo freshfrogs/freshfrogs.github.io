@@ -212,46 +212,20 @@
           var stakingStats = null;
           var profile = null;
 
-          try {
-            if (typeof ffFetchOwnedFrogCount === 'function') {
-              ownedCount = await ffFetchOwnedFrogCount(wallet);
-            }
-          } catch (e) {
-            console.warn('[404 wallet] ffFetchOwnedFrogCount failed', e);
-          }
-
-          try {
-            if (typeof ffFetchStakingStats === 'function') {
-              stakingStats = await ffFetchStakingStats(wallet);
-            }
-          } catch (e) {
-            console.warn('[404 wallet] ffFetchStakingStats failed', e);
-          }
-
-          try {
-            if (typeof ffFetchOpenSeaProfile === 'function') {
-              profile = await ffFetchOpenSeaProfile(wallet);
-            }
-          } catch (e) {
-            console.warn('[404 wallet] ffFetchOpenSeaProfile failed', e);
-          }
-
           if (typeof ffApplyDashboardUpdates === 'function') {
             ffApplyDashboardUpdates(wallet, ownedCount, stakingStats, profile);
           }
 
-          // Switch to the wallet view – this will call
-          // renderOwnedAndStakedFrogs(ffCurrentAccount) inside site.js,
-          // which builds the *exact same* owned/staked frog cards as
-          // when a user connects their wallet.
+          // Show the wallet view
           if (typeof ffShowView === 'function') {
             ffShowView('wallet');
-          } else {
-            // Fallback: directly render if needed
-            if (typeof renderOwnedAndStakedFrogs === 'function') {
-              renderOwnedAndStakedFrogs(wallet);
-            }
           }
+
+          // Render frogs in READ-ONLY mode (no stake/unstake/transfer buttons)
+          if (typeof renderOwnedAndStakedFrogs === 'function') {
+            renderOwnedAndStakedFrogs(wallet, { readOnly: true });
+          }
+
         } catch (err) {
           console.warn('[404 wallet] Failed to init wallet view from URL:', err);
         }
