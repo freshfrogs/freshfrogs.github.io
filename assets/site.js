@@ -584,7 +584,7 @@ function dedupeByTokenId(items, idExtractor) {
 async function fetchRecentSales(limit = 24) {
   const params = new URLSearchParams({
     contractAddress: FF_COLLECTION_ADDRESS,
-    order: 'asc', // newest first
+    order: 'desc', // newest first
     limit: String(limit)
   });
 
