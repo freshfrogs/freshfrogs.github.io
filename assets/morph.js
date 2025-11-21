@@ -1,9 +1,11 @@
 /* assets/morph.js
    FreshFrogs Morph / Metamorph logic
-   - Shows preview inside a real frog card
-   - NO JSON output (removed)
-   - Name moved to bottom-left under image, uses "/" not "+"
-   - Uses Parent A background image zoomed to remove black default
+   - Preview inside FrogCard
+   - NO JSON output
+   - Name line bottom-left with "/"
+   - Parent A background zoomed
+   - Preview Morph button ALSO calls saveCurrentMorph()
+     using parameters exactly as required (function not edited)
 */
 
 (function () {
@@ -38,7 +40,7 @@
         return;
       }
 
-      await ffMetamorphBuild(tokenA, tokenB);
+      await ffMetamorphBuildAndSave(tokenA, tokenB);
     });
 
     clearBtn.addEventListener('click', () => {
@@ -52,6 +54,49 @@
       }
     });
   }
+
+  // ------------------------
+  // Build + Save wrapper
+  // ------------------------
+
+  async function ffMetamorphBuildAndSave(tokenA, tokenB) {
+    const statusEl = document.getElementById('morph-status');
+
+    // 1) build preview + traits
+    const result = await ffMetamorphBuild(tokenA, tokenB);
+    if (!result) return;
+
+    const { newTraits, previewUrl } = result;
+
+    // 2) get address
+    const address = ffGetConnectedAddress();
+
+    // 3) call your save function EXACTLY as-is
+    if (typeof saveCurrentMorph === 'function') {
+      try {
+        await saveCurrentMorph(
+          address,
+          tokenA,
+          tokenB,
+          newTraits,
+          previewUrl,
+          null,   // value optional
+          null    // signature optional
+        );
+        if (statusEl) statusEl.textContent = `Saved morph for #${tokenA} / #${tokenB}`;
+      } catch (e) {
+        console.error('saveCurrentMorph failed:', e);
+        if (statusEl) statusEl.textContent = `Preview ready (save failed — check console)`;
+      }
+    } else {
+      console.warn('saveCurrentMorph() not found on window. Preview built but not saved.');
+      if (statusEl) statusEl.textContent = `Preview ready (save function not loaded)`;
+    }
+  }
+
+  // ------------------------
+  // Morph Core Logic
+  // ------------------------
 
   async function ffMetamorphBuild(tokenA, tokenB) {
     const statusEl = document.getElementById('morph-status');
@@ -77,7 +122,7 @@
       const previewCont = card.querySelector('#morph-preview');
       const traitsEl    = card.querySelector('#morph-traits');
 
-      // Apply Parent A background to layered container (removes black)
+      // Apply Parent A background (removes black)
       ffApplyParentBackground(previewCont, tokenA);
 
       // Base maps
@@ -130,54 +175,46 @@
 
       // ----- Build layers + metadata list -----
       previewCont.innerHTML = '';
+      traitsEl.innerHTML = '';
 
-      function addLine(type, val) {
-        if (!traitsEl) return;
-        const p = document.createElement('p');
-        p.className = 'frog-attr-text';
-        p.textContent = `${type}: ${val}`;
-        traitsEl.appendChild(p);
+      const newTraits = [];
+
+      function addTrait(type, val, layerKey) {
+        if (!val) return;
+        newTraits.push({ trait_type: type, value: val });
+        if (traitsEl) {
+          const p = document.createElement('p');
+          p.className = 'frog-attr-text';
+          p.textContent = `${type}: ${val}`;
+          traitsEl.appendChild(p);
+        }
+        if (layerKey) build_trait(layerKey, val, 'morph-preview');
       }
 
       if (metadataC.Frog !== '') {
-        addLine('Frog', metadataC.Frog);
-        build_trait('Frog', metadataC.Frog, 'morph-preview');
+        addTrait('Frog', metadataC.Frog, 'Frog');
       } else if (metadataC.SpecialFrog !== '') {
-        addLine('SpecialFrog', metadataC.SpecialFrog);
-        build_trait('SpecialFrog', metadataC.SpecialFrog, 'morph-preview');
+        addTrait('SpecialFrog', metadataC.SpecialFrog, 'SpecialFrog');
       }
 
-      if (metadataC.Subset !== '') {
-        addLine('Frog/subset', metadataC.Subset);
-        build_trait('Frog/subset', metadataC.Subset, 'morph-preview');
-      }
-      if (metadataC.Trait !== '') {
-        addLine('Trait', metadataC.Trait);
-        build_trait('Trait', metadataC.Trait, 'morph-preview');
-      }
-      if (metadataC.Accessory !== '') {
-        addLine('Accessory', metadataC.Accessory);
-        build_trait('Accessory', metadataC.Accessory, 'morph-preview');
-      }
-      if (metadataC.Eyes !== '') {
-        addLine('Eyes', metadataC.Eyes);
-        build_trait('Eyes', metadataC.Eyes, 'morph-preview');
-      }
-      if (metadataC.Hat !== '') {
-        addLine('Hat', metadataC.Hat);
-        build_trait('Hat', metadataC.Hat, 'morph-preview');
-      }
-      if (metadataC.Mouth !== '') {
-        addLine('Mouth', metadataC.Mouth);
-        build_trait('Mouth', metadataC.Mouth, 'morph-preview');
-      }
+      addTrait('Frog/subset', metadataC.Subset, 'Frog/subset');
+      addTrait('Trait', metadataC.Trait, 'Trait');
+      addTrait('Accessory', metadataC.Accessory, 'Accessory');
+      addTrait('Eyes', metadataC.Eyes, 'Eyes');
+      addTrait('Hat', metadataC.Hat, 'Hat');
+      addTrait('Mouth', metadataC.Mouth, 'Mouth');
+
+      // Capture preview to a PNG dataURL for previewUrl param
+      const previewUrl = await ffCapturePreviewDataUrl('morph-preview', tokenA);
 
       if (statusEl) statusEl.textContent = `Preview ready: #${tokenA} / #${tokenB}`;
-      return { attributes: metadataC };
+
+      return { newTraits, previewUrl };
 
     } catch (err) {
       console.error('ffMetamorphBuild error:', err);
       if (statusEl) statusEl.textContent = `Morph failed: ${err.message || err}`;
+      return null;
     }
   }
 
@@ -190,9 +227,6 @@
     card.className = 'recent_sale_card';
     card.style.margin = '0 auto';
 
-    // NOTE:
-    // - header stays simple/minimal
-    // - name line is under image, bottom-left (like normal frog name)
     card.innerHTML = `
       <div class="recent_sale_header">
         <div class="sale_card_title">Morphed Preview</div>
@@ -204,17 +238,11 @@
         Morphed Preview #${tokenA} / #${tokenB}
       </div>
 
-      <div class="recent_sale_properties" id="morph-traits">
-        <!-- metadata lines injected here -->
-      </div>
+      <div class="recent_sale_properties" id="morph-traits"></div>
     `;
     return card;
   }
 
-  /**
-   * Sets Parent A png as background and zooms to show mostly background color.
-   * Layers still render on top inside .frog_img_cont.
-   */
   function ffApplyParentBackground(container, tokenA) {
     if (!container) return;
 
@@ -222,14 +250,77 @@
 
     container.style.backgroundImage = `url("${imgUrl}")`;
     container.style.backgroundRepeat = 'no-repeat';
-
-    // heavy zoom so only the background area shows
     container.style.backgroundSize = '500% 500%';
     container.style.backgroundPosition = 'bottom right';
-
-    // override black base
     container.style.backgroundColor = 'transparent';
   }
 
-  window.ffMetamorphBuild = ffMetamorphBuild;
+  // ------------------------
+  // Preview Capture (dataURL)
+  // ------------------------
+
+  /**
+   * Builds a PNG dataURL from the layered preview container.
+   * Draw order = background (Parent A PNG) then each overlay image in DOM order.
+   */
+  async function ffCapturePreviewDataUrl(containerId, tokenA) {
+    const cont = document.getElementById(containerId);
+    if (!cont) return `https://freshfrogs.github.io/frog/${tokenA}.png`;
+
+    const size = 256; // your frog frames are 256x256
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+
+    // Draw base (Parent A PNG)
+    const baseUrl = `https://freshfrogs.github.io/frog/${tokenA}.png`;
+    await ffDrawImage(ctx, baseUrl, size);
+
+    // Draw overlays (traits) in order
+    const imgs = Array.from(cont.querySelectorAll('img'));
+    for (const imgEl of imgs) {
+      const src = imgEl.getAttribute('src');
+      if (!src) continue;
+      await ffDrawImage(ctx, src, size);
+    }
+
+    return canvas.toDataURL('image/png');
+  }
+
+  function ffDrawImage(ctx, src, size) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, size, size);
+        resolve();
+      };
+      img.onerror = () => resolve(); // fail soft
+      img.src = src;
+    });
+  }
+
+  // ------------------------
+  // Address Helper
+  // ------------------------
+
+  function ffGetConnectedAddress() {
+    // Prefer any explicit globals your site.js might set
+    if (window.FF_CONNECTED_ADDRESS) return window.FF_CONNECTED_ADDRESS;
+    if (window.currentAccount) return window.currentAccount;
+    if (window.userAddress) return window.userAddress;
+
+    // MetaMask / EIP-1193
+    if (window.ethereum?.selectedAddress) return window.ethereum.selectedAddress;
+
+    // Web3 fallback
+    if (window.web3?.currentProvider?.selectedAddress) {
+      return window.web3.currentProvider.selectedAddress;
+    }
+
+    return null; // allowed by your save function
+  }
+
+  window.ffMetamorphBuildAndSave = ffMetamorphBuildAndSave;
 })();
