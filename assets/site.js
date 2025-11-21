@@ -580,31 +580,28 @@ function createMorphedFrogCard({ metadata, ownerAddress }) {
       ? `Morphed Frog (${metadata.frogA} + ${metadata.frogB})`
       : "Morphed Frog");
 
-  const traitsHtml = buildTraitsHtml(metadata);
+  // ensure traits render in the text section
+  if (!metadata.attributes && Array.isArray(metadata.traits)) {
+    metadata.attributes = metadata.traits;
+  }
 
-  const imgSrc =
-    metadata?.image ||
-    metadata?.image_url ||
-    metadata?.previewImage ||
-    metadata?.preview ||
-    "https://freshfrogs.github.io/assets/blackWhite.png"; // safe fallback
+  const traitsHtml = buildTraitsHtml(metadata);
+  const imgContainerId = `morph-img-${Math.random().toString(16).slice(2)}`;
+
+  // base token for background (Parent A)
+  const baseTokenId = parseTokenId(metadata?.frogA ?? metadata?.tokenA ?? null);
 
   const card = document.createElement("div");
   card.className = "recent_sale_card morphed_frog_card";
+  card.dataset.imgContainerId = imgContainerId;
+  if (baseTokenId != null) card.dataset.morphBaseTokenId = baseTokenId;
 
   card.innerHTML = `
     <strong class="sale_card_title">--</strong>
     <strong class="sale_card_price">Morphed</strong>
     <div style="clear: both;"></div>
 
-    <div class="frog_img_cont">
-      <img
-        src="${ffEscapeHtml(imgSrc)}"
-        class="recent_sale_img"
-        alt="${ffEscapeHtml(name)}"
-        loading="lazy"
-      />
-    </div>
+    <div id="${imgContainerId}" class="frog_img_cont"></div>
 
     <div class="recent_sale_traits">
       <strong class="sale_card_title">
@@ -619,7 +616,61 @@ function createMorphedFrogCard({ metadata, ownerAddress }) {
 
   if (ownerAddress) ffSetOwnerLabel(card, ownerAddress);
 
+  // Build layered image from saved metadata
+  ffBuildLayeredMorphedImage(metadata, imgContainerId, baseTokenId);
+
   return card;
+}
+
+async function ffBuildLayeredMorphedImage(metadata, containerId, baseTokenId = null) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  try {
+    const attrs = Array.isArray(metadata?.attributes) ? metadata.attributes : [];
+
+    const baseId = parseTokenId(baseTokenId ?? metadata?.frogA ?? metadata?.tokenA ?? null);
+    const baseUrl = baseId != null
+      ? `https://freshfrogs.github.io/frog/${baseId}.png`
+      : null;
+
+    container.innerHTML = '';
+
+    // Same background trick as ffBuildLayeredFrogImage (uses Parent A)
+    if (baseUrl) {
+      container.style.backgroundImage    = `url("${baseUrl}")`;
+      container.style.backgroundRepeat   = 'no-repeat';
+      container.style.backgroundSize     = '1000%';
+      container.style.backgroundPosition = 'bottom right';
+      container.style.backgroundColor    = 'transparent';
+    }
+
+    // If build_trait is ready, layer everything
+    if (typeof build_trait === 'function' && attrs.length) {
+      for (const attr of attrs) {
+        if (!attr?.trait_type || !attr?.value) continue;
+        build_trait(attr.trait_type, attr.value, containerId);
+      }
+      return;
+    }
+
+    // Fallback if build_trait isn't loaded yet:
+    // show saved preview image if present, else base frog png
+    const fallbackImg =
+      metadata?.image ||
+      metadata?.image_url ||
+      (baseUrl || "https://freshfrogs.github.io/assets/blackWhite.png");
+
+    const img = document.createElement('img');
+    img.src = fallbackImg;
+    img.alt = metadata?.name || "Morphed Frog";
+    img.className = 'recent_sale_img';
+    img.loading = 'lazy';
+    container.appendChild(img);
+
+  } catch (err) {
+    console.warn('ffBuildLayeredMorphedImage failed:', err);
+  }
 }
 
 // Build layered frog image (uses metadata from /frog/json and build_trait from ethereum-dapp.js)
