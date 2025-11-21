@@ -23,6 +23,9 @@ const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
+// Morph storage Worker (Cloudflare Worker KV)
+const FF_MORPH_WORKER_URL = 'https://freshfrogs-morphs.danielssouthworth.workers.dev/';
+
 // Activity mode (sales vs mints) for "Collection" panel
 let FF_ACTIVITY_MODE = 'sales'; // 'sales' or 'mints'
 let FF_RECENT_LIMIT  = 24;
@@ -570,6 +573,55 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
   return card;
 }
 
+function createMorphedFrogCard({ metadata, ownerAddress }) {
+  const name =
+    metadata?.name ||
+    (metadata?.frogA != null && metadata?.frogB != null
+      ? `Morphed Frog (${metadata.frogA} + ${metadata.frogB})`
+      : "Morphed Frog");
+
+  const traitsHtml = buildTraitsHtml(metadata);
+
+  const imgSrc =
+    metadata?.image ||
+    metadata?.image_url ||
+    metadata?.previewImage ||
+    metadata?.preview ||
+    "https://freshfrogs.github.io/assets/blackWhite.png"; // safe fallback
+
+  const card = document.createElement("div");
+  card.className = "recent_sale_card morphed_frog_card";
+
+  card.innerHTML = `
+    <strong class="sale_card_title">--</strong>
+    <strong class="sale_card_price">Morphed</strong>
+    <div style="clear: both;"></div>
+
+    <div class="frog_img_cont">
+      <img
+        src="${ffEscapeHtml(imgSrc)}"
+        class="recent_sale_img"
+        alt="${ffEscapeHtml(name)}"
+        loading="lazy"
+      />
+    </div>
+
+    <div class="recent_sale_traits">
+      <strong class="sale_card_title">
+        <span class="frog-name-link">${ffEscapeHtml(name)}</span>
+      </strong>
+      <strong class="sale_card_price rarity_badge rarity_unknown">MORPH TEST</strong><br>
+      <div class="recent_sale_properties">
+        ${traitsHtml}
+      </div>
+    </div>
+  `;
+
+  if (ownerAddress) ffSetOwnerLabel(card, ownerAddress);
+
+  return card;
+}
+
 // Build layered frog image (uses metadata from /frog/json and build_trait from ethereum-dapp.js)
 async function ffBuildLayeredFrogImage(tokenId, containerId) {
   const container = document.getElementById(containerId);
@@ -1092,6 +1144,30 @@ async function ffFetchOwnedFrogs(address) {
   return frogs;
 }
 
+// ------------------------
+// Morphed frogs (off-chain saved metadata)
+// ------------------------
+async function ffFetchMorphedFrogs(address) {
+  if (!FF_MORPH_WORKER_URL || !address) return [];
+
+  try {
+    const url = `${FF_MORPH_WORKER_URL}/morphs?address=${address}`;
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return [];
+
+    const data = await res.json();
+    const morphs = Array.isArray(data?.morphs) ? data.morphs : [];
+
+    // each record should have morphedMeta
+    return morphs
+      .map((m) => m?.morphedMeta)
+      .filter((meta) => meta && typeof meta === "object");
+  } catch (err) {
+    console.warn("ffFetchMorphedFrogs failed:", err);
+    return [];
+  }
+}
+
 async function ffFetchStakedTokenIds(address) {
   if (!ffWeb3 || typeof CONTROLLER_ABI === 'undefined') return [];
 
@@ -1128,10 +1204,12 @@ async function renderOwnedAndStakedFrogs(address) {
   const isPublic = !!window.FF_PUBLIC_WALLET_VIEW;
 
   try {
-    const [ownedNfts, stakedIds] = await Promise.all([
+    const [ownedNfts, stakedIds, morphedMetas] = await Promise.all([
       ffFetchOwnedFrogs(address),
-      ffFetchStakedTokenIds(address).catch(() => [])
+      ffFetchStakedTokenIds(address).catch(() => []),
+      ffFetchMorphedFrogs(address)
     ]);
+
 
     if (ownedGrid) ownedGrid.innerHTML = '';
     if (stakedGrid) stakedGrid.innerHTML = '';
@@ -1171,6 +1249,23 @@ async function renderOwnedAndStakedFrogs(address) {
         ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
       }
       ffAttachStakeMetaIfStaked(card, tokenId);
+    }
+
+    // ---- Render morphed frogs as owned frogs (no staking / no sale price) ----
+    if (Array.isArray(morphedMetas) && morphedMetas.length) {
+      for (const meta of morphedMetas) {
+        // normalize attributes field if your morph builder uses a different key
+        if (!meta.attributes && Array.isArray(meta.traits)) {
+          meta.attributes = meta.traits;
+        }
+
+        const morphCard = createMorphedFrogCard({
+          metadata: meta,
+          ownerAddress: address
+        });
+
+        ownedGrid?.appendChild(morphCard);
+      }
     }
 
     for (const tokenId of stakedIds) {
