@@ -47,40 +47,53 @@
   // FrogMorph = SAVE wrapper
   // ------------------------
 
-  async function FrogMorph() {
-    const statusEl = document.getElementById('morph-status');
+    async function FrogMorph() {
+        const statusEl = document.getElementById('morph-status');
 
-    if (!LAST_MORPH) {
-      if (statusEl) statusEl.textContent = 'Nothing to morph yet. Click Generate first.';
-      return;
+        if (!LAST_MORPH) {
+            if (statusEl) statusEl.textContent = 'Nothing to save yet — click Generate first.';
+            return;
+        }
+
+        const { tokenA, tokenB, newTraits, previewUrl } = LAST_MORPH;
+        const address = getConnectedAddress();
+
+        // ✅ Call the test helper ONLY when we have real args
+        if (typeof SaveFrogMorphTest === "function") {
+            SaveFrogMorphTest({
+            address,
+            frogA: tokenA,
+            frogB: tokenB,
+            newTraits,
+            previewUrl,
+            value: null,
+            signature: null
+            });
+        }
+
+        if (typeof saveCurrentMorph !== 'function') {
+            console.warn('saveCurrentMorph() not found on window. Preview built but not saved.');
+            if (statusEl) statusEl.textContent = 'Save function not loaded.';
+            return;
+        }
+
+        try {
+            if (statusEl) statusEl.textContent = `Saving morph #${tokenA} / #${tokenB}…`;
+            await saveCurrentMorph(
+            address,
+            tokenA,
+            tokenB,
+            newTraits,
+            previewUrl,
+            null, // value optional
+            null  // signature optional
+            );
+            if (statusEl) statusEl.textContent = `Saved morph for #${tokenA} / #${tokenB}`;
+        } catch (e) {
+            console.error('saveCurrentMorph failed:', e);
+            if (statusEl) statusEl.textContent = 'Save failed — check console.';
+        }
     }
-
-    const { tokenA, tokenB, newTraits, previewUrl } = LAST_MORPH;
-    const address = ffGetConnectedAddress();
-
-    if (typeof saveCurrentMorph !== 'function') {
-      console.warn('saveCurrentMorph() not found on window. Preview built but not saved.');
-      if (statusEl) statusEl.textContent = 'Save function not loaded.';
-      return;
-    }
-
-    try {
-      if (statusEl) statusEl.textContent = `Saving morph #${tokenA} / #${tokenB}…`;
-      await saveCurrentMorph(
-        address,
-        tokenA,
-        tokenB,
-        newTraits,
-        previewUrl,
-        null,
-        null
-      );
-      if (statusEl) statusEl.textContent = `Saved morph for #${tokenA} / #${tokenB}`;
-    } catch (e) {
-      console.error('saveCurrentMorph failed:', e);
-      if (statusEl) statusEl.textContent = 'Save failed — check console.';
-    }
-  }
 
   window.FrogMorph = FrogMorph;
 
