@@ -232,7 +232,8 @@ async function loadRecentActivity() {
         headerLeft,
         headerRight,
         footerHtml: '',
-        actionHtml
+        actionHtml,
+        ownerAddress
       });
 
       container.appendChild(card);
@@ -487,7 +488,8 @@ function createFrogCard({
   headerLeft,
   headerRight,
   footerHtml,
-  actionHtml
+  actionHtml,
+  ownerAddress
 }) {
   const frogName   = `Frog #${tokenId}`;
   const rarityRank = getRarityRank(tokenId);
@@ -508,7 +510,9 @@ function createFrogCard({
   card.dataset.imgContainerId = imgContainerId;
 
   card.innerHTML = `
-    <strong class="sale_card_title">${headerLeft || ''}</strong>
+    <strong class="sale_card_title">
+      ${ffBuildOwnerLabel(ownerAddress, headerLeft)}
+    </strong>
     <strong class="sale_card_price">${headerRight || ''}</strong>
     <div style="clear: both;"></div>
 
@@ -740,6 +744,23 @@ function truncateAddress(address) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
+// Build clickable owner label for the top-left of the frog card
+function ffBuildOwnerLabel(ownerAddress, fallbackText) {
+  if (!ownerAddress) {
+    return fallbackText || '';
+  }
+
+  const addr = String(ownerAddress);
+  return `
+    <a
+      href="https://freshfrogs.github.io/${addr}"
+      class="frog-owner-link"
+    >
+      ${truncateAddress(addr)}
+    </a>
+  `;
+}
+
 // Resolve the "true" frog owner:
 // - If staked: use stakerAddress(tokenId) from the staking contract
 // - Otherwise: fall back to collection.ownerOf(tokenId)
@@ -948,7 +969,8 @@ async function ffLoadMoreRarity() {
               Etherscan
             </a>
           </div>
-        `
+        `,
+        ownerAddress
       });
 
       grid.appendChild(card);
@@ -1004,35 +1026,25 @@ function ffEnsurePondLoaded() {
 }
 
 // Set owner label (top-left) on a pond card using stakerAddress(tokenId)
+// Set owner label (top-left) on a pond card using stakerAddress(tokenId)
 async function ffDecoratePondOwner(card, tokenId) {
   try {
-    // Prefer helper if present
-    if (typeof ffEnsureReadContracts === 'function') {
-      const ok = await ffEnsureReadContracts();
-      if (!ok) return;
-    } else {
-      // Fallback: require controller already initialised (e.g. via wallet connect)
-      if (!ffWeb3 || !window.controller) return;
-    }
-
-    if (typeof stakerAddress !== 'function') {
-      console.warn('stakerAddress() helper not available; cannot show pond owner.');
-      return;
-    }
+    const ok = await ffEnsureReadContracts();
+    if (!ok || typeof stakerAddress !== 'function') return;
 
     const staker = await stakerAddress(tokenId);
     if (!staker || staker === ZERO_ADDRESS) return;
 
-    // First .sale_card_title in the card is the top-left header
     const titleEls = card.querySelectorAll('.sale_card_title');
     const ownerEl = titleEls[0];
     if (ownerEl) {
-      ownerEl.textContent = truncateAddress(staker);
+      ownerEl.innerHTML = ffBuildOwnerLabel(staker, '');
     }
   } catch (err) {
     console.warn('ffDecoratePondOwner failed for token', tokenId, err);
   }
 }
+
 
 async function ffLoadMorePond() {
   const grid = document.getElementById('pond-grid');
@@ -1250,7 +1262,8 @@ async function renderOwnedAndStakedFrogs(address) {
           headerLeft: truncateAddress(address),
           headerRight: 'Owned',
           footerHtml: '',
-          actionHtml
+          actionHtml,
+          ownerAddress: address
         });
 
         ownedGrid.appendChild(card);
@@ -1316,7 +1329,8 @@ async function renderOwnedAndStakedFrogs(address) {
           headerLeft: truncateAddress(address || ffCurrentAccount) || 'Pond',
           headerRight: 'Staked',
           footerHtml,
-          actionHtml
+          actionHtml,
+          ownerAddress: address || ffCurrentAccount
         });
 
         stakedGrid.appendChild(card);
