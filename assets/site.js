@@ -292,7 +292,7 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
         <span class="stake-level-label">Staked Lvl. ${levelNum}</span>
       </div>
       <div class="stake-meta-row stake-meta-subrow">
-        <span>Staked: ${stakedDate} (${stakedDays}d)</span>
+        <span>Staked: ${stakedDate}</span>
       </div>
       <div class="stake-progress">
         <div class="stake-progress-bar" style="width:${pct}%;"></div>
@@ -1249,7 +1249,7 @@ async function ffDecorateStakedFrogCard(tokenId) {
     const barEl  = document.getElementById(`stake-progress-bar-${tokenId}`);
 
     if (lvlEl)  lvlEl.textContent  = `Staked Lvl. ${levelNum}`;
-    if (dateEl) dateEl.textContent = `Staked: ${stakedDate} (${stakedDays}d)`;
+    if (dateEl) dateEl.textContent = `Staked: ${stakedDate}`;
     if (nextEl) nextEl.textContent = ``;
 
     const MAX_DAYS  = 41.7;
