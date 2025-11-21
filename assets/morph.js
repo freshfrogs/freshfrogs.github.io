@@ -1,6 +1,8 @@
 /* assets/morph.js
    FreshFrogs Morph / Metamorph logic
    - Shows preview inside a real frog card
+   - NO JSON output (removed)
+   - Name moved to bottom-left under image, uses "/" not "+"
    - Uses Parent A background image zoomed to remove black default
 */
 
@@ -46,7 +48,7 @@
       if (slot) slot.innerHTML = '';
       if (statusEl) {
         statusEl.textContent =
-          'Pick two Frogs to preview a metamorph. This does not mint — it only builds the combo preview + JSON.';
+          'Pick two Frogs to preview a metamorph. This does not mint — it only builds the combo preview + metadata list.';
       }
     });
   }
@@ -64,7 +66,7 @@
         throw new Error('build_trait() missing. Make sure ethereum-dapp.js loads before morph.js.');
       }
 
-      if (statusEl) statusEl.textContent = `Morphing Frog #${tokenA} + Frog #${tokenB}…`;
+      if (statusEl) statusEl.textContent = `Morphing Frog #${tokenA} / Frog #${tokenB}…`;
       if (!slot) throw new Error('morph-card-slot not found');
 
       // ------- create preview card (real FrogCard) -------
@@ -73,11 +75,10 @@
       slot.appendChild(card);
 
       const previewCont = card.querySelector('#morph-preview');
-      const jsonEl      = card.querySelector('#morph-json');
       const traitsEl    = card.querySelector('#morph-traits');
 
-      // Apply Parent A background to layered container
-      ffApplyParentBackground(previewCont, tokenA, basePath);
+      // Apply Parent A background to layered container (removes black)
+      ffApplyParentBackground(previewCont, tokenA);
 
       // Base maps
       const metadataA = { Frog:'', SpecialFrog:'', Trait:'', Accessory:'', Eyes:'', Hat:'', Mouth:'' };
@@ -127,57 +128,52 @@
       metadataC.Hat       = metadataA.Hat       || metadataB.Hat       || '';
       metadataC.Mouth     = metadataA.Mouth     || metadataB.Mouth     || '';
 
-      // ----- Build layers + output attributes -----
-      const out = { attributes: [] };
+      // ----- Build layers + metadata list -----
       previewCont.innerHTML = '';
 
-      function pushAttr(type, val) {
-        out.attributes.push({ trait_type: type, value: val });
-        if (traitsEl) {
-          const p = document.createElement('p');
-          p.className = 'frog-attr-text';
-          p.textContent = `${type}: ${val}`;
-          traitsEl.appendChild(p);
-        }
+      function addLine(type, val) {
+        if (!traitsEl) return;
+        const p = document.createElement('p');
+        p.className = 'frog-attr-text';
+        p.textContent = `${type}: ${val}`;
+        traitsEl.appendChild(p);
       }
 
       if (metadataC.Frog !== '') {
-        pushAttr('Frog', metadataC.Frog);
+        addLine('Frog', metadataC.Frog);
         build_trait('Frog', metadataC.Frog, 'morph-preview');
       } else if (metadataC.SpecialFrog !== '') {
-        pushAttr('SpecialFrog', metadataC.SpecialFrog);
+        addLine('SpecialFrog', metadataC.SpecialFrog);
         build_trait('SpecialFrog', metadataC.SpecialFrog, 'morph-preview');
       }
 
       if (metadataC.Subset !== '') {
-        pushAttr('Frog/subset', metadataC.Subset);
+        addLine('Frog/subset', metadataC.Subset);
         build_trait('Frog/subset', metadataC.Subset, 'morph-preview');
       }
       if (metadataC.Trait !== '') {
-        pushAttr('Trait', metadataC.Trait);
+        addLine('Trait', metadataC.Trait);
         build_trait('Trait', metadataC.Trait, 'morph-preview');
       }
       if (metadataC.Accessory !== '') {
-        pushAttr('Accessory', metadataC.Accessory);
+        addLine('Accessory', metadataC.Accessory);
         build_trait('Accessory', metadataC.Accessory, 'morph-preview');
       }
       if (metadataC.Eyes !== '') {
-        pushAttr('Eyes', metadataC.Eyes);
+        addLine('Eyes', metadataC.Eyes);
         build_trait('Eyes', metadataC.Eyes, 'morph-preview');
       }
       if (metadataC.Hat !== '') {
-        pushAttr('Hat', metadataC.Hat);
+        addLine('Hat', metadataC.Hat);
         build_trait('Hat', metadataC.Hat, 'morph-preview');
       }
       if (metadataC.Mouth !== '') {
-        pushAttr('Mouth', metadataC.Mouth);
+        addLine('Mouth', metadataC.Mouth);
         build_trait('Mouth', metadataC.Mouth, 'morph-preview');
       }
 
-      if (jsonEl) jsonEl.textContent = JSON.stringify(out.attributes, null, 2);
-
-      if (statusEl) statusEl.textContent = `Preview ready: Frog #${tokenA} + Frog #${tokenB}`;
-      return out;
+      if (statusEl) statusEl.textContent = `Preview ready: #${tokenA} / #${tokenB}`;
+      return { attributes: metadataC };
 
     } catch (err) {
       console.error('ffMetamorphBuild error:', err);
@@ -194,39 +190,41 @@
     card.className = 'recent_sale_card';
     card.style.margin = '0 auto';
 
+    // NOTE:
+    // - header stays simple/minimal
+    // - name line is under image, bottom-left (like normal frog name)
     card.innerHTML = `
       <div class="recent_sale_header">
         <div class="sale_card_title">Morphed Preview</div>
-        <div class="sale_card_price">#${tokenA} + #${tokenB}</div>
       </div>
 
       <div id="morph-preview" class="frog_img_cont"></div>
 
-      <div class="recent_sale_properties" id="morph-traits">
-        <!-- trait <p> lines injected here -->
+      <div class="frog_name" style="margin: 6px 8px 2px; text-align:left;">
+        Morphed Preview #${tokenA} / #${tokenB}
       </div>
 
-      <pre id="morph-json" class="morph-json" style="margin:8px; font-size:0.75rem; white-space:pre-wrap;">// morphed attributes will appear here</pre>
+      <div class="recent_sale_properties" id="morph-traits">
+        <!-- metadata lines injected here -->
+      </div>
     `;
     return card;
   }
 
   /**
    * Sets Parent A png as background and zooms to show mostly background color.
-   * We keep your layered traits on top.
+   * Layers still render on top inside .frog_img_cont.
    */
-  function ffApplyParentBackground(container, tokenA, basePath) {
+  function ffApplyParentBackground(container, tokenA) {
     if (!container) return;
+
     const imgUrl = `https://freshfrogs.github.io/frog/${tokenA}.png`;
 
     container.style.backgroundImage = `url("${imgUrl}")`;
     container.style.backgroundRepeat = 'no-repeat';
 
-    // Big zoom so you mostly see flat background
+    // heavy zoom so only the background area shows
     container.style.backgroundSize = '500% 500%';
-
-    // Background in repo pngs is usually clean in corners.
-    // bottom right matches your CSS default, so keep it.
     container.style.backgroundPosition = 'bottom right';
 
     // override black base
