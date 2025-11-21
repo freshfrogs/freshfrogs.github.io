@@ -298,7 +298,7 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
         <span class="stake-level-label">Staked Lvl. ${levelNum}</span>
       </div>
       <div class="stake-meta-row stake-meta-subrow">
-        <span>Staked: ${stakedDate} (${stakedDays}d)</span>
+        <span>Staked: ${stakedDate}</span>
       </div>
       <div class="stake-progress">
         <div class="stake-progress-bar" style="width:${pct}%;"></div>
