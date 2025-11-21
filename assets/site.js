@@ -12,28 +12,21 @@ const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // optional
 const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
 const FF_ALCHEMY_CORE_BASE  = `https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`;
 
-// 🔹 Which provider to use for *recent sales only*
-//   'alchemy' → use Alchemy getNFTSales
-//   'opensea' → use OpenSea Get Events (by collection)
 const FF_SALES_SOURCE = 'opensea'; // 'opensea' or 'alchemy'
-
-// 🔹 OpenSea collection slug for Fresh Frogs
-//     e.g. if your URL is https://opensea.io/collection/fresh-frogs
-//     then slug = 'fresh-frogs'
 const FF_OPENSEA_COLLECTION_SLUG = 'fresh-frogs'; // <-- update if needed
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 // Activity mode (sales vs mints) for "Collection" panel
 let FF_ACTIVITY_MODE = 'sales'; // 'sales' or 'mints'
-let FF_RECENT_LIMIT  = 24;
+let FF_RECENT_LIMIT  = 42;
 
 // Toggle to show staking stats on non-wallet cards
 const FF_SHOW_STAKING_STATS_ON_CARDS = true;
 
 // Rarity paging
 let FF_RARITY_INDEX = 0;
-const FF_RARITY_BATCH = 24;
+const FF_RARITY_BATCH = 42;
 
 // Pond paging
 let FF_POND_PAGE_KEY = null;
