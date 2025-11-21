@@ -276,4 +276,50 @@
     return null;
   }
 
+  // TESTING ONLY — does NOT call the Worker yet.
+    // Builds the payload you *will* send and logs it.
+    function saveCurrentMorph({
+    address,
+    frogA,
+    frogB,
+    newTraits = [],     // array of {trait_type,value} OR {type,value}
+    previewUrl = null,  // image URL or base64
+    value = null,       // optional EIP-712 value object
+    signature = null    // optional signature string
+    } = {}) {
+    // Basic guards so you notice missing stuff in console
+    if (!address) console.warn("[SaveFrogMorphTest] Missing address");
+    if (frogA == null || frogB == null) console.warn("[SaveFrogMorphTest] Missing frogA/frogB");
+
+    // Normalize traits into attributes[] your FrogCards expect
+    const attributes = (newTraits || []).map(t => ({
+        trait_type: t.trait_type || t.type || t.trait || "Unknown",
+        value: t.value ?? t.val ?? ""
+    }));
+
+    const morphedMeta = {
+        name: `Morphed Frog (${frogA} + ${frogB})`,
+        image: previewUrl,
+        attributes,
+        frogA,
+        frogB,
+        createdBy: address
+    };
+
+    const payload = {
+        address,
+        frogA,
+        frogB,
+        morphedMeta,
+        value,
+        signature
+    };
+
+    console.log("🧪 SaveFrogMorph TEST payload:", payload);
+    console.log("🧪 morphedMeta:", morphedMeta);
+    console.table(attributes);
+
+    return payload; // handy for quick inspection / unit tests
+    }
+
 })();
