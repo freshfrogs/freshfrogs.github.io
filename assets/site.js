@@ -740,6 +740,44 @@ function truncateAddress(address) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
+// Resolve the "true" frog owner:
+// - If staked: use stakerAddress(tokenId) from the staking contract
+// - Otherwise: fall back to collection.ownerOf(tokenId)
+async function ffResolveFrogOwner(tokenId) {
+  // Make sure we have read-only contracts ready
+  const ok = await ffEnsureReadContracts().catch((err) => {
+    console.warn('ffResolveFrogOwner: ffEnsureReadContracts failed', err);
+    return false;
+  });
+  if (!ok) return null;
+
+  // 1) Prefer the staking contract (true owner while staked)
+  if (typeof stakerAddress === 'function' && window.controller) {
+    try {
+      const staker = await stakerAddress(tokenId);
+      if (staker && staker !== ZERO_ADDRESS) {
+        return staker;
+      }
+    } catch (err) {
+      console.warn('ffResolveFrogOwner: stakerAddress failed for token', tokenId, err);
+    }
+  }
+
+  // 2) Fallback to ERC-721 ownerOf
+  if (!window.collection || !window.collection.methods || !window.collection.methods.ownerOf) {
+    return null;
+  }
+
+  try {
+    const owner = await window.collection.methods.ownerOf(tokenId).call();
+    return owner || null;
+  } catch (err) {
+    console.warn('ffResolveFrogOwner: ownerOf failed for token', tokenId, err);
+    return null;
+  }
+}
+
+
 function formatSalePrice(sale) {
   if (!sale) return '--';
 
@@ -876,9 +914,13 @@ async function ffLoadMoreRarity() {
 
       const rank = entry.ranking ?? entry.rank ?? entry.position ?? getRarityRank(tokenId);
 
-      const metadata = await fetchFrogMetadata(tokenId);
+      // Fetch metadata + owner in parallel to keep things snappy
+      const [metadata, ownerAddress] = await Promise.all([
+        fetchFrogMetadata(tokenId),
+        ffResolveFrogOwner(tokenId).catch(() => null)
+      ]);
 
-      const headerLeft  = ''; // owner lookup skipped for now (too heavy for full 4,040 list)
+      const headerLeft  = ownerAddress ? truncateAddress(ownerAddress) : '';
       const headerRight = rank ? `Rank #${rank}` : '';
 
       const card = createFrogCard({
@@ -914,13 +956,6 @@ async function ffLoadMoreRarity() {
       ffAttachStakeMetaIfStaked(card, tokenId);
     }
 
-    FF_RARITY_INDEX += slice.length;
-
-    if (status) {
-      status.textContent = FF_RARITY_INDEX >= rankings.length
-        ? 'All frogs loaded.'
-        : 'Top ranked Frogs across the collection (lower rank = rarer).';
-    }
   } catch (err) {
     console.error('ffLoadMoreRarity failed', err);
     if (status) status.textContent = 'Unable to load rarity rankings.';
