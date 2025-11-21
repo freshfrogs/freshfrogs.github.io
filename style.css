@@ -702,7 +702,7 @@ a {
 /* Reuse recent_sale_card style for owned / staked NFTs */
 .nft-grid .recent_sale_card {
   max-width: 240px;      /* 🔹 same cap for wallet grids */
-  width: 100%;
+  width: 240px;
   margin: 8px auto;
 }
 
