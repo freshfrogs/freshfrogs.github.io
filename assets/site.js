@@ -439,7 +439,7 @@ function createFrogCard({
       ${footerHtml || ''}
       ${actionHtml || ''}
     </div>
-  """
+  `;
 
   if (typeof ffBuildLayeredFrogImage === 'function') {
     ffBuildLayeredFrogImage(tokenId, imgContainerId).catch((err) => {
