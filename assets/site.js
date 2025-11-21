@@ -15,7 +15,7 @@ const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // optional (u
 //  - 'alchemy'  => use Alchemy only
 const FF_RECENT_SALES_SOURCE = 'opensea';
 
-// OpenSea collection slug (confirmed by you)
+// OpenSea collection slug
 const FF_OPENSEA_COLLECTION_SLUG = 'fresh-frogs';
 
 const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
@@ -270,7 +270,6 @@ async function loadRecentActivity() {
         ownerAddress = item.to || item.receiver || item.buyerAddress || item.ownerAddress || null;
         headerRight  = formatMintAge(item);
       } else {
-        // Prefer buyer; fallback to seller; then any known from/to
         ownerAddress =
           item.buyerAddress ||
           item.to ||
@@ -292,49 +291,24 @@ async function loadRecentActivity() {
         }
       }
 
-      const actionHtml = `
-        <div class="recent_sale_links">
-          <a
-            class="sale_link_btn opensea"
-            href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            OpenSea
-          </a>
-          <a
-            class="sale_link_btn etherscan"
-            href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Etherscan
-          </a>
-        </div>
-     `;
-
+      // ✅ No OpenSea / Etherscan buttons anymore
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '--',  // always visible baseline
+        headerLeft: '--',
         headerRight,
         footerHtml: '',
-        actionHtml
+        actionHtml: '' // removed
       });
 
       container.appendChild(card);
 
-      // Set top-left owner label (username async)
-      if (ownerAddress) {
-        ffSetOwnerLabel(card, ownerAddress);
-      }
+      if (ownerAddress) ffSetOwnerLabel(card, ownerAddress);
 
-      // Layered images everywhere
       if (card.dataset.imgContainerId) {
         ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
       }
 
-      // Staking meta
       ffAttachStakeMetaIfStaked(card, tokenId);
     }
   } catch (err) {
@@ -398,9 +372,8 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
       </div>
     `;
 
-    const firstAction = parent.querySelector('.recent_sale_links');
-    if (firstAction) parent.insertBefore(wrapper, firstAction);
-    else parent.appendChild(wrapper);
+    // Insert staking block after traits block
+    parent.appendChild(wrapper);
   } catch (err) {
     console.warn('ffAttachStakeMetaIfStaked failed for token', tokenId, err);
   }
@@ -547,6 +520,8 @@ function buildRarityLookup(rankings) {
 // ------------------------
 function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml, actionHtml }) {
   const frogName   = `Frog #${tokenId}`;
+  const osLink     = `https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}`;
+
   const rarityRank = getRarityRank(tokenId);
   const rarityTier = rarityRank ? getRarityTier(rarityRank) : null;
 
@@ -560,6 +535,7 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
   card.dataset.tokenId = tokenId;
   card.dataset.imgContainerId = imgContainerId;
 
+  // ✅ Frog name is now the OpenSea link
   card.innerHTML = `
     <strong class="sale_card_title">${headerLeft || ''}</strong>
     <strong class="sale_card_price">${headerRight || ''}</strong>
@@ -575,7 +551,9 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
     </div>
 
     <div class="recent_sale_traits">
-      <strong class="sale_card_title">${frogName}</strong>
+      <strong class="sale_card_title">
+        <a class="frog-name-link" href="${osLink}" target="_blank" rel="noopener noreferrer">${frogName}</a>
+      </strong>
       <strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
       <div class="recent_sale_properties">
         ${traitsHtml}
@@ -717,25 +695,12 @@ async function fetchRecentSalesOpenSea(limit = 24) {
     const tokenId = parseTokenId(nft.identifier || nft.token_id || e.tokenId);
     if (tokenId == null) continue;
 
-    // BIG address fallback net
     const buyerAddress = ffPickAddress(
-      e.buyer,
-      e.taker,
-      e.to_account,
-      e.toAccount,
-      e.to,
-      e.buyer_address,
-      e.winner_account
+      e.buyer, e.taker, e.to_account, e.toAccount, e.to, e.buyer_address, e.winner_account
     );
 
     const sellerAddress = ffPickAddress(
-      e.seller,
-      e.maker,
-      e.from_account,
-      e.fromAccount,
-      e.from,
-      e.seller_address,
-      e.loser_account
+      e.seller, e.maker, e.from_account, e.fromAccount, e.from, e.seller_address, e.loser_account
     );
 
     const paymentToken = e.payment_token || e.payment?.payment_token || {};
@@ -982,16 +947,7 @@ async function ffLoadMoreRarity() {
         headerLeft: '--',
         headerRight: rank ? `Rank #${rank}` : '',
         footerHtml: '',
-        actionHtml: `
-          <div class="recent_sale_links">
-            <a class="sale_link_btn opensea"
-               href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-               target="_blank" rel="noopener noreferrer">OpenSea</a>
-            <a class="sale_link_btn etherscan"
-               href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-               target="_blank" rel="noopener noreferrer">Etherscan</a>
-          </div>
-        `
+        actionHtml: '' // removed
       });
 
       grid.appendChild(card);
@@ -1091,16 +1047,7 @@ async function ffLoadMorePond() {
         headerLeft: '--',
         headerRight: 'Staked',
         footerHtml: '',
-        actionHtml: `
-          <div class="recent_sale_links">
-            <a class="sale_link_btn opensea"
-               href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-               target="_blank" rel="noopener noreferrer">OpenSea</a>
-            <a class="sale_link_btn etherscan"
-               href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-               target="_blank" rel="noopener noreferrer">Etherscan</a>
-          </div>
-        `
+        actionHtml: '' // removed
       });
 
       grid.appendChild(card);
@@ -1201,18 +1148,11 @@ async function renderOwnedAndStakedFrogs(address) {
 
       const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '--';
 
+      // ✅ Keep only wallet actions (no OS/ES)
       const actionHtml = isPublic ? '' : `
         <div class="recent_sale_links">
           <button class="sale_link_btn" onclick="ffStakeFrog(${tokenId})">Stake</button>
           <button class="sale_link_btn" onclick="ffTransferFrog(${tokenId})">Transfer</button>
-        </div>
-        <div class="recent_sale_links">
-          <a class="sale_link_btn opensea"
-             href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-             target="_blank" rel="noopener noreferrer">OpenSea</a>
-          <a class="sale_link_btn etherscan"
-             href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-             target="_blank" rel="noopener noreferrer">Etherscan</a>
         </div>
       `;
 
@@ -1255,14 +1195,6 @@ async function renderOwnedAndStakedFrogs(address) {
       const actionHtml = isPublic ? '' : `
         <div class="recent_sale_links">
           <button class="sale_link_btn" onclick="ffUnstakeFrog(${tokenId})">Unstake</button>
-        </div>
-        <div class="recent_sale_links">
-          <a class="sale_link_btn opensea"
-             href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-             target="_blank" rel="noopener noreferrer">OpenSea</a>
-          <a class="sale_link_btn etherscan"
-             href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-             target="_blank" rel="noopener noreferrer">Etherscan</a>
         </div>
       `;
 
