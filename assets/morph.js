@@ -115,9 +115,7 @@
       if (!slot) throw new Error('morph-card-slot not found');
 
       // ------- create preview card (real FrogCard) -------
-      slot.innerHTML = '';
-      const card = ffCreateMorphCard(tokenA, tokenB);
-      slot.appendChild(card);
+      const card = document.querySelector('#morph-card-slot .recent_sale_card');
 
       const previewCont = card.querySelector('#morph-preview');
       const traitsEl    = card.querySelector('#morph-traits');
