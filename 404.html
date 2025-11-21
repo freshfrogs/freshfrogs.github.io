@@ -1,454 +1,356 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>FreshFrogs – Wallet Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <head>
+      <title>FreshFrogs Wallet Viewer</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="style.css" type="text/css">
+      <link rel="shortcut icon" type="image/x-icon" href="https://freshfrogs.github.io/assets/blackWhite.png">
 
-  <!-- Match main site styles -->
-  <link rel="stylesheet" href="style.css" />
-  <link
-    rel="shortcut icon"
-    type="image/x-icon"
-    href="https://freshfrogs.github.io/assets/blackWhite.png"
-  />
-</head>
-<body class="layout-4">
-  <div class="page">
-    <!-- HEADER -->
-    <header class="site-header">
-      <nav class="nav">
-        <!-- Views controlled by JS -->
-        <a href="#" data-view="collection">Collection</a>
-        <a href="#" data-view="rarity">Rarity</a>
-        <a href="#" data-view="pond">Pond</a>
-        <!-- Wallet tab appears AFTER connect, shows shortened address -->
-        <a
-          href="#"
-          data-view="wallet"
-          id="wallet-nav-link"
-          style="display: none;"
-        ></a>
-      </nav>
-    </header>
-
-    <!-- DASHBOARD HERO -->
-    <section class="hero">
-      <div class="hero-main">
-        <div class="hero-media">
-          <img src="https://freshfrogs.github.io/frog/16.png" class="fly" />
-          <img src="https://freshfrogs.github.io/frog/678.png" class="fly" />
-          <img src="https://freshfrogs.github.io/frog/31.png" class="fly" />
-          <img src="https://freshfrogs.github.io/frog/594.png" class="fly" />
-        </div>
-        <h1 class="hero-title">freshfrogs.github.io</h1>
-        <p class="hero-subtitle">
-          A collection of 4,040 randomly generated frogs on the Ethereum
-          blockchain, that are each unique with thousands of different
-          combinations!
-          Stake and earn rewards, level up, unlock custom trait animations and
-          more! All secondary sales are entitled to a <b>5%</b> royalty.
+      <!-- Existing scripts you already use -->
+      <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+      <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
+      <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
+      <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+      <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+      <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+  </head>
+  <body>
+    <div class="main_panel">
+      <div class="desc_cont">
+        <img src="https://freshfrogs.github.io/assets/FLY.gif" class="fly"/>
+        <h2>FreshFrogs Wallet Viewer</h2>
+        <p class="title_desc">
+          Paste a wallet address directly after freshfrogs.github.io/ to view frogs owned and staked by that wallet.
         </p>
-        <div class="hero-actions">
-          <button class="btn primary" id="hero-view-collection-btn">
-            View Collection
-          </button>
-          <!-- This is the main connect button (still works normally) -->
-          <button class="btn secondary" id="hero-connect-wallet-btn">
-            Connect Wallet
-          </button>
+        <p class="title_desc">
+          Example: freshfrogs.github.io/0x0000000000000000000000000000000000000000
+        </p>
+        <p class="title_desc">
+          Currently viewing: <span id="wallet-address" class="wallet_invalid">No wallet detected</span>
+        </p>
+        <a class="pointer" href="https://freshfrogs.io/the-pond" target="_blank">Stake your frogs 🐸</a>
+        <br>
+        <a class="pointer" href="https://freshfrogs.io/" target="_blank">Return to homepage ↩️</a>
+      </div>
+    </div>
+
+    <div class="wallet_layout">
+      <div class="wallet_dashboard_column">
+        <div class="user_panel" id="wallet-dashboard">
+          <strong class="sale_card_title"></strong><strong class="sale_card_price"></strong>
+          <div style="clear: both;"></div>
+          <div class="frog_img_cont">
+            <img src="https://freshfrogs.github.io/assets/blackWhite.png" class="recent_sale_img" id="dashboard-avatar" alt="Wallet Avatar">
+          </div>
+          <div class="recent_sale_traits">
+            <div class="user_panel_title">
+              <strong id="dashboard-username" class="sale_card_title">Connect Ethereum Wallet</strong>
+              <strong class="user_panel_address" id="dashboard-wallet">--</strong>
+            </div>
+            <div class="user_panel_prop" id="dashboard-badges">
+              <div class="dashboard_badge">
+                <span class="dashboard_badge_icon">🐸</span>
+                <div>
+                  <span class="dashboard_badge_title">Collection</span>
+                  <span class="dashboard_badge_desc"><span id="stat-owned">--</span> frogs discovered</span>
+                </div>
+              </div>
+              <div class="dashboard_badge">
+                <span class="dashboard_badge_icon">🌿</span>
+                <div>
+                  <span class="dashboard_badge_title">Staking</span>
+                  <span class="dashboard_badge_desc"><span id="stat-staked">--</span> frogs earning Flyz</span>
+                </div>
+              </div>
+              <div class="dashboard_badge">
+                <span class="dashboard_badge_icon">💰</span>
+                <div>
+                  <span class="dashboard_badge_title">Rewards</span>
+                  <span class="dashboard_badge_desc">
+                    <span id="stat-rewards-available">--</span> Flyz ready •
+                    <span id="stat-rewards-earned">--</span> total earned
+                  </span>
+                </div>
+              </div>
+              <div class="dashboard_badge">
+                <span class="dashboard_badge_icon">⭐</span>
+                <div>
+                  <span class="dashboard_badge_title">Status</span>
+                  <span class="dashboard_badge_desc">
+                    Current rank: <span id="dashboard-role">New Explorer</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span id="stat-rewards-available-inline" style="display: none;">--</span>
+        <p id="dashboard-status" class="dashboard_status">Connect your wallet to load your dashboard.</p>
+      </div>
+
+      <div class="wallet_frogs_column">
+        <div class="recent_sales" id="wallet-frogs">
+          <p id="wallet-frogs-status" class="recent_sales_status">Waiting for wallet address...</p>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- MAIN DASHBOARD LAYOUT -->
-    <main class="dashboard-main">
-      <!-- Recent Activity (sales / mints) -->
-      <section
-        class="panel dashboard-section"
-        id="recent-activity-panel"
-        style="background: transparent; box-shadow: none; padding: 0;"
-      >
-        <h2>Recent Activity</h2>
-        <p class="dashboard-note" id="recent-sales-status">
-          Loading recent sales...
-        </p>
+    <!-- Your existing main site logic (if needed) -->
+    <script src="assets/site.js"></script>
 
-        <div class="recent_sales" id="recent-sales"></div>
+    <!-- 404-specific wallet-from-URL + Alchemy logic -->
+    <script>
+      (function () {
+        'use strict';
 
-        <button id="load-more-activity" class="btn secondary" type="button">
-          Load More
-        </button>
-      </section>
+        // ------------------------
+        // Config – these are your real values
+        // ------------------------
+        const FF_COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
+        // This is the same key you already use on the site
+        const FF_ALCHEMY_API_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+        const FF_ALCHEMY_NFT_BASE = 'https://eth-mainnet.g.alchemy.com/nft/v3/' + FF_ALCHEMY_API_KEY;
 
-      <!-- Rarity Rankings -->
-      <section
-        class="panel dashboard-section"
-        id="rarity-panel"
-        style="display:none; background: transparent; box-shadow: none; padding: 0;"
-      >
-        <h2>Rarity Rankings</h2>
-        <p class="dashboard-note" id="rarity-status">
-          Top ranked Frogs across the collection (lower rank = rarer).
-        </p>
-
-        <div id="rarity-grid" class="recent_sales"></div>
-
-        <button id="load-more-rarity" class="btn secondary" type="button">
-          Load More
-        </button>
-      </section>
-
-      <!-- Pond -->
-      <section
-        class="panel dashboard-section"
-        id="pond-panel"
-        style="display:none; background: transparent; box-shadow: none; padding: 0;"
-      >
-        <h2>The Pond</h2>
-        <p class="dashboard-note" id="pond-status">
-          All Frogs currently staked by the community.
-        </p>
-
-        <div id="pond-grid" class="recent_sales"></div>
-
-        <button id="load-more-pond" class="btn secondary" type="button">
-          Load More
-        </button>
-      </section>
-
-      <!-- Owned Frogs (wallet view; stacked vertically) -->
-      <section
-        class="panel dashboard-section"
-        id="owned-panel"
-        style="display:none; background: transparent; box-shadow: none; padding: 0;"
-      >
-        <h2>Owned Frogs</h2>
-        <p class="dashboard-note" id="owned-frogs-status">
-          These are Frogs currently held in your wallet.
-        </p>
-
-        <div id="owned-frogs-grid" class="nft-grid"></div>
-      </section>
-
-      <!-- Staked Frogs (wallet view; BELOW owned frogs) -->
-      <section
-        class="panel dashboard-section"
-        id="staked-panel"
-        style="display:none; background: transparent; box-shadow: none; padding: 0;"
-      >
-        <h2>Staked Frogs</h2>
-        <p class="dashboard-note" id="staked-frogs-status">
-          These Frogs are staked in the FreshFrogs controller.
-        </p>
-
-        <div id="staked-frogs-grid" class="nft-grid"></div>
-      </section>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="site-footer">
-      <span class="footer-links" style="color: white;">
-        <a href="#">freshfrogs.github.io</a>
-      </span>
-    </footer>
-  </div>
-
-  <!-- Web3 for wallet / staking functions -->
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-
-  <!-- ABIs + legacy staking helpers (used for staking level / progress) -->
-  <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
-  <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
-  <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
-
-  <!-- Rarity rankings (must load before site.js) -->
-  <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
-
-  <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
-  <script src="https://freshfrogs.github.io/assets/site.js"></script>
-
-  <!-- 404-specific wallet-from-URL logic -->
-  <script>
-    (function () {
-      'use strict';
-
-      // ------------------------
-      // Config – update API key
-      // ------------------------
-      const FF_COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
-      const FF_ALCHEMY_API_KEY = 'YOUR_ALCHEMY_API_KEY_HERE'; // TODO: set this
-      const FF_ALCHEMY_NFT_BASE =
-        'https://eth-mainnet.g.alchemy.com/nft/v3/' + FF_ALCHEMY_API_KEY;
-
-      // ------------------------
-      // Helpers
-      // ------------------------
-      function $(id) {
-        return document.getElementById(id);
-      }
-
-      function isValidEthAddress(addr) {
-        return /^0x[a-fA-F0-9]{40}$/.test(addr);
-      }
-
-      function shortenAddress(addr) {
-        if (!addr || addr.length < 11) return addr || '';
-        return addr.slice(0, 6) + '...' + addr.slice(-4);
-      }
-
-      function getWalletFromPath() {
-        // e.g. /0xabc... => "0xabc..."
-        var raw = window.location.pathname.replace(/^\/+|\/+$/g, '');
-        if (!raw) return null;
-        var first = raw.split('/')[0];
-        if (isValidEthAddress(first)) return first;
-        return null;
-      }
-
-      // ------------------------
-      // Alchemy: owned frogs (by wallet)
-      // ------------------------
-      async function fetchOwnedFrogs(walletAddress) {
-        if (
-          !FF_ALCHEMY_API_KEY ||
-          FF_ALCHEMY_API_KEY === 'YOUR_ALCHEMY_API_KEY_HERE'
-        ) {
-          console.warn(
-            '[FreshFrogs] 404 wallet view: set FF_ALCHEMY_API_KEY in 404.html'
-          );
-          return [];
+        // ------------------------
+        // Helpers
+        // ------------------------
+        function $(id) {
+          return document.getElementById(id);
         }
 
-        var frogs = [];
-        var pageKey = null;
+        function isValidEthAddress(addr) {
+          return /^0x[a-fA-F0-9]{40}$/.test(addr);
+        }
 
-        try {
-          do {
-            var params = new URLSearchParams({
-              owner: walletAddress,
-              withMetadata: 'true',
-              pageSize: '100'
-            });
-            params.append('contractAddresses[]', FF_COLLECTION_ADDRESS);
-            if (pageKey) params.set('pageKey', pageKey);
+        function shortenAddress(addr) {
+          if (!addr || addr.length < 11) return addr || '';
+          return addr.slice(0, 6) + '...' + addr.slice(-4);
+        }
 
-            var url = FF_ALCHEMY_NFT_BASE + '/getNFTsForOwner?' + params.toString();
-            var res = await fetch(url);
+        function getWalletFromPath() {
+          // e.g. /0xabc... or /0xabc.../whatever
+          var raw = window.location.pathname.replace(/^\/+|\/+$/g, '');
+          if (!raw) return null;
+          var first = raw.split('/')[0];
+          if (isValidEthAddress(first)) return first;
+          return null;
+        }
 
-            if (!res.ok) {
-              console.error(
-                '[FreshFrogs] Alchemy getNFTsForOwner failed',
-                res.status,
-                res.statusText
-              );
-              break;
-            }
+        function setStatus(text) {
+          var el = $('wallet-frogs-status');
+          if (el) el.textContent = text;
+        }
 
-            var data = await res.json();
-            var nfts = data.ownedNfts || data.nfts || [];
+        // ------------------------
+        // Alchemy: owned frogs by wallet
+        // ------------------------
+        async function fetchOwnedFrogs(walletAddress) {
+          var frogs = [];
+          var pageKey = null;
 
-            for (var i = 0; i < nfts.length; i++) {
-              var nft = nfts[i];
-              var rawId = (nft.tokenId || '').toString();
-              var tokenId = 0;
-              if (rawId.startsWith('0x')) {
-                tokenId = parseInt(rawId, 16);
-              } else {
-                tokenId = parseInt(rawId, 10);
-              }
-
-              var img =
-                (nft.image && (nft.image.cachedUrl || nft.image.pngUrl || nft.image.originalUrl)) ||
-                (nft.media &&
-                  nft.media[0] &&
-                  (nft.media[0].gateway || nft.media[0].raw)) ||
-                'https://freshfrogs.github.io/assets/blackWhite.png';
-
-              var rarity = null;
-              try {
-                if (window.RARITY_RANKINGS && tokenId in window.RARITY_RANKINGS) {
-                  rarity = window.RARITY_RANKINGS[tokenId];
-                }
-              } catch (e) {
-                // ignore
-              }
-
-              frogs.push({
-                tokenId: tokenId,
-                imageUrl: img,
-                rarity: rarity,
-                source: 'owned'
+          try {
+            do {
+              var params = new URLSearchParams({
+                owner: walletAddress,
+                withMetadata: 'true',
+                pageSize: '100'
               });
+              params.append('contractAddresses[]', FF_COLLECTION_ADDRESS);
+              if (pageKey) params.set('pageKey', pageKey);
+
+              var url = FF_ALCHEMY_NFT_BASE + '/getNFTsForOwner?' + params.toString();
+              var res = await fetch(url);
+
+              if (!res.ok) {
+                console.error('[FreshFrogs 404] Alchemy getNFTsForOwner failed', res.status, res.statusText);
+                break;
+              }
+
+              var data = await res.json();
+              var nfts = data.ownedNfts || data.nfts || [];
+
+              for (var i = 0; i < nfts.length; i++) {
+                var nft = nfts[i];
+                var rawId = (nft.tokenId || '').toString();
+                var tokenId = 0;
+                if (rawId.startsWith('0x')) {
+                  tokenId = parseInt(rawId, 16);
+                } else {
+                  tokenId = parseInt(rawId, 10);
+                }
+
+                var img =
+                  (nft.image && (nft.image.cachedUrl || nft.image.pngUrl || nft.image.originalUrl)) ||
+                  (nft.media && nft.media[0] && (nft.media[0].gateway || nft.media[0].raw)) ||
+                  'https://freshfrogs.github.io/assets/blackWhite.png';
+
+                var rarity = null;
+                try {
+                  if (window.RARITY_RANKINGS && tokenId in window.RARITY_RANKINGS) {
+                    rarity = window.RARITY_RANKINGS[tokenId];
+                  }
+                } catch (e) {
+                  // ignore
+                }
+
+                frogs.push({
+                  tokenId: tokenId,
+                  imageUrl: img,
+                  rarity: rarity
+                });
+              }
+
+              pageKey = data.pageKey || null;
+            } while (pageKey);
+          } catch (err) {
+            console.error('[FreshFrogs 404] Error fetching owned frogs', err);
+          }
+
+          return frogs;
+        }
+
+        // ------------------------
+        // Rendering
+        // ------------------------
+        function renderFrogCard(frog) {
+          var container = $('wallet-frogs');
+          var status = $('wallet-frogs-status');
+          if (!container) return;
+
+          if (status) {
+            status.style.display = 'none';
+          }
+
+          var card = document.createElement('div');
+          card.className = 'recent_sale_card';
+
+          var imgCont = document.createElement('div');
+          imgCont.className = 'frog_img_cont';
+
+          var img = document.createElement('img');
+          img.className = 'recent_sale_img';
+          img.src = frog.imageUrl;
+          img.alt = 'Fresh Frog #' + frog.tokenId;
+          imgCont.appendChild(img);
+
+          var traits = document.createElement('div');
+          traits.className = 'recent_sale_traits';
+
+          var headerRow = document.createElement('div');
+          headerRow.className = 'recent_sale_title_row';
+
+          var title = document.createElement('strong');
+          title.className = 'sale_card_title';
+          title.textContent = 'Fresh Frog #' + frog.tokenId;
+
+          var tag = document.createElement('strong');
+          tag.className = 'sale_card_price';
+          tag.textContent = 'Owned 🐸';
+
+          headerRow.appendChild(title);
+          headerRow.appendChild(tag);
+
+          var meta = document.createElement('div');
+          meta.className = 'recent_sale_prop';
+
+          if (frog.rarity != null) {
+            var raritySpan = document.createElement('span');
+            raritySpan.textContent = 'Rarity rank: #' + frog.rarity;
+            meta.appendChild(raritySpan);
+          }
+
+          traits.appendChild(headerRow);
+          traits.appendChild(meta);
+
+          card.appendChild(imgCont);
+          card.appendChild(traits);
+
+          container.appendChild(card);
+        }
+
+        async function loadWalletView(walletAddress) {
+          var shortAddr = shortenAddress(walletAddress);
+
+          // Update "Currently viewing" line
+          var addrSpan = $('wallet-address');
+          if (addrSpan) {
+            addrSpan.textContent = walletAddress;
+            addrSpan.classList.remove('wallet_invalid');
+            addrSpan.classList.add('wallet_valid');
+          }
+
+          // Update dashboard header
+          var dashUser = $('dashboard-username');
+          var dashWallet = $('dashboard-wallet');
+          if (dashUser) dashUser.textContent = 'Wallet Viewer';
+          if (dashWallet) dashWallet.textContent = shortAddr || walletAddress;
+
+          // Reset stats
+          var statOwned = $('stat-owned');
+          var statStaked = $('stat-staked');
+          if (statOwned) statOwned.textContent = '--';
+          if (statStaked) statStaked.textContent = '0';
+
+          var dashStatus = $('dashboard-status');
+          if (dashStatus) {
+            dashStatus.textContent = 'Loading frogs for ' + (shortAddr || walletAddress) + '...';
+          }
+          setStatus('Loading frogs for this wallet...');
+
+          var container = $('wallet-frogs');
+          if (container) {
+            container.innerHTML = '';
+            var p = document.createElement('p');
+            p.id = 'wallet-frogs-status';
+            p.className = 'recent_sales_status';
+            p.textContent = 'Loading frogs for this wallet...';
+            container.appendChild(p);
+          }
+
+          // Fetch owned frogs
+          var owned = await fetchOwnedFrogs(walletAddress);
+          if (!owned || !owned.length) {
+            if (statOwned) statOwned.textContent = '0';
+            setStatus('No Fresh Frogs found for this wallet.');
+            if (dashStatus) {
+              dashStatus.textContent = 'No frogs found for this wallet yet.';
             }
+            return;
+          }
 
-            pageKey = data.pageKey || null;
-          } while (pageKey);
-        } catch (err) {
-          console.error('[FreshFrogs] Error fetching owned frogs', err);
+          if (statOwned) statOwned.textContent = String(owned.length);
+          if (dashStatus) {
+            dashStatus.textContent = 'Loaded ' + owned.length + ' owned frogs.';
+          }
+
+          // Render them
+          for (var i = 0; i < owned.length; i++) {
+            renderFrogCard(owned[i]);
+          }
         }
 
-        return frogs;
-      }
+        // ------------------------
+        // Init on page load
+        // ------------------------
+        document.addEventListener('DOMContentLoaded', function () {
+          var walletAddress = getWalletFromPath();
 
-      // ------------------------
-      // Staked frogs stub – plug in your staking logic later
-      // ------------------------
-      async function fetchStakedFrogs(_walletAddress) {
-        // TODO: replace this stub with real staking lookup
-        // (e.g., using your controller contract / ethereum-dapp.js helpers)
-        return [];
-      }
+          if (!walletAddress) {
+            // No valid address in URL – show default text
+            var addrSpan = $('wallet-address');
+            if (addrSpan) {
+              addrSpan.textContent = 'No wallet detected';
+              addrSpan.classList.remove('wallet_valid');
+              addrSpan.classList.add('wallet_invalid');
+            }
+            setStatus('Waiting for wallet address...');
+            return;
+          }
 
-      // ------------------------
-      // Rendering
-      // ------------------------
-      function renderFrogCard(frog, gridId) {
-        var grid = $(gridId);
-        if (!grid) return;
-
-        var card = document.createElement('div');
-        card.className = 'recent_sale_card nft-card';
-
-        var imgCont = document.createElement('div');
-        imgCont.className = 'frog_img_cont';
-
-        var img = document.createElement('img');
-        img.className = 'recent_sale_img';
-        img.src = frog.imageUrl;
-        img.alt = 'Fresh Frog #' + frog.tokenId;
-        imgCont.appendChild(img);
-
-        var traits = document.createElement('div');
-        traits.className = 'recent_sale_traits';
-
-        var headerRow = document.createElement('div');
-        headerRow.className = 'recent_sale_title_row';
-
-        var title = document.createElement('strong');
-        title.className = 'sale_card_title';
-        title.textContent = 'Fresh Frog #' + frog.tokenId;
-
-        var tag = document.createElement('strong');
-        tag.className = 'sale_card_price';
-        tag.textContent = frog.source === 'staked' ? 'Staked 🟢' : 'Owned 🐸';
-
-        headerRow.appendChild(title);
-        headerRow.appendChild(tag);
-
-        var meta = document.createElement('div');
-        meta.className = 'recent_sale_prop';
-
-        if (frog.rarity != null) {
-          var raritySpan = document.createElement('span');
-          raritySpan.textContent = 'Rarity rank: #' + frog.rarity;
-          meta.appendChild(raritySpan);
-        }
-
-        traits.appendChild(headerRow);
-        traits.appendChild(meta);
-
-        card.appendChild(imgCont);
-        card.appendChild(traits);
-
-        grid.appendChild(card);
-      }
-
-      async function loadWalletView(walletAddress) {
-        var shortAddr = shortenAddress(walletAddress);
-
-        // Show wallet tab with address
-        var walletNav = $('wallet-nav-link');
-        if (walletNav) {
-          walletNav.style.display = 'inline-block';
-          walletNav.textContent = shortAddr || walletAddress;
-        }
-
-        // Panels: hide collection/rarity/pond, show owned + staked
-        var collectionPanel = $('recent-activity-panel');
-        var rarityPanel = $('rarity-panel');
-        var pondPanel = $('pond-panel');
-        var ownedPanel = $('owned-panel');
-        var stakedPanel = $('staked-panel');
-
-        if (collectionPanel) collectionPanel.style.display = 'none';
-        if (rarityPanel) rarityPanel.style.display = 'none';
-        if (pondPanel) pondPanel.style.display = 'none';
-        if (ownedPanel) ownedPanel.style.display = 'block';
-        if (stakedPanel) stakedPanel.style.display = 'block';
-
-        var ownedStatus = $('owned-frogs-status');
-        var stakedStatus = $('staked-frogs-status');
-
-        if (ownedStatus)
-          ownedStatus.textContent =
-            'Loading frogs for ' + (shortAddr || walletAddress) + '...';
-        if (stakedStatus)
-          stakedStatus.textContent =
-            'Loading staked frogs for ' + (shortAddr || walletAddress) + '...';
-
-        // Fetch data
-        var results = await Promise.all([
-          fetchOwnedFrogs(walletAddress),
-          fetchStakedFrogs(walletAddress)
-        ]);
-
-        var owned = results[0] || [];
-        var staked = results[1] || [];
-
-        var ownedGrid = $('owned-frogs-grid');
-        var stakedGrid = $('staked-frogs-grid');
-        if (ownedGrid) ownedGrid.innerHTML = '';
-        if (stakedGrid) stakedGrid.innerHTML = '';
-
-        if (!owned.length) {
-          if (ownedStatus)
-            ownedStatus.textContent =
-              'No owned Fresh Frogs found for this wallet.';
-        } else {
-          if (ownedStatus)
-            ownedStatus.textContent =
-              'Showing ' + owned.length + ' owned Fresh Frogs.';
-          owned.forEach(function (frog) {
-            renderFrogCard(frog, 'owned-frogs-grid');
-          });
-        }
-
-        if (!staked.length) {
-          if (stakedStatus)
-            stakedStatus.textContent =
-              'No staked Fresh Frogs found for this wallet.';
-        } else {
-          if (stakedStatus)
-            stakedStatus.textContent =
-              'Showing ' + staked.length + ' staked Fresh Frogs.';
-          staked.forEach(function (frog) {
-            renderFrogCard(frog, 'staked-frogs-grid');
-          });
-        }
-      }
-
-      // ------------------------
-      // Init on 404 load
-      // ------------------------
-      document.addEventListener('DOMContentLoaded', function () {
-        var walletAddress = getWalletFromPath();
-        if (!walletAddress) {
-          // No address in URL – behave like normal homepage
-          return;
-        }
-        if (
-          !FF_ALCHEMY_API_KEY ||
-          FF_ALCHEMY_API_KEY === 'YOUR_ALCHEMY_API_KEY_HERE'
-        ) {
-          console.warn(
-            '[FreshFrogs] 404 wallet view: set FF_ALCHEMY_API_KEY in 404.html'
-          );
-          return;
-        }
-        loadWalletView(walletAddress);
-      });
-    })();
-  </script>
-</body>
+          loadWalletView(walletAddress);
+        });
+      })();
+    </script>
+  </body>
 </html>
