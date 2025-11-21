@@ -43,10 +43,13 @@ document.addEventListener('DOMContentLoaded', () => {
   ffInitNav();
   ffWireHeroButtons();
 
+  ffInitWalletOnLoad();
+
+  // Spin up read-only staking contracts + backfill stake meta on all cards
+  ffBootStakeMetaWatcher();
+
   // Default view: Collection (recent sales)
   ffShowView('collection'); // this calls loadRecentActivity()
-
-  ffInitWalletOnLoad();
 
   const loadMoreBtn =
     document.getElementById('load-more-activity') ||
@@ -253,7 +256,15 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
   if (!card) return;
 
-  // If staking helpers or controller aren't ready yet, queue for later
+  // Try to make sure read-only contracts & helpers exist
+  // (no-op if they are already initialised)
+  try {
+    await ffEnsureReadContracts();
+  } catch (e) {
+    console.warn('ffAttachStakeMetaIfStaked: ffEnsureReadContracts failed', e);
+  }
+
+  // If staking helpers or controller still aren't ready yet, queue for later
   if (
     typeof window.stakerAddress !== 'function' ||
     typeof window.stakingValues !== 'function' ||
@@ -298,7 +309,7 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
         <span class="stake-level-label">Staked Lvl. ${levelNum}</span>
       </div>
       <div class="stake-meta-row stake-meta-subrow">
-        <span>Staked: ${stakedDate}</span>
+        <span>Staked: ${stakedDate} (${stakedDays}d)</span>
       </div>
       <div class="stake-progress">
         <div class="stake-progress-bar" style="width:${pct}%;"></div>
@@ -334,27 +345,40 @@ function ffProcessPendingStakeMeta() {
   }
 }
 
-// Make sure *all* existing frog cards get staking info once things are ready
-function ffRefreshStakeMetaForAllCards() {
-  if (
-    typeof window.stakerAddress !== 'function' ||
-    typeof window.stakingValues !== 'function' ||
-    !window.controller
-  ) {
-    return;
-  }
+// Try a few times on startup to initialise read-only contracts
+// and then decorate ALL existing cards (including any that were queued)
+function ffBootStakeMetaWatcher() {
+  let attempts = 0;
+  const maxAttempts = 5;
 
-  const cards = document.querySelectorAll('.recent_sale_card');
-  cards.forEach((card) => {
-    const raw = card.dataset.tokenId;
-    const tokenId = parseTokenId(raw);
-    if (tokenId != null) {
-      ffAttachStakeMetaIfStaked(card, tokenId);
+  const tick = async () => {
+    attempts += 1;
+
+    const ok = await ffEnsureReadContracts().catch(() => false);
+
+    if (
+      ok &&
+      typeof window.stakerAddress === 'function' &&
+      typeof window.stakingValues === 'function'
+    ) {
+      // First flush anything that was queued while helpers were missing
+      ffProcessPendingStakeMeta();
+      // Then re-scan all cards so nothing slips through (e.g. first pond card)
+      ffRefreshAllStakeMeta();
+      return;
     }
-  });
+
+    if (attempts < maxAttempts) {
+      setTimeout(tick, 1500); // retry after 1.5s
+    } else {
+      console.warn('[FreshFrogs] staking helpers not ready after retries; some stake badges may be missing.');
+    }
+  };
+
+  tick();
 }
 
-// Refresh staking info on all already-rendered frog cards
+// Refresh staking info on all already-rendered frog cards (single implementation)
 async function ffRefreshAllStakeMeta() {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
 
@@ -368,6 +392,12 @@ async function ffRefreshAllStakeMeta() {
     ffAttachStakeMetaIfStaked(card, tokenId);
   }
 }
+
+// Backwards-compatible alias used in connectWallet()
+function ffRefreshStakeMetaForAllCards() {
+  ffRefreshAllStakeMeta();
+}
+
 
 // ------------------------
 // Token / rarity helpers
