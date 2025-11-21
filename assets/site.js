@@ -8,7 +8,7 @@ const FF_COLLECTION_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const FF_CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 
 const FF_ALCHEMY_API_KEY    = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
-const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // optional (used only for recent sales)
+const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // optional (used for recent sales + usernames)
 
 // Recent sales source toggle:
 //  - 'opensea'  => try OpenSea first, fallback to Alchemy on error
@@ -16,7 +16,7 @@ const FF_OPENSEA_API_KEY    = '48ffee972fc245fa965ecfe902b02ab4'; // optional (u
 const FF_RECENT_SALES_SOURCE = 'opensea';
 
 // If using OpenSea as recent sales source, set your collection slug here.
-// Example: 'fresh-frogs' (whatever your OpenSea collection slug is)
+// Example: 'fresh-frogs' (your OpenSea collection slug)
 const FF_OPENSEA_COLLECTION_SLUG = 'fresh-frogs'; // <-- FILL THIS IN
 
 const FF_ALCHEMY_NFT_BASE   = `https://eth-mainnet.g.alchemy.com/nft/v3/${FF_ALCHEMY_API_KEY}`;
@@ -47,12 +47,16 @@ let ffCurrentAccount = null;
 // Queue of cards that need staking decoration once contracts/helpers are ready
 const FF_PENDING_STAKE_CARDS = [];
 
-// Cache of last sale prices from recent sales fetch
-// tokenId -> formatted price string (e.g. "0.23 ETH")
-const FF_SALE_PRICE_CACHE = new Map();
+// Global read-contracts init promise so we don't spam init
+let FF_READ_READY_PROMISE = null;
 
-// Cache of last known seller/buyer timestamps if needed later
+// Cache of last sale prices from recent sales fetch
+const FF_SALE_PRICE_CACHE = new Map(); // tokenId -> "0.23 ETH"
 const FF_RECENT_SALES_CACHE = new Map(); // tokenId -> { priceText, timestamp, buyer, seller }
+
+// OpenSea username cache
+const FF_OS_USERNAME_CACHE = new Map();       // addressLower -> username|null
+const FF_OS_USERNAME_INFLIGHT = new Map();    // addressLower -> Promise<string|null>
 
 // ------------------------
 // Entry
@@ -64,8 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Detect public wallet view (404 /address) automatically
   ffDetectPublicWalletFromPath();
 
+  // Kick off read-only contract init ASAP so staking meta works immediately
+  ffInitReadContractsOnLoad();
+
   // Default view: Collection (recent sales)
-  ffShowView('collection'); // this calls loadRecentActivity()
+  ffShowView('collection');
 
   ffInitWalletOnLoad();
 
@@ -110,6 +117,27 @@ function ffDetectPublicWalletFromPath() {
       ffCurrentAccount = first;
     }
   } catch {}
+}
+
+// ------------------------
+// Read-only init on load to fix staking timing
+// ------------------------
+function ffInitReadContractsOnLoad() {
+  if (!FF_READ_READY_PROMISE) {
+    FF_READ_READY_PROMISE = ffEnsureReadContracts()
+      .then((ok) => {
+        if (ok) {
+          ffProcessPendingStakeMeta();
+          ffRefreshStakeMetaForAllCards();
+        }
+        return ok;
+      })
+      .catch((err) => {
+        console.warn('ffInitReadContractsOnLoad failed', err);
+        return false;
+      });
+  }
+  return FF_READ_READY_PROMISE;
 }
 
 // ------------------------
@@ -239,7 +267,6 @@ async function loadRecentActivity() {
 
         headerRight = item.priceText || formatSalePrice(item);
 
-        // Cache sale price for later wallet cards
         if (headerRight && headerRight !== '--') {
           FF_SALE_PRICE_CACHE.set(tokenId, headerRight);
           FF_RECENT_SALES_CACHE.set(tokenId, {
@@ -250,8 +277,6 @@ async function loadRecentActivity() {
           });
         }
       }
-
-      const headerLeft = ownerAddress ? formatOwnerLink(ownerAddress) : '--';
 
       const actionHtml = `
         <div class="recent_sale_links">
@@ -277,7 +302,7 @@ async function loadRecentActivity() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft,
+        headerLeft: '--', // will be set async w/ OpenSea username
         headerRight,
         footerHtml: '',
         actionHtml
@@ -285,12 +310,14 @@ async function loadRecentActivity() {
 
       container.appendChild(card);
 
-      // Always try layered rendering after insertion
+      if (ownerAddress) {
+        ffSetOwnerLabel(card, ownerAddress);
+      }
+
       if (card.dataset.imgContainerId) {
         ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
       }
 
-      // Staking stats on recent sales / mints if frog is staked
       ffAttachStakeMetaIfStaked(card, tokenId);
     }
   } catch (err) {
@@ -307,7 +334,9 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
   if (!FF_SHOW_STAKING_STATS_ON_CARDS) return;
   if (!card) return;
 
-  // If staking helpers or controller aren't ready yet, queue for later
+  // Ensure read infra is initializing as early as possible
+  ffInitReadContractsOnLoad();
+
   if (
     typeof window.stakerAddress !== 'function' ||
     typeof window.stakingValues !== 'function' ||
@@ -325,7 +354,6 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
     if (!Array.isArray(values) || values.length < 5) return;
 
     const [stakedDays, rawLevel, daysToNext, flyzEarned, stakedDate] = values;
-
     const levelNum = ffRomanToArabic(rawLevel) ?? rawLevel;
 
     const MAX_DAYS  = 41.7;
@@ -338,7 +366,6 @@ async function ffAttachStakeMetaIfStaked(card, tokenId) {
       card;
 
     const parent = propsBlock.parentElement || card;
-
     parent.querySelectorAll('.stake-meta, .staking-sale-stats').forEach((el) => el.remove());
 
     const wrapper = document.createElement('div');
@@ -398,6 +425,78 @@ function ffRefreshStakeMetaForAllCards() {
       ffAttachStakeMetaIfStaked(card, tokenId);
     }
   });
+}
+
+// ------------------------
+// Owner label + OpenSea username everywhere
+// ------------------------
+function ffSetOwnerLabel(card, address) {
+  if (!card || !address) return;
+
+  const titleEls = card.querySelectorAll('.sale_card_title');
+  const ownerEl = titleEls[0];
+  if (!ownerEl) return;
+
+  // Set placeholder immediately (short addr link)
+  ownerEl.innerHTML = formatOwnerLink(address, truncateAddress(address));
+
+  // Then async upgrade to OpenSea username
+  ffResolveOpenSeaUsername(address).then((username) => {
+    if (!username) return;
+    ownerEl.innerHTML = formatOwnerLink(address, username);
+  });
+}
+
+async function ffResolveOpenSeaUsername(address) {
+  if (!address) return null;
+  const key = String(address).toLowerCase();
+
+  if (FF_OS_USERNAME_CACHE.has(key)) {
+    return FF_OS_USERNAME_CACHE.get(key);
+  }
+  if (FF_OS_USERNAME_INFLIGHT.has(key)) {
+    return FF_OS_USERNAME_INFLIGHT.get(key);
+  }
+
+  const p = (async () => {
+    try {
+      if (!FF_OPENSEA_API_KEY) {
+        FF_OS_USERNAME_CACHE.set(key, null);
+        return null;
+      }
+
+      const url = `https://api.opensea.io/api/v2/accounts/${address}`;
+      const res = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'X-API-KEY': FF_OPENSEA_API_KEY
+        }
+      });
+
+      if (!res.ok) {
+        FF_OS_USERNAME_CACHE.set(key, null);
+        return null;
+      }
+
+      const data = await res.json();
+      const username =
+        data.username ||
+        data?.account?.username ||
+        null;
+
+      const finalName = username && String(username).trim() ? String(username).trim() : null;
+      FF_OS_USERNAME_CACHE.set(key, finalName);
+      return finalName;
+    } catch (err) {
+      FF_OS_USERNAME_CACHE.set(key, null);
+      return null;
+    } finally {
+      FF_OS_USERNAME_INFLIGHT.delete(key);
+    }
+  })();
+
+  FF_OS_USERNAME_INFLIGHT.set(key, p);
+  return p;
 }
 
 // ------------------------
@@ -502,7 +601,6 @@ function createFrogCard({
     : 'rarity_badge rarity_unknown';
 
   const traitsHtml = buildTraitsHtml(metadata);
-
   const imgContainerId = `frog-img-${tokenId}-${Math.random().toString(16).slice(2)}`;
 
   const card = document.createElement('div');
@@ -758,10 +856,8 @@ async function fetchRecentSalesAlchemy(limit = 24) {
 
   const payload = await response.json();
   let sales = Array.isArray(payload.nftSales) ? payload.nftSales : [];
-
   sales = dedupeByTokenId(sales, (sale) => sale.tokenId);
 
-  // normalize to include priceText so UI is consistent
   const normalized = sales.map((sale) => {
     const tokenId = parseTokenId(sale.tokenId);
     return {
@@ -820,7 +916,6 @@ async function fetchRecentMints(limit = 24) {
       : [];
 
   transfers = dedupeByTokenId(transfers, (t) => t.erc721TokenId || t.tokenId);
-
   return transfers;
 }
 
@@ -850,10 +945,11 @@ function truncateAddress(address) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
-function formatOwnerLink(address) {
-  const safe = ffEscapeHtml(address);
-  const label = truncateAddress(address);
-  return `<a class="frog-owner-link" href="https://freshfrogs.github.io/${safe}">${label}</a>`;
+// owner link text is passed in (username or truncated addr)
+function formatOwnerLink(address, text) {
+  const safeAddr = ffEscapeHtml(address);
+  const label = ffEscapeHtml(text || truncateAddress(address));
+  return `<a class="frog-owner-link" href="https://freshfrogs.github.io/${safeAddr}">${label}</a>`;
 }
 
 function formatSalePrice(sale) {
@@ -925,7 +1021,6 @@ function normalizeMetadata(metadata) {
       return null;
     }
   }
-
   if (typeof metadata === 'object') return metadata;
   return null;
 }
@@ -948,12 +1043,11 @@ function ffEnsureRarityLoaded() {
     FF_RARITY_INDEX = 0;
     ffLoadMoreRarity();
   } else {
-    // refresh staking/owner when coming back
     ffRefreshStakeMetaForAllCards();
   }
 }
 
-// Decorate top-left owner label for rarity cards.
+// Decorate owner label for rarity cards.
 // If staked => stakerAddress(tokenId). Else => ownerOf(tokenId).
 async function ffDecorateRarityOwner(card, tokenId) {
   try {
@@ -972,12 +1066,7 @@ async function ffDecorateRarityOwner(card, tokenId) {
     }
 
     if (!owner) return;
-
-    const titleEls = card.querySelectorAll('.sale_card_title');
-    const ownerEl = titleEls[0];
-    if (ownerEl) {
-      ownerEl.innerHTML = formatOwnerLink(owner);
-    }
+    ffSetOwnerLabel(card, owner);
   } catch (err) {
     console.warn('ffDecorateRarityOwner failed for token', tokenId, err);
   }
@@ -1007,17 +1096,13 @@ async function ffLoadMoreRarity() {
       if (tokenId == null) continue;
 
       const rank = entry.ranking ?? entry.rank ?? entry.position ?? getRarityRank(tokenId);
-
       const metadata = await fetchFrogMetadata(tokenId);
-
-      const headerLeft  = ''; 
-      const headerRight = rank ? `Rank #${rank}` : '';
 
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft,
-        headerRight,
+        headerLeft: '--',
+        headerRight: rank ? `Rank #${rank}` : '',
         footerHtml: '',
         actionHtml: `
           <div class="recent_sale_links">
@@ -1065,7 +1150,7 @@ async function ffLoadMoreRarity() {
 }
 
 // ===================================================
-// Pond panel (frogs owned by controller = staked by community)
+// Pond panel
 // ===================================================
 async function ffFetchPondFrogs(limit = 24, pageKey = null) {
   const params = new URLSearchParams({
@@ -1105,7 +1190,6 @@ function ffEnsurePondLoaded() {
   }
 }
 
-// Set owner label (top-left) on a pond card using stakerAddress(tokenId)
 async function ffDecoratePondOwner(card, tokenId) {
   try {
     const ok = await ffEnsureReadContracts();
@@ -1116,11 +1200,7 @@ async function ffDecoratePondOwner(card, tokenId) {
     const staker = await stakerAddress(tokenId);
     if (!staker || staker === ZERO_ADDRESS) return;
 
-    const titleEls = card.querySelectorAll('.sale_card_title');
-    const ownerEl = titleEls[0];
-    if (ownerEl) {
-      ownerEl.innerHTML = formatOwnerLink(staker);
-    }
+    ffSetOwnerLabel(card, staker);
   } catch (err) {
     console.warn('ffDecoratePondOwner failed for token', tokenId, err);
   }
@@ -1154,7 +1234,7 @@ async function ffLoadMorePond() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '',
+        headerLeft: '--',
         headerRight: 'Staked',
         footerHtml: '',
         actionHtml: `
@@ -1199,7 +1279,6 @@ async function ffLoadMorePond() {
     if (status) status.textContent = 'Unable to load pond frogs.';
   }
 }
-
 
 // ===================================================
 // Owned / Staked frogs (wallet view)
@@ -1311,43 +1390,30 @@ async function renderOwnedAndStakedFrogs(address) {
 
         const actionHtml = isPublic ? '' : `
           <div class="recent_sale_links">
-            <button class="sale_link_btn" onclick="ffStakeFrog(${tokenId})">
-              Stake
-            </button>
-            <button class="sale_link_btn" onclick="ffTransferFrog(${tokenId})">
-              Transfer
-            </button>
+            <button class="sale_link_btn" onclick="ffStakeFrog(${tokenId})">Stake</button>
+            <button class="sale_link_btn" onclick="ffTransferFrog(${tokenId})">Transfer</button>
           </div>
           <div class="recent_sale_links">
-            <a
-              class="sale_link_btn opensea"
-              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              OpenSea
-            </a>
-            <a
-              class="sale_link_btn etherscan"
-              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </a>
+            <a class="sale_link_btn opensea"
+               href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+               target="_blank" rel="noopener noreferrer">OpenSea</a>
+            <a class="sale_link_btn etherscan"
+               href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+               target="_blank" rel="noopener noreferrer">Etherscan</a>
           </div>
         `;
 
         const card = createFrogCard({
           tokenId,
           metadata,
-          headerLeft: formatOwnerLink(address),
+          headerLeft: '--',
           headerRight: salePrice,
           footerHtml: '',
           actionHtml
         });
 
         ownedGrid.appendChild(card);
+        ffSetOwnerLabel(card, address);
 
         if (card.dataset.imgContainerId) {
           ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
@@ -1388,40 +1454,29 @@ async function renderOwnedAndStakedFrogs(address) {
 
         const actionHtml = isPublic ? '' : `
           <div class="recent_sale_links">
-            <button class="sale_link_btn" onclick="ffUnstakeFrog(${tokenId})">
-              Unstake
-            </button>
+            <button class="sale_link_btn" onclick="ffUnstakeFrog(${tokenId})">Unstake</button>
           </div>
           <div class="recent_sale_links">
-            <a
-              class="sale_link_btn opensea"
-              href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              OpenSea
-            </a>
-            <a
-              class="sale_link_btn etherscan"
-              href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Etherscan
-            </a>
+            <a class="sale_link_btn opensea"
+               href="https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}"
+               target="_blank" rel="noopener noreferrer">OpenSea</a>
+            <a class="sale_link_btn etherscan"
+               href="https://etherscan.io/nft/${FF_COLLECTION_ADDRESS}/${tokenId}"
+               target="_blank" rel="noopener noreferrer">Etherscan</a>
           </div>
         `;
 
         const card = createFrogCard({
           tokenId,
           metadata,
-          headerLeft: formatOwnerLink(address || ffCurrentAccount) || 'Pond',
+          headerLeft: '--',
           headerRight: salePrice,
           footerHtml,
           actionHtml
         });
 
         stakedGrid.appendChild(card);
+        ffSetOwnerLabel(card, address || ffCurrentAccount);
 
         if (card.dataset.imgContainerId) {
           ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
@@ -1497,7 +1552,7 @@ async function ffStakeFrog(tokenId) {
 
 async function ffUnstakeFrog(tokenId) {
   tokenId = parseTokenId(tokenId);
-  if (tokenId ==null) return;
+  if (tokenId == null) return;
 
   try {
     if (typeof initiate_withdraw === 'function') {
@@ -1552,9 +1607,7 @@ function ffSetText(id, value) {
 
 function ffSetAvatar(id, url) {
   const el = document.getElementById(id);
-  if (el && url) {
-    el.src = url;
-  }
+  if (el && url) el.src = url;
 }
 
 function ffUpdateWalletBasicUI(address) {
@@ -1563,10 +1616,7 @@ function ffUpdateWalletBasicUI(address) {
   ffSetText('wallet-status-label', isPublic ? 'Viewing' : 'Connected');
   ffSetText('dashboard-wallet', `Wallet: ${truncateAddress(address)}`);
 
-  if (isPublic) {
-    // Don't reveal / change nav label in public view
-    return;
-  }
+  if (isPublic) return;
 
   const walletNav = document.getElementById('wallet-nav-link');
   if (walletNav) {
@@ -1586,49 +1636,32 @@ function ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile) {
     if (typeof stakingStats.staked === 'number') {
       ffSetText('stat-staked', stakingStats.staked.toString());
     }
-
     if (stakingStats.rewardsAvailable != null) {
       ffSetText('stat-rewards-available', stakingStats.rewardsAvailable.toString());
     }
-
     if (stakingStats.rewardsEarned != null) {
       ffSetText('stat-rewards-earned', stakingStats.rewardsEarned.toString());
     }
   }
 
   if (profile) {
-    if (profile.username) {
-      ffSetText('dashboard-username', profile.username);
-    }
-    if (profile.avatarUrl) {
-      ffSetAvatar('dashboard-avatar', profile.avatarUrl);
-    }
+    if (profile.username) ffSetText('dashboard-username', profile.username);
+    if (profile.avatarUrl) ffSetAvatar('dashboard-avatar', profile.avatarUrl);
   }
 }
 
 async function ffFetchOwnedFrogCount(address) {
-  if (!FF_ALCHEMY_NFT_BASE) {
-    console.warn('Alchemy NFT base URL missing; owned frog count disabled.');
-    return null;
-  }
+  if (!FF_ALCHEMY_NFT_BASE) return null;
 
   const url = `${FF_ALCHEMY_NFT_BASE}/getNFTsForOwner?owner=${address}`;
   const res = await fetch(url);
-  if (!res.ok) {
-    console.warn('Alchemy getNFTsForOwner failed:', res.status);
-    return null;
-  }
+  if (!res.ok) return null;
 
   const data = await res.json();
   const all = Array.isArray(data.ownedNfts) ? data.ownedNfts : [];
   const target = FF_COLLECTION_ADDRESS.toLowerCase();
 
-  const frogs = all.filter((nft) => {
-    const addr = nft.contract && nft.contract.address;
-    return addr && addr.toLowerCase() === target;
-  });
-
-  return frogs.length;
+  return all.filter((nft) => nft?.contract?.address?.toLowerCase() === target).length;
 }
 
 async function ffTryContractCall(contract, names, args = []) {
@@ -1658,10 +1691,7 @@ async function ffEnsureReadContracts() {
       } else if (typeof Web3 !== 'undefined') {
         ffWeb3 = new Web3(`https://eth-mainnet.g.alchemy.com/v2/${FF_ALCHEMY_API_KEY}`);
       }
-      if (!ffWeb3) {
-        console.warn('ffEnsureReadContracts: no provider available for read-only calls.');
-        return false;
-      }
+      if (!ffWeb3) return false;
       window.web3 = ffWeb3;
     }
 
@@ -1672,11 +1702,7 @@ async function ffEnsureReadContracts() {
       window.controller = new ffWeb3.eth.Contract(CONTROLLER_ABI, FF_CONTROLLER_ADDRESS);
     }
 
-    if (!window.controller) {
-      console.warn('ffEnsureReadContracts: controller contract not initialised.');
-      return false;
-    }
-
+    if (!window.controller) return false;
     return true;
   } catch (err) {
     console.warn('ffEnsureReadContracts failed:', err);
@@ -1686,10 +1712,7 @@ async function ffEnsureReadContracts() {
 
 async function ffFetchStakingStats(address) {
   const ok = await ffEnsureReadContracts();
-  if (!ok || typeof CONTROLLER_ABI === 'undefined' || !ffWeb3) {
-    console.warn('Web3 or CONTROLLER_ABI missing; staking stats disabled.');
-    return null;
-  }
+  if (!ok || typeof CONTROLLER_ABI === 'undefined' || !ffWeb3) return null;
 
   const contract = new ffWeb3.eth.Contract(CONTROLLER_ABI, FF_CONTROLLER_ADDRESS);
 
@@ -1713,61 +1736,38 @@ async function ffFetchStakingStats(address) {
     'claimedRewards'
   ], [address]);
 
-  const stats = {
-    staked: null,
-    rewardsAvailable: null,
-    rewardsEarned: null
-  };
+  const stats = { staked: null, rewardsAvailable: null, rewardsEarned: null };
 
-  if (Array.isArray(stakedRaw)) {
-    stats.staked = stakedRaw.length;
-  } else if (stakedRaw != null && !isNaN(stakedRaw)) {
-    stats.staked = Number(stakedRaw);
-  }
+  if (Array.isArray(stakedRaw)) stats.staked = stakedRaw.length;
+  else if (stakedRaw != null && !isNaN(stakedRaw)) stats.staked = Number(stakedRaw);
 
-  if (rewardsAvailableRaw != null) {
-    stats.rewardsAvailable = rewardsAvailableRaw;
-  }
-
-  if (rewardsEarnedRaw != null) {
-    stats.rewardsEarned = rewardsEarnedRaw;
-  }
+  if (rewardsAvailableRaw != null) stats.rewardsAvailable = rewardsAvailableRaw;
+  if (rewardsEarnedRaw != null) stats.rewardsEarned = rewardsEarnedRaw;
 
   return stats;
 }
 
 async function ffFetchOpenSeaProfile(address) {
-  if (!FF_OPENSEA_API_KEY) {
-    console.warn('OpenSea API key missing; profile fetch disabled.');
-    return null;
-  }
+  if (!FF_OPENSEA_API_KEY) return null;
 
   const url = `https://api.opensea.io/api/v2/accounts/${address}`;
   const res = await fetch(url, {
-    headers: {
-      'Accept': 'application/json',
-      'X-API-KEY': FF_OPENSEA_API_KEY
-    }
+    headers: { 'Accept': 'application/json', 'X-API-KEY': FF_OPENSEA_API_KEY }
   });
 
-  if (!res.ok) {
-    console.warn('OpenSea profile request failed:', res.status);
-    return null;
-  }
-
+  if (!res.ok) return null;
   const data = await res.json();
 
   const username =
     data.username ||
-    (data.account && data.account.username) ||
-    (data.account && data.account.address) ||
+    data?.account?.username ||
     null;
 
   const avatarUrl =
     data.profile_image_url ||
     data.profileImageUrl ||
-    (data.account && data.account.profile_image_url) ||
-    (data.account && data.account.image_url) ||
+    data?.account?.profile_image_url ||
+    data?.account?.image_url ||
     null;
 
   return { username, avatarUrl };
@@ -1780,66 +1780,38 @@ async function connectWallet() {
   }
 
   try {
-    const accounts = await window.ethereum.request({
-      method: 'eth_requestAccounts'
-    });
-
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     if (!accounts || !accounts.length) return;
 
     const address = accounts[0];
     ffCurrentAccount = address;
 
-    // If user connects wallet, we are no longer in public view.
     window.FF_PUBLIC_WALLET_VIEW = false;
     window.FF_PUBLIC_WALLET_ADDRESS = null;
 
-    if (!ffWeb3) {
-      ffWeb3 = new Web3(window.ethereum);
-    }
-
+    if (!ffWeb3) ffWeb3 = new Web3(window.ethereum);
     window.web3 = ffWeb3;
     window.user_address = address;
 
-    try {
-      if (typeof COLLECTION_ABI !== 'undefined') {
-        window.collection = new ffWeb3.eth.Contract(
-          COLLECTION_ABI,
-          FF_COLLECTION_ADDRESS
-        );
-      }
-      if (typeof CONTROLLER_ABI !== 'undefined') {
-        window.controller = new ffWeb3.eth.Contract(
-          CONTROLLER_ABI,
-          FF_CONTROLLER_ADDRESS
-        );
-      }
-    } catch (err) {
-      console.warn('Failed to init legacy contracts', err);
+    if (typeof COLLECTION_ABI !== 'undefined') {
+      window.collection = new ffWeb3.eth.Contract(COLLECTION_ABI, FF_COLLECTION_ADDRESS);
+    }
+    if (typeof CONTROLLER_ABI !== 'undefined') {
+      window.controller = new ffWeb3.eth.Contract(CONTROLLER_ABI, FF_CONTROLLER_ADDRESS);
     }
 
     ffUpdateWalletBasicUI(address);
 
     const [ownedCount, stakingStats, profile] = await Promise.all([
-      ffFetchOwnedFrogCount(address).catch((err) => {
-        console.warn('Owned frogs count fetch failed:', err);
-        return null;
-      }),
-      ffFetchStakingStats(address).catch((err) => {
-        console.warn('Staking stats fetch failed:', err);
-        return null;
-      }),
-      ffFetchOpenSeaProfile(address).catch((err) => {
-        console.warn('OpenSea profile fetch failed:', err);
-        return null;
-      })
+      ffFetchOwnedFrogCount(address).catch(() => null),
+      ffFetchStakingStats(address).catch(() => null),
+      ffFetchOpenSeaProfile(address).catch(() => null)
     ]);
 
     ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile);
-
     renderOwnedAndStakedFrogs(address);
 
-    ffProcessPendingStakeMeta();
-    ffRefreshStakeMetaForAllCards();
+    ffInitReadContractsOnLoad();
 
     ffShowView('wallet');
 
@@ -1853,15 +1825,12 @@ window.connectWallet = connectWallet;
 
 function ffInitWalletOnLoad() {
   const btn = document.getElementById('connect-wallet-button');
-  if (btn) {
-    btn.addEventListener('click', connectWallet);
-  }
+  if (btn) btn.addEventListener('click', connectWallet);
 
   ffSetText('wallet-status-label', 'Disconnected');
   ffSetText('dashboard-wallet', 'Wallet: —');
   ffSetText('dashboard-username', 'Not connected');
 
-  // If we're in public wallet view, apply dashboard now
   if (window.FF_PUBLIC_WALLET_VIEW && ffCurrentAccount) {
     (async () => {
       try {
@@ -1889,12 +1858,8 @@ function ffRomanToArabic(roman) {
 
   for (let i = roman.length - 1; i >= 0; i--) {
     const val = map[roman[i]] || 0;
-    if (val < prev) {
-      total -= val;
-    } else {
-      total += val;
-      prev = val;
-    }
+    if (val < prev) total -= val;
+    else { total += val; prev = val; }
   }
 
   return total || null;
