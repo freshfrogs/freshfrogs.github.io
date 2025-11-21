@@ -689,7 +689,7 @@ a {
 /* Reuse recent_sale_card style for owned / staked NFTs */
 /* Make cards a bit slimmer and stop stretching them to full row height */
 .recent_sale_card {
-  width: 100%;
+  width: 260px;
   max-width: 260px;
   margin: 8px auto;
   align-self: flex-start;
