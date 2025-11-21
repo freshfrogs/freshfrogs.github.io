@@ -720,3 +720,11 @@ padding: 0.55rem 1.2rem;
 .nav a.active::after {
   width: 80%;
 }
+.frog-owner-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.frog-owner-link:hover {
+  text-decoration: underline;
+}
