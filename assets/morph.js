@@ -219,7 +219,7 @@
         signature: signed.signature
       });
 
-      ffSetMorphStatus('✅ Morph saved! It will show up in your Wallet.');
+      ffSetMorphStatus('✅ Morph saved! It will show up with your owned frogs.');
 
     } catch (err) {
       console.error('Save failed:', err);
