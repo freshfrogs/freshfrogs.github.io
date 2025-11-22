@@ -17,12 +17,14 @@
     ffWireButtons();
     ffEnsureGalleryContainer();
     ffLoadUserGalleryOnStart();
+    ffRenderMorphedFrogsOnMorphPage();
 
     const connectBtn = document.getElementById('hero-connect-wallet-btn');
     if (connectBtn && typeof connectWallet === 'function') {
       connectBtn.addEventListener('click', async () => {
         await connectWallet();
         ffLoadUserGalleryOnStart(true);
+        ffRenderMorphedFrogsOnMorphPage(true);
       });
     }
   });
@@ -50,7 +52,7 @@
   // ------------------------
   // Gallery container
   // ------------------------
-    function ffEnsureGalleryContainer() {
+  function ffEnsureGalleryContainer() {
     if (document.getElementById('morph-token-gallery')) return;
 
     const slot = document.getElementById('morph-card-slot');
@@ -59,12 +61,12 @@
     gallery.className = 'morph-gallery';
 
     if (slot?.parentElement) {
-        // ✅ Insert gallery AFTER the preview card slot
-        slot.parentElement.insertBefore(gallery, slot.nextSibling);
+      // ✅ Insert gallery AFTER the preview card slot
+      slot.parentElement.insertBefore(gallery, slot.nextSibling);
     } else {
-        document.body.appendChild(gallery);
+      document.body.appendChild(gallery);
     }
-    }
+  }
 
   // ------------------------
   // Load user's owned + staked frogs
@@ -134,6 +136,54 @@
 
       btn.addEventListener('click', () => ffToggleSelect(id, btn));
       gallery.appendChild(btn);
+    }
+  }
+
+  async function ffRenderMorphedFrogsOnMorphPage(force = false) {
+    const status = document.getElementById('morphed-frogs-status');
+    const grid   = document.getElementById('morphed-frogs-grid');
+
+    if (!status || !grid) return;
+
+    const address = ffGetConnectedAddress();
+    if (!address) {
+      grid.innerHTML = '';
+      grid.dataset.loadedFor = '';
+      status.textContent = 'Connect your wallet to load your morphed frogs.';
+      return;
+    }
+
+    const key = address.toLowerCase();
+    if (!force && grid.dataset.loadedFor === key) return;
+
+    grid.dataset.loadedFor = key;
+    grid.innerHTML = '';
+    status.textContent = 'Loading your morphed frogs…';
+
+    try {
+      const morphs = await ffFetchMorphedFrogs(address);
+      if (!Array.isArray(morphs) || !morphs.length) {
+        status.textContent = 'No morphed frogs saved yet.';
+        return;
+      }
+
+      status.textContent = '';
+
+      for (const meta of morphs) {
+        if (!meta.attributes && Array.isArray(meta.traits)) {
+          meta.attributes = meta.traits;
+        }
+
+        const card = createMorphedFrogCard({ metadata: meta, ownerAddress: address });
+        grid.appendChild(card);
+
+        const contId = card.dataset.imgContainerId;
+        const baseId = parseTokenId(meta?.frogA ?? meta?.tokenA ?? null);
+        ffBuildLayeredMorphedImage(meta, contId, baseId);
+      }
+    } catch (err) {
+      console.warn('ffRenderMorphedFrogsOnMorphPage failed:', err);
+      status.textContent = 'Unable to load morphed frogs right now.';
     }
   }
 
