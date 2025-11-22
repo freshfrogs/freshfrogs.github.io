@@ -593,7 +593,7 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
       </div>
       ${footerHtml || ''}
       ${actionHtml || ''}
-      ${ffActionButtonsHTML(frog.tokenId)}
+      ${ffActionButtonsHTML(tokenId)}
     </div>
   `;
 
