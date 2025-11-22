@@ -153,9 +153,21 @@ function ffInitNav() {
   const links = document.querySelectorAll('.nav a[data-view]');
   links.forEach((link) => {
     link.addEventListener('click', (e) => {
-      e.preventDefault();
       const view = link.dataset.view;
-      ffShowView(view);
+      const normalizePath = (path) => {
+        if (!path) return '/';
+        return path.replace(/\/+$/, '') || '/';
+      };
+
+      const currentPath = normalizePath(window.location.pathname || '/');
+      const targetPath = normalizePath(link.pathname || link.getAttribute('href'));
+
+      // If the link points to the current page (including folder index pages),
+      // keep SPA behavior to swap views without reloading.
+      if (currentPath === targetPath) {
+        e.preventDefault();
+        ffShowView(view);
+      }
     });
   });
 }
@@ -1492,6 +1504,20 @@ function ffUpdateWalletBasicUI(address) {
   }
 }
 
+function ffLinkWalletAddress(address) {
+  const walletLink = document.getElementById('wallet-nav-link');
+  if (!walletLink) return;
+
+  walletLink.style.display = 'inline-block';
+  walletLink.href = `/${address}`;
+
+  // override SPA click to navigate to address URL
+  walletLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = `/${address}`;
+  });
+}
+
 function ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile) {
   ffUpdateWalletBasicUI(address);
   if (typeof ownedCount === 'number') ffSetText('stat-owned', ownedCount.toString());
@@ -1612,6 +1638,8 @@ async function connectWallet() {
     if (!ffWeb3) ffWeb3 = new Web3(window.ethereum);
     window.web3 = ffWeb3;
     window.user_address = address;
+
+    ffLinkWalletAddress(address);
 
     if (typeof COLLECTION_ABI !== 'undefined') {
       window.collection = new ffWeb3.eth.Contract(COLLECTION_ABI, FF_COLLECTION_ADDRESS);
