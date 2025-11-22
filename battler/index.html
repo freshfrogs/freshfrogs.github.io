@@ -30,6 +30,13 @@
     .small{ font-size:12px; color:var(--muted);}
     .row{ display:flex; align-items:center; justify-content:space-between; gap:8px;}
   </style>
+
+  <!-- Option A: load your existing site JS FIRST -->
+  <script src="../assets/rarityrankings.js"></script>
+  <script src="../assets/controller_abi.js"></script>
+  <script src="../assets/collection_abi.js"></script>
+  <script src="../assets/ethereum-dapp.js"></script>
+  <script src="../assets/site.js"></script>
 </head>
 <body>
 <header>
@@ -101,41 +108,15 @@
 </div>
 
 <script>
-/* ----------------------------
-   Integration hooks (YOUR SITE)
-   ---------------------------- */
-
-// Replace these with your real functions:
-async function connectWallet() {
-  if (!window.ethereum) throw new Error("No wallet");
-  const [address] = await ethereum.request({ method: "eth_requestAccounts" });
-  return address.toLowerCase();
-}
-
-// Should return frogs like:
-// [{ tokenId, image, metadata:{ traits:[{trait_type,value}], name } }]
-async function fetchOwnedAndStakedFrogs(address) {
-
-  const url = `${FF_ALCHEMY_NFT_BASE}/getNFTsForOwner?owner=${address}&withMetadata=true&pageSize=100`;
-  const res = await fetch(url);
-  if (!res.ok) return [];
-
-  const data = await res.json();
-  const all = Array.isArray(data.ownedNfts) ? data.ownedNfts : [];
-  const target = FF_COLLECTION_ADDRESS.toLowerCase();
-
-  const seen = new Set();
-  const frogs = [];
-  for (const nft of all) {
-    if (nft?.contract?.address?.toLowerCase() !== target) continue;
-    const id = parseTokenId(nft.tokenId || nft.id?.tokenId);
-    if (id == null || seen.has(id)) continue;
-    seen.add(id);
-    frogs.push(nft);
-  }
-  return frogs;
-
-}
+/* =========================================================
+   Battler (Option A) – expects your site.js globals.
+   Uses:
+     - connectWallet()
+     - ffFetchOwnedFrogs(address)
+     - ffFetchStakedFrogs(address)
+     - ffFetchRecentMorphedFrogs(address?)  (optional)
+     - getRarityRank(tokenId), getRarityTier(rank) (rarityrankings.js)
+   ========================================================= */
 
 /* ----------------------------
    Trait + rarity mapping
@@ -149,7 +130,7 @@ const RARITY_MULT = {
   "LEGENDARY": 1.30
 };
 
-// Simple starter bonuses. We’ll expand.
+// Starter bonuses. We’ll expand/balance later.
 const TRAIT_BONUSES = {
   "Cyber Eyes":        { atkPct: 0.12 },
   "Silver Crown":      { critPct: 0.10 },
@@ -161,6 +142,32 @@ const TRAIT_BONUSES = {
   "Fire Aura":         { dotPct: 0.04 },
   "Ice Aura":          { slowPct: 0.10 }
 };
+
+function computeRarityTierLabel(tokenId){
+  try{
+    if (typeof getRarityRank !== "function" || typeof getRarityTier !== "function") return "COMMON";
+    const rank = getRarityRank(tokenId);
+    const tier = rank ? getRarityTier(rank) : null;
+    return (tier?.label || "COMMON").toUpperCase();
+  }catch(e){
+    return "COMMON";
+  }
+}
+
+function normalizeFrog(raw){
+  const tokenId = Number(raw.tokenId ?? raw.id ?? raw.token_id);
+  const metadata = raw.metadata || raw.meta || raw;
+  const traits = metadata?.traits || raw.traits || [];
+  const image = raw.image || metadata?.image || raw.image_url || "";
+
+  return {
+    tokenId,
+    name: raw.name || metadata?.name || `Frog #${tokenId}`,
+    image,
+    rarityTier: (raw.rarityTier || raw.rarity || computeRarityTierLabel(tokenId)),
+    metadata: { ...metadata, traits }
+  };
+}
 
 function buildFrogStats(frog){
   // Base stats
@@ -187,7 +194,7 @@ function buildFrogStats(frog){
   stats.atk   = +(stats.atk * mult).toFixed(2);
   stats.def   = +(stats.def * mult).toFixed(2);
 
-  const traits = frog.metadata?.traits || frog.traits || [];
+  const traits = frog.metadata?.traits || [];
   for (const t of traits){
     const val = t.value;
     const bonus = TRAIT_BONUSES[val];
@@ -210,6 +217,32 @@ function buildFrogStats(frog){
   stats.crit = Math.min(0.8, +stats.crit.toFixed(3));
 
   return stats;
+}
+
+/* ----------------------------
+   Fetch playable frogs (calls YOUR site.js)
+   ---------------------------- */
+
+async function fetchPlayableFrogs(address){
+  const ownedFn  = window.ffFetchOwnedFrogs;
+  const stakedFn = window.ffFetchStakedFrogs;
+  const morphedFn= window.ffFetchRecentMorphedFrogs;
+
+  const owned   = (typeof ownedFn  === "function") ? await ownedFn(address)  : [];
+  const staked  = (typeof stakedFn === "function") ? await stakedFn(address) : [];
+  let morphed   = [];
+  if (typeof morphedFn === "function"){
+    try { morphed = await morphedFn(address); } catch(e){ morphed = await morphedFn(); }
+  }
+
+  // merge + normalize + de-dupe by tokenId
+  const all = [...owned, ...staked, ...morphed].map(normalizeFrog);
+  const seen = new Set();
+  return all.filter(f=>{
+    if(seen.has(f.tokenId)) return false;
+    seen.add(f.tokenId);
+    return true;
+  });
 }
 
 /* ----------------------------
@@ -268,7 +301,6 @@ function drawPlayer(){
   ctx.fillText("FROG", player.x-14, player.y+4);
   ctx.restore();
 
-  // hp bar
   drawBar(player.x-40, player.y-40, 80, 8, player.hp/player.maxHp, "#37e07b");
 }
 
@@ -293,7 +325,6 @@ function drawBar(x,y,w,h,t,color){
 
 function render(){
   clear();
-  // background lane
   ctx.save();
   ctx.fillStyle="#0a0f17";
   ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -360,7 +391,6 @@ function endRun(){
 function updateCombat(dt){
   if(!player) return;
 
-  // Player attacks nearest enemy
   player.atkTimer += dt;
   const playerInterval = 1 / player.spd;
 
@@ -376,12 +406,10 @@ function updateCombat(dt){
     }
     target.hp -= dmg;
 
-    // lifesteal
     if(player.lifesteal > 0){
       player.hp = Math.min(player.maxHp, player.hp + dmg*player.lifesteal);
     }
 
-    // dot
     if(player.dot > 0){
       target.dotTimer = 2.0;
       target.dotDps = player.atk * player.dot;
@@ -397,14 +425,12 @@ function updateCombat(dt){
     }
   }
 
-  // Enemy attacks player
   for(const e of enemies){
     e.atkTimer += dt;
     const interval = 1 / e.spd;
     if(e.atkTimer >= interval){
       e.atkTimer = 0;
 
-      // evade
       if(Math.random() < player.evade) continue;
 
       let dmg = Math.max(1, e.atk - player.def);
@@ -417,7 +443,6 @@ function updateCombat(dt){
       }
     }
 
-    // dot ticks
     if(e.dotTimer && e.dotTimer > 0){
       const tick = Math.min(dt, e.dotTimer);
       e.dotTimer -= tick;
@@ -510,13 +535,15 @@ requestAnimationFrame(loop);
 
 ui.connectBtn.onclick = async ()=>{
   try{
-    address = await connectWallet();
+    if (typeof window.connectWallet !== "function") throw new Error("connectWallet() not found on window");
+    address = (await window.connectWallet()).toLowerCase();
     ui.addr.textContent = address.slice(0,6)+"..."+address.slice(-4);
-    frogs = await fetchOwnedAndStakedFrogs(address);
+
+    frogs = await fetchPlayableFrogs(address);
     renderFrogList();
     log("Wallet connected.");
   }catch(e){
-    log(e.message);
+    log(e.message || String(e));
   }
 };
 
@@ -571,7 +598,7 @@ function makeMockFrogs(){
       tokenId: 12,
       name: "Frog #12",
       image: "https://freshfrogs.github.io/assets/frogs/12.png",
-      rarityTier: "Rare",
+      rarityTier: "RARE",
       metadata:{ traits:[
         {trait_type:"Eyes", value:"Cyber Eyes"},
         {trait_type:"Head", value:"Silver Crown"},
@@ -581,7 +608,7 @@ function makeMockFrogs(){
       tokenId: 666,
       name: "Frog #666",
       image: "https://freshfrogs.github.io/assets/frogs/666.png",
-      rarityTier: "Epic",
+      rarityTier: "EPIC",
       metadata:{ traits:[
         {trait_type:"Skin", value:"Zombie Skin"},
         {trait_type:"Mask", value:"Ninja Mask"},
@@ -591,7 +618,7 @@ function makeMockFrogs(){
       tokenId: 4040,
       name: "Frog #4040",
       image: "https://freshfrogs.github.io/assets/frogs/4040.png",
-      rarityTier: "Legendary",
+      rarityTier: "LEGENDARY",
       metadata:{ traits:[
         {trait_type:"Armor", value:"Amphibious Armor"},
         {trait_type:"Aura", value:"Fire Aura"},
