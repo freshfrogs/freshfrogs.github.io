@@ -1244,6 +1244,25 @@ async function ffFetchRecentMorphedFrogs(limit = 24) {
   }
 }
 
+function ffEnsureRecentMorphsAbovePond() {
+  const grid = document.getElementById('recent-morphs-grid');
+  const pondGrid = document.getElementById('pond-grid');
+  if (!grid || !pondGrid) return;
+
+  // find the panel/section containing recent morphs
+  const morphsPanel =
+    document.getElementById('recent-morphs-panel') ||
+    document.getElementById('recent-morphs-section') ||
+    grid.closest('.panel') ||
+    grid.parentElement;
+
+  const pondPanel = pondGrid.closest('.panel') || pondGrid.parentElement;
+
+  if (morphsPanel && pondPanel && pondPanel.parentNode) {
+    pondPanel.parentNode.insertBefore(morphsPanel, pondPanel);
+  }
+}
+
 function ffEnsureRecentMorphsLoaded() {
   const grid = document.getElementById('recent-morphs-grid');
   if (!grid) return;
