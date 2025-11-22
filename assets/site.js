@@ -32,6 +32,7 @@ let FF_RECENT_LIMIT  = 24;
 
 // Toggle to show staking stats on non-wallet cards ff_admin_9f3k2j
 const FF_SHOW_STAKING_STATS_ON_CARDS = true;
+const FF_MORPH_ADMIN_KEY = "ff_admin_9f3k2j";
 
 // Rarity paging
 let FF_RARITY_INDEX = 0;
@@ -1224,27 +1225,56 @@ async function ffLoadMorePond() {
 async function ffFetchRecentMorphedFrogs(limit = 24) {
   if (!FF_MORPH_WORKER_URL) return [];
 
+  let cursor = null;
+  let all = [];
+
   try {
-    const params = new URLSearchParams();
-    if (limit) params.set('limit', String(limit));
-    params.set('recent', 'true');
+    while (true) {
+      const u = new URL(`${FF_MORPH_WORKER_URL}/allMorphs`);
+      u.searchParams.set("limit", "100");
+      if (cursor) u.searchParams.set("cursor", cursor);
 
-    const url = `${FF_MORPH_WORKER_URL}/morphs?${params.toString()}`;
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) return [];
+      const res = await fetch(u.toString(), {
+        cache: "no-store",
+        headers: {
+          // NOTE: you said you're keeping this in client.
+          // Put your real key into FF_MORPH_ADMIN_KEY.
+          authorization: `Bearer ${FF_MORPH_ADMIN_KEY}`
+        }
+      });
 
-    const data = await res.json();
-    const morphs = Array.isArray(data?.morphs) ? data.morphs : [];
+      if (!res.ok) break;
 
-    // normalize to metadata objects
-    return morphs
-      .map(m => m?.morphedMeta || m)
-      .filter(meta => meta && typeof meta === 'object');
+      const data = await res.json();
+      const page = Array.isArray(data?.morphs) ? data.morphs : [];
+      all = all.concat(page);
+
+      if (data.list_complete || !data.cursor) break;
+      cursor = data.cursor;
+
+      // stop early once we have enough for "recent"
+      if (all.length >= limit) break;
+    }
+
+    // newest-first if timestamps exist
+    all.sort((a, b) => {
+      const ta = Number(a?.createdAt || a?.timestamp || 0);
+      const tb = Number(b?.createdAt || b?.timestamp || 0);
+      return tb - ta;
+    });
+
+    // normalize to metadata objects your renderer expects
+    return all
+      .slice(0, limit)
+      .map(m => m?.morphedMeta || m?.metadata || m)
+      .filter(meta => meta && typeof meta === "object");
+
   } catch (err) {
-    console.warn('ffFetchRecentMorphedFrogs failed:', err);
+    console.warn("ffFetchRecentMorphedFrogs failed:", err);
     return [];
   }
 }
+
 
 function ffEnsureRecentMorphsLoaded() {
   const grid = document.getElementById('recent-morphs-grid');
