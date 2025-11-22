@@ -17,11 +17,24 @@
     <!-- HEADER -->
     <header class="site-header">
       <nav class="nav">
+        <!-- ✅ Top-left Connect Wallet (hidden automatically after connect) -->
+
         <a href="/" data-view="collection">Collection</a>
         <a href="/rarity/" data-view="rarity">Rarity</a>
         <a href="/pond/" data-view="pond">Pond</a>
+
+        <!-- Keep Morph link in HTML; JS hides it until connected -->
         <a href="/morph/" data-view="morph">Morph</a>
-        <a href="#" data-view="wallet" id="wallet-nav-link" style="display: none;"></a>
+
+        <!-- ✅ Shop on OpenSea -->
+        <a href="https://opensea.io/collection/fresh-frogs"
+          target="_blank" rel="noopener noreferrer">
+          OpenSea
+        </a>
+
+        <!-- Wallet address link, shown after connect -->
+        <a href="#" id="header-connect-wallet-btn">Connect</a>
+        <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
       </nav>
     </header>
 
@@ -42,15 +55,6 @@
           Stake and earn rewards, level up, unlock custom trait animations and
           more! All secondary sales are entitled to a <b>5%</b> royalty.
         </p>
-        <div class="hero-actions">
-          <button class="btn primary" id="hero-view-collection-btn">
-            View Collection
-          </button>
-          <!-- Normal connect still works if user wants to connect their own wallet -->
-          <button class="btn secondary" id="hero-connect-wallet-btn">
-            Connect Wallet
-          </button>
-        </div>
       </div>
     </section>
 
