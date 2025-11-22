@@ -1877,6 +1877,59 @@ function ffInitWalletOnLoad() {
   ffRestoreWalletSession();
 }
 
+async function ffRestoreWalletSession() {
+  if (!window.ethereum) return false;
+
+  let flag = null;
+  try { flag = sessionStorage.getItem('FF_SESSION_CONNECTED'); } catch {}
+  if (flag !== '1') return false;
+
+  try {
+    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+    if (!accounts?.length) {
+      try { sessionStorage.removeItem('FF_SESSION_CONNECTED'); } catch {}
+      return false;
+    }
+
+    const address = accounts[0];
+
+    ffCurrentAccount = address;
+    FF_CONNECTED_ADDRESS = address;
+    window.user_address = address;
+
+    if (!ffWeb3) ffWeb3 = new Web3(window.ethereum);
+
+    // ✅ if we landed on /0x... and it’s OURS, disable public view
+    if (
+      window.FF_PUBLIC_WALLET_VIEW &&
+      window.FF_PUBLIC_WALLET_ADDRESS &&
+      window.FF_PUBLIC_WALLET_ADDRESS.toLowerCase() === address.toLowerCase()
+    ) {
+      window.FF_PUBLIC_WALLET_VIEW = false;
+      window.FF_PUBLIC_WALLET_ADDRESS = null;
+    }
+
+    ffLinkWalletAddress(address);
+    ffUpdateWalletBasicUI(address);
+    ffApplyConnectionVisibility(true);
+
+    // ✅ force wallet cards to re-render with actions if we’re on wallet view
+    const activeNav = document.querySelector('.nav a.active[data-view]');
+    const activeView = activeNav?.dataset.view || ffDetermineInitialViewFromPath();
+
+    if (activeView === 'wallet' && typeof renderOwnedAndStakedFrogs === 'function') {
+      FF_LAST_WALLET_RENDERED_FOR = null;
+      FF_WALLET_RENDER_INFLIGHT = false;
+      renderOwnedAndStakedFrogs(address);
+    }
+
+    return true;
+  } catch (err) {
+    console.warn('ffRestoreWalletSession failed:', err);
+    return false;
+  }
+}
+
 function ffApplyConnectionVisibility(isConnected) {
   // Morph nav link hidden until connected
   const morphNav =
