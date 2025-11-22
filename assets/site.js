@@ -1219,50 +1219,30 @@ async function ffLoadMorePond() {
 }
 
 // ------------------------
-// Recent morphs (pond page)
+// Recent morphs (pond page) — SINGLE SOURCE OF TRUTH
 // ------------------------
 async function ffFetchRecentMorphedFrogs(limit = 24) {
   if (!FF_MORPH_WORKER_URL) return [];
 
   try {
-    const u = new URL(`${FF_MORPH_WORKER_URL}/allMorphs`);
-    u.searchParams.set("limit", String(limit));
+    const params = new URLSearchParams();
+    if (limit) params.set('limit', String(limit));
+    params.set('recent', 'true');
 
-    const res = await fetch(u.toString(), { cache: "no-store" });
+    const url = `${FF_MORPH_WORKER_URL}/morphs?${params.toString()}`;
+    const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) return [];
 
     const data = await res.json();
-
-    // worker shape: { morphs: [...], cursor, list_complete }
     const morphs = Array.isArray(data?.morphs) ? data.morphs : [];
 
-    // each record is likely { morphedMeta: {...}, createdAt, createdBy, etc }
+    // normalize to metadata objects
     return morphs
-      .map(m => m?.morphedMeta || m?.metadata || m)
-      .filter(meta => meta && typeof meta === "object");
+      .map(m => m?.morphedMeta || m)
+      .filter(meta => meta && typeof meta === 'object');
   } catch (err) {
-    console.warn("ffFetchRecentMorphedFrogs failed:", err);
+    console.warn('ffFetchRecentMorphedFrogs failed:', err);
     return [];
-  }
-}
-
-
-function ffEnsureRecentMorphsAbovePond() {
-  const grid = document.getElementById('recent-morphs-grid');
-  const pondGrid = document.getElementById('pond-grid');
-  if (!grid || !pondGrid) return;
-
-  // find the panel/section containing recent morphs
-  const morphsPanel =
-    document.getElementById('recent-morphs-panel') ||
-    document.getElementById('recent-morphs-section') ||
-    grid.closest('.panel') ||
-    grid.parentElement;
-
-  const pondPanel = pondGrid.closest('.panel') || pondGrid.parentElement;
-
-  if (morphsPanel && pondPanel && pondPanel.parentNode) {
-    pondPanel.parentNode.insertBefore(morphsPanel, pondPanel);
   }
 }
 
@@ -1270,8 +1250,10 @@ function ffEnsureRecentMorphsLoaded() {
   const grid = document.getElementById('recent-morphs-grid');
   if (!grid) return;
 
-  // Use a real loaded flag instead of children length
-  if (grid.dataset.loaded !== "true") {
+  // prevent double-start while async load is running
+  if (grid.dataset.loading === "1") return;
+
+  if (!grid.children.length) {
     ffLoadRecentMorphs();
   } else {
     const status = document.getElementById('recent-morphs-status');
@@ -1284,18 +1266,31 @@ async function ffLoadRecentMorphs() {
   const status = document.getElementById('recent-morphs-status');
   if (!grid) return;
 
-  if (status) status.textContent = 'Loading Recent Morphs…';
-
-  grid.innerHTML = ''; // ✅ add this
-
+  // in-flight lock + reset
+  grid.dataset.loading = "1";
+  grid.innerHTML = "";
 
   try {
-    const morphs = await ffFetchRecentMorphedFrogs(24);
+    let morphs = await ffFetchRecentMorphedFrogs(24);
 
     if (!Array.isArray(morphs) || !morphs.length) {
       if (status) status.textContent = 'No morphed frogs have been created yet.';
       return;
     }
+
+    // ✅ DEDUPE morphs by best-available unique key
+    const seen = new Set();
+    morphs = morphs.filter(meta => {
+      const id =
+        meta.morphId ||
+        meta.id ||
+        meta.signature ||
+        `${meta.createdBy || ''}-${meta.frogA ?? meta.tokenA}-${meta.frogB ?? meta.tokenB}-${meta.createdAt || meta.timestamp || ''}`;
+
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
 
     if (status) status.textContent = 'Latest morphed frogs from the community.';
 
@@ -1308,7 +1303,6 @@ async function ffLoadRecentMorphs() {
         metadata: meta,
         ownerAddress: meta?.createdBy
       });
-
       grid.appendChild(card);
 
       const contId = card.dataset.imgContainerId;
@@ -1318,6 +1312,8 @@ async function ffLoadRecentMorphs() {
   } catch (err) {
     console.warn('ffLoadRecentMorphs failed:', err);
     if (status) status.textContent = 'Unable to load recent morphs right now.';
+  } finally {
+    grid.dataset.loading = "";
   }
 }
 
