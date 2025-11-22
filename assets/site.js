@@ -568,6 +568,7 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
   card.dataset.tokenId = tokenId;
   card.dataset.imgContainerId = imgContainerId;
 
+  // ✅ Frog name is now the OpenSea link
   card.innerHTML = `
     <strong class="sale_card_title">${headerLeft || ''}</strong>
     <strong class="sale_card_price">${headerRight || ''}</strong>
@@ -582,25 +583,20 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
       />
     </div>
 
-    <!-- content area -->
     <div class="recent_sale_traits">
       <strong class="sale_card_title">
         <a class="frog-name-link" href="${osLink}" target="_blank" rel="noopener noreferrer">${frogName}</a>
       </strong>
       <strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
-
       <div class="recent_sale_properties">
         ${traitsHtml}
       </div>
-
       ${footerHtml || ''}
-      ${actionHtml || ''}   <!-- keep your per-view actions here -->
+      ${actionHtml || ''}
     </div>
 
-    <!-- ✅ hard-bottom actions -->
-    <div class="frog-card-bottom">
-      ${ffActionButtonsHTML(tokenId)}
-    </div>
+    <!-- ✅ buttons back at the true bottom of the card -->
+    ${ffActionButtonsHTML(tokenId)}
   `;
 
   if (typeof ffBuildLayeredFrogImage === 'function') {
