@@ -1247,7 +1247,8 @@ function ffEnsureRecentMorphsLoaded() {
   const grid = document.getElementById('recent-morphs-grid');
   if (!grid) return;
 
-  if (!grid.children.length) {
+  // Use a real loaded flag instead of children length
+  if (grid.dataset.loaded !== "true") {
     ffLoadRecentMorphs();
   } else {
     const status = document.getElementById('recent-morphs-status');
