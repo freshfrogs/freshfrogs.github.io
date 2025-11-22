@@ -224,6 +224,7 @@ function ffShowView(view) {
     ffEnsureRarityLoaded();
   } else if (view === 'pond') {
     ffEnsurePondLoaded();
+    ffEnsureRecentMorphsLoaded();
   } else if (view === 'wallet' && ffCurrentAccount) {
     const ownedGrid = document.getElementById('owned-frogs-grid');
     const stakedGrid = document.getElementById('staked-frogs-grid');
@@ -1210,6 +1211,78 @@ async function ffLoadMorePond() {
   } catch (err) {
     console.error('ffLoadMorePond failed', err);
     if (status) status.textContent = 'Unable to load pond frogs.';
+  }
+}
+
+// ------------------------
+// Recent morphs (pond page)
+// ------------------------
+async function ffFetchRecentMorphedFrogs(limit = 24) {
+  if (!FF_MORPH_WORKER_URL) return [];
+
+  try {
+    const params = new URLSearchParams();
+    if (limit) params.set('limit', String(limit));
+    params.set('recent', 'true');
+
+    const url = `${FF_MORPH_WORKER_URL}/morphs?${params.toString()}`;
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) return [];
+
+    const data = await res.json();
+    const morphs = Array.isArray(data?.morphs) ? data.morphs : [];
+
+    return morphs
+      .map((m) => m?.morphedMeta || m)
+      .filter((meta) => meta && typeof meta === 'object');
+  } catch (err) {
+    console.warn('ffFetchRecentMorphedFrogs failed:', err);
+    return [];
+  }
+}
+
+function ffEnsureRecentMorphsLoaded() {
+  const grid = document.getElementById('recent-morphs-grid');
+  if (!grid) return;
+
+  if (!grid.children.length) {
+    ffLoadRecentMorphs();
+  } else {
+    const status = document.getElementById('recent-morphs-status');
+    if (status) status.textContent = 'Latest morphed frogs from the community.';
+  }
+}
+
+async function ffLoadRecentMorphs() {
+  const grid = document.getElementById('recent-morphs-grid');
+  const status = document.getElementById('recent-morphs-status');
+  if (!grid) return;
+
+  try {
+    const morphs = await ffFetchRecentMorphedFrogs(24);
+
+    if (!Array.isArray(morphs) || !morphs.length) {
+      if (status) status.textContent = 'No morphed frogs have been created yet.';
+      return;
+    }
+
+    if (status) status.textContent = 'Latest morphed frogs from the community.';
+
+    for (const meta of morphs) {
+      if (!meta.attributes && Array.isArray(meta.traits)) {
+        meta.attributes = meta.traits;
+      }
+
+      const card = createMorphedFrogCard({ metadata: meta, ownerAddress: meta?.createdBy });
+      grid.appendChild(card);
+
+      const contId = card.dataset.imgContainerId;
+      const baseId = parseTokenId(meta?.frogA ?? meta?.tokenA ?? null);
+      ffBuildLayeredMorphedImage(meta, contId, baseId);
+    }
+  } catch (err) {
+    console.warn('ffLoadRecentMorphs failed:', err);
+    if (status) status.textContent = 'Unable to load recent morphs right now.';
   }
 }
 
