@@ -1804,7 +1804,14 @@ async function connectWallet() {
 
     ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile);
 
+    // ✅ force wallet re-render so actions show immediately
+    FF_LAST_WALLET_RENDERED_FOR = null;
+    FF_WALLET_RENDER_INFLIGHT = false;
+
     ffInitReadContractsOnLoad();
+
+    // ✅ update nav visibility (morph hidden until connected, connect btn hidden after)
+    ffApplyConnectionVisibility(true);
 
     const activeNav = document.querySelector('.nav a.active[data-view]');
     const activeView = activeNav?.dataset.view;
@@ -1814,6 +1821,7 @@ async function connectWallet() {
       ffShowView('wallet');
       renderOwnedAndStakedFrogs(address);
     }
+
   } catch (err) {
     console.error('Wallet connection failed:', err);
     alert('Failed to connect wallet.');
