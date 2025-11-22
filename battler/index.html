@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>FreshFrog Battler</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#121823; --panel2:#0f1520;
+      --txt:#e6f0ff; --muted:#8aa0c2; --accent:#7df9a8; --danger:#ff7a7a;
+    }
+    body{ margin:0; font-family:system-ui,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--txt); }
+    header{ padding:12px 16px; display:flex; align-items:center; gap:12px; background:#0d121a; border-bottom:1px solid #1e2a3d; position:sticky; top:0;}
+    button{ background:var(--panel); color:var(--txt); border:1px solid #24324a; padding:8px 10px; border-radius:10px; cursor:pointer;}
+    button:hover{ border-color:#3b4f72;}
+    #wrap{ display:grid; grid-template-columns:320px 1fr; gap:12px; padding:12px; }
+    #left{ background:var(--panel); border:1px solid #1c2940; border-radius:14px; padding:12px; height:calc(100vh - 86px); overflow:auto;}
+    #gamePanel{ background:var(--panel); border:1px solid #1c2940; border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px;}
+    canvas{ width:100%; height:520px; background:#05070a; border-radius:12px; border:1px solid #1c2940;}
+    .frogRow{ display:flex; align-items:center; gap:8px; padding:6px; border-radius:10px; background:var(--panel2); border:1px solid #1c2940; margin-bottom:6px; cursor:pointer;}
+    .frogRow:hover{ border-color:#3b4f72;}
+    .frogRow img{ width:48px; height:48px; image-rendering:pixelated; border-radius:8px; background:#000;}
+    .pill{ font-size:12px; padding:2px 6px; border:1px solid #2b3b55; border-radius:999px; color:var(--muted); }
+    .stat{ display:flex; justify-content:space-between; font-size:14px; padding:2px 0;}
+    #buffModal{ position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; }
+    #buffCard{ width:min(720px,95vw); background:var(--panel); border:1px solid #2a3a55; border-radius:14px; padding:14px; }
+    .buffGrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:8px;}
+    .buffBtn{ background:var(--panel2); border:1px solid #2a3a55; padding:10px; border-radius:12px; text-align:left;}
+    .buffBtn b{ display:block; margin-bottom:4px;}
+    .small{ font-size:12px; color:var(--muted);}
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  </style>
+</head>
+<body>
+<header>
+  <button id="connectBtn">Connect Wallet</button>
+  <div id="addr" class="pill">not connected</div>
+  <div class="pill">FreshFrog Battler (PvE)</div>
+</header>
+
+<div id="wrap">
+  <aside id="left">
+    <div class="row">
+      <h3 style="margin:0;">Your Frogs</h3>
+      <button id="mockBtn" title="Dev mode">Load Mock Frogs</button>
+    </div>
+    <div class="small">Click a frog to battle.</div>
+    <div id="frogList" style="margin-top:8px;"></div>
+  </aside>
+
+  <main id="gamePanel">
+    <div class="row">
+      <div>
+        <div class="small">Selected Frog</div>
+        <div id="selectedName" style="font-weight:700;">none</div>
+      </div>
+      <div class="row">
+        <div class="pill">Wave: <span id="waveTxt">0</span></div>
+        <div class="pill">Score: <span id="scoreTxt">0</span></div>
+        <button id="startBtn" disabled>Start Run</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+    </div>
+
+    <canvas id="c" width="1000" height="520"></canvas>
+
+    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px;">
+      <div>
+        <div class="small">HP</div>
+        <div id="hpTxt">-</div>
+      </div>
+      <div>
+        <div class="small">ATK</div>
+        <div id="atkTxt">-</div>
+      </div>
+      <div>
+        <div class="small">DEF</div>
+        <div id="defTxt">-</div>
+      </div>
+      <div>
+        <div class="small">SPD</div>
+        <div id="spdTxt">-</div>
+      </div>
+      <div>
+        <div class="small">CRIT</div>
+        <div id="critTxt">-</div>
+      </div>
+    </div>
+
+    <div id="log" class="small" style="min-height:18px;"></div>
+  </main>
+</div>
+
+<!-- BUFF MODAL -->
+<div id="buffModal">
+  <div id="buffCard">
+    <div style="font-weight:800;">Choose a Buff</div>
+    <div class="small">Pick one. It applies immediately.</div>
+    <div class="buffGrid" id="buffGrid"></div>
+  </div>
+</div>
+
+<script>
+/* ----------------------------
+   Integration hooks (YOUR SITE)
+   ---------------------------- */
+
+// Replace these with your real functions:
+async function connectWallet() {
+  if (!window.ethereum) throw new Error("No wallet");
+  const [address] = await ethereum.request({ method: "eth_requestAccounts" });
+  return address.toLowerCase();
+}
+
+// Should return frogs like:
+// [{ tokenId, image, metadata:{ traits:[{trait_type,value}], name } }]
+async function fetchOwnedAndStakedFrogs(address) {
+  // TODO: plug in your Alchemy + controller logic
+  // for now empty:
+  return [];
+}
+
+/* ----------------------------
+   Trait + rarity mapping
+   ---------------------------- */
+
+const RARITY_MULT = {
+  "COMMON": 1.00,
+  "UNCOMMON": 1.05,
+  "RARE": 1.12,
+  "EPIC": 1.20,
+  "LEGENDARY": 1.30
+};
+
+// Simple starter bonuses. We’ll expand.
+const TRAIT_BONUSES = {
+  "Cyber Eyes":        { atkPct: 0.12 },
+  "Silver Crown":      { critPct: 0.10 },
+  "Gold Crown":        { critPct: 0.15, luckPct: 0.07 },
+  "Zombie Skin":       { lifestealPct: 0.06 },
+  "Amphibious Armor":  { defFlat: 3 },
+  "Wizard Hat":        { ability: "arcane_burst" },
+  "Ninja Mask":        { spdPct: 0.10, evadePct: 0.05 },
+  "Fire Aura":         { dotPct: 0.04 },
+  "Ice Aura":          { slowPct: 0.10 }
+};
+
+function buildFrogStats(frog){
+  // Base stats
+  let stats = {
+    maxHp: 120, hp: 120,
+    atk: 14,
+    def: 4,
+    spd: 1.0,      // attacks per second multiplier
+    crit: 0.05,
+    luck: 0.00,
+    lifesteal: 0.00,
+    evade: 0.00,
+    dot: 0.00,
+    slow: 0.00,
+    ability: null
+  };
+
+  const rarityLabel = (frog.rarityTier || "COMMON").toUpperCase();
+  const mult = RARITY_MULT[rarityLabel] ?? 1.0;
+
+  // scale core
+  stats.maxHp = Math.round(stats.maxHp * mult);
+  stats.hp    = stats.maxHp;
+  stats.atk   = +(stats.atk * mult).toFixed(2);
+  stats.def   = +(stats.def * mult).toFixed(2);
+
+  const traits = frog.metadata?.traits || frog.traits || [];
+  for (const t of traits){
+    const val = t.value;
+    const bonus = TRAIT_BONUSES[val];
+    if (!bonus) continue;
+
+    if (bonus.atkPct) stats.atk *= (1 + bonus.atkPct);
+    if (bonus.defFlat) stats.def += bonus.defFlat;
+    if (bonus.spdPct) stats.spd *= (1 + bonus.spdPct);
+    if (bonus.critPct) stats.crit += bonus.critPct;
+    if (bonus.luckPct) stats.luck += bonus.luckPct;
+    if (bonus.lifestealPct) stats.lifesteal += bonus.lifestealPct;
+    if (bonus.evadePct) stats.evade += bonus.evadePct;
+    if (bonus.dotPct) stats.dot += bonus.dotPct;
+    if (bonus.slowPct) stats.slow += bonus.slowPct;
+    if (bonus.ability) stats.ability = bonus.ability;
+  }
+
+  stats.atk = +stats.atk.toFixed(2);
+  stats.spd = +stats.spd.toFixed(2);
+  stats.crit = Math.min(0.8, +stats.crit.toFixed(3));
+
+  return stats;
+}
+
+/* ----------------------------
+   Game state
+   ---------------------------- */
+
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+let address = null;
+let frogs = [];
+let selectedFrog = null;
+let player = null;
+let enemies = [];
+let wave = 0;
+let score = 0;
+let running = false;
+let lastTime = performance.now();
+
+const ui = {
+  frogList: document.getElementById("frogList"),
+  selectedName: document.getElementById("selectedName"),
+  startBtn: document.getElementById("startBtn"),
+  resetBtn: document.getElementById("resetBtn"),
+  connectBtn: document.getElementById("connectBtn"),
+  addr: document.getElementById("addr"),
+  waveTxt: document.getElementById("waveTxt"),
+  scoreTxt: document.getElementById("scoreTxt"),
+  hpTxt: document.getElementById("hpTxt"),
+  atkTxt: document.getElementById("atkTxt"),
+  defTxt: document.getElementById("defTxt"),
+  spdTxt: document.getElementById("spdTxt"),
+  critTxt: document.getElementById("critTxt"),
+  log: document.getElementById("log"),
+  buffModal: document.getElementById("buffModal"),
+  buffGrid: document.getElementById("buffGrid"),
+  mockBtn: document.getElementById("mockBtn"),
+};
+
+function log(msg){ ui.log.textContent = msg; }
+
+/* ----------------------------
+   Rendering
+   ---------------------------- */
+
+function clear(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
+function drawPlayer(){
+  if(!player) return;
+  ctx.save();
+  ctx.fillStyle = "#37e07b";
+  ctx.fillRect(player.x-22, player.y-22, 44, 44);
+  ctx.fillStyle = "#0b0f14";
+  ctx.fillText("FROG", player.x-14, player.y+4);
+  ctx.restore();
+
+  // hp bar
+  drawBar(player.x-40, player.y-40, 80, 8, player.hp/player.maxHp, "#37e07b");
+}
+
+function drawEnemies(){
+  for(const e of enemies){
+    ctx.save();
+    ctx.fillStyle = "#ff7a7a";
+    ctx.fillRect(e.x-18, e.y-18, 36, 36);
+    ctx.restore();
+    drawBar(e.x-30, e.y-30, 60, 6, e.hp/e.maxHp, "#ff7a7a");
+  }
+}
+
+function drawBar(x,y,w,h,t,color){
+  ctx.save();
+  ctx.fillStyle = "#1a2435";
+  ctx.fillRect(x,y,w,h);
+  ctx.fillStyle = color;
+  ctx.fillRect(x,y,w*t,h);
+  ctx.restore();
+}
+
+function render(){
+  clear();
+  // background lane
+  ctx.save();
+  ctx.fillStyle="#0a0f17";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle="#142033";
+  for(let i=0;i<canvas.width;i+=80){
+    ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke();
+  }
+  ctx.restore();
+
+  drawPlayer();
+  drawEnemies();
+}
+
+/* ----------------------------
+   Combat + waves
+   ---------------------------- */
+
+function spawnWave(){
+  wave++;
+  enemies = [];
+
+  const count = Math.min(3 + Math.floor(wave/2), 12);
+  const hpScale = 1 + wave * 0.18;
+  const atkScale = 1 + wave * 0.12;
+
+  for(let i=0;i<count;i++){
+    enemies.push({
+      x: 700 + i*40,
+      y: 140 + (i%4)*80,
+      maxHp: Math.round(40 * hpScale),
+      hp: Math.round(40 * hpScale),
+      atk: +(6 * atkScale).toFixed(2),
+      def: +(1.5 * hpScale/2).toFixed(2),
+      spd: 0.8 + wave*0.01,
+      atkTimer: 0
+    });
+  }
+
+  log(`Wave ${wave} begins!`);
+}
+
+function startRun(){
+  if(!selectedFrog) return;
+
+  player = {
+    x: 260, y: 260,
+    ...buildFrogStats(selectedFrog),
+    atkTimer: 0
+  };
+
+  wave = 0;
+  score = 0;
+  running = true;
+  spawnWave();
+  updateHud();
+}
+
+function endRun(){
+  running = false;
+  log(`Run ended. Final score: ${score}`);
+  saveHighScore(score);
+}
+
+function updateCombat(dt){
+  if(!player) return;
+
+  // Player attacks nearest enemy
+  player.atkTimer += dt;
+  const playerInterval = 1 / player.spd;
+
+  if(player.atkTimer >= playerInterval && enemies.length){
+    player.atkTimer = 0;
+    const target = enemies[0];
+
+    let dmg = Math.max(1, player.atk - target.def);
+    const critRoll = Math.random();
+    if(critRoll < player.crit){
+      dmg *= 2;
+      score += 5;
+    }
+    target.hp -= dmg;
+
+    // lifesteal
+    if(player.lifesteal > 0){
+      player.hp = Math.min(player.maxHp, player.hp + dmg*player.lifesteal);
+    }
+
+    // dot
+    if(player.dot > 0){
+      target.dotTimer = 2.0;
+      target.dotDps = player.atk * player.dot;
+    }
+
+    if(target.hp <= 0){
+      enemies.shift();
+      score += 10;
+      if(!enemies.length){
+        score += wave * 3;
+        offerBuff();
+      }
+    }
+  }
+
+  // Enemy attacks player
+  for(const e of enemies){
+    e.atkTimer += dt;
+    const interval = 1 / e.spd;
+    if(e.atkTimer >= interval){
+      e.atkTimer = 0;
+
+      // evade
+      if(Math.random() < player.evade) continue;
+
+      let dmg = Math.max(1, e.atk - player.def);
+      player.hp -= dmg;
+      if(player.hp <= 0){
+        player.hp = 0;
+        updateHud();
+        endRun();
+        return;
+      }
+    }
+
+    // dot ticks
+    if(e.dotTimer && e.dotTimer > 0){
+      const tick = Math.min(dt, e.dotTimer);
+      e.dotTimer -= tick;
+      e.hp -= e.dotDps * tick;
+    }
+  }
+
+  updateHud();
+}
+
+function updateHud(){
+  ui.waveTxt.textContent = wave;
+  ui.scoreTxt.textContent = score;
+  if(player){
+    ui.hpTxt.textContent = `${Math.round(player.hp)} / ${player.maxHp}`;
+    ui.atkTxt.textContent = player.atk.toFixed(1);
+    ui.defTxt.textContent = player.def.toFixed(1);
+    ui.spdTxt.textContent = player.spd.toFixed(2);
+    ui.critTxt.textContent = (player.crit*100).toFixed(1)+"%";
+  } else {
+    ui.hpTxt.textContent = ui.atkTxt.textContent = ui.defTxt.textContent =
+    ui.spdTxt.textContent = ui.critTxt.textContent = "-";
+  }
+}
+
+/* ----------------------------
+   Buffs
+   ---------------------------- */
+
+const BUFFS = [
+  { id:"atk10", name:"+10% ATK", desc:"Your frog hits harder.", apply:p=>p.atk*=1.10 },
+  { id:"hp20", name:"+20 Max HP", desc:"More survivability.", apply:p=>{p.maxHp+=20; p.hp+=20;} },
+  { id:"def5", name:"+2 DEF", desc:"Take less damage.", apply:p=>p.def+=2 },
+  { id:"crit6", name:"+6% Crit", desc:"More crit hits.", apply:p=>p.crit=Math.min(0.8,p.crit+0.06) },
+  { id:"spd8", name:"+8% Attack Speed", desc:"Faster attacks.", apply:p=>p.spd*=1.08 },
+  { id:"heal30", name:"Heal 30%", desc:"Instant heal.", apply:p=>p.hp=Math.min(p.maxHp,p.hp+p.maxHp*0.30) },
+  { id:"lifesteal3", name:"+3% Lifesteal", desc:"Heal from damage.", apply:p=>p.lifesteal+=0.03 },
+  { id:"evade4", name:"+4% Evade", desc:"Chance to dodge hits.", apply:p=>p.evade+=0.04 },
+];
+
+function offerBuff(){
+  running = false;
+  ui.buffGrid.innerHTML = "";
+  ui.buffModal.style.display = "flex";
+
+  const choices = BUFFS.sort(()=>Math.random()-0.5).slice(0,3);
+  for(const b of choices){
+    const btn = document.createElement("button");
+    btn.className="buffBtn";
+    btn.innerHTML = `<b>${b.name}</b><div class="small">${b.desc}</div>`;
+    btn.onclick = ()=>{
+      b.apply(player);
+      ui.buffModal.style.display="none";
+      running = true;
+      spawnWave();
+      updateHud();
+    };
+    ui.buffGrid.appendChild(btn);
+  }
+}
+
+/* ----------------------------
+   High score
+   ---------------------------- */
+
+function saveHighScore(s){
+  const key="ff_battler_highscore";
+  const cur=+localStorage.getItem(key)||0;
+  if(s>cur) localStorage.setItem(key, s);
+}
+
+/* ----------------------------
+   Main loop
+   ---------------------------- */
+function loop(t){
+  const dt = (t - lastTime) / 1000;
+  lastTime = t;
+
+  if(running){
+    updateCombat(dt);
+  }
+  render();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ----------------------------
+   UI events
+   ---------------------------- */
+
+ui.connectBtn.onclick = async ()=>{
+  try{
+    address = await connectWallet();
+    ui.addr.textContent = address.slice(0,6)+"..."+address.slice(-4);
+    frogs = await fetchOwnedAndStakedFrogs(address);
+    renderFrogList();
+    log("Wallet connected.");
+  }catch(e){
+    log(e.message);
+  }
+};
+
+ui.startBtn.onclick = startRun;
+ui.resetBtn.onclick = ()=>{
+  running=false; player=null; enemies=[]; wave=0; score=0; updateHud(); log("Reset.");
+};
+
+ui.mockBtn.onclick = ()=>{
+  frogs = makeMockFrogs();
+  renderFrogList();
+  log("Loaded mock frogs.");
+};
+
+function renderFrogList(){
+  ui.frogList.innerHTML="";
+  if(!frogs.length){
+    ui.frogList.innerHTML = `<div class="small">No frogs loaded.</div>`;
+    return;
+  }
+  for(const f of frogs){
+    const row = document.createElement("div");
+    row.className="frogRow";
+    row.innerHTML = `
+      <img src="${f.image}" alt="">
+      <div style="flex:1;">
+        <div style="font-weight:700;">${f.name || ("Frog #"+f.tokenId)}</div>
+        <div class="small">${(f.rarityTier||"Common")}</div>
+      </div>
+      <div class="pill">#${f.tokenId}</div>
+    `;
+    row.onclick = ()=>{
+      selectedFrog=f;
+      ui.selectedName.textContent = f.name || ("Frog #"+f.tokenId);
+      ui.startBtn.disabled=false;
+      const s = buildFrogStats(f);
+      ui.hpTxt.textContent = `${s.hp} / ${s.maxHp}`;
+      ui.atkTxt.textContent = s.atk.toFixed(1);
+      ui.defTxt.textContent = s.def.toFixed(1);
+      ui.spdTxt.textContent = s.spd.toFixed(2);
+      ui.critTxt.textContent = (s.crit*100).toFixed(1)+"%";
+      log("Selected frog.");
+    };
+    ui.frogList.appendChild(row);
+  }
+}
+
+// Mocking for dev
+function makeMockFrogs(){
+  return [
+    {
+      tokenId: 12,
+      name: "Frog #12",
+      image: "https://freshfrogs.github.io/assets/frogs/12.png",
+      rarityTier: "Rare",
+      metadata:{ traits:[
+        {trait_type:"Eyes", value:"Cyber Eyes"},
+        {trait_type:"Head", value:"Silver Crown"},
+      ]}
+    },
+    {
+      tokenId: 666,
+      name: "Frog #666",
+      image: "https://freshfrogs.github.io/assets/frogs/666.png",
+      rarityTier: "Epic",
+      metadata:{ traits:[
+        {trait_type:"Skin", value:"Zombie Skin"},
+        {trait_type:"Mask", value:"Ninja Mask"},
+      ]}
+    },
+    {
+      tokenId: 4040,
+      name: "Frog #4040",
+      image: "https://freshfrogs.github.io/assets/frogs/4040.png",
+      rarityTier: "Legendary",
+      metadata:{ traits:[
+        {trait_type:"Armor", value:"Amphibious Armor"},
+        {trait_type:"Aura", value:"Fire Aura"},
+      ]}
+    }
+  ];
+}
+</script>
+</body>
+</html>
