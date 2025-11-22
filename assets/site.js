@@ -30,7 +30,7 @@ const FF_MORPH_WORKER_URL = 'https://freshfrogs-morphs.danielssouthworth.workers
 let FF_ACTIVITY_MODE = 'sales'; // 'sales' or 'mints'
 let FF_RECENT_LIMIT  = 24;
 
-// Toggle to show staking stats on non-wallet cards
+// Toggle to show staking stats on non-wallet cards ff_admin_9f3k2j
 const FF_SHOW_STAKING_STATS_ON_CARDS = true;
 
 // Rarity paging
@@ -1225,29 +1225,23 @@ async function ffFetchRecentMorphedFrogs(limit = 24) {
   if (!FF_MORPH_WORKER_URL) return [];
 
   try {
-    const params = new URLSearchParams();
-    if (limit) params.set('limit', String(limit));
-    params.set('recent', 'true');
+    const u = new URL(`${FF_MORPH_WORKER_URL}/allMorphs`);
+    u.searchParams.set("limit", String(limit));
 
-    const url = `${FF_MORPH_WORKER_URL}/morphs?${params.toString()}`;
-    const res = await fetch(url, { cache: 'no-store' });
+    const res = await fetch(u.toString(), { cache: "no-store" });
     if (!res.ok) return [];
 
     const data = await res.json();
 
-    // ✅ accept multiple possible shapes from worker
-    let morphs = [];
-    if (Array.isArray(data)) morphs = data;
-    else if (Array.isArray(data?.morphs)) morphs = data.morphs;
-    else if (Array.isArray(data?.results)) morphs = data.results;
-    else if (Array.isArray(data?.items)) morphs = data.items;
-    else if (Array.isArray(data?.recentMorphs)) morphs = data.recentMorphs;
+    // worker shape: { morphs: [...], cursor, list_complete }
+    const morphs = Array.isArray(data?.morphs) ? data.morphs : [];
 
+    // each record is likely { morphedMeta: {...}, createdAt, createdBy, etc }
     return morphs
-      .map((m) => m?.morphedMeta || m?.metadata || m)
-      .filter((meta) => meta && typeof meta === 'object');
+      .map(m => m?.morphedMeta || m?.metadata || m)
+      .filter(meta => meta && typeof meta === "object");
   } catch (err) {
-    console.warn('ffFetchRecentMorphedFrogs failed:', err);
+    console.warn("ffFetchRecentMorphedFrogs failed:", err);
     return [];
   }
 }
@@ -1291,7 +1285,10 @@ async function ffLoadRecentMorphs() {
   if (!grid) return;
 
   if (status) status.textContent = 'Loading Recent Morphs…';
-  grid.innerHTML = '';
+  const morphs = await ffFetchRecentMorphedFrogs(24);
+
+  grid.innerHTML = ''; // ✅ add this
+
 
   try {
     const morphs = await ffFetchRecentMorphedFrogs(24);
