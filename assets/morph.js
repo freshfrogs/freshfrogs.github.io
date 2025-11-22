@@ -50,21 +50,21 @@
   // ------------------------
   // Gallery container
   // ------------------------
-  function ffEnsureGalleryContainer() {
+    function ffEnsureGalleryContainer() {
     if (document.getElementById('morph-token-gallery')) return;
 
-    // Put gallery above preview card slot
     const slot = document.getElementById('morph-card-slot');
     const gallery = document.createElement('div');
     gallery.id = 'morph-token-gallery';
     gallery.className = 'morph-gallery';
 
     if (slot?.parentElement) {
-      slot.parentElement.insertBefore(gallery, slot);
+        // ✅ Insert gallery AFTER the preview card slot
+        slot.parentElement.insertBefore(gallery, slot.nextSibling);
     } else {
-      document.body.prepend(gallery);
+        document.body.appendChild(gallery);
     }
-  }
+    }
 
   // ------------------------
   // Load user's owned + staked frogs
