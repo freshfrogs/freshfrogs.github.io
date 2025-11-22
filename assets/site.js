@@ -27,7 +27,7 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const FF_MORPH_WORKER_URL = 'https://freshfrogs-morphs.danielssouthworth.workers.dev';
 
 // Activity mode (sales vs mints) for "Collection" panel
-let FF_ACTIVITY_MODE = 'mints'; // 'sales' or 'mints'
+let FF_ACTIVITY_MODE = 'sales'; // 'sales' or 'mints'
 let FF_RECENT_LIMIT  = 24;
 
 // Toggle to show staking stats on non-wallet cards
@@ -309,7 +309,7 @@ async function loadRecentActivity() {
 
         headerRight = item.priceText || formatSalePrice(item);
 
-        if (headerRight && headerRight !== '') {
+        if (headerRight && headerRight !== '--') {
           FF_SALE_PRICE_CACHE.set(tokenId, headerRight);
           FF_RECENT_SALES_CACHE.set(tokenId, {
             priceText: headerRight,
@@ -324,7 +324,7 @@ async function loadRecentActivity() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '',
+        headerLeft: '--',
         headerRight,
         footerHtml: '',
         actionHtml: '' // removed
@@ -1089,7 +1089,7 @@ async function ffLoadMoreRarity() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '',
+        headerLeft: '--',
         headerRight: rank ? `Rank #${rank}` : '',
         footerHtml: '',
         actionHtml: '' // removed
@@ -1189,7 +1189,7 @@ async function ffLoadMorePond() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '',
+        headerLeft: '--',
         headerRight: 'Staked',
         footerHtml: '',
         actionHtml: '' // removed
@@ -1289,6 +1289,11 @@ async function renderOwnedAndStakedFrogs(address) {
   FF_WALLET_RENDER_INFLIGHT = true;
   FF_LAST_WALLET_RENDERED_FOR = address;
 
+  if (window.FF_PUBLIC_WALLET_VIEW && ffIsViewingOwnWallet(address)) {
+    window.FF_PUBLIC_WALLET_VIEW = false;
+    window.FF_PUBLIC_WALLET_ADDRESS = null;
+  }
+
   const ownedGrid   = document.getElementById('owned-frogs-grid');
   const ownedStatus = document.getElementById('owned-frogs-status');
   const stakedGrid  = document.getElementById('staked-frogs-grid');
@@ -1318,7 +1323,7 @@ async function renderOwnedAndStakedFrogs(address) {
       let metadata = normalizeMetadata(nft.rawMetadata || nft.metadata || nft.tokenMetadata);
       if (!hasUsableMetadata(metadata)) metadata = await fetchFrogMetadata(tokenId);
 
-      const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '';
+      const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '--';
 
       // ✅ Keep only wallet actions (no OS/ES)
       const actionHtml = isPublic ? '' : `
@@ -1330,7 +1335,7 @@ async function renderOwnedAndStakedFrogs(address) {
 
       const card = createFrogCard({
         tokenId, metadata,
-        headerLeft: '',
+        headerLeft: '--',
         headerRight: salePrice,
         footerHtml: '',
         actionHtml
@@ -1370,7 +1375,7 @@ async function renderOwnedAndStakedFrogs(address) {
 
     for (const tokenId of stakedIds) {
       const metadata = await fetchFrogMetadata(tokenId);
-      const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '';
+      const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '--';
 
       const footerHtml = `
         <div class="stake-meta">
@@ -1395,7 +1400,7 @@ async function renderOwnedAndStakedFrogs(address) {
 
       const card = createFrogCard({
         tokenId, metadata,
-        headerLeft: '',
+        headerLeft: '--',
         headerRight: salePrice,
         footerHtml,
         actionHtml
@@ -1657,6 +1662,7 @@ async function connectWallet() {
   if (!window.ethereum) return alert('No Ethereum wallet detected.');
 
   try {
+    const wasPublicWalletRoute = window.FF_PUBLIC_WALLET_VIEW && !!window.FF_PUBLIC_WALLET_ADDRESS;
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     if (!accounts?.length) return;
 
@@ -1690,6 +1696,15 @@ async function connectWallet() {
     ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile);
 
     ffInitReadContractsOnLoad();
+
+    const activeNav = document.querySelector('.nav a.active[data-view]');
+    const activeView = activeNav?.dataset.view;
+    const onWalletView = activeView === 'wallet' || wasPublicWalletRoute;
+
+    if (onWalletView && typeof renderOwnedAndStakedFrogs === 'function') {
+      ffShowView('wallet');
+      renderOwnedAndStakedFrogs(address);
+    }
   } catch (err) {
     console.error('Wallet connection failed:', err);
     alert('Failed to connect wallet.');
@@ -1714,7 +1729,11 @@ function ffInitWalletOnLoad() {
     FF_CONNECTED_ADDRESS = cachedAddress;
     window.user_address = cachedAddress;
 
-    if (!window.FF_PUBLIC_WALLET_VIEW) {
+    if (window.FF_PUBLIC_WALLET_VIEW && ffAddressesEqual(window.FF_PUBLIC_WALLET_ADDRESS, cachedAddress)) {
+      window.FF_PUBLIC_WALLET_VIEW = false;
+      window.FF_PUBLIC_WALLET_ADDRESS = null;
+      ffCurrentAccount = cachedAddress;
+    } else if (!window.FF_PUBLIC_WALLET_VIEW) {
       ffCurrentAccount = cachedAddress;
       window.FF_PUBLIC_WALLET_ADDRESS = null;
     }
@@ -1734,6 +1753,12 @@ function ffInitWalletOnLoad() {
       ffApplyDashboardUpdates(ffCurrentAccount, ownedCount, stakingStats, profile);
       ffShowView('wallet');
     })();
+  }
+
+  const activeNav = document.querySelector('.nav a.active[data-view]');
+  const activeView = activeNav?.dataset.view;
+  if (activeView === 'wallet' && ffCurrentAccount && typeof renderOwnedAndStakedFrogs === 'function') {
+    renderOwnedAndStakedFrogs(ffCurrentAccount);
   }
 }
 
