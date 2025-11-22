@@ -1352,48 +1352,28 @@ async function ffFetchOwnedFrogs(address) {
 // ------------------------
 // Morphed frogs (off-chain saved metadata)
 // ------------------------
-async function ffFetchRecentMorphedFrogs(limit = 24) {
-  if (!FF_MORPH_WORKER_URL) return [];
+async function ffFetchMorphedFrogs(address) {
+  if (!FF_MORPH_WORKER_URL || !address) return [];
 
-  async function fetchAndParse(url) {
-    const res = await fetch(url, { cache: 'no-store' });
+  try {
+    const url = `${FF_MORPH_WORKER_URL}/morphs?address=${address}`;
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return [];
 
     const data = await res.json();
+    const morphs = Array.isArray(data?.morphs) ? data.morphs : [];
 
-    // ✅ accept multiple worker response shapes
-    let morphs = [];
-    if (Array.isArray(data)) morphs = data;
-    else if (Array.isArray(data?.morphs)) morphs = data.morphs;
-    else if (Array.isArray(data?.results)) morphs = data.results;
-    else if (Array.isArray(data?.items)) morphs = data.items;
-    else if (Array.isArray(data?.recentMorphs)) morphs = data.recentMorphs;
-
+    // each record should have morphedMeta
     return morphs
-      .map((m) => m?.morphedMeta || m?.metadata || m)
-      .filter((meta) => meta && typeof meta === 'object');
-  }
-
-  try {
-    const params = new URLSearchParams();
-    if (limit) params.set('limit', String(limit));
-
-    // 1) try recent=true style
-    const urlRecent = `${FF_MORPH_WORKER_URL}/morphs?${params.toString()}&recent=true`;
-    let out = await fetchAndParse(urlRecent);
-
-    // 2) fallback to plain list if worker ignores recent param
-    if (!out.length) {
-      const urlPlain = `${FF_MORPH_WORKER_URL}/morphs?${params.toString()}`;
-      out = await fetchAndParse(urlPlain);
-    }
-
-    return out;
+      .map((m) => m?.morphedMeta)
+      .filter((meta) => meta && typeof meta === "object");
   } catch (err) {
-    console.warn('ffFetchRecentMorphedFrogs failed:', err);
+    console.warn("ffFetchMorphedFrogs failed:", err);
     return [];
   }
 }
+
+
 
 async function ffFetchStakedTokenIds(address) {
   if (!ffWeb3 || typeof CONTROLLER_ABI === 'undefined') return [];
