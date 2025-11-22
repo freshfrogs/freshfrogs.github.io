@@ -1225,21 +1225,48 @@ async function ffFetchRecentMorphedFrogs(limit = 24) {
   if (!FF_MORPH_WORKER_URL) return [];
 
   try {
-    const u = new URL(`${FF_MORPH_WORKER_URL}/allMorphs`);
-    u.searchParams.set("limit", String(limit));
+    let cursor = null;
+    let records = [];
 
-    const res = await fetch(u.toString(), { cache: "no-store" });
-    if (!res.ok) return [];
+    // Pull pages until we have enough for "recent"
+    while (true) {
+      const u = new URL(`${FF_MORPH_WORKER_URL}/allMorphs`);
+      u.searchParams.set("limit", "100");
+      if (cursor) u.searchParams.set("cursor", cursor);
 
-    const data = await res.json();
+      // ✅ No admin key by default.
+      // If you *ever* want to use one, set window.FF_MORPH_ADMIN_KEY = "...."
+      const headers = {};
+      if (typeof window.FF_MORPH_ADMIN_KEY === "string" && window.FF_MORPH_ADMIN_KEY.trim()) {
+        headers.authorization = `Bearer ${window.FF_MORPH_ADMIN_KEY.trim()}`;
+      }
 
-    // worker shape: { morphs: [...], cursor, list_complete }
-    const morphs = Array.isArray(data?.morphs) ? data.morphs : [];
+      const res = await fetch(u.toString(), { cache: "no-store", headers });
+      if (!res.ok) break;
 
-    // each record is likely { morphedMeta: {...}, createdAt, createdBy, etc }
-    return morphs
-      .map(m => m?.morphedMeta || m?.metadata || m)
+      const data = await res.json();
+      const page = Array.isArray(data?.morphs) ? data.morphs : [];
+      records = records.concat(page);
+
+      if (records.length >= limit) break;
+      if (data.list_complete || !data.cursor) break;
+
+      cursor = data.cursor;
+    }
+
+    // ✅ newest-first (handles different timestamp field names)
+    records.sort((a, b) => {
+      const ta = Number(a?.createdAt || a?.timestamp || a?.created_date || 0);
+      const tb = Number(b?.createdAt || b?.timestamp || b?.created_date || 0);
+      return tb - ta;
+    });
+
+    // return only the metadata objects used by createMorphedFrogCard()
+    return records
+      .slice(0, limit)
+      .map(r => r?.morphedMeta || r?.metadata || r)
       .filter(meta => meta && typeof meta === "object");
+
   } catch (err) {
     console.warn("ffFetchRecentMorphedFrogs failed:", err);
     return [];
