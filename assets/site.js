@@ -27,7 +27,7 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const FF_MORPH_WORKER_URL = 'https://freshfrogs-morphs.danielssouthworth.workers.dev';
 
 // Activity mode (sales vs mints) for "Collection" panel
-let FF_ACTIVITY_MODE = 'sales'; // 'sales' or 'mints'
+let FF_ACTIVITY_MODE = 'mints'; // 'sales' or 'mints'
 let FF_RECENT_LIMIT  = 24;
 
 // Toggle to show staking stats on non-wallet cards
