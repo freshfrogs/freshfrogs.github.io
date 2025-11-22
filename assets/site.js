@@ -1290,18 +1290,14 @@ async function ffLoadRecentMorphs() {
   const status = document.getElementById('recent-morphs-status');
   if (!grid) return;
 
-  // show loading in status, not as a dummy child in grid
   if (status) status.textContent = 'Loading Recent Morphs…';
+  grid.innerHTML = '';
 
   try {
     const morphs = await ffFetchRecentMorphedFrogs(24);
 
-    // ✅ clear placeholders no matter what
-    grid.innerHTML = '';
-
     if (!Array.isArray(morphs) || !morphs.length) {
       if (status) status.textContent = 'No morphed frogs have been created yet.';
-      grid.dataset.loaded = "true";
       return;
     }
 
@@ -1312,22 +1308,20 @@ async function ffLoadRecentMorphs() {
         meta.attributes = meta.traits;
       }
 
-      const card = createMorphedFrogCard({ metadata: meta, ownerAddress: meta?.createdBy });
+      const card = createMorphedFrogCard({
+        metadata: meta,
+        ownerAddress: meta?.createdBy
+      });
+
       grid.appendChild(card);
 
       const contId = card.dataset.imgContainerId;
       const baseId = parseTokenId(meta?.frogA ?? meta?.tokenA ?? null);
       ffBuildLayeredMorphedImage(meta, contId, baseId);
     }
-
-    // ✅ mark loaded so we don’t re-fetch on scroll/nav
-    grid.dataset.loaded = "true";
-
   } catch (err) {
     console.warn('ffLoadRecentMorphs failed:', err);
-    grid.innerHTML = '';
     if (status) status.textContent = 'Unable to load recent morphs right now.';
-    grid.dataset.loaded = "true";
   }
 }
 
@@ -1358,23 +1352,45 @@ async function ffFetchOwnedFrogs(address) {
 // ------------------------
 // Morphed frogs (off-chain saved metadata)
 // ------------------------
-async function ffFetchMorphedFrogs(address) {
-  if (!FF_MORPH_WORKER_URL || !address) return [];
+async function ffFetchRecentMorphedFrogs(limit = 24) {
+  if (!FF_MORPH_WORKER_URL) return [];
 
-  try {
-    const url = `${FF_MORPH_WORKER_URL}/morphs?address=${address}`;
-    const res = await fetch(url, { cache: "no-store" });
+  async function fetchAndParse(url) {
+    const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) return [];
 
     const data = await res.json();
-    const morphs = Array.isArray(data?.morphs) ? data.morphs : [];
 
-    // each record should have morphedMeta
+    // ✅ accept multiple worker response shapes
+    let morphs = [];
+    if (Array.isArray(data)) morphs = data;
+    else if (Array.isArray(data?.morphs)) morphs = data.morphs;
+    else if (Array.isArray(data?.results)) morphs = data.results;
+    else if (Array.isArray(data?.items)) morphs = data.items;
+    else if (Array.isArray(data?.recentMorphs)) morphs = data.recentMorphs;
+
     return morphs
-      .map((m) => m?.morphedMeta)
-      .filter((meta) => meta && typeof meta === "object");
+      .map((m) => m?.morphedMeta || m?.metadata || m)
+      .filter((meta) => meta && typeof meta === 'object');
+  }
+
+  try {
+    const params = new URLSearchParams();
+    if (limit) params.set('limit', String(limit));
+
+    // 1) try recent=true style
+    const urlRecent = `${FF_MORPH_WORKER_URL}/morphs?${params.toString()}&recent=true`;
+    let out = await fetchAndParse(urlRecent);
+
+    // 2) fallback to plain list if worker ignores recent param
+    if (!out.length) {
+      const urlPlain = `${FF_MORPH_WORKER_URL}/morphs?${params.toString()}`;
+      out = await fetchAndParse(urlPlain);
+    }
+
+    return out;
   } catch (err) {
-    console.warn("ffFetchMorphedFrogs failed:", err);
+    console.warn('ffFetchRecentMorphedFrogs failed:', err);
     return [];
   }
 }
