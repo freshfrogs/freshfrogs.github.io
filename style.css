@@ -728,3 +728,44 @@ padding: 0.55rem 1.2rem;
 .frog-owner-link:hover {
   text-decoration: underline;
 }
+/* Morph gallery */
+.morph-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 24px;
+  justify-content: center;
+}
+
+.morph-thumb {
+  width: 128px;
+  height: 128px;
+  padding: 0;
+  border: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+
+.morph-thumb img {
+  width: 128px;
+  height: 128px;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.morph-thumb-label {
+  position: absolute;
+  bottom: 2px;
+  left: 4px;
+  font-size: 12px;
+  background: rgba(0,0,0,0.65);
+  color: white;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+.morph-thumb.selected {
+  border-color: #52ff9b; /* neon-ish frog green */
+  box-shadow: 0 0 0 2px rgba(82,255,155,0.5);
+}
