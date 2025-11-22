@@ -975,8 +975,10 @@ function truncateAddress(address) {
 function formatOwnerLink(address, text) {
   const safeAddr = ffEscapeHtml(address);
   const label = ffEscapeHtml(text || truncateAddress(address));
-  return `<a class="frog-owner-link" href="https://freshfrogs.github.io/${safeAddr}">${label}</a>`;
+  const osProfile = `https://opensea.io/${safeAddr}`;
+  return `<a class="frog-owner-link" href="${osProfile}" target="_blank" rel="noopener noreferrer">${label}</a>`;
 }
+
 
 function formatSalePrice(sale) {
   const fee = sale?.sellerFee || sale?.protocolFee || sale?.royaltyFee || sale?.price || sale?.payment;
