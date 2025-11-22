@@ -1788,6 +1788,10 @@ async function connectWallet() {
     ffCurrentAccount = address;
     FF_CONNECTED_ADDRESS = address;
 
+    // ✅ remember that the user connected this session (for silent restore on new pages)
+    try { sessionStorage.setItem('FF_SESSION_CONNECTED', '1'); } catch {}
+
+
     window.FF_PUBLIC_WALLET_VIEW = false;
     window.FF_PUBLIC_WALLET_ADDRESS = null;
 
@@ -1840,53 +1844,39 @@ async function connectWallet() {
 window.connectWallet = connectWallet;
 
 function ffInitWalletOnLoad() {
-  const btn = document.getElementById('connect-wallet-button');
-  if (btn) btn.addEventListener('click', connectWallet);
+  // wire any connect buttons that exist on the page
+  const btnIds = [
+    'connect-wallet-button',
+    'hero-connect-wallet-btn',
+    'header-connect-wallet-btn'
+  ];
+  btnIds.forEach((id) => {
+    const b = document.getElementById(id);
+    if (b) b.addEventListener('click', connectWallet);
+  });
 
+  // default UI = disconnected
   ffSetText('wallet-status-label', 'Disconnected');
   ffSetText('dashboard-wallet', 'Wallet: —');
   ffSetText('dashboard-username', 'Not connected');
 
-  let cachedAddress = null;
-  try { cachedAddress = localStorage.getItem(FF_WALLET_STORAGE_KEY); }
-  catch {}
+  const walletNav = document.getElementById('wallet-nav-link');
+  if (walletNav) walletNav.style.display = 'none';
 
-  if (cachedAddress && /^0x[a-fA-F0-9]{40}$/i.test(cachedAddress)) {
-    FF_CONNECTED_ADDRESS = cachedAddress;
-    window.user_address = cachedAddress;
+  ffApplyConnectionVisibility(false);
 
-    if (window.FF_PUBLIC_WALLET_VIEW && ffAddressesEqual(window.FF_PUBLIC_WALLET_ADDRESS, cachedAddress)) {
-      window.FF_PUBLIC_WALLET_VIEW = false;
-      window.FF_PUBLIC_WALLET_ADDRESS = null;
-      ffCurrentAccount = cachedAddress;
-    } else if (!window.FF_PUBLIC_WALLET_VIEW) {
-      ffCurrentAccount = cachedAddress;
-      window.FF_PUBLIC_WALLET_ADDRESS = null;
-    }
-
-    ffLinkWalletAddress(cachedAddress);
-    const displayAddress = window.FF_PUBLIC_WALLET_ADDRESS || ffCurrentAccount || cachedAddress;
-    ffUpdateWalletBasicUI(displayAddress);
-  }
-
+  // If this is a public wallet route (/0x...), render read-only
   if (window.FF_PUBLIC_WALLET_VIEW && ffCurrentAccount) {
-    (async () => {
-      const [ownedCount, stakingStats, profile] = await Promise.all([
-        ffFetchOwnedFrogCount(ffCurrentAccount).catch(() => null),
-        ffFetchStakingStats(ffCurrentAccount).catch(() => null),
-        ffFetchOpenSeaProfile(ffCurrentAccount).catch(() => null),
-      ]);
-      ffApplyDashboardUpdates(ffCurrentAccount, ownedCount, stakingStats, profile);
-      ffShowView('wallet');
-    })();
+    ffUpdateWalletBasicUI(ffCurrentAccount);
+    if (typeof renderOwnedAndStakedFrogs === 'function') {
+      renderOwnedAndStakedFrogs(ffCurrentAccount);
+    }
   }
 
-  const activeNav = document.querySelector('.nav a.active[data-view]');
-  const activeView = activeNav?.dataset.view;
-  if (activeView === 'wallet' && ffCurrentAccount && typeof renderOwnedAndStakedFrogs === 'function') {
-    renderOwnedAndStakedFrogs(ffCurrentAccount);
-  }
+  // ✅ silently restore if they already connected earlier THIS session
+  ffRestoreWalletSession();
 }
+
 function ffApplyConnectionVisibility(isConnected) {
   // Morph nav link hidden until connected
   const morphNav =
