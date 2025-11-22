@@ -153,9 +153,21 @@ function ffInitNav() {
   const links = document.querySelectorAll('.nav a[data-view]');
   links.forEach((link) => {
     link.addEventListener('click', (e) => {
-      e.preventDefault();
       const view = link.dataset.view;
-      ffShowView(view);
+      const normalizePath = (path) => {
+        if (!path) return '/';
+        return path.replace(/\/+$/, '') || '/';
+      };
+
+      const currentPath = normalizePath(window.location.pathname || '/');
+      const targetPath = normalizePath(link.pathname || link.getAttribute('href'));
+
+      // If the link points to the current page (including folder index pages),
+      // keep SPA behavior to swap views without reloading.
+      if (currentPath === targetPath) {
+        e.preventDefault();
+        ffShowView(view);
+      }
     });
   });
 }
