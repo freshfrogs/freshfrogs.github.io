@@ -188,18 +188,20 @@ function ffInitNav() {
 }
 
 function ffWireHeroButtons() {
-  const viewCollectionBtn = document.getElementById('hero-view-collection-btn');
-  const heroConnectBtn    = document.getElementById('hero-connect-wallet-btn');
+  // Old hero connect (if any page still has it)
+  const heroConnectBtn = document.getElementById('hero-connect-wallet-btn');
 
-  if (viewCollectionBtn) {
-    viewCollectionBtn.addEventListener('click', () => {
-      ffShowView('collection');
-    });
-  }
-  if (heroConnectBtn) {
-    heroConnectBtn.addEventListener('click', connectWallet);
-  }
+  // ✅ New top-left connect button
+  const headerConnectBtn =
+    document.getElementById('header-connect-wallet-btn') ||
+    document.getElementById('nav-connect-wallet-btn');
+
+  heroConnectBtn?.addEventListener('click', connectWallet);
+  headerConnectBtn?.addEventListener('click', connectWallet);
+
+  // View Collection button removed — no wiring needed.
 }
+
 
 function ffShowView(view) {
   const links = document.querySelectorAll('.nav a[data-view]');

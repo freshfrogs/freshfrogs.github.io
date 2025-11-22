@@ -11,15 +11,25 @@
     <!-- HEADER -->
     <header class="site-header">
       <nav class="nav">
-        <a href="/" data-view="collection" class="active">Collection</a>
+        <!-- ✅ Top-left Connect Wallet (hidden automatically after connect) -->
+        <button class="btn secondary" id="header-connect-wallet-btn">Connect Wallet</button>
+
+        <a href="/" data-view="collection">Collection</a>
         <a href="/rarity/" data-view="rarity">Rarity</a>
         <a href="/pond/" data-view="pond">Pond</a>
+
+        <!-- Keep Morph link in HTML; JS hides it until connected -->
         <a href="/morph/" data-view="morph">Morph</a>
 
-        <!-- Wallet tab appears after connect -->
+        <!-- ✅ Shop on OpenSea -->
+        <a href="https://opensea.io/collection/fresh-frogs"
+          target="_blank" rel="noopener noreferrer">
+          Shop on OpenSea
+        </a>
+
+        <!-- Wallet address link, shown after connect -->
         <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
       </nav>
-
       <!-- 🔹 Top-right connect button removed -->
     </header>
 
