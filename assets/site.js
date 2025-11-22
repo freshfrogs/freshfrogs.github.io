@@ -295,7 +295,7 @@ async function loadRecentActivity() {
 
         headerRight = item.priceText || formatSalePrice(item);
 
-        if (headerRight && headerRight !== '--') {
+        if (headerRight && headerRight !== '') {
           FF_SALE_PRICE_CACHE.set(tokenId, headerRight);
           FF_RECENT_SALES_CACHE.set(tokenId, {
             priceText: headerRight,
@@ -310,7 +310,7 @@ async function loadRecentActivity() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '--',
+        headerLeft: '',
         headerRight,
         footerHtml: '',
         actionHtml: '' // removed
@@ -1075,7 +1075,7 @@ async function ffLoadMoreRarity() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '--',
+        headerLeft: '',
         headerRight: rank ? `Rank #${rank}` : '',
         footerHtml: '',
         actionHtml: '' // removed
@@ -1175,7 +1175,7 @@ async function ffLoadMorePond() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '--',
+        headerLeft: '',
         headerRight: 'Staked',
         footerHtml: '',
         actionHtml: '' // removed
@@ -1303,7 +1303,7 @@ async function renderOwnedAndStakedFrogs(address) {
       let metadata = normalizeMetadata(nft.rawMetadata || nft.metadata || nft.tokenMetadata);
       if (!hasUsableMetadata(metadata)) metadata = await fetchFrogMetadata(tokenId);
 
-      const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '--';
+      const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '';
 
       // ✅ Keep only wallet actions (no OS/ES)
       const actionHtml = isPublic ? '' : `
@@ -1315,7 +1315,7 @@ async function renderOwnedAndStakedFrogs(address) {
 
       const card = createFrogCard({
         tokenId, metadata,
-        headerLeft: '--',
+        headerLeft: '',
         headerRight: salePrice,
         footerHtml: '',
         actionHtml
@@ -1355,7 +1355,7 @@ async function renderOwnedAndStakedFrogs(address) {
 
     for (const tokenId of stakedIds) {
       const metadata = await fetchFrogMetadata(tokenId);
-      const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '--';
+      const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '';
 
       const footerHtml = `
         <div class="stake-meta">
@@ -1380,7 +1380,7 @@ async function renderOwnedAndStakedFrogs(address) {
 
       const card = createFrogCard({
         tokenId, metadata,
-        headerLeft: '--',
+        headerLeft: '',
         headerRight: salePrice,
         footerHtml,
         actionHtml
