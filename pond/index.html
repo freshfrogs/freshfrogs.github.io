@@ -27,10 +27,10 @@
     <section class="hero">
       <div class="hero-main">
         <div class="hero-media">
-          <img src="https://freshfrogs.github.io/frog/16.png" class="fly" />
-          <img src="https://freshfrogs.github.io/frog/3753.png" class="fly" />
-          <img src="https://freshfrogs.github.io/frog/467.png" class="fly" />
-          <img src="https://freshfrogs.github.io/frog/594.png" class="fly" />
+          <img src="/frog/16.png" class="fly" />
+          <img src="/frog/3753.png" class="fly" />
+          <img src="/frog/467.png" class="fly" />
+          <img src="/frog/594.png" class="fly" />
         </div>
         <h1 class="hero-title">freshfrogs.github.io</h1>
         <p class="hero-subtitle">
@@ -156,14 +156,21 @@
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 
   <!-- ABIs + legacy staking helpers (used for staking level / progress) -->
-  <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
-  <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
-  <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
+  <script src="/assets/collection_abi.js"></script>
+  <script src="/assets/controller_abi.js"></script>
+  <script src="/assets/ethereum-dapp.js"></script>
 
   <!-- Rarity rankings (must load before site.js) -->
-  <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+  <script src="/assets/rarityrankings.js"></script>
 
   <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
-  <script src="https://freshfrogs.github.io/assets/site.js"></script>
+  <script src="/assets/site.js"></script>
+
+  <script>
+    window.addEventListener("load", () => {
+      const link = document.querySelector('.nav a[data-view="pond"]');
+      if (link) link.click();
+    });
+  </script>
 </body>
 </html>
