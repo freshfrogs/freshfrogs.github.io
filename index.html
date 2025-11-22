@@ -4,24 +4,20 @@
   <meta charset="UTF-8" />
   <title>FreshFrogs – Wallet Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body class="layout-4">
   <div class="page">
     <!-- HEADER -->
     <header class="site-header">
       <nav class="nav">
-        <!-- Views controlled by JS -->
-        <a href="#" data-view="collection">Collection</a>
-        <a href="#" data-view="rarity">Rarity</a>
-        <a href="#" data-view="pond">Pond</a>
-        <!-- Wallet tab appears AFTER connect, shows shortened address -->
-        <a
-          href="#"
-          data-view="wallet"
-          id="wallet-nav-link"
-          style="display: none;"
-        ></a>
+        <a href="/" data-view="collection" class="active">Collection</a>
+        <a href="/rarity/" data-view="rarity">Rarity</a>
+        <a href="/pond/" data-view="pond">Pond</a>
+        <a href="/morph/" data-view="morph">Morph</a>
+
+        <!-- Wallet tab appears after connect -->
+        <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
       </nav>
 
       <!-- 🔹 Top-right connect button removed -->
