@@ -115,9 +115,26 @@ async function connectWallet() {
 // Should return frogs like:
 // [{ tokenId, image, metadata:{ traits:[{trait_type,value}], name } }]
 async function fetchOwnedAndStakedFrogs(address) {
-  // TODO: plug in your Alchemy + controller logic
-  // for now empty:
-  return [];
+
+  const url = `${FF_ALCHEMY_NFT_BASE}/getNFTsForOwner?owner=${address}&withMetadata=true&pageSize=100`;
+  const res = await fetch(url);
+  if (!res.ok) return [];
+
+  const data = await res.json();
+  const all = Array.isArray(data.ownedNfts) ? data.ownedNfts : [];
+  const target = FF_COLLECTION_ADDRESS.toLowerCase();
+
+  const seen = new Set();
+  const frogs = [];
+  for (const nft of all) {
+    if (nft?.contract?.address?.toLowerCase() !== target) continue;
+    const id = parseTokenId(nft.tokenId || nft.id?.tokenId);
+    if (id == null || seen.has(id)) continue;
+    seen.add(id);
+    frogs.push(nft);
+  }
+  return frogs;
+
 }
 
 /* ----------------------------
