@@ -521,4 +521,73 @@
     return null;
   }
 
+    // ---------------------------------------------------
+  // REAL SAVE — sends morphed metadata to your Worker KV
+  // (unchanged from your version)
+  // ---------------------------------------------------
+  async function SaveFrogMorph({
+    address,
+    frogA,
+    frogB,
+    newTraits = [],
+    previewUrl = null,
+    value = null,
+    signature = null
+  } = {}) {
+    if (typeof FF_MORPH_WORKER_URL === 'undefined' || !FF_MORPH_WORKER_URL) {
+      console.warn("[SaveFrogMorph] Missing FF_MORPH_WORKER_URL");
+      return null;
+    }
+    if (!address || frogA == null || frogB == null) {
+      console.warn("[SaveFrogMorph] Missing address/frogA/frogB");
+      return null;
+    }
+
+    const attributes = (newTraits || []).map(t => ({
+      trait_type: t.trait_type || t.type || t.trait || "Unknown",
+      value: t.value ?? t.val ?? ""
+    }));
+
+    const morphedMeta = {
+      name: `Morphed Frog (${frogA} + ${frogB})`,
+      image: previewUrl,
+      attributes,
+      frogA,
+      frogB,
+      createdBy: address
+    };
+
+    const payload = {
+      address,
+      frogA,
+      frogB,
+      morphedMeta,
+      value,
+      signature
+    };
+
+    try {
+      const res = await fetch(FF_MORPH_WORKER_URL + "/saveMorph", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const out = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        console.error("[SaveFrogMorph] Worker error:", res.status, out);
+        throw new Error(out.error || "SaveMorph failed");
+      }
+
+      console.log("✅ SaveFrogMorph saved:", out);
+      return out;
+    } catch (err) {
+      console.error("❌ SaveFrogMorph failed:", err);
+      return null;
+    }
+  }
+
+  window.SaveFrogMorph = SaveFrogMorph;
+
 })();
