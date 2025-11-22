@@ -769,3 +769,21 @@ padding: 0.55rem 1.2rem;
   border-color: #52ff9b; /* neon-ish frog green */
   box-shadow: 0 0 0 2px rgba(82,255,155,0.5);
 }
+/* make the whole card a vertical layout */
+.recent_sale_card{
+  display: flex;
+  flex-direction: column;
+}
+
+/* this is your content area */
+.recent_sale_traits{
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;          /* take remaining space */
+}
+
+/* bottom container always sits at end */
+.frog-card-bottom{
+  margin-top: auto;        /* pushes to bottom */
+  padding-top: 10px;
+}
