@@ -1236,16 +1236,24 @@ async function ffFetchRecentMorphedFrogs(limit = 24) {
     if (!res.ok) return [];
 
     const data = await res.json();
-    const morphs = Array.isArray(data?.morphs) ? data.morphs : [];
+
+    // ✅ accept multiple possible shapes from worker
+    let morphs = [];
+    if (Array.isArray(data)) morphs = data;
+    else if (Array.isArray(data?.morphs)) morphs = data.morphs;
+    else if (Array.isArray(data?.results)) morphs = data.results;
+    else if (Array.isArray(data?.items)) morphs = data.items;
+    else if (Array.isArray(data?.recentMorphs)) morphs = data.recentMorphs;
 
     return morphs
-      .map((m) => m?.morphedMeta || m)
+      .map((m) => m?.morphedMeta || m?.metadata || m)
       .filter((meta) => meta && typeof meta === 'object');
   } catch (err) {
     console.warn('ffFetchRecentMorphedFrogs failed:', err);
     return [];
   }
 }
+
 
 function ffEnsureRecentMorphsAbovePond() {
   const grid = document.getElementById('recent-morphs-grid');
