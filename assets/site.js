@@ -34,6 +34,7 @@ let FF_RECENT_LIMIT  = 24;
 const FF_SHOW_STAKING_STATS_ON_CARDS = true;
 const FF_MORPH_ADMIN_KEY = "ff_admin_9f3k2j";
 
+
 // Rarity paging
 let FF_RARITY_INDEX = 0;
 const FF_RARITY_BATCH = 24;
@@ -594,9 +595,6 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
       ${footerHtml || ''}
       ${actionHtml || ''}
     </div>
-
-    <!-- ✅ buttons back at the true bottom of the card -->
-    ${ffActionButtonsHTML(tokenId)}
   `;
 
   if (typeof ffBuildLayeredFrogImage === 'function') {
@@ -2001,19 +1999,4 @@ function ffRomanToArabic(roman) {
     prev = Math.max(prev, val);
   }
   return total || null;
-}
-function ffActionButtonsHTML(tokenId) {
-  const openseaUrl = `https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}`;
-  const etherscanUrl = `https://etherscan.io/token/${FF_COLLECTION_ADDRESS}?a=${tokenId}`;
-
-  return `
-    <div class="frog-actions">
-      <a class="btn btn-opensea" href="${openseaUrl}" target="_blank" rel="noopener noreferrer">
-        OpenSea
-      </a>
-      <a class="btn btn-etherscan" href="${etherscanUrl}" target="_blank" rel="noopener noreferrer">
-        EtherScan
-      </a>
-    </div>
-  `;
 }
