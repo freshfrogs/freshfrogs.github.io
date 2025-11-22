@@ -593,7 +593,6 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
       </div>
       ${footerHtml || ''}
       ${actionHtml || ''}
-      ${ffActionButtonsHTML(tokenId)}
     </div>
   `;
 
@@ -1999,19 +1998,4 @@ function ffRomanToArabic(roman) {
     prev = Math.max(prev, val);
   }
   return total || null;
-}
-function ffActionButtonsHTML(tokenId) {
-  const openseaUrl = `https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}`;
-  const etherscanUrl = `https://etherscan.io/token/${FF_COLLECTION_ADDRESS}?a=${tokenId}`;
-
-  return `
-    <div class="frog-actions">
-      <a class="btn btn-opensea" href="${openseaUrl}" target="_blank" rel="noopener noreferrer">
-        OpenSea
-      </a>
-      <a class="btn btn-etherscan" href="${etherscanUrl}" target="_blank" rel="noopener noreferrer">
-        EtherScan
-      </a>
-    </div>
-  `;
 }
