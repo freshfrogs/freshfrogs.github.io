@@ -72,7 +72,7 @@
   // Load user's owned + staked frogs
   // ------------------------
   async function ffLoadUserGalleryOnStart(force = false) {
-    const address = ffGetConnectedAddress();
+    const address = await ffGetConnectedAddressAsync();
     if (!address) {
       ffSetMorphStatus('Connect wallet to load your frogs.');
       return;
@@ -145,7 +145,7 @@
 
     if (!status || !grid) return;
 
-    const address = ffGetConnectedAddress();
+    const address = await ffGetConnectedAddressAsync();
     if (!address) {
       grid.innerHTML = '';
       grid.dataset.loadedFor = '';
@@ -570,6 +570,31 @@
     if (window.web3?.currentProvider?.selectedAddress) return window.web3.currentProvider.selectedAddress;
     return null;
   }
+
+  async function ffGetConnectedAddressAsync() {
+  // normal sync checks first
+  let addr = ffGetConnectedAddress();
+  if (addr) return addr;
+
+  // silent restore (NO popup)
+  if (!window.ethereum?.request) return null;
+
+  try {
+    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+    if (accounts?.length) {
+      addr = accounts[0];
+
+      // make Morph + other scripts see it
+      window.user_address = addr;
+      window.FF_CONNECTED_ADDRESS = addr;
+
+      return addr;
+    }
+  } catch (e) {}
+
+  return null;
+}
+
 
     // ---------------------------------------------------
   // REAL SAVE — sends morphed metadata to your Worker KV
