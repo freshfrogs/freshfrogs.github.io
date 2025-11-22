@@ -43,8 +43,10 @@ let FF_POND_PAGE_KEY = null;
 // ------------------------
 // Global wallet state
 // ------------------------
+const FF_WALLET_STORAGE_KEY = 'ffLastConnectedWallet';
 let ffWeb3 = null;
 let ffCurrentAccount = null;
+let FF_CONNECTED_ADDRESS = null;
 
 // Prevent double-renders in wallet view (fixes duplicate cards)
 let FF_WALLET_RENDER_INFLIGHT = false;
@@ -77,8 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Kick off read-only contract init ASAP so staking meta works immediately
   ffInitReadContractsOnLoad();
 
-  // Default view: Collection (recent sales)
-  ffShowView('collection');
+  // Default view derived from current path
+  const initialView = ffDetermineInitialViewFromPath();
+  ffShowView(initialView);
 
   ffInitWalletOnLoad();
 
@@ -123,6 +126,17 @@ function ffDetectPublicWalletFromPath() {
       ffCurrentAccount = first;
     }
   } catch {}
+}
+
+function ffDetermineInitialViewFromPath() {
+  const path = (window.location.pathname || '/').replace(/\/+$/, '/') || '/';
+
+  if (window.FF_PUBLIC_WALLET_VIEW) return 'wallet';
+  if (/^\/rarity(\/|$)/i.test(path)) return 'rarity';
+  if (/^\/pond(\/|$)/i.test(path)) return 'pond';
+  if (/^\/morph(\/|$)/i.test(path)) return 'morph';
+
+  return 'collection';
 }
 
 // ------------------------
@@ -1280,7 +1294,8 @@ async function renderOwnedAndStakedFrogs(address) {
   const stakedGrid  = document.getElementById('staked-frogs-grid');
   const stakedStatus= document.getElementById('staked-frogs-status');
 
-  const isPublic = !!window.FF_PUBLIC_WALLET_VIEW;
+  const viewingOwnWallet = ffIsViewingOwnWallet(address);
+  const isPublic = window.FF_PUBLIC_WALLET_VIEW && !viewingOwnWallet;
 
   try {
     const [ownedNfts, stakedIds, morphedMetas] = await Promise.all([
@@ -1490,18 +1505,27 @@ function ffSetText(id, value) { const el = document.getElementById(id); if (el) 
 function ffSetAvatar(id, url) { const el = document.getElementById(id); if (el && url) el.src = url; }
 
 function ffUpdateWalletBasicUI(address) {
-  const isPublic = !!window.FF_PUBLIC_WALLET_VIEW;
+  const isPublicViewOnly = window.FF_PUBLIC_WALLET_VIEW && !ffIsViewingOwnWallet(address);
 
-  ffSetText('wallet-status-label', isPublic ? 'Viewing' : 'Connected');
+  ffSetText('wallet-status-label', isPublicViewOnly ? 'Viewing' : 'Connected');
   ffSetText('dashboard-wallet', `Wallet: ${truncateAddress(address)}`);
 
-  if (isPublic) return;
+  if (isPublicViewOnly) return;
 
   const walletNav = document.getElementById('wallet-nav-link');
   if (walletNav) {
     walletNav.style.display = '';
     walletNav.textContent = truncateAddress(address);
   }
+}
+
+function ffAddressesEqual(a, b) {
+  if (!a || !b) return false;
+  return String(a).toLowerCase() === String(b).toLowerCase();
+}
+
+function ffIsViewingOwnWallet(address) {
+  return ffAddressesEqual(address, FF_CONNECTED_ADDRESS);
 }
 
 function ffLinkWalletAddress(address) {
@@ -1516,6 +1540,13 @@ function ffLinkWalletAddress(address) {
     e.preventDefault();
     window.location.href = `/${address}`;
   });
+}
+
+function ffPersistConnectedWallet(address) {
+  try {
+    if (address) localStorage.setItem(FF_WALLET_STORAGE_KEY, address);
+    else localStorage.removeItem(FF_WALLET_STORAGE_KEY);
+  } catch {}
 }
 
 function ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile) {
@@ -1631,6 +1662,7 @@ async function connectWallet() {
 
     const address = accounts[0];
     ffCurrentAccount = address;
+    FF_CONNECTED_ADDRESS = address;
 
     window.FF_PUBLIC_WALLET_VIEW = false;
     window.FF_PUBLIC_WALLET_ADDRESS = null;
@@ -1640,6 +1672,7 @@ async function connectWallet() {
     window.user_address = address;
 
     ffLinkWalletAddress(address);
+    ffPersistConnectedWallet(address);
 
     if (typeof COLLECTION_ABI !== 'undefined') {
       window.collection = new ffWeb3.eth.Contract(COLLECTION_ABI, FF_COLLECTION_ADDRESS);
@@ -1656,7 +1689,6 @@ async function connectWallet() {
 
     ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile);
 
-    ffShowView('wallet');
     ffInitReadContractsOnLoad();
   } catch (err) {
     console.error('Wallet connection failed:', err);
@@ -1673,6 +1705,24 @@ function ffInitWalletOnLoad() {
   ffSetText('wallet-status-label', 'Disconnected');
   ffSetText('dashboard-wallet', 'Wallet: —');
   ffSetText('dashboard-username', 'Not connected');
+
+  let cachedAddress = null;
+  try { cachedAddress = localStorage.getItem(FF_WALLET_STORAGE_KEY); }
+  catch {}
+
+  if (cachedAddress && /^0x[a-fA-F0-9]{40}$/i.test(cachedAddress)) {
+    FF_CONNECTED_ADDRESS = cachedAddress;
+    window.user_address = cachedAddress;
+
+    if (!window.FF_PUBLIC_WALLET_VIEW) {
+      ffCurrentAccount = cachedAddress;
+      window.FF_PUBLIC_WALLET_ADDRESS = null;
+    }
+
+    ffLinkWalletAddress(cachedAddress);
+    const displayAddress = window.FF_PUBLIC_WALLET_ADDRESS || ffCurrentAccount || cachedAddress;
+    ffUpdateWalletBasicUI(displayAddress);
+  }
 
   if (window.FF_PUBLIC_WALLET_VIEW && ffCurrentAccount) {
     (async () => {
