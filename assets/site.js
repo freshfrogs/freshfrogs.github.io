@@ -72,6 +72,7 @@ const FF_OS_USERNAME_INFLIGHT = new Map();    // addressLower -> Promise<string|
 document.addEventListener('DOMContentLoaded', () => {
   ffInitNav();
   ffWireHeroButtons();
+  ffApplyConnectionVisibility(!!FF_CONNECTED_ADDRESS);
 
   // Detect public wallet view (404 /address) automatically
   ffDetectPublicWalletFromPath();
@@ -1859,6 +1860,26 @@ function ffInitWalletOnLoad() {
     })();
   }
 }
+
+function ffApplyConnectionVisibility(isConnected) {
+  // Morph nav link hidden until connected
+  const morphNav =
+    document.querySelector('.nav a[data-view="morph"]') ||
+    document.querySelector('.nav a[href^="/morph"]');
+  if (morphNav) morphNav.style.display = isConnected ? '' : 'none';
+
+  // Wallet address link shown only when connected
+  const walletNav = document.getElementById('wallet-nav-link');
+  if (walletNav) walletNav.style.display = isConnected ? '' : 'none';
+
+  // Connect button shown only when NOT connected
+  const connectBtn =
+    document.getElementById('header-connect-wallet-btn') ||
+    document.getElementById('nav-connect-wallet-btn') ||
+    document.getElementById('hero-connect-wallet-btn');
+  if (connectBtn) connectBtn.style.display = isConnected ? 'none' : '';
+}
+
 
 function ffRomanToArabic(roman) {
   if (!roman) return null;
