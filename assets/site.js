@@ -1261,11 +1261,18 @@ async function ffLoadRecentMorphs() {
   const status = document.getElementById('recent-morphs-status');
   if (!grid) return;
 
+  // show loading in status, not as a dummy child in grid
+  if (status) status.textContent = 'Loading Recent Morphs…';
+
   try {
     const morphs = await ffFetchRecentMorphedFrogs(24);
 
+    // ✅ clear placeholders no matter what
+    grid.innerHTML = '';
+
     if (!Array.isArray(morphs) || !morphs.length) {
       if (status) status.textContent = 'No morphed frogs have been created yet.';
+      grid.dataset.loaded = "true";
       return;
     }
 
@@ -1283,9 +1290,15 @@ async function ffLoadRecentMorphs() {
       const baseId = parseTokenId(meta?.frogA ?? meta?.tokenA ?? null);
       ffBuildLayeredMorphedImage(meta, contId, baseId);
     }
+
+    // ✅ mark loaded so we don’t re-fetch on scroll/nav
+    grid.dataset.loaded = "true";
+
   } catch (err) {
     console.warn('ffLoadRecentMorphs failed:', err);
+    grid.innerHTML = '';
     if (status) status.textContent = 'Unable to load recent morphs right now.';
+    grid.dataset.loaded = "true";
   }
 }
 
