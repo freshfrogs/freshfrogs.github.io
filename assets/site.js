@@ -32,7 +32,6 @@ let FF_RECENT_LIMIT  = 24;
 
 // Toggle to show staking stats on non-wallet cards ff_admin_9f3k2j
 const FF_SHOW_STAKING_STATS_ON_CARDS = true;
-const FF_MORPH_ADMIN_KEY = 'ff_admin_9f3k2j';
 
 // Rarity paging
 let FF_RARITY_INDEX = 0;
@@ -1226,48 +1225,21 @@ async function ffFetchRecentMorphedFrogs(limit = 24) {
   if (!FF_MORPH_WORKER_URL) return [];
 
   try {
-    let cursor = null;
-    let records = [];
+    const u = new URL(`${FF_MORPH_WORKER_URL}/allMorphs`);
+    u.searchParams.set("limit", String(limit));
 
-    // Pull pages until we have enough for "recent"
-    while (true) {
-      const u = new URL(`${FF_MORPH_WORKER_URL}/allMorphs`);
-      u.searchParams.set("limit", "100");
-      if (cursor) u.searchParams.set("cursor", cursor);
+    const res = await fetch(u.toString(), { cache: "no-store" });
+    if (!res.ok) return [];
 
-      // ✅ No admin key by default.
-      // If you *ever* want to use one, set window.FF_MORPH_ADMIN_KEY = "...."
-      const headers = {};
-      if (typeof window.FF_MORPH_ADMIN_KEY === "string" && window.FF_MORPH_ADMIN_KEY.trim()) {
-        headers.authorization = `Bearer ${window.FF_MORPH_ADMIN_KEY.trim()}`;
-      }
+    const data = await res.json();
 
-      const res = await fetch(u.toString(), { cache: "no-store", headers });
-      if (!res.ok) break;
+    // worker shape: { morphs: [...], cursor, list_complete }
+    const morphs = Array.isArray(data?.morphs) ? data.morphs : [];
 
-      const data = await res.json();
-      const page = Array.isArray(data?.morphs) ? data.morphs : [];
-      records = records.concat(page);
-
-      if (records.length >= limit) break;
-      if (data.list_complete || !data.cursor) break;
-
-      cursor = data.cursor;
-    }
-
-    // ✅ newest-first (handles different timestamp field names)
-    records.sort((a, b) => {
-      const ta = Number(a?.createdAt || a?.timestamp || a?.created_date || 0);
-      const tb = Number(b?.createdAt || b?.timestamp || b?.created_date || 0);
-      return tb - ta;
-    });
-
-    // return only the metadata objects used by createMorphedFrogCard()
-    return records
-      .slice(0, limit)
-      .map(r => r?.morphedMeta || r?.metadata || r)
+    // each record is likely { morphedMeta: {...}, createdAt, createdBy, etc }
+    return morphs
+      .map(m => m?.morphedMeta || m?.metadata || m)
       .filter(meta => meta && typeof meta === "object");
-
   } catch (err) {
     console.warn("ffFetchRecentMorphedFrogs failed:", err);
     return [];
@@ -1313,7 +1285,6 @@ async function ffLoadRecentMorphs() {
   if (!grid) return;
 
   if (status) status.textContent = 'Loading Recent Morphs…';
-  const morphs = await ffFetchRecentMorphedFrogs(24);
 
   grid.innerHTML = ''; // ✅ add this
 
