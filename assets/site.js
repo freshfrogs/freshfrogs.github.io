@@ -223,6 +223,7 @@ function ffShowView(view) {
   } else if (view === 'rarity') {
     ffEnsureRarityLoaded();
   } else if (view === 'pond') {
+    ffEnsureRecentMorphsAbovePond();  // ✅ move section above pond cards
     ffEnsurePondLoaded();
     ffEnsureRecentMorphsLoaded();
   } else if (view === 'wallet' && ffCurrentAccount) {
