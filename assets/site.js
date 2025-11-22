@@ -32,6 +32,7 @@ let FF_RECENT_LIMIT  = 24;
 
 // Toggle to show staking stats on non-wallet cards ff_admin_9f3k2j
 const FF_SHOW_STAKING_STATS_ON_CARDS = true;
+const FF_MORPH_ADMIN_KEY = 'ff_admin_9f3k2j';
 
 // Rarity paging
 let FF_RARITY_INDEX = 0;
