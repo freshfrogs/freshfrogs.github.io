@@ -771,8 +771,6 @@ padding: 0.55rem 1.2rem;
 }
 /* your existing button styles stay the same */
 .recent_sale_card .frog-actions{
-  margin-top: 10px;
-  padding-top: 8px;
   display: flex;
   gap: 8px;
   justify-content: center;
