@@ -566,22 +566,16 @@ padding: 0.55rem 1.2rem;
 }
 
 .sale_link_btn {
-  flex: 1 1 48%;
-  text-align: center;
-  font-size: 0.72rem;
-  padding: 4px 6px;
-  border-radius: 0px;
-  border: 1px solid lightcoral;
-  background: lightcoral;
+  background: cornflowerblue;
   color: white;
-  cursor: pointer;
-  text-decoration: none;
-  font-weight: 600;
-  transition:
-    background 160ms ease-out,
-    transform 120ms ease-out,
-    border-color 160ms ease-out;
+  border: none;
   box-shadow: 2px 2px darkslateblue;
+  padding: 8px;
+  font-family: monospace;
+  width: 100%;
+  margin: 8px;
+  cursor: pointer;
+  background: lightcoral;
 }
 
 .sale_link_btn:hover {

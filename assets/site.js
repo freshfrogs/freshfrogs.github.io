@@ -1514,7 +1514,7 @@ async function renderOwnedAndStakedFrogs(address) {
 
       // ✅ Keep only wallet actions (no OS/ES)
       const actionHtml = isPublic ? '' : `
-        <div class="recent_sale_links">
+        <div class="frog-actions">
           <button class="sale_link_btn" onclick="ffStakeFrog(${tokenId})">Stake</button>
           <button class="sale_link_btn" onclick="ffTransferFrog(${tokenId})">Transfer</button>
         </div>
