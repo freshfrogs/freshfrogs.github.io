@@ -830,18 +830,18 @@ function ffActionButtonsHTML(tokenId) {
   const osUrl = `https://opensea.io/assets/ethereum/${FF_COLLECTION_ADDRESS}/${tokenId}`;
   const esUrl = `https://etherscan.io/token/${FF_COLLECTION_ADDRESS}?a=${tokenId}`;
 
-  // ⬇️ PUT YOUR EXISTING BUTTON CLASS HERE
-  // Example: 'frog_action_btn' or 'sale_action_btn' or whatever Stake uses
-  const btnClass = 'frog_action_btn';
+  const cls = "frog_action_btn"; // <-- EXACT class your Stake/Transfer buttons use
 
   return `
     <div class="frog-actions">
-      <a class="${btnClass}" href="${osUrl}" target="_blank" rel="noopener noreferrer">
+      <button class="${cls}" type="button"
+        onclick="window.open('${osUrl}', '_blank', 'noopener,noreferrer')">
         OpenSea
-      </a>
-      <a class="${btnClass}" href="${esUrl}" target="_blank" rel="noopener noreferrer">
+      </button>
+      <button class="${cls}" type="button"
+        onclick="window.open('${esUrl}', '_blank', 'noopener,noreferrer')">
         EtherScan
-      </a>
+      </button>
     </div>
   `;
 }
