@@ -772,7 +772,7 @@ padding: 0.55rem 1.2rem;
 /* your existing button styles stay the same */
 .recent_sale_card .frog-actions{
   display: flex;
-  gap: 8px;
+  gap: 0px;
   justify-content: center;
 }
 /* makes <a> behave exactly like your <button> */
@@ -783,4 +783,6 @@ padding: 0.55rem 1.2rem;
   box-shadow: 2px 2px darkslateblue;
   padding: 8px;
   font-family: monospace;
+  width: 100%;
+  margin: 8px;
 }
