@@ -785,4 +785,5 @@ padding: 0.55rem 1.2rem;
   font-family: monospace;
   width: 100%;
   margin: 8px;
+  cursor: pointer;
 }
