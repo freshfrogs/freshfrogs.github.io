@@ -769,3 +769,11 @@ padding: 0.55rem 1.2rem;
   border-color: #52ff9b; /* neon-ish frog green */
   box-shadow: 0 0 0 2px rgba(82,255,155,0.5);
 }
+/* your existing button styles stay the same */
+.recent_sale_card .frog-actions{
+  margin-top: 10px;
+  padding-top: 8px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
