@@ -380,11 +380,26 @@
   // ---------------------------
   // Camera + Drawing
   // ---------------------------
-  const updateCamera = () => {
-    const top = topFrog();
-    const target = Math.min(0, CANVAS_H*0.4 - (top.y - cameraY));
-    cameraY += (target - cameraY) * 0.08;
-  };
+function updateCamera() {
+  // Pick something to follow safely
+  const target =
+    player ||
+    active ||
+    (stack && stack.length ? stack[stack.length - 1] : null) ||
+    (obstacles && obstacles.length ? obstacles[0] : null);
+
+  if (!target || typeof target.y !== "number") {
+    return; // nothing valid to follow yet
+  }
+
+  const targetY = target.y;
+
+  // --- your existing camera math below ---
+  // If you already had these lines, keep them.
+  const desired = Math.min(0, CANVAS_H * 0.45 - (targetY - cameraY));
+  cameraY += (desired - cameraY) * 0.08;
+}
+
 
   const drawBackground = () => {
     // subtle pixel grid
