@@ -595,6 +595,9 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
       ${footerHtml || ''}
       ${actionHtml || ''}
     </div>
+
+    <!-- ✅ buttons back at the true bottom of the card -->
+    ${ffActionButtonsHTML(tokenId)}
   `;
 
   if (typeof ffBuildLayeredFrogImage === 'function') {
