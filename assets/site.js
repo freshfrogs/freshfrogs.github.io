@@ -298,7 +298,7 @@ async function loadRecentActivity() {
       }
 
       let ownerAddress = null;
-      let headerRight = '--';
+      let headerRight = '';
 
       if (FF_ACTIVITY_MODE === 'mints') {
         ownerAddress = item.to || item.receiver || item.buyerAddress || item.ownerAddress || null;
@@ -314,7 +314,7 @@ async function loadRecentActivity() {
 
         headerRight = item.priceText || formatSalePrice(item);
 
-        if (headerRight && headerRight !== '--') {
+        if (headerRight && headerRight !== '') {
           FF_SALE_PRICE_CACHE.set(tokenId, headerRight);
           FF_RECENT_SALES_CACHE.set(tokenId, {
             priceText: headerRight,
@@ -329,7 +329,7 @@ async function loadRecentActivity() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '--',
+        headerLeft: '',
         headerRight,
         footerHtml: '',
         actionHtml: '' // removed
@@ -860,7 +860,7 @@ async function fetchRecentSalesOpenSea(limit = 24) {
     const decimals = paymentToken.decimals != null ? Number(paymentToken.decimals) : 18;
     const symbol = paymentToken.symbol || 'ETH';
 
-    let priceText = '--';
+    let priceText = '';
     const quantityRaw =
       e.payment?.quantity ||
       e.sale_price?.amount ||
@@ -974,7 +974,7 @@ async function fetchFrogMetadata(tokenId) {
 // Formatting helpers
 // ------------------------
 function truncateAddress(address) {
-  if (!address || typeof address !== 'string') return '--';
+  if (!address || typeof address !== 'string') return '';
   if (address.length <= 10) return address;
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
@@ -989,7 +989,7 @@ function formatOwnerLink(address, text) {
 
 function formatSalePrice(sale) {
   const fee = sale?.sellerFee || sale?.protocolFee || sale?.royaltyFee || sale?.price || sale?.payment;
-  if (!fee?.amount) return sale?.priceText || '--';
+  if (!fee?.amount) return sale?.priceText || '';
 
   const decimals = typeof fee.decimals === 'number' ? fee.decimals : 18;
 
@@ -1008,12 +1008,12 @@ function formatSalePrice(sale) {
 }
 
 function ffFormatAgeFromTimestamp(timestamp) {
-  if (!timestamp) return '--';
+  if (!timestamp) return '';
   const d = timestamp instanceof Date ? timestamp : new Date(timestamp);
-  if (Number.isNaN(d.getTime())) return '--';
+  if (Number.isNaN(d.getTime())) return '';
 
   const diffSeconds = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (!Number.isFinite(diffSeconds) || diffSeconds < 0) return '--';
+  if (!Number.isFinite(diffSeconds) || diffSeconds < 0) return '';
 
   if (diffSeconds < 86400) return '<1d ago';
   return `${Math.floor(diffSeconds / 86400)}d ago`;
@@ -1099,7 +1099,7 @@ async function ffLoadMoreRarity() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '--',
+        headerLeft: '',
         headerRight: rank ? `Rank #${rank}` : '',
         footerHtml: '',
         actionHtml: '' // removed
@@ -1199,7 +1199,7 @@ async function ffLoadMorePond() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '--',
+        headerLeft: '',
         headerRight: 'Staked',
         footerHtml: '',
         actionHtml: '' // removed
@@ -1482,7 +1482,7 @@ async function renderOwnedAndStakedFrogs(address) {
       let metadata = normalizeMetadata(nft.rawMetadata || nft.metadata || nft.tokenMetadata);
       if (!hasUsableMetadata(metadata)) metadata = await fetchFrogMetadata(tokenId);
 
-      const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '--';
+      const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '';
 
       // ✅ Keep only wallet actions (no OS/ES)
       const actionHtml = isPublic ? '' : `
@@ -1494,7 +1494,7 @@ async function renderOwnedAndStakedFrogs(address) {
 
       const card = createFrogCard({
         tokenId, metadata,
-        headerLeft: '--',
+        headerLeft: '',
         headerRight: salePrice,
         footerHtml: '',
         actionHtml
@@ -1534,7 +1534,7 @@ async function renderOwnedAndStakedFrogs(address) {
 
     for (const tokenId of stakedIds) {
       const metadata = await fetchFrogMetadata(tokenId);
-      const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '--';
+      const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '';
 
       const footerHtml = `
         <div class="stake-meta">
@@ -1559,7 +1559,7 @@ async function renderOwnedAndStakedFrogs(address) {
 
       const card = createFrogCard({
         tokenId, metadata,
-        headerLeft: '--',
+        headerLeft: '',
         headerRight: salePrice,
         footerHtml,
         actionHtml
