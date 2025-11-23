@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>FreshFrog Runner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <link rel="stylesheet" href="/style.css" />
+
+  <style>
+    body{ margin:0; background:#05070a; color:#e6f0ff; font-family:system-ui,Segoe UI,Roboto,Arial; }
+    header{ position:sticky; top:0; background:#0d121a; border-bottom:1px solid #1e2a3d; padding:10px 12px; display:flex; align-items:center; gap:10px;}
+    button{ background:#121823; color:#e6f0ff; border:1px solid #24324a; padding:7px 10px; border-radius:10px; cursor:pointer; }
+    button:hover{ border-color:#3b4f72;}
+    #wrap{ display:grid; grid-template-columns:300px 1fr; gap:12px; padding:12px; }
+    #left{ background:#121823; border:1px solid #1c2940; border-radius:14px; padding:10px; height:calc(100vh - 86px); overflow:auto;}
+    #game{ background:#121823; border:1px solid #1c2940; border-radius:14px; padding:10px; display:flex; flex-direction:column; gap:8px;}
+    canvas{ width:100%; height:520px; background:#020408; border-radius:12px; border:1px solid #1c2940; image-rendering:pixelated; }
+    .frogRow{ display:flex; align-items:center; gap:8px; padding:6px; border-radius:10px; background:#0f1520; border:1px solid #1c2940; margin-bottom:6px; cursor:pointer;}
+    .frogRow:hover{ border-color:#3b4f72;}
+    .frogRow img{ width:44px; height:44px; image-rendering:pixelated; border-radius:8px; background:#000;}
+    .pill{ font-size:12px; padding:2px 6px; border:1px solid #2b3b55; border-radius:999px; color:#8aa0c2; }
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:8px;}
+    .small{ font-size:12px; color:#8aa0c2;}
+  </style>
+
+  <script>
+    window.FF_PAGE = "runner";  // disables site.js auto-init via guard
+  </script>
+
+  <!-- Web3 + your existing scripts (same ordering as main index) -->
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
+  <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
+  <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
+  <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+  <script src="https://freshfrogs.github.io/assets/site.js"></script>
+</head>
+<body>
+
+<header>
+  <button id="connectBtn">Connect Wallet</button>
+  <div id="addr" class="pill">not connected</div>
+  <div class="pill">FreshFrog Runner</div>
+</header>
+
+<div id="wrap">
+  <aside id="left">
+    <div class="row">
+      <h3 style="margin:0;">Choose a Frog</h3>
+      <button id="mockBtn">Mock Frogs</button>
+    </div>
+    <div class="small">Your selected Frog becomes the runner.</div>
+    <div id="frogList" style="margin-top:8px;"></div>
+  </aside>
+
+  <main id="game">
+    <div class="row">
+      <div>
+        <div class="small">Selected Frog</div>
+        <div id="selectedName" style="font-weight:800;">none</div>
+      </div>
+      <div class="row">
+        <div class="pill">Score: <span id="scoreTxt">0</span></div>
+        <div class="pill">Best: <span id="bestTxt">0</span></div>
+        <button id="startBtn" disabled>Start</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+    </div>
+
+    <canvas id="c" width="1000" height="520"></canvas>
+    <div id="log" class="small"></div>
+  </main>
+</div>
+
+<script>
+/* ===============================
+   Helpers from your site.js
+   =============================== */
+
+function normalizeFrog(raw){
+  const tokenId = Number(raw.tokenId ?? raw.id ?? raw.token_id);
+  const metadata = raw.metadata || raw.rawMetadata || raw;
+  const traits = metadata?.attributes || metadata?.traits || [];
+  return {
+    tokenId,
+    name: metadata?.name || raw.name || `Frog #${tokenId}`,
+    image: raw.image || metadata?.image || `https://freshfrogs.github.io/frog/${tokenId}.png`,
+    rarityTier: (window.getRarityTier && window.getRarityRank)
+      ? (getRarityTier(getRarityRank(tokenId))?.label || "Common")
+      : "Common",
+    traits
+  };
+}
+
+async function fetchPlayableFrogs(address){
+  const owned = await window.ffFetchOwnedFrogs(address);
+  const stakedIds = await window.ffFetchStakedTokenIds(address).catch(()=>[]);
+  const morphed = await window.ffFetchMorphedFrogs(address).catch(()=>[]);
+  const stakedNfts = await Promise.all(stakedIds.map(id=>window.fetchFrogMetadata(id).then(m=>({tokenId:id, metadata:m}))));
+  const allRaw = [
+    ...owned,
+    ...stakedNfts,
+    ...morphed.map((m,i)=>({ tokenId: 900000+i, metadata:m, image:m.image }))
+  ];
+  const out = [];
+  const seen = new Set();
+  for (const r of allRaw){
+    const f = normalizeFrog(r);
+    if (!seen.has(f.tokenId)){
+      seen.add(f.tokenId);
+      out.push(f);
+    }
+  }
+  return out;
+}
+
+/* ===============================
+   Runner Game
+   =============================== */
+
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+const ui = {
+  connectBtn: document.getElementById("connectBtn"),
+  addr: document.getElementById("addr"),
+  frogList: document.getElementById("frogList"),
+  selectedName: document.getElementById("selectedName"),
+  startBtn: document.getElementById("startBtn"),
+  resetBtn: document.getElementById("resetBtn"),
+  mockBtn: document.getElementById("mockBtn"),
+  scoreTxt: document.getElementById("scoreTxt"),
+  bestTxt: document.getElementById("bestTxt"),
+  log: document.getElementById("log"),
+};
+
+let address=null, frogs=[], selected=null;
+
+// world
+let running=false, score=0, best=+localStorage.getItem("ff_runner_best")||0;
+ui.bestTxt.textContent = best;
+
+const groundY = 420;
+let speed = 220;     // px/sec base
+let gravity = 1800;  // px/sec^2
+let jumpVel = 640;   // px/sec
+let magnet = 0;      // coin magnet radius
+
+let player=null;
+let obstacles=[];
+let coins=[];
+
+let lastT=performance.now();
+let spawnTimer=0;
+let coinTimer=0;
+
+function log(msg){ ui.log.textContent = msg; }
+
+function applyTraitBonuses(frog){
+  // tiny silly bonuses based on trait text
+  const tvals = (frog.traits||[]).map(t=>String(t.value||t.trait_value||"").toLowerCase());
+  speed = 220;
+  jumpVel = 640;
+  magnet = 0;
+
+  if (tvals.some(v=>v.includes("ninja")||v.includes("cyber"))) speed *= 1.08;
+  if (tvals.some(v=>v.includes("crown")||v.includes("wizard"))) magnet = 90;
+  if (tvals.some(v=>v.includes("armor")||v.includes("zombie"))) jumpVel *= 1.06;
+
+  const tier = String(frog.rarityTier||"common").toLowerCase();
+  if (tier.includes("rare")) speed *= 1.05;
+  if (tier.includes("epic")) speed *= 1.10;
+  if (tier.includes("legendary")) speed *= 1.15;
+}
+
+function resetRun(){
+  running=false; score=0;
+  obstacles=[]; coins=[];
+  player = null;
+  ui.scoreTxt.textContent = score;
+  log("Reset.");
+}
+
+function startRun(){
+  if(!selected) return;
+  applyTraitBonuses(selected);
+
+  player = {
+    x:160, y:groundY, vy:0, w:54, h:54,
+    img: (()=>{ const im=new Image(); im.src=selected.image; return im; })()
+  };
+  obstacles=[]; coins=[];
+  score=0; spawnTimer=0; coinTimer=0;
+  running=true;
+  log("GO! Space / tap to jump.");
+}
+
+function spawnObstacle(){
+  const h = 34 + Math.random()*38;
+  obstacles.push({
+    x: canvas.width + 30,
+    y: groundY - h + 6,
+    w: 26 + Math.random()*20,
+    h,
+  });
+}
+
+function spawnCoin(){
+  coins.push({
+    x: canvas.width + 30,
+    y: 250 + Math.random()*120,
+    r: 10,
+    vx: speed
+  });
+}
+
+function jump(){
+  if(!running || !player) return;
+  if(player.y >= groundY-1){
+    player.vy = -jumpVel;
+  }
+}
+
+function update(dt){
+  if(!running || !player) return;
+
+  // player physics
+  player.vy += gravity*dt;
+  player.y += player.vy*dt;
+  if(player.y > groundY){ player.y=groundY; player.vy=0; }
+
+  // spawns
+  spawnTimer += dt;
+  coinTimer += dt;
+  if(spawnTimer > 1.2 + Math.random()*0.9){
+    spawnTimer = 0;
+    spawnObstacle();
+  }
+  if(coinTimer > 0.7 + Math.random()*0.7){
+    coinTimer=0;
+    spawnCoin();
+  }
+
+  // move obstacles
+  for(const o of obstacles){ o.x -= speed*dt; }
+  obstacles = obstacles.filter(o=>o.x+o.w>0);
+
+  // move coins + magnet pull
+  for(const c of coins){
+    c.x -= speed*dt;
+    if(magnet>0){
+      const dx = (player.x+player.w/2) - c.x;
+      const dy = (player.y-player.h/2) - c.y;
+      const d = Math.hypot(dx,dy);
+      if(d < magnet){
+        c.x += dx/d * 220*dt;
+        c.y += dy/d * 220*dt;
+      }
+    }
+  }
+
+  // collisions
+  const px=player.x, py=player.y-player.h, pw=player.w, ph=player.h;
+
+  // obstacle hit
+  for(const o of obstacles){
+    if(px < o.x+o.w && px+pw > o.x && py < o.y+o.h && py+ph > o.y){
+      running=false;
+      best = Math.max(best, score);
+      localStorage.setItem("ff_runner_best", best);
+      ui.bestTxt.textContent = best;
+      log("RIP. Hit an obstacle.");
+      return;
+    }
+  }
+
+  // coin collect
+  coins = coins.filter(c=>{
+    const cx=c.x, cy=c.y;
+    if(cx>px && cx<px+pw && cy>py && cy<py+ph){
+      score += 5;
+      return false;
+    }
+    return c.x+c.r>0;
+  });
+
+  score += dt*4; // distance score
+  ui.scoreTxt.textContent = Math.floor(score);
+}
+
+function render(){
+  // bg
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#020408"; ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // parallax stripes
+  ctx.fillStyle="#09111a";
+  for(let i=0;i<canvas.width;i+=70){
+    ctx.fillRect((i-(performance.now()/10)%70), 0, 30, canvas.height);
+  }
+
+  // ground
+  ctx.fillStyle="#0c1622"; ctx.fillRect(0,groundY+6,canvas.width,canvas.height-groundY);
+
+  // obstacles
+  ctx.fillStyle="#ff7a7a";
+  for(const o of obstacles){
+    ctx.fillRect(o.x, o.y, o.w, o.h);
+  }
+
+  // coins
+  ctx.fillStyle="#ffd36a";
+  for(const c of coins){
+    ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill();
+  }
+
+  // player sprite
+  if(player){
+    const drawY = player.y-player.h;
+    try{
+      ctx.drawImage(player.img, player.x, drawY, player.w, player.h);
+    }catch{
+      ctx.fillStyle="#37e07b";
+      ctx.fillRect(player.x, drawY, player.w, player.h);
+    }
+  }
+
+  // HUD text
+  ctx.fillStyle="#8aa0c2";
+  ctx.fillText("SPACE / TAP to jump", 12, 18);
+}
+
+function loop(t){
+  const dt=(t-lastT)/1000; lastT=t;
+  update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ===============================
+   UI
+   =============================== */
+
+ui.connectBtn.onclick = async ()=>{
+  try{
+    if(!window.ethereum?.request) throw new Error("No wallet provider.");
+    if(typeof window.connectWallet === "function"){
+      await window.connectWallet(); // sets FF_CONNECTED_ADDRESS
+      address = (window.FF_CONNECTED_ADDRESS||window.user_address||"").toLowerCase();
+    }else{
+      const [a] = await ethereum.request({method:"eth_requestAccounts"});
+      address = (a||"").toLowerCase();
+    }
+
+    if(!address) throw new Error("No address returned.");
+    ui.addr.textContent = address.slice(0,6)+"..."+address.slice(-4);
+
+    frogs = await fetchPlayableFrogs(address);
+    renderFrogList();
+    log("Wallet connected.");
+  }catch(e){
+    console.error(e);
+    log(e.message||String(e));
+  }
+};
+
+ui.startBtn.onclick = startRun;
+ui.resetBtn.onclick = resetRun;
+ui.mockBtn.onclick = ()=>{
+  frogs = [
+    { tokenId:12, name:"Frog #12", image:"https://freshfrogs.github.io/frog/12.png", rarityTier:"Rare",
+      traits:[{value:"Cyber Eyes"}]},
+    { tokenId:666, name:"Frog #666", image:"https://freshfrogs.github.io/frog/666.png", rarityTier:"Epic",
+      traits:[{value:"Ninja Mask"}]},
+  ];
+  renderFrogList();
+};
+
+function renderFrogList(){
+  ui.frogList.innerHTML="";
+  if(!frogs.length){
+    ui.frogList.innerHTML=`<div class="small">No frogs found.</div>`;
+    return;
+  }
+  for(const f of frogs){
+    const row=document.createElement("div");
+    row.className="frogRow";
+    row.innerHTML=`
+      <img src="${f.image}"/>
+      <div style="flex:1;">
+        <div style="font-weight:700;">${f.name}</div>
+        <div class="small">${f.rarityTier||"Common"}</div>
+      </div>
+      <div class="pill">#${f.tokenId}</div>
+    `;
+    row.onclick=()=>{
+      selected=f;
+      ui.selectedName.textContent=f.name;
+      ui.startBtn.disabled=false;
+      resetRun();
+      log("Selected frog. Hit Start.");
+    };
+    ui.frogList.appendChild(row);
+  }
+}
+
+// controls
+window.addEventListener("keydown", e=>{
+  if(e.code==="Space"||e.code==="ArrowUp") { e.preventDefault(); jump(); }
+});
+canvas.addEventListener("pointerdown", jump);
+</script>
+</body>
+</html>
