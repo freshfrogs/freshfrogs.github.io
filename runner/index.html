@@ -130,8 +130,10 @@
   const CANVAS_H = 960;
   const FLOOR_Y = CANVAS_H - 70;
 
-  const GRAVITY = 0.6;
-  const DROP_SPEED_CAP = 18;
+  // SLOWER / BALANCED DROP FEEL
+  const GRAVITY = 0.35;
+  const DROP_SPEED_CAP = 10;
+
   const SWAY_SPEED_START = 2.2;
   const SWAY_SPEED_RAMP = 0.015;
 
@@ -189,7 +191,7 @@
   let swayDir = 1;
   let swaySpeed = SWAY_SPEED_START;
   let cameraY = 0;
-  let running = false;
+  let running = false;   // IMPORTANT: start frozen until Play
   let dropping = false;
 
   let score = 0;
@@ -271,7 +273,7 @@
   const dropActive = () => {
     if (!running || dropping) return;
     dropping = true;
-    active.vy = 2.5;
+    active.vy = 1.6; // slower start speed
     beep(520, 0.04);
   };
 
@@ -314,10 +316,8 @@
       return;
     }
 
-    // slight settle and store
+    // store + ramp difficulty
     stack.push(active);
-
-    // ramp difficulty
     swaySpeed += SWAY_SPEED_RAMP;
 
     spawnActive();
@@ -366,7 +366,7 @@
 
   playBtn.onclick = () => {
     overlay.classList.remove("show");
-    resetGame();
+    resetGame(); // sets running=true fresh and centered
   };
   restartBtn.onclick = () => {
     overlay.classList.remove("show");
@@ -389,11 +389,9 @@
   }
 
   const drawBackground = () => {
-    // subtle pixel grid
     ctx.fillStyle = "#05080b";
     ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
 
-    // stars / bubbles
     for (let i=0;i<40;i++){
       const x = (i*97)%CANVAS_W;
       const y = (i*151)%CANVAS_H;
@@ -401,11 +399,9 @@
       ctx.fillRect(x, y, 2,2);
     }
 
-    // floor
     ctx.fillStyle = "#071018";
     ctx.fillRect(0, FLOOR_Y, CANVAS_W, CANVAS_H - FLOOR_Y);
 
-    // floor line
     ctx.fillStyle = "#122635";
     ctx.fillRect(0, FLOOR_Y-2, CANVAS_W, 2);
   };
@@ -415,7 +411,6 @@
     const y = f.y - cameraY;
     const s = f.size;
 
-    // shadow / base
     ctx.fillStyle = "rgba(0,0,0,0.35)";
     ctx.fillRect(x+6, y+s-6, s-12, 8);
 
@@ -423,7 +418,6 @@
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(f.img, x, y, s, s);
     } else {
-      // fallback pixel block
       ctx.fillStyle = f.isBase ? "#214a3b" : "#2b845a";
       ctx.fillRect(x, y, s, s);
       ctx.fillStyle = "#0b1c14";
@@ -433,7 +427,6 @@
       ctx.fillRect(x+s-22, y+14, 8,8);
     }
 
-    // wobble ring for perfect
     if (f.wobble > 0.01) {
       ctx.strokeStyle = "rgba(155,255,177,0.7)";
       ctx.lineWidth = 2;
@@ -458,12 +451,16 @@
     drawBackground();
     updateCamera();
 
-    // update active frog
     if (active) {
       if (!dropping) {
-        // sway left/right above stack
-        active.x += swayDir * swaySpeed;
-        if (active.x < 10 || active.x + active.size > CANVAS_W-10) swayDir *= -1;
+        // only sway when game is running
+        if (running) {
+          active.x += swayDir * swaySpeed;
+          if (active.x < 10 || active.x + active.size > CANVAS_W-10) swayDir *= -1;
+        } else {
+          // keep centered behind overlay
+          active.x = CANVAS_W/2 - active.size/2;
+        }
         active.y = topFrog().y - 180;
       } else {
         active.vy = Math.min(DROP_SPEED_CAP, active.vy + GRAVITY);
@@ -481,7 +478,6 @@
       }
     }
 
-    // wobble decay
     for (const f of stack) {
       if (f.wobble > 0) f.wobble *= 0.92;
     }
@@ -494,7 +490,9 @@
   // ---------------------------
   // Start screen
   // ---------------------------
-  resetGame(); // ensure stack exists from frame 1
+  resetGame();     // create base + active frog
+  running = false; // freeze sway until Play
+
   overlay.classList.add("show");
   overlayTitle.textContent = "Frog Stack";
   overlayScore.textContent = "";
