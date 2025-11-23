@@ -779,8 +779,10 @@ padding: 0.55rem 1.2rem;
 }
 /* makes <a> behave exactly like your <button> */
 .frog-actions .frog_action_btn{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  background: cornflowerblue;
+  color: white;
+  border: none;
+  box-shadow: 2px 2px darkslateblue;
+  padding: 8px;
+  font-family: monospace;
 }

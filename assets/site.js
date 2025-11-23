@@ -838,7 +838,7 @@ function ffActionButtonsHTML(tokenId) {
         onclick="window.open('${osUrl}', '_blank', 'noopener,noreferrer')">
         OpenSea
       </button>
-      <button class="${cls}" type="button"
+      <button class="${cls}" type="button" style="background: antiquewhite; color: #333;"
         onclick="window.open('${esUrl}', '_blank', 'noopener,noreferrer')">
         EtherScan
       </button>
