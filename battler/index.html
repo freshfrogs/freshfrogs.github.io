@@ -532,17 +532,34 @@ requestAnimationFrame(loop);
 /* ----------------------------
    UI events
    ---------------------------- */
-
 ui.connectBtn.onclick = async ()=>{
   try{
-    if (typeof window.connectWallet !== "function") throw new Error("connectWallet() not found on window");
-    address = (await window.connectWallet()).toLowerCase();
+    // Debug: see what's actually available
+    console.log("[Battler] window.connectWallet =", window.connectWallet);
+    console.log("[Battler] ethereum =", window.ethereum);
+
+    // 1) Try your site's connectWallet if it's there
+    if (typeof window.connectWallet === "function") {
+      address = (await window.connectWallet()).toLowerCase();
+    } 
+    // 2) Otherwise fallback to MetaMask native connect
+    else if (window.ethereum?.request) {
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      address = (accounts?.[0] || "").toLowerCase();
+    } 
+    else {
+      throw new Error("No wallet provider found. Is MetaMask installed?");
+    }
+
+    if (!address) throw new Error("Wallet returned no address.");
+
     ui.addr.textContent = address.slice(0,6)+"..."+address.slice(-4);
 
     frogs = await fetchPlayableFrogs(address);
     renderFrogList();
     log("Wallet connected.");
   }catch(e){
+    console.error(e);
     log(e.message || String(e));
   }
 };
