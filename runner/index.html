@@ -8,27 +8,32 @@
   <link rel="stylesheet" href="/style.css" />
 
   <style>
-    body{ margin:0; background:#05070a; color:#e6f0ff; font-family:system-ui,Segoe UI,Roboto,Arial; }
-    header{ position:sticky; top:0; background:#0d121a; border-bottom:1px solid #1e2a3d; padding:10px 12px; display:flex; align-items:center; gap:10px;}
-    button{ background:#121823; color:#e6f0ff; border:1px solid #24324a; padding:7px 10px; border-radius:10px; cursor:pointer; }
+    :root{
+      --bg:#05070a; --panel:#121823; --panel2:#0f1520;
+      --txt:#e6f0ff; --muted:#8aa0c2; --line:#1c2940; --accent:#37e07b;
+    }
+    body{ margin:0; background:var(--bg); color:var(--txt); font-family:system-ui,Segoe UI,Roboto,Arial;}
+    header{ position:sticky; top:0; z-index:10; background:#0d121a; border-bottom:1px solid #1e2a3d; padding:10px 12px; display:flex; align-items:center; gap:10px;}
+    button{ background:var(--panel); color:var(--txt); border:1px solid #24324a; padding:7px 10px; border-radius:10px; cursor:pointer; }
     button:hover{ border-color:#3b4f72;}
     #wrap{ display:grid; grid-template-columns:300px 1fr; gap:12px; padding:12px; }
-    #left{ background:#121823; border:1px solid #1c2940; border-radius:14px; padding:10px; height:calc(100vh - 86px); overflow:auto;}
-    #game{ background:#121823; border:1px solid #1c2940; border-radius:14px; padding:10px; display:flex; flex-direction:column; gap:8px;}
-    canvas{ width:100%; height:520px; background:#020408; border-radius:12px; border:1px solid #1c2940; image-rendering:pixelated; }
-    .frogRow{ display:flex; align-items:center; gap:8px; padding:6px; border-radius:10px; background:#0f1520; border:1px solid #1c2940; margin-bottom:6px; cursor:pointer;}
+    #left{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:10px; height:calc(100vh - 86px); overflow:auto;}
+    #game{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:10px; display:flex; flex-direction:column; gap:8px;}
+    canvas{
+      width:100%; height:520px; background:#020408; border-radius:12px; border:1px solid var(--line);
+      image-rendering:pixelated;
+    }
+    .frogRow{ display:flex; align-items:center; gap:8px; padding:6px; border-radius:10px; background:var(--panel2); border:1px solid var(--line); margin-bottom:6px; cursor:pointer;}
     .frogRow:hover{ border-color:#3b4f72;}
     .frogRow img{ width:44px; height:44px; image-rendering:pixelated; border-radius:8px; background:#000;}
-    .pill{ font-size:12px; padding:2px 6px; border:1px solid #2b3b55; border-radius:999px; color:#8aa0c2; }
+    .pill{ font-size:12px; padding:2px 6px; border:1px solid #2b3b55; border-radius:999px; color:var(--muted); }
     .row{ display:flex; align-items:center; justify-content:space-between; gap:8px;}
-    .small{ font-size:12px; color:#8aa0c2;}
+    .small{ font-size:12px; color:var(--muted);}
   </style>
 
-  <script>
-    window.FF_PAGE = "runner";  // disables site.js auto-init via guard
-  </script>
+  <script>window.FF_PAGE="runner";</script>
 
-  <!-- Web3 + your existing scripts (same ordering as main index) -->
+  <!-- Same load order as main index -->
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
   <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
@@ -75,17 +80,34 @@
 
 <script>
 /* ===============================
-   Helpers from your site.js
+   Normalize + Fetch (fixed)
    =============================== */
 
 function normalizeFrog(raw){
-  const tokenId = Number(raw.tokenId ?? raw.id ?? raw.token_id);
-  const metadata = raw.metadata || raw.rawMetadata || raw;
+  const parse = (typeof window.parseTokenId === "function")
+    ? window.parseTokenId
+    : (v)=> {
+        if (v == null) return null;
+        if (typeof v === "string" && v.startsWith("0x")) return parseInt(v,16);
+        const n = Number(v);
+        return Number.isFinite(n) ? n : null;
+      };
+
+  const tokenId =
+    parse(raw?.tokenId) ??
+    parse(raw?.id?.tokenId) ??
+    parse(raw?.token_id) ??
+    parse(raw?.nft?.identifier);
+
+  if (tokenId == null) return null;
+
+  const metadata = raw.rawMetadata || raw.metadata || raw.tokenMetadata || raw;
   const traits = metadata?.attributes || metadata?.traits || [];
+
   return {
     tokenId,
     name: metadata?.name || raw.name || `Frog #${tokenId}`,
-    image: raw.image || metadata?.image || `https://freshfrogs.github.io/frog/${tokenId}.png`,
+    image: `https://freshfrogs.github.io/frog/${tokenId}.png`,
     rarityTier: (window.getRarityTier && window.getRarityRank)
       ? (getRarityTier(getRarityRank(tokenId))?.label || "Common")
       : "Common",
@@ -94,29 +116,41 @@ function normalizeFrog(raw){
 }
 
 async function fetchPlayableFrogs(address){
-  const owned = await window.ffFetchOwnedFrogs(address);
-  const stakedIds = await window.ffFetchStakedTokenIds(address).catch(()=>[]);
-  const morphed = await window.ffFetchMorphedFrogs(address).catch(()=>[]);
-  const stakedNfts = await Promise.all(stakedIds.map(id=>window.fetchFrogMetadata(id).then(m=>({tokenId:id, metadata:m}))));
-  const allRaw = [
-    ...owned,
-    ...stakedNfts,
-    ...morphed.map((m,i)=>({ tokenId: 900000+i, metadata:m, image:m.image }))
-  ];
-  const out = [];
-  const seen = new Set();
-  for (const r of allRaw){
-    const f = normalizeFrog(r);
-    if (!seen.has(f.tokenId)){
-      seen.add(f.tokenId);
-      out.push(f);
+  const [ownedNfts, stakedIds, morphedMetas] = await Promise.all([
+    window.ffFetchOwnedFrogs(address),                         // :contentReference[oaicite:4]{index=4}
+    window.ffFetchStakedTokenIds(address).catch(()=>[]),       // :contentReference[oaicite:5]{index=5}
+    window.ffFetchMorphedFrogs(address).catch(()=>[])          // :contentReference[oaicite:6]{index=6}
+  ]);
+
+  // If any owned lack usable metadata, follow your site pattern and fetch it
+  const owned = [];
+  for (const nft of ownedNfts){
+    const f = normalizeFrog(nft);
+    if (!f) continue;
+    if (!f.traits?.length && typeof window.fetchFrogMetadata === "function") {
+      const meta = await window.fetchFrogMetadata(f.tokenId);  // :contentReference[oaicite:7]{index=7}
+      f.traits = meta?.attributes || meta?.traits || [];
+      f.name = meta?.name || f.name;
     }
+    owned.push(f);
   }
-  return out;
+
+  const staked = stakedIds.map(id => normalizeFrog({ tokenId:id })).filter(Boolean);
+  const morphed = (morphedMetas||[]).map((meta,i)=>({
+    tokenId: 900000+i,
+    name: meta?.name || "Morphed Frog",
+    image: meta?.image || meta?.image_url || "https://freshfrogs.github.io/assets/blackWhite.png",
+    rarityTier: "Morphed",
+    traits: meta?.attributes || meta?.traits || []
+  }));
+
+  const all=[...owned,...staked,...morphed];
+  const seen=new Set();
+  return all.filter(f=>!seen.has(f.tokenId) && seen.add(f.tokenId));
 }
 
 /* ===============================
-   Runner Game
+   Runner Game (visual pass)
    =============================== */
 
 const canvas = document.getElementById("c");
@@ -137,204 +171,195 @@ const ui = {
 
 let address=null, frogs=[], selected=null;
 
-// world
-let running=false, score=0, best=+localStorage.getItem("ff_runner_best")||0;
-ui.bestTxt.textContent = best;
+let running=false, score=0;
+let best=+localStorage.getItem("ff_runner_best")||0;
+ui.bestTxt.textContent=best;
 
-const groundY = 420;
-let speed = 220;     // px/sec base
-let gravity = 1800;  // px/sec^2
-let jumpVel = 640;   // px/sec
-let magnet = 0;      // coin magnet radius
+const groundY=420;
+let speed=230, gravity=1850, jumpVel=660, magnet=0;
 
-let player=null;
-let obstacles=[];
-let coins=[];
+let player=null, obstacles=[], coins=[];
+let lastT=performance.now(), spawnTimer=0, coinTimer=0, bgScroll=0;
 
-let lastT=performance.now();
-let spawnTimer=0;
-let coinTimer=0;
-
-function log(msg){ ui.log.textContent = msg; }
+function log(msg){ ui.log.textContent=msg; }
 
 function applyTraitBonuses(frog){
-  // tiny silly bonuses based on trait text
-  const tvals = (frog.traits||[]).map(t=>String(t.value||t.trait_value||"").toLowerCase());
-  speed = 220;
-  jumpVel = 640;
-  magnet = 0;
+  const tvals=(frog.traits||[]).map(t=>String(t.value||t.trait_value||"").toLowerCase());
+  speed=230; jumpVel=660; magnet=0;
 
-  if (tvals.some(v=>v.includes("ninja")||v.includes("cyber"))) speed *= 1.08;
-  if (tvals.some(v=>v.includes("crown")||v.includes("wizard"))) magnet = 90;
-  if (tvals.some(v=>v.includes("armor")||v.includes("zombie"))) jumpVel *= 1.06;
+  if(tvals.some(v=>v.includes("ninja")||v.includes("cyber"))) speed*=1.10;
+  if(tvals.some(v=>v.includes("crown")||v.includes("wizard"))) magnet=110;
+  if(tvals.some(v=>v.includes("armor")||v.includes("zombie"))) jumpVel*=1.07;
 
-  const tier = String(frog.rarityTier||"common").toLowerCase();
-  if (tier.includes("rare")) speed *= 1.05;
-  if (tier.includes("epic")) speed *= 1.10;
-  if (tier.includes("legendary")) speed *= 1.15;
+  const tier=String(frog.rarityTier||"common").toLowerCase();
+  if(tier.includes("rare")) speed*=1.05;
+  if(tier.includes("epic")) speed*=1.10;
+  if(tier.includes("legendary")) speed*=1.18;
 }
 
 function resetRun(){
-  running=false; score=0;
-  obstacles=[]; coins=[];
-  player = null;
-  ui.scoreTxt.textContent = score;
-  log("Reset.");
+  running=false; score=0; obstacles=[]; coins=[]; player=null;
+  ui.scoreTxt.textContent=0; log("Reset.");
 }
 
 function startRun(){
   if(!selected) return;
   applyTraitBonuses(selected);
 
-  player = {
-    x:160, y:groundY, vy:0, w:54, h:54,
-    img: (()=>{ const im=new Image(); im.src=selected.image; return im; })()
+  player={
+    x:170, y:groundY, vy:0, w:70, h:70,
+    img:(()=>{const im=new Image(); im.src=selected.image; return im;})()
   };
-  obstacles=[]; coins=[];
-  score=0; spawnTimer=0; coinTimer=0;
-  running=true;
-  log("GO! Space / tap to jump.");
+  obstacles=[]; coins=[]; score=0; spawnTimer=0; coinTimer=0; bgScroll=0;
+  running=true; log("GO! Space / tap to jump.");
 }
 
 function spawnObstacle(){
-  const h = 34 + Math.random()*38;
+  const type=Math.random();
+  const h = type<0.5 ? 42 : 60;
+  const w = type<0.5 ? 34 : 50;
   obstacles.push({
-    x: canvas.width + 30,
-    y: groundY - h + 6,
-    w: 26 + Math.random()*20,
-    h,
+    x: canvas.width+30,
+    y: groundY-h+8,
+    w, h,
+    spike: type>=0.5
   });
 }
 
 function spawnCoin(){
   coins.push({
-    x: canvas.width + 30,
-    y: 250 + Math.random()*120,
-    r: 10,
-    vx: speed
+    x: canvas.width+30,
+    y: 230 + Math.random()*150,
+    r: 10
   });
 }
 
 function jump(){
-  if(!running || !player) return;
-  if(player.y >= groundY-1){
-    player.vy = -jumpVel;
-  }
+  if(!running||!player) return;
+  if(player.y>=groundY-1) player.vy=-jumpVel;
 }
 
 function update(dt){
-  if(!running || !player) return;
+  if(!running||!player) return;
 
-  // player physics
+  bgScroll += speed*dt*0.5;
+
   player.vy += gravity*dt;
-  player.y += player.vy*dt;
-  if(player.y > groundY){ player.y=groundY; player.vy=0; }
+  player.y  += player.vy*dt;
+  if(player.y>groundY){ player.y=groundY; player.vy=0; }
 
-  // spawns
-  spawnTimer += dt;
-  coinTimer += dt;
-  if(spawnTimer > 1.2 + Math.random()*0.9){
-    spawnTimer = 0;
-    spawnObstacle();
-  }
-  if(coinTimer > 0.7 + Math.random()*0.7){
-    coinTimer=0;
-    spawnCoin();
-  }
+  spawnTimer+=dt; coinTimer+=dt;
+  if(spawnTimer>1.1+Math.random()*0.8){ spawnTimer=0; spawnObstacle(); }
+  if(coinTimer>0.65+Math.random()*0.6){ coinTimer=0; spawnCoin(); }
 
-  // move obstacles
-  for(const o of obstacles){ o.x -= speed*dt; }
-  obstacles = obstacles.filter(o=>o.x+o.w>0);
+  for(const o of obstacles) o.x -= speed*dt;
+  obstacles=obstacles.filter(o=>o.x+o.w>0);
 
-  // move coins + magnet pull
   for(const c of coins){
     c.x -= speed*dt;
     if(magnet>0){
-      const dx = (player.x+player.w/2) - c.x;
-      const dy = (player.y-player.h/2) - c.y;
-      const d = Math.hypot(dx,dy);
-      if(d < magnet){
-        c.x += dx/d * 220*dt;
-        c.y += dy/d * 220*dt;
+      const dx=(player.x+player.w/2)-c.x;
+      const dy=(player.y-player.h/2)-c.y;
+      const d=Math.hypot(dx,dy);
+      if(d<magnet){
+        c.x += dx/d*260*dt;
+        c.y += dy/d*260*dt;
       }
     }
   }
 
-  // collisions
   const px=player.x, py=player.y-player.h, pw=player.w, ph=player.h;
 
-  // obstacle hit
   for(const o of obstacles){
-    if(px < o.x+o.w && px+pw > o.x && py < o.y+o.h && py+ph > o.y){
+    if(px<o.x+o.w && px+pw>o.x && py<o.y+o.h && py+ph>o.y){
       running=false;
-      best = Math.max(best, score);
+      best=Math.max(best, score|0);
       localStorage.setItem("ff_runner_best", best);
-      ui.bestTxt.textContent = best;
+      ui.bestTxt.textContent=best;
       log("RIP. Hit an obstacle.");
       return;
     }
   }
 
-  // coin collect
-  coins = coins.filter(c=>{
-    const cx=c.x, cy=c.y;
-    if(cx>px && cx<px+pw && cy>py && cy<py+ph){
-      score += 5;
-      return false;
+  coins=coins.filter(c=>{
+    if(c.x>px && c.x<px+pw && c.y>py && c.y<py+ph){
+      score+=8; return false;
     }
     return c.x+c.r>0;
   });
 
-  score += dt*4; // distance score
-  ui.scoreTxt.textContent = Math.floor(score);
+  score += dt*5;
+  ui.scoreTxt.textContent = score|0;
 }
 
 function render(){
-  // bg
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle="#020408"; ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // parallax stripes
-  ctx.fillStyle="#09111a";
-  for(let i=0;i<canvas.width;i+=70){
-    ctx.fillRect((i-(performance.now()/10)%70), 0, 30, canvas.height);
+  // sky
+  ctx.fillStyle="#050a12";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // parallax swamp bands
+  for(let layer=0; layer<3; layer++){
+    const y=80+layer*70;
+    const bandH=60;
+    const par=(layer+1)*0.35;
+    const off=-(bgScroll*par)%120;
+    ctx.fillStyle= layer===0 ? "#0a1522" : layer===1 ? "#07101a" : "#050b12";
+    for(let x=off; x<canvas.width; x+=120){
+      ctx.fillRect(x, y, 80, bandH);
+    }
+  }
+
+  // lane lines
+  ctx.strokeStyle="#0f1b2a";
+  for(let i=0;i<canvas.width;i+=60){
+    ctx.beginPath();
+    ctx.moveTo(i, groundY+6);
+    ctx.lineTo(i+30, groundY+6);
+    ctx.stroke();
   }
 
   // ground
-  ctx.fillStyle="#0c1622"; ctx.fillRect(0,groundY+6,canvas.width,canvas.height-groundY);
+  ctx.fillStyle="#07131e";
+  ctx.fillRect(0, groundY+6, canvas.width, canvas.height-groundY);
 
   // obstacles
-  ctx.fillStyle="#ff7a7a";
   for(const o of obstacles){
+    ctx.fillStyle = o.spike ? "#ff7a7a" : "#c9a66b";
     ctx.fillRect(o.x, o.y, o.w, o.h);
+    if(o.spike){
+      ctx.fillStyle="#2b0d0d";
+      ctx.fillRect(o.x+6, o.y+8, o.w-12, 8);
+    }
   }
 
-  // coins
-  ctx.fillStyle="#ffd36a";
+  // coins (flies)
   for(const c of coins){
+    ctx.fillStyle="#ffd36a";
     ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#000";
+    ctx.fillRect(c.x-2,c.y-2,4,4);
   }
 
   // player sprite
   if(player){
-    const drawY = player.y-player.h;
-    try{
-      ctx.drawImage(player.img, player.x, drawY, player.w, player.h);
-    }catch{
-      ctx.fillStyle="#37e07b";
+    const drawY=player.y-player.h;
+    try{ ctx.drawImage(player.img, player.x, drawY, player.w, player.h); }
+    catch{
+      ctx.fillStyle= "#37e07b";
       ctx.fillRect(player.x, drawY, player.w, player.h);
     }
   }
 
-  // HUD text
+  // text
   ctx.fillStyle="#8aa0c2";
   ctx.fillText("SPACE / TAP to jump", 12, 18);
 }
 
 function loop(t){
   const dt=(t-lastT)/1000; lastT=t;
-  update(dt);
-  render();
+  update(dt); render();
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
@@ -346,16 +371,17 @@ requestAnimationFrame(loop);
 ui.connectBtn.onclick = async ()=>{
   try{
     if(!window.ethereum?.request) throw new Error("No wallet provider.");
-    if(typeof window.connectWallet === "function"){
-      await window.connectWallet(); // sets FF_CONNECTED_ADDRESS
-      address = (window.FF_CONNECTED_ADDRESS||window.user_address||"").toLowerCase();
-    }else{
-      const [a] = await ethereum.request({method:"eth_requestAccounts"});
-      address = (a||"").toLowerCase();
-    }
 
+    if(typeof window.connectWallet==="function"){
+      await window.connectWallet();
+      address=(window.FF_CONNECTED_ADDRESS||window.user_address||"").toLowerCase();
+    }else{
+      const [a]=await ethereum.request({method:"eth_requestAccounts"});
+      address=(a||"").toLowerCase();
+    }
     if(!address) throw new Error("No address returned.");
-    ui.addr.textContent = address.slice(0,6)+"..."+address.slice(-4);
+
+    ui.addr.textContent=address.slice(0,6)+"..."+address.slice(-4);
 
     frogs = await fetchPlayableFrogs(address);
     renderFrogList();
@@ -366,14 +392,13 @@ ui.connectBtn.onclick = async ()=>{
   }
 };
 
-ui.startBtn.onclick = startRun;
-ui.resetBtn.onclick = resetRun;
-ui.mockBtn.onclick = ()=>{
-  frogs = [
-    { tokenId:12, name:"Frog #12", image:"https://freshfrogs.github.io/frog/12.png", rarityTier:"Rare",
-      traits:[{value:"Cyber Eyes"}]},
-    { tokenId:666, name:"Frog #666", image:"https://freshfrogs.github.io/frog/666.png", rarityTier:"Epic",
-      traits:[{value:"Ninja Mask"}]},
+ui.startBtn.onclick=startRun;
+ui.resetBtn.onclick=resetRun;
+
+ui.mockBtn.onclick=()=>{
+  frogs=[
+    {tokenId:12,name:"Frog #12",image:"https://freshfrogs.github.io/frog/12.png",rarityTier:"Rare",traits:[{value:"Cyber Eyes"}]},
+    {tokenId:666,name:"Frog #666",image:"https://freshfrogs.github.io/frog/666.png",rarityTier:"Epic",traits:[{value:"Ninja Mask"}]},
   ];
   renderFrogList();
 };
@@ -406,9 +431,8 @@ function renderFrogList(){
   }
 }
 
-// controls
 window.addEventListener("keydown", e=>{
-  if(e.code==="Space"||e.code==="ArrowUp") { e.preventDefault(); jump(); }
+  if(e.code==="Space"||e.code==="ArrowUp"){ e.preventDefault(); jump(); }
 });
 canvas.addEventListener("pointerdown", jump);
 </script>
