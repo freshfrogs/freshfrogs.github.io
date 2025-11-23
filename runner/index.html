@@ -1,440 +1,504 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <title>FreshFrog Runner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-
-  <link rel="stylesheet" href="/style.css" />
-
+  <meta charset="UTF-8" />
+  <title>Fresh Frogs – Frog Stack</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     :root{
-      --bg:#05070a; --panel:#121823; --panel2:#0f1520;
-      --txt:#e6f0ff; --muted:#8aa0c2; --line:#1c2940; --accent:#37e07b;
+      --bg:#0a0f14;
+      --bg2:#0f1820;
+      --ink:#e8f6ff;
+      --muted:#8aa4b6;
+      --accent:#6ee7ff;
+      --accent2:#9bffb1;
+      --danger:#ff7a7a;
+      --card:#0f1b24;
+      --line:#1b2a36;
+      --pixel: "ui-monospace", "SFMono-Regular", Menlo, Consolas, monospace;
     }
-    body{ margin:0; background:var(--bg); color:var(--txt); font-family:system-ui,Segoe UI,Roboto,Arial;}
-    header{ position:sticky; top:0; z-index:10; background:#0d121a; border-bottom:1px solid #1e2a3d; padding:10px 12px; display:flex; align-items:center; gap:10px;}
-    button{ background:var(--panel); color:var(--txt); border:1px solid #24324a; padding:7px 10px; border-radius:10px; cursor:pointer; }
-    button:hover{ border-color:#3b4f72;}
-    #wrap{ display:grid; grid-template-columns:300px 1fr; gap:12px; padding:12px; }
-    #left{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:10px; height:calc(100vh - 86px); overflow:auto;}
-    #game{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:10px; display:flex; flex-direction:column; gap:8px;}
-    canvas{
-      width:100%; height:520px; background:#020408; border-radius:12px; border:1px solid var(--line);
-      image-rendering:pixelated;
+    *{box-sizing:border-box}
+    body{
+      margin:0; background: radial-gradient(1200px 800px at 50% -20%, #142231 0%, var(--bg) 65%);
+      color:var(--ink); font-family: var(--pixel);
+      display:grid; place-items:center; min-height:100vh;
     }
-    .frogRow{ display:flex; align-items:center; gap:8px; padding:6px; border-radius:10px; background:var(--panel2); border:1px solid var(--line); margin-bottom:6px; cursor:pointer;}
-    .frogRow:hover{ border-color:#3b4f72;}
-    .frogRow img{ width:44px; height:44px; image-rendering:pixelated; border-radius:8px; background:#000;}
-    .pill{ font-size:12px; padding:2px 6px; border:1px solid #2b3b55; border-radius:999px; color:var(--muted); }
-    .row{ display:flex; align-items:center; justify-content:space-between; gap:8px;}
-    .small{ font-size:12px; color:var(--muted);}
+    .wrap{width:min(980px, 100vw); padding:16px;}
+    .topbar{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:10px 12px; background:linear-gradient(180deg, #0f1b24, #0b141b);
+      border:1px solid var(--line); border-radius:14px; box-shadow:0 8px 30px rgba(0,0,0,.35);
+      margin-bottom:12px;
+    }
+    .title{
+      display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:1px;
+      text-transform:uppercase; font-size:14px;
+    }
+    .dot{width:10px;height:10px;border-radius:3px;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+    .stats{display:flex; gap:14px; font-size:12px; color:var(--muted)}
+    .stats b{color:var(--ink)}
+    .btns{display:flex; gap:8px; align-items:center;}
+    button{
+      background:#0d1922; color:var(--ink); border:1px solid var(--line);
+      padding:8px 10px; border-radius:10px; font-family:var(--pixel); font-size:12px;
+      cursor:pointer; transition:.12s transform ease, .12s border-color ease, .12s background ease;
+      user-select:none;
+    }
+    button:hover{transform:translateY(-1px); border-color:#274053; background:#0f1f2a}
+    button:active{transform:translateY(1px)}
+    .canvas-wrap{
+      position:relative; background:linear-gradient(180deg, var(--bg2), var(--bg));
+      border:1px solid var(--line); border-radius:16px; overflow:hidden;
+      box-shadow:0 12px 40px rgba(0,0,0,.45);
+      touch-action:manipulation;
+    }
+    canvas{display:block; width:100%; height:auto;}
+    .overlay{
+      position:absolute; inset:0; display:none; place-items:center; background:rgba(3,6,9,.72);
+      backdrop-filter: blur(2px);
+    }
+    .overlay.show{display:grid;}
+    .panel{
+      background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 18px;
+      width:min(420px, 92%); text-align:center; box-shadow:0 10px 30px rgba(0,0,0,.5);
+    }
+    .panel h1{margin:0 0 8px; font-size:18px; letter-spacing:1px; text-transform:uppercase;}
+    .panel p{margin:6px 0; color:var(--muted); font-size:12px; line-height:1.45}
+    .panel .big{font-size:28px; color:var(--accent2); margin:8px 0 2px; font-weight:900;}
+    .kbd{
+      display:inline-flex; gap:6px; align-items:center; padding:2px 6px; border-radius:6px;
+      border:1px solid var(--line); background:#0c151d; color:var(--ink); font-size:11px;
+    }
+    .footer-tip{margin-top:10px; font-size:11px; color:var(--muted)}
+    .badge{
+      position:absolute; top:10px; left:10px; font-size:11px; padding:4px 6px;
+      background:#0b151d; border:1px solid var(--line); border-radius:8px; color:var(--muted);
+    }
   </style>
-
-  <script>window.FF_PAGE="runner";</script>
-
-  <!-- Same load order as main index -->
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-  <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
-  <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
-  <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
-  <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
-  <script src="https://freshfrogs.github.io/assets/site.js"></script>
 </head>
 <body>
-
-<header>
-  <button id="connectBtn">Connect Wallet</button>
-  <div id="addr" class="pill">not connected</div>
-  <div class="pill">FreshFrog Runner</div>
-</header>
-
-<div id="wrap">
-  <aside id="left">
-    <div class="row">
-      <h3 style="margin:0;">Choose a Frog</h3>
-      <button id="mockBtn">Mock Frogs</button>
-    </div>
-    <div class="small">Your selected Frog becomes the runner.</div>
-    <div id="frogList" style="margin-top:8px;"></div>
-  </aside>
-
-  <main id="game">
-    <div class="row">
-      <div>
-        <div class="small">Selected Frog</div>
-        <div id="selectedName" style="font-weight:800;">none</div>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title"><span class="dot"></span> Frog Stack</div>
+      <div class="stats">
+        Score: <b id="score">0</b>
+        Best: <b id="best">0</b>
+        Height: <b id="height">0</b>
+        Drops: <b id="drops">0</b>
       </div>
-      <div class="row">
-        <div class="pill">Score: <span id="scoreTxt">0</span></div>
-        <div class="pill">Best: <span id="bestTxt">0</span></div>
-        <button id="startBtn" disabled>Start</button>
-        <button id="resetBtn">Reset</button>
+      <div class="btns">
+        <button id="muteBtn">Sound: ON</button>
+        <button id="restartBtn">Restart</button>
       </div>
     </div>
 
-    <canvas id="c" width="1000" height="520"></canvas>
-    <div id="log" class="small"></div>
-  </main>
-</div>
+    <div class="canvas-wrap">
+      <div class="badge">tap / click / space to drop</div>
+      <canvas id="game" width="720" height="960"></canvas>
+
+      <div class="overlay" id="overlay">
+        <div class="panel">
+          <h1 id="overlayTitle">Frog Stack</h1>
+          <div class="big" id="overlayScore">0</div>
+          <p id="overlayText">Stack frogs as high as possible. Perfect drops give bonus points.</p>
+          <p>
+            Controls:
+            <span class="kbd">Click / Tap</span>
+            <span class="kbd">Space</span>
+            <span class="kbd">↓</span>
+          </p>
+          <div style="margin-top:10px">
+            <button id="playBtn">Play</button>
+          </div>
+          <div class="footer-tip">Pro tip: line up the center for a “perfect” landing.</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <script>
-/* ===============================
-   Normalize + Fetch (fixed)
-   =============================== */
+(() => {
+  // ---------------------------
+  // Config (tweak as you want)
+  // ---------------------------
+  const USE_NFT_IMAGES = true;   // set false for pure pixel squares
+  const NFT_BASE = "https://freshfrogs.github.io/frog/"; // {id}.png
+  const NFT_MIN_ID = 1;
+  const NFT_MAX_ID = 4040;
 
-function normalizeFrog(raw){
-  const parse = (typeof window.parseTokenId === "function")
-    ? window.parseTokenId
-    : (v)=> {
-        if (v == null) return null;
-        if (typeof v === "string" && v.startsWith("0x")) return parseInt(v,16);
-        const n = Number(v);
-        return Number.isFinite(n) ? n : null;
-      };
+  const CANVAS_W = 720;
+  const CANVAS_H = 960;
+  const FLOOR_Y = CANVAS_H - 70;
 
-  const tokenId =
-    parse(raw?.tokenId) ??
-    parse(raw?.id?.tokenId) ??
-    parse(raw?.token_id) ??
-    parse(raw?.nft?.identifier);
+  const GRAVITY = 0.6;
+  const DROP_SPEED_CAP = 18;
+  const SWAY_SPEED_START = 2.2;
+  const SWAY_SPEED_RAMP = 0.015;
 
-  if (tokenId == null) return null;
+  const BASE_SIZE = 110;
+  const SIZE_JITTER = 8;
 
-  const metadata = raw.rawMetadata || raw.metadata || raw.tokenMetadata || raw;
-  const traits = metadata?.attributes || metadata?.traits || [];
+  const PERFECT_TOL = 6; // px center alignment for perfect drop
+  const PERFECT_BONUS = 10;
 
-  return {
-    tokenId,
-    name: metadata?.name || raw.name || `Frog #${tokenId}`,
-    image: `https://freshfrogs.github.io/frog/${tokenId}.png`,
-    rarityTier: (window.getRarityTier && window.getRarityRank)
-      ? (getRarityTier(getRarityRank(tokenId))?.label || "Common")
-      : "Common",
-    traits
+  const FALL_TILT_TOL = 0.62; // how far center can hang over before topples (ratio of width)
+
+  // ---------------------------
+  // DOM
+  // ---------------------------
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+
+  const scoreEl = document.getElementById("score");
+  const bestEl = document.getElementById("best");
+  const heightEl = document.getElementById("height");
+  const dropsEl = document.getElementById("drops");
+
+  const overlay = document.getElementById("overlay");
+  const overlayTitle = document.getElementById("overlayTitle");
+  const overlayScore = document.getElementById("overlayScore");
+  const overlayText = document.getElementById("overlayText");
+  const playBtn = document.getElementById("playBtn");
+  const restartBtn = document.getElementById("restartBtn");
+  const muteBtn = document.getElementById("muteBtn");
+
+  // ---------------------------
+  // Tiny sound (optional)
+  // ---------------------------
+  let muted = false;
+  const beep = (freq=440, dur=0.05, type="square", gain=0.06) => {
+    if (muted) return;
+    try {
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ac.createOscillator();
+      const g = ac.createGain();
+      osc.type = type; osc.frequency.value = freq;
+      g.gain.value = gain;
+      osc.connect(g); g.connect(ac.destination);
+      osc.start();
+      osc.stop(ac.currentTime + dur);
+      osc.onended = () => ac.close();
+    } catch (e) {}
   };
-}
 
-async function fetchPlayableFrogs(address){
-  const [ownedNfts, stakedIds, morphedMetas] = await Promise.all([
-    window.ffFetchOwnedFrogs(address),                         // :contentReference[oaicite:4]{index=4}
-    window.ffFetchStakedTokenIds(address).catch(()=>[]),       // :contentReference[oaicite:5]{index=5}
-    window.ffFetchMorphedFrogs(address).catch(()=>[])          // :contentReference[oaicite:6]{index=6}
-  ]);
+  // ---------------------------
+  // State
+  // ---------------------------
+  let stack = [];
+  let active = null;
+  let swayDir = 1;
+  let swaySpeed = SWAY_SPEED_START;
+  let cameraY = 0;
+  let running = false;
+  let dropping = false;
 
-  // If any owned lack usable metadata, follow your site pattern and fetch it
-  const owned = [];
-  for (const nft of ownedNfts){
-    const f = normalizeFrog(nft);
-    if (!f) continue;
-    if (!f.traits?.length && typeof window.fetchFrogMetadata === "function") {
-      const meta = await window.fetchFrogMetadata(f.tokenId);  // :contentReference[oaicite:7]{index=7}
-      f.traits = meta?.attributes || meta?.traits || [];
-      f.name = meta?.name || f.name;
-    }
-    owned.push(f);
-  }
+  let score = 0;
+  let drops = 0;
+  let best = +localStorage.getItem("frogstack_best") || 0;
 
-  const staked = stakedIds.map(id => normalizeFrog({ tokenId:id })).filter(Boolean);
-  const morphed = (morphedMetas||[]).map((meta,i)=>({
-    tokenId: 900000+i,
-    name: meta?.name || "Morphed Frog",
-    image: meta?.image || meta?.image_url || "https://freshfrogs.github.io/assets/blackWhite.png",
-    rarityTier: "Morphed",
-    traits: meta?.attributes || meta?.traits || []
-  }));
+  bestEl.textContent = best;
 
-  const all=[...owned,...staked,...morphed];
-  const seen=new Set();
-  return all.filter(f=>!seen.has(f.tokenId) && seen.add(f.tokenId));
-}
-
-/* ===============================
-   Runner Game (visual pass)
-   =============================== */
-
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
-
-const ui = {
-  connectBtn: document.getElementById("connectBtn"),
-  addr: document.getElementById("addr"),
-  frogList: document.getElementById("frogList"),
-  selectedName: document.getElementById("selectedName"),
-  startBtn: document.getElementById("startBtn"),
-  resetBtn: document.getElementById("resetBtn"),
-  mockBtn: document.getElementById("mockBtn"),
-  scoreTxt: document.getElementById("scoreTxt"),
-  bestTxt: document.getElementById("bestTxt"),
-  log: document.getElementById("log"),
-};
-
-let address=null, frogs=[], selected=null;
-
-let running=false, score=0;
-let best=+localStorage.getItem("ff_runner_best")||0;
-ui.bestTxt.textContent=best;
-
-const groundY=420;
-let speed=230, gravity=1850, jumpVel=660, magnet=0;
-
-let player=null, obstacles=[], coins=[];
-let lastT=performance.now(), spawnTimer=0, coinTimer=0, bgScroll=0;
-
-function log(msg){ ui.log.textContent=msg; }
-
-function applyTraitBonuses(frog){
-  const tvals=(frog.traits||[]).map(t=>String(t.value||t.trait_value||"").toLowerCase());
-  speed=230; jumpVel=660; magnet=0;
-
-  if(tvals.some(v=>v.includes("ninja")||v.includes("cyber"))) speed*=1.10;
-  if(tvals.some(v=>v.includes("crown")||v.includes("wizard"))) magnet=110;
-  if(tvals.some(v=>v.includes("armor")||v.includes("zombie"))) jumpVel*=1.07;
-
-  const tier=String(frog.rarityTier||"common").toLowerCase();
-  if(tier.includes("rare")) speed*=1.05;
-  if(tier.includes("epic")) speed*=1.10;
-  if(tier.includes("legendary")) speed*=1.18;
-}
-
-function resetRun(){
-  running=false; score=0; obstacles=[]; coins=[]; player=null;
-  ui.scoreTxt.textContent=0; log("Reset.");
-}
-
-function startRun(){
-  if(!selected) return;
-  applyTraitBonuses(selected);
-
-  player={
-    x:170, y:groundY, vy:0, w:70, h:70,
-    img:(()=>{const im=new Image(); im.src=selected.image; return im;})()
+  // image cache
+  const imgCache = new Map();
+  const loadFrogImage = (id) => {
+    if (!USE_NFT_IMAGES) return null;
+    if (imgCache.has(id)) return imgCache.get(id);
+    const img = new Image();
+    img.src = `${NFT_BASE}${id}.png`;
+    imgCache.set(id, img);
+    return img;
   };
-  obstacles=[]; coins=[]; score=0; spawnTimer=0; coinTimer=0; bgScroll=0;
-  running=true; log("GO! Space / tap to jump.");
-}
 
-function spawnObstacle(){
-  const type=Math.random();
-  const h = type<0.5 ? 42 : 60;
-  const w = type<0.5 ? 34 : 50;
-  obstacles.push({
-    x: canvas.width+30,
-    y: groundY-h+8,
-    w, h,
-    spike: type>=0.5
-  });
-}
+  // ---------------------------
+  // Helpers
+  // ---------------------------
+  const rand = (a,b)=>Math.random()*(b-a)+a;
+  const randi = (a,b)=>Math.floor(rand(a,b+1));
 
-function spawnCoin(){
-  coins.push({
-    x: canvas.width+30,
-    y: 230 + Math.random()*150,
-    r: 10
-  });
-}
+  const resetGame = () => {
+    stack = [];
+    active = null;
+    swayDir = 1;
+    swaySpeed = SWAY_SPEED_START;
+    cameraY = 0;
+    score = 0;
+    drops = 0;
+    running = true;
+    dropping = false;
 
-function jump(){
-  if(!running||!player) return;
-  if(player.y>=groundY-1) player.vy=-jumpVel;
-}
+    // base frog platform
+    const baseSize = BASE_SIZE + 30;
+    const base = makeFrog(
+      CANVAS_W/2 - baseSize/2,
+      FLOOR_Y - baseSize,
+      baseSize,
+      0,
+      true
+    );
+    stack.push(base);
 
-function update(dt){
-  if(!running||!player) return;
+    spawnActive();
+    syncUI();
+  };
 
-  bgScroll += speed*dt*0.5;
+  const makeFrog = (x, y, size, vy=0, isBase=false) => {
+    const id = randi(NFT_MIN_ID, NFT_MAX_ID);
+    return {
+      x, y, size, vy,
+      id,
+      img: loadFrogImage(id),
+      isBase,
+      landed: isBase,
+      wobble: 0,
+      tilt: 0,
+    };
+  };
 
-  player.vy += gravity*dt;
-  player.y  += player.vy*dt;
-  if(player.y>groundY){ player.y=groundY; player.vy=0; }
+  const topFrog = () => stack[stack.length-1];
 
-  spawnTimer+=dt; coinTimer+=dt;
-  if(spawnTimer>1.1+Math.random()*0.8){ spawnTimer=0; spawnObstacle(); }
-  if(coinTimer>0.65+Math.random()*0.6){ coinTimer=0; spawnCoin(); }
+  const spawnActive = () => {
+    const size = BASE_SIZE + rand(-SIZE_JITTER, SIZE_JITTER);
+    active = makeFrog(
+      CANVAS_W/2 - size/2,
+      topFrog().y - 180,
+      size,
+      0,
+      false
+    );
+    swayDir = Math.random() < 0.5 ? -1 : 1;
+  };
 
-  for(const o of obstacles) o.x -= speed*dt;
-  obstacles=obstacles.filter(o=>o.x+o.w>0);
+  const dropActive = () => {
+    if (!running || dropping) return;
+    dropping = true;
+    active.vy = 2.5;
+    beep(520, 0.04);
+  };
 
-  for(const c of coins){
-    c.x -= speed*dt;
-    if(magnet>0){
-      const dx=(player.x+player.w/2)-c.x;
-      const dy=(player.y-player.h/2)-c.y;
-      const d=Math.hypot(dx,dy);
-      if(d<magnet){
-        c.x += dx/d*260*dt;
-        c.y += dy/d*260*dt;
-      }
+  const intersectsX = (a, b) => {
+    const ax1 = a.x, ax2 = a.x + a.size;
+    const bx1 = b.x, bx2 = b.x + b.size;
+    return Math.min(ax2, bx2) - Math.max(ax1, bx1);
+  };
+
+  const centerX = (f) => f.x + f.size/2;
+
+  const landActiveOn = (under) => {
+    active.y = under.y - active.size;
+    active.vy = 0;
+    active.landed = true;
+    dropping = false;
+
+    const dx = centerX(active) - centerX(under);
+    const overlap = intersectsX(active, under);
+
+    // scoring
+    let add = Math.max(1, Math.floor(overlap / 8));
+    if (Math.abs(dx) <= PERFECT_TOL) {
+      add += PERFECT_BONUS;
+      active.wobble = 1.0;
+      beep(880, 0.06, "square", 0.08);
+    } else {
+      beep(660, 0.04);
     }
-  }
+    score += add;
+    drops++;
 
-  const px=player.x, py=player.y-player.h, pw=player.w, ph=player.h;
-
-  for(const o of obstacles){
-    if(px<o.x+o.w && px+pw>o.x && py<o.y+o.h && py+ph>o.y){
-      running=false;
-      best=Math.max(best, score|0);
-      localStorage.setItem("ff_runner_best", best);
-      ui.bestTxt.textContent=best;
-      log("RIP. Hit an obstacle.");
+    // check tilt/fall condition
+    const maxHang = under.size * FALL_TILT_TOL;
+    if (Math.abs(dx) > maxHang || overlap <= 6) {
+      // topples
+      active.tilt = dx > 0 ? 1 : -1;
+      running = false;
+      setTimeout(()=>gameOver(), 380);
       return;
     }
-  }
 
-  coins=coins.filter(c=>{
-    if(c.x>px && c.x<px+pw && c.y>py && c.y<py+ph){
-      score+=8; return false;
+    // slight settle and store
+    stack.push(active);
+
+    // ramp difficulty
+    swaySpeed += SWAY_SPEED_RAMP;
+
+    spawnActive();
+    syncUI();
+  };
+
+  const gameOver = () => {
+    running = false;
+    dropping = false;
+    if (score > best) {
+      best = score;
+      localStorage.setItem("frogstack_best", best);
     }
-    return c.x+c.r>0;
+    bestEl.textContent = best;
+
+    overlayTitle.textContent = "Game Over";
+    overlayScore.textContent = score;
+    overlayText.textContent = `You stacked ${stack.length-1} frogs.`;
+    overlay.classList.add("show");
+    beep(180, 0.2, "square", 0.1);
+  };
+
+  const syncUI = () => {
+    scoreEl.textContent = score;
+    dropsEl.textContent = drops;
+    heightEl.textContent = Math.max(0, stack.length-1);
+  };
+
+  // ---------------------------
+  // Input
+  // ---------------------------
+  const onAction = (e) => {
+    e.preventDefault();
+    if (!overlay.classList.contains("show")) dropActive();
+  };
+
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space" || e.code === "ArrowDown") {
+      e.preventDefault();
+      if (overlay.classList.contains("show")) return;
+      dropActive();
+    }
   });
 
-  score += dt*5;
-  ui.scoreTxt.textContent = score|0;
-}
+  canvas.addEventListener("pointerdown", onAction, {passive:false});
 
-function render(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  playBtn.onclick = () => {
+    overlay.classList.remove("show");
+    resetGame();
+  };
+  restartBtn.onclick = () => {
+    overlay.classList.remove("show");
+    resetGame();
+  };
+  muteBtn.onclick = () => {
+    muted = !muted;
+    muteBtn.textContent = `Sound: ${muted ? "OFF" : "ON"}`;
+  };
 
-  // sky
-  ctx.fillStyle="#050a12";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+  // ---------------------------
+  // Camera + Drawing
+  // ---------------------------
+  const updateCamera = () => {
+    const top = topFrog();
+    const target = Math.min(0, CANVAS_H*0.4 - (top.y - cameraY));
+    cameraY += (target - cameraY) * 0.08;
+  };
 
-  // parallax swamp bands
-  for(let layer=0; layer<3; layer++){
-    const y=80+layer*70;
-    const bandH=60;
-    const par=(layer+1)*0.35;
-    const off=-(bgScroll*par)%120;
-    ctx.fillStyle= layer===0 ? "#0a1522" : layer===1 ? "#07101a" : "#050b12";
-    for(let x=off; x<canvas.width; x+=120){
-      ctx.fillRect(x, y, 80, bandH);
+  const drawBackground = () => {
+    // subtle pixel grid
+    ctx.fillStyle = "#05080b";
+    ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
+
+    // stars / bubbles
+    for (let i=0;i<40;i++){
+      const x = (i*97)%CANVAS_W;
+      const y = (i*151)%CANVAS_H;
+      ctx.fillStyle = i%3===0 ? "#0e2430" : "#0a1820";
+      ctx.fillRect(x, y, 2,2);
     }
-  }
 
-  // lane lines
-  ctx.strokeStyle="#0f1b2a";
-  for(let i=0;i<canvas.width;i+=60){
-    ctx.beginPath();
-    ctx.moveTo(i, groundY+6);
-    ctx.lineTo(i+30, groundY+6);
-    ctx.stroke();
-  }
+    // floor
+    ctx.fillStyle = "#071018";
+    ctx.fillRect(0, FLOOR_Y, CANVAS_W, CANVAS_H - FLOOR_Y);
 
-  // ground
-  ctx.fillStyle="#07131e";
-  ctx.fillRect(0, groundY+6, canvas.width, canvas.height-groundY);
+    // floor line
+    ctx.fillStyle = "#122635";
+    ctx.fillRect(0, FLOOR_Y-2, CANVAS_W, 2);
+  };
 
-  // obstacles
-  for(const o of obstacles){
-    ctx.fillStyle = o.spike ? "#ff7a7a" : "#c9a66b";
-    ctx.fillRect(o.x, o.y, o.w, o.h);
-    if(o.spike){
-      ctx.fillStyle="#2b0d0d";
-      ctx.fillRect(o.x+6, o.y+8, o.w-12, 8);
+  const drawFrog = (f) => {
+    const x = f.x;
+    const y = f.y - cameraY;
+    const s = f.size;
+
+    // shadow / base
+    ctx.fillStyle = "rgba(0,0,0,0.35)";
+    ctx.fillRect(x+6, y+s-6, s-12, 8);
+
+    if (USE_NFT_IMAGES && f.img && f.img.complete) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(f.img, x, y, s, s);
+    } else {
+      // fallback pixel block
+      ctx.fillStyle = f.isBase ? "#214a3b" : "#2b845a";
+      ctx.fillRect(x, y, s, s);
+      ctx.fillStyle = "#0b1c14";
+      ctx.fillRect(x+6, y+6, s-12, s-12);
+      ctx.fillStyle = "#9bffb1";
+      ctx.fillRect(x+14, y+14, 8,8);
+      ctx.fillRect(x+s-22, y+14, 8,8);
     }
-  }
 
-  // coins (flies)
-  for(const c of coins){
-    ctx.fillStyle="#ffd36a";
-    ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="#000";
-    ctx.fillRect(c.x-2,c.y-2,4,4);
-  }
-
-  // player sprite
-  if(player){
-    const drawY=player.y-player.h;
-    try{ ctx.drawImage(player.img, player.x, drawY, player.w, player.h); }
-    catch{
-      ctx.fillStyle= "#37e07b";
-      ctx.fillRect(player.x, drawY, player.w, player.h);
+    // wobble ring for perfect
+    if (f.wobble > 0.01) {
+      ctx.strokeStyle = "rgba(155,255,177,0.7)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x-2, y-2, s+4, s+4);
     }
-  }
+  };
 
-  // text
-  ctx.fillStyle="#8aa0c2";
-  ctx.fillText("SPACE / TAP to jump", 12, 18);
-}
+  const drawActiveGuide = () => {
+    if (!active) return;
+    const under = topFrog();
+    const y = under.y - active.size - cameraY;
+    ctx.fillStyle = "rgba(110,231,255,0.08)";
+    ctx.fillRect(under.x, y, under.size, active.size);
+  };
 
-function loop(t){
-  const dt=(t-lastT)/1000; lastT=t;
-  update(dt); render();
-  requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
+  // ---------------------------
+  // Update Loop
+  // ---------------------------
+  const step = () => {
+    requestAnimationFrame(step);
 
-/* ===============================
-   UI
-   =============================== */
+    drawBackground();
+    updateCamera();
 
-ui.connectBtn.onclick = async ()=>{
-  try{
-    if(!window.ethereum?.request) throw new Error("No wallet provider.");
+    // update active frog
+    if (active) {
+      if (!dropping) {
+        // sway left/right above stack
+        active.x += swayDir * swaySpeed;
+        if (active.x < 10 || active.x + active.size > CANVAS_W-10) swayDir *= -1;
+        active.y = topFrog().y - 180;
+      } else {
+        active.vy = Math.min(DROP_SPEED_CAP, active.vy + GRAVITY);
+        active.y += active.vy;
 
-    if(typeof window.connectWallet==="function"){
-      await window.connectWallet();
-      address=(window.FF_CONNECTED_ADDRESS||window.user_address||"").toLowerCase();
-    }else{
-      const [a]=await ethereum.request({method:"eth_requestAccounts"});
-      address=(a||"").toLowerCase();
+        const under = topFrog();
+        if (active.y + active.size >= under.y) {
+          landActiveOn(under);
+        }
+
+        if (active.y - cameraY > CANVAS_H + 120) {
+          running = false;
+          gameOver();
+        }
+      }
     }
-    if(!address) throw new Error("No address returned.");
 
-    ui.addr.textContent=address.slice(0,6)+"..."+address.slice(-4);
+    // wobble decay
+    for (const f of stack) {
+      if (f.wobble > 0) f.wobble *= 0.92;
+    }
 
-    frogs = await fetchPlayableFrogs(address);
-    renderFrogList();
-    log("Wallet connected.");
-  }catch(e){
-    console.error(e);
-    log(e.message||String(e));
-  }
-};
+    drawActiveGuide();
+    for (const f of stack) drawFrog(f);
+    if (active) drawFrog(active);
+  };
 
-ui.startBtn.onclick=startRun;
-ui.resetBtn.onclick=resetRun;
+  // ---------------------------
+  // Start screen
+  // ---------------------------
+  overlay.classList.add("show");
+  overlayTitle.textContent = "Frog Stack";
+  overlayScore.textContent = "";
+  overlayText.textContent = "Drop frogs and stack them as high as possible.";
+  requestAnimationFrame(step);
 
-ui.mockBtn.onclick=()=>{
-  frogs=[
-    {tokenId:12,name:"Frog #12",image:"https://freshfrogs.github.io/frog/12.png",rarityTier:"Rare",traits:[{value:"Cyber Eyes"}]},
-    {tokenId:666,name:"Frog #666",image:"https://freshfrogs.github.io/frog/666.png",rarityTier:"Epic",traits:[{value:"Ninja Mask"}]},
-  ];
-  renderFrogList();
-};
-
-function renderFrogList(){
-  ui.frogList.innerHTML="";
-  if(!frogs.length){
-    ui.frogList.innerHTML=`<div class="small">No frogs found.</div>`;
-    return;
-  }
-  for(const f of frogs){
-    const row=document.createElement("div");
-    row.className="frogRow";
-    row.innerHTML=`
-      <img src="${f.image}"/>
-      <div style="flex:1;">
-        <div style="font-weight:700;">${f.name}</div>
-        <div class="small">${f.rarityTier||"Common"}</div>
-      </div>
-      <div class="pill">#${f.tokenId}</div>
-    `;
-    row.onclick=()=>{
-      selected=f;
-      ui.selectedName.textContent=f.name;
-      ui.startBtn.disabled=false;
-      resetRun();
-      log("Selected frog. Hit Start.");
-    };
-    ui.frogList.appendChild(row);
-  }
-}
-
-window.addEventListener("keydown", e=>{
-  if(e.code==="Space"||e.code==="ArrowUp"){ e.preventDefault(); jump(); }
-});
-canvas.addEventListener("pointerdown", jump);
+})();
 </script>
 </body>
 </html>
