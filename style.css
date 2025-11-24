@@ -560,8 +560,8 @@ padding: 0.55rem 1.2rem;
 .recent_sale_links {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin: 8px;
+  gap: 0px;
+  margin: 0px;
   margin-top: 10px;
 }
 
