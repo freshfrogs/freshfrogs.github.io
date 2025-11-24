@@ -1843,11 +1843,6 @@ async function connectWallet() {
     ]);
 
     ffApplyDashboardUpdates(address, ownedCount, stakingStats, profile);
-
-    // ✅ force wallet re-render so actions show immediately
-    FF_LAST_WALLET_RENDERED_FOR = null;
-    FF_WALLET_RENDER_INFLIGHT = false;
-
     ffInitReadContractsOnLoad();
 
     // ✅ update nav visibility (morph hidden until connected, connect btn hidden after)
