@@ -34,6 +34,7 @@ let FF_RECENT_LIMIT  = 24;
 const FF_SHOW_STAKING_STATS_ON_CARDS = true;
 const FF_MORPH_ADMIN_KEY = "ff_admin_9f3k2j";
 
+let FF_WALLET_RENDER_TOKEN = 0;
 
 // Rarity paging
 let FF_RARITY_INDEX = 0;
@@ -1472,18 +1473,13 @@ async function ffFetchStakedTokenIds(address) {
 }
 
 async function renderOwnedAndStakedFrogs(address) {
-  if (FF_WALLET_RENDER_INFLIGHT) return;
+  const myToken = ++FF_WALLET_RENDER_TOKEN;   // newest render wins
   FF_WALLET_RENDER_INFLIGHT = true;
   FF_LAST_WALLET_RENDERED_FOR = address;
 
-  if (window.FF_PUBLIC_WALLET_VIEW && ffIsViewingOwnWallet(address)) {
-    window.FF_PUBLIC_WALLET_VIEW = false;
-    window.FF_PUBLIC_WALLET_ADDRESS = null;
-  }
-
   const ownedGrid   = document.getElementById('owned-frogs-grid');
-  const ownedStatus = document.getElementById('owned-frogs-status');
   const stakedGrid  = document.getElementById('staked-frogs-grid');
+  const ownedStatus = document.getElementById('owned-frogs-status');
   const stakedStatus= document.getElementById('staked-frogs-status');
 
   const viewingOwnWallet = ffIsViewingOwnWallet(address);
@@ -1496,6 +1492,8 @@ async function renderOwnedAndStakedFrogs(address) {
       ffFetchMorphedFrogs(address)
     ]);
 
+    // If a newer render started, bail out
+    if (myToken !== FF_WALLET_RENDER_TOKEN) return;
 
     if (ownedGrid) ownedGrid.innerHTML = '';
     if (stakedGrid) stakedGrid.innerHTML = '';
@@ -1504,6 +1502,8 @@ async function renderOwnedAndStakedFrogs(address) {
     if (stakedStatus) stakedStatus.textContent = stakedIds.length ? '' : 'No staked frogs found for this wallet.';
 
     for (const nft of ownedNfts) {
+      if (myToken !== FF_WALLET_RENDER_TOKEN) return;
+
       const tokenId = parseTokenId(nft.tokenId || nft.id?.tokenId);
       if (tokenId == null) continue;
 
@@ -1512,7 +1512,6 @@ async function renderOwnedAndStakedFrogs(address) {
 
       const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '';
 
-      // ✅ Keep only wallet actions (no OS/ES)
       const actionHtml = isPublic ? '' : `
         <div class="frog-actions">
           <button class="sale_link_btn" onclick="ffStakeFrog(${tokenId})">Stake</button>
@@ -1530,54 +1529,14 @@ async function renderOwnedAndStakedFrogs(address) {
 
       ownedGrid?.appendChild(card);
       ffSetOwnerLabel(card, address);
-
-      if (card.dataset.imgContainerId) {
-        ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
-      }
       ffAttachStakeMetaIfStaked(card, tokenId);
     }
 
-    // ---- Render morphed frogs as owned frogs (no staking / no sale price) ----
-    if (Array.isArray(morphedMetas) && morphedMetas.length) {
-      for (const meta of morphedMetas) {
-        // normalize attributes field if your morph builder uses a different key
-        if (!meta.attributes && Array.isArray(meta.traits)) {
-          meta.attributes = meta.traits;
-        }
-
-        const morphCard = createMorphedFrogCard({
-          metadata: meta,
-          ownerAddress: address
-        });
-
-        ownedGrid?.appendChild(morphCard);
-
-        // NOW the container exists in DOM, so layering works
-        const contId = morphCard.dataset.imgContainerId;
-        const baseId = parseTokenId(meta?.frogA ?? meta?.tokenA ?? null);
-        ffBuildLayeredMorphedImage(meta, contId, baseId);
-
-      }
-    }
-
     for (const tokenId of stakedIds) {
+      if (myToken !== FF_WALLET_RENDER_TOKEN) return;
+
       const metadata = await fetchFrogMetadata(tokenId);
       const salePrice = FF_SALE_PRICE_CACHE.get(tokenId) || '';
-
-      const footerHtml = `
-        <div class="stake-meta">
-          <div class="stake-meta-row">
-            <span id="stake-level-${tokenId}" class="stake-level-label">Staked Lvl. —</span>
-          </div>
-          <div class="stake-meta-row stake-meta-subrow">
-            <span id="stake-date-${tokenId}">Staked: —</span>
-            <span id="stake-next-${tokenId}"></span>
-          </div>
-          <div class="stake-progress">
-            <div id="stake-progress-bar-${tokenId}" class="stake-progress-bar"></div>
-          </div>
-        </div>
-      `;
 
       const actionHtml = isPublic ? '' : `
         <div class="recent_sale_links">
@@ -1589,24 +1548,23 @@ async function renderOwnedAndStakedFrogs(address) {
         tokenId, metadata,
         headerLeft: '',
         headerRight: salePrice,
-        footerHtml,
+        footerHtml: '',
         actionHtml
       });
 
       stakedGrid?.appendChild(card);
       ffSetOwnerLabel(card, address);
-
-      if (card.dataset.imgContainerId) {
-        ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
-      }
       ffDecorateStakedFrogCard(tokenId);
     }
+
   } catch (err) {
     console.error('renderOwnedAndStakedFrogs failed:', err);
     if (ownedStatus)  ownedStatus.textContent  = 'Unable to load owned frogs.';
     if (stakedStatus) stakedStatus.textContent = 'Unable to load staked frogs.';
   } finally {
-    FF_WALLET_RENDER_INFLIGHT = false;
+    if (myToken === FF_WALLET_RENDER_TOKEN) {
+      FF_WALLET_RENDER_INFLIGHT = false;
+    }
   }
 }
 
