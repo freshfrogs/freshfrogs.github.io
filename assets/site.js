@@ -42,6 +42,7 @@ const FF_RARITY_BATCH = 24;
 
 // Pond paging
 let FF_POND_PAGE_KEY = null;
+let FF_RARITY_LOADING = false;
 
 // ------------------------
 // Global wallet state
@@ -1101,23 +1102,26 @@ async function ffDecorateRarityOwner(card, tokenId) {
 }
 
 async function ffLoadMoreRarity() {
-  const grid   = document.getElementById('rarity-grid');
-  const status = document.getElementById('rarity-status');
-  if (!grid) return;
-
-  const rankings = window.freshfrogs_rarity_rankings;
-  if (!Array.isArray(rankings) || !rankings.length) {
-    if (status) status.textContent = 'Rarity rankings data not loaded.';
-    return;
-  }
-
-  const slice = rankings.slice(FF_RARITY_INDEX, FF_RARITY_INDEX + FF_RARITY_BATCH);
-  if (!slice.length) {
-    if (status) status.textContent = 'All frogs loaded.';
-    return;
-  }
+  if (FF_RARITY_LOADING) return;   // ✅ prevent duplicate batch appends
+  FF_RARITY_LOADING = true;
 
   try {
+    const grid   = document.getElementById('rarity-grid');
+    const status = document.getElementById('rarity-status');
+    if (!grid) return;
+
+    const rankings = window.freshfrogs_rarity_rankings;
+    if (!Array.isArray(rankings) || !rankings.length) {
+      if (status) status.textContent = 'Rarity rankings data not loaded.';
+      return;
+    }
+
+    const slice = rankings.slice(FF_RARITY_INDEX, FF_RARITY_INDEX + FF_RARITY_BATCH);
+    if (!slice.length) {
+      if (status) status.textContent = 'All frogs loaded.';
+      return;
+    }
+
     for (const entry of slice) {
       const tokenId = parseTokenId(entry.id ?? entry.tokenId ?? entry.frogId);
       if (tokenId == null) continue;
@@ -1131,14 +1135,10 @@ async function ffLoadMoreRarity() {
         headerLeft: '',
         headerRight: rank ? `Rank #${rank}` : '',
         footerHtml: '',
-        actionHtml: '' // removed
+        actionHtml: ''
       });
 
       grid.appendChild(card);
-
-      if (card.dataset.imgContainerId) {
-        ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
-      }
 
       ffAttachStakeMetaIfStaked(card, tokenId);
       ffDecorateRarityOwner(card, tokenId);
@@ -1153,7 +1153,10 @@ async function ffLoadMoreRarity() {
     }
   } catch (err) {
     console.error('ffLoadMoreRarity failed', err);
+    const status = document.getElementById('rarity-status');
     if (status) status.textContent = 'Unable to load rarity rankings.';
+  } finally {
+    FF_RARITY_LOADING = false;  // ✅ always release lock
   }
 }
 
