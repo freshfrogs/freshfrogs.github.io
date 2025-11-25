@@ -5,8 +5,20 @@
   <title>freshfrogs.github.io</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="/style.css" />
+  <style>
+    #frog-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: #bfe8ff; /* light blue */
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+  </style>
 </head>
 <body class="layout-4">
+  <!-- Random trait-built frogs background -->
+  <canvas id="frog-bg"></canvas>
   <div class="page">
     <!-- HEADER -->
     <header class="site-header">
