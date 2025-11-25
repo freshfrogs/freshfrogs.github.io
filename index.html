@@ -184,7 +184,7 @@
     let animId = null;
     let lastTime = 0;
 
-    // Mouse tracking (window-level so it works even with content on top)
+    // Mouse tracking
     const mouse = {
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
@@ -197,7 +197,7 @@
       mouse.active = true;
     });
 
-    // Click to trigger a hop on the nearest frog
+    // Click to trigger a hop on nearest frog
     window.addEventListener("click", (e) => {
       const clickX = e.clientX;
       const clickY = e.clientY;
@@ -217,9 +217,8 @@
         }
       }
 
-      const MAX_CLICK_RADIUS = 120; // only trigger if fairly close
+      const MAX_CLICK_RADIUS = 120;
       if (nearest && nearestDist2 <= MAX_CLICK_RADIUS * MAX_CLICK_RADIUS) {
-        // Force a special hop
         nearest.state = "hopping";
         nearest.hopTime = 0;
         nearest.hopDuration = randRange(nearest.hopDurMin * 0.6, nearest.hopDurMax * 0.9);
@@ -227,7 +226,7 @@
       }
     });
 
-    // ---- animated trait values ----
+    // ---- animated trait basenames (file names) ----
     const ANIMATED_VALUES = new Set([
       'witchStraw',
       'witchBrown',
@@ -270,6 +269,25 @@
       'treeFrog(4)'
     ]);
 
+    // Turn a metadata value like "Golden Dart Frog" into "goldenDartFrog"
+    function toAnimationKey(value) {
+      const s = String(value).trim();
+
+      // If it's already exactly one of the keys, just use it.
+      if (ANIMATED_VALUES.has(s)) return s;
+
+      // Basic camelCase-ish pass: split on non-alphanumeric, capitalize chunks
+      const parts = s.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+      if (!parts.length) return s;
+
+      const first = parts[0].toLowerCase();
+      const rest = parts
+        .slice(1)
+        .map(p => p.charAt(0).toUpperCase() + p.slice(1));
+
+      return [first, ...rest].join("");
+    }
+
     // ----------------- helpers -----------------
     function randInt(min, maxInclusive) {
       return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
@@ -290,7 +308,6 @@
     function loadImage(url) {
       return new Promise((resolve, reject) => {
         const img = new Image();
-        img.crossOrigin = "anonymous";
         img.decoding = "async";
         img.onload = () => resolve(img);
         img.onerror = () => reject(new Error("Failed to load " + url));
@@ -305,24 +322,27 @@
       return res.json();
     }
 
-    // Try GIF first only for values in ANIMATED_VALUES, then PNG
+    // Try GIF using the animation key, fall back to PNG using raw metadata value
     async function loadLayerImage(traitType, value) {
-      const v = String(value);
-      const pngUrl = `${BUILD_BASE}/${traitType}/${v}.png`;
+      const raw = String(value);              // exact metadata value (for PNG)
+      const key = toAnimationKey(raw);        // best guess for animated file
 
-      if (ANIMATED_VALUES.has(v)) {
-        const animUrl = `${BUILD_BASE}/${traitType}/animations/${v}_animation.gif`;
+      const pngUrl = `${BUILD_BASE}/${traitType}/${raw}.png`;
+
+      // Only try GIF if the derived key is in ANIMATED_VALUES
+      if (ANIMATED_VALUES.has(key)) {
+        const animUrl = `${BUILD_BASE}/${traitType}/animations/${key}_animation.gif`;
         try {
           return await loadImage(animUrl);
         } catch (e) {
-          // fall through to PNG if GIF missing
+          // fall through to PNG
         }
       }
 
       try {
         return await loadImage(pngUrl);
       } catch (e) {
-        return null; // non-visual or missing asset
+        return null; // non-visual trait or missing asset
       }
     }
 
@@ -410,7 +430,6 @@
           y: pos.y,
           baseY: pos.y,
           vx: randRange(-vxRange, vxRange),
-          // seek factors: how strongly this frog is attracted to mouse
           seekFactorX: randRange(0.08, 0.18),
           seekFactorY: randRange(0.04, 0.10),
 
@@ -448,17 +467,16 @@
         const centerX = frog.x + FROG_SIZE / 2;
         const centerBaseY = frog.baseY + FROG_SIZE / 2;
 
-        // Soft attraction toward mouse
+        // Soft attraction to mouse
         if (mouse.active) {
           const dx = mouse.x - centerX;
           const dy = mouse.y - centerBaseY;
-
           frog.x     += dx * frog.seekFactorX * dt;
           frog.baseY += dy * frog.seekFactorY * dt;
         }
 
-        // gentle sideways drift + edge bounce
-        frog.x += frog.vx * dt * 0.3; // damp vx so seek dominates
+        // Sideways drift (reduced so seek dominates)
+        frog.x += frog.vx * dt * 0.3;
         if (frog.x < -FROG_SIZE * 0.25) {
           frog.x = -FROG_SIZE * 0.25;
           frog.vx *= -1;
@@ -467,14 +485,12 @@
           frog.vx *= -1;
         }
 
-        // clamp baseY a bit so they don't wander off-screen vertically
         const marginY = 24;
         frog.baseY = Math.max(
           marginY,
           Math.min(height - marginY - FROG_SIZE, frog.baseY)
         );
 
-        // idle / hopping behavior
         if (frog.state === "idle") {
           frog.idleTime -= dt;
           frog.y = frog.baseY;
