@@ -175,48 +175,6 @@
     const META_BASE    = "/frog/json/";
     const META_EXT     = ".json";
     const BUILD_BASE   = "/frog/build_files";
-    const ANIMATED_VALUES = new Set([
-  'witchStraw',
-  'witchBrown',
-  'witchBlack',
-  'goldenDartFrog',
-  'blueDartFrog',
-  'blueTreeFrog',
-  'brownTreeFrog',
-  'redEyedTreeFrog',
-  'tongueSpiderRed',
-  'tongueSpider',
-  'tongue',
-  'tongueFly',
-  'croaking',
-  'peace',
-  'inversedEyes',
-  'closedEyes',
-  'thirdEye',
-  'mask',
-  'smoking',
-  'smokingCigar',
-  'smokingPipe',
-  'circleShadesRed',
-  'circleShadesPurple',
-  'shades',
-  'shadesPurple',
-  'shadesThreeD',
-  'shadesWhite',
-  'circleNightVision',
-  'baseballCapBlue',
-  'baseballCapRed',
-  'baseballCapWhite',
-  'yellow',
-  'blue(2)',
-  'blue',
-  'cyan',
-  'brown',
-  'silverEthChain',
-  'goldDollarChain',
-  'treeFrog(4)'
-]);
-
 
     const canvas = document.getElementById("frog-bg");
     if (!canvas || !canvas.getContext) return;
@@ -225,6 +183,92 @@
     let frogs = [];
     let animId = null;
     let lastTime = 0;
+
+    // Mouse tracking (window-level so it works even with content on top)
+    const mouse = {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      active: false
+    };
+
+    window.addEventListener("mousemove", (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.active = true;
+    });
+
+    // Click to trigger a hop on the nearest frog
+    window.addEventListener("click", (e) => {
+      const clickX = e.clientX;
+      const clickY = e.clientY;
+
+      let nearest = null;
+      let nearestDist2 = Infinity;
+
+      for (const frog of frogs) {
+        const cx = frog.x + FROG_SIZE / 2;
+        const cy = frog.y + FROG_SIZE / 2;
+        const dx = clickX - cx;
+        const dy = clickY - cy;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < nearestDist2) {
+          nearestDist2 = d2;
+          nearest = frog;
+        }
+      }
+
+      const MAX_CLICK_RADIUS = 120; // only trigger if fairly close
+      if (nearest && nearestDist2 <= MAX_CLICK_RADIUS * MAX_CLICK_RADIUS) {
+        // Force a special hop
+        nearest.state = "hopping";
+        nearest.hopTime = 0;
+        nearest.hopDuration = randRange(nearest.hopDurMin * 0.6, nearest.hopDurMax * 0.9);
+        nearest.hopHeight = randRange(nearest.hopHeightMax * 1.1, nearest.hopHeightMax * 1.7);
+      }
+    });
+
+    // ---- animated trait values ----
+    const ANIMATED_VALUES = new Set([
+      'witchStraw',
+      'witchBrown',
+      'witchBlack',
+      'goldenDartFrog',
+      'blueDartFrog',
+      'blueTreeFrog',
+      'brownTreeFrog',
+      'redEyedTreeFrog',
+      'tongueSpiderRed',
+      'tongueSpider',
+      'tongue',
+      'tongueFly',
+      'croaking',
+      'peace',
+      'inversedEyes',
+      'closedEyes',
+      'thirdEye',
+      'mask',
+      'smoking',
+      'smokingCigar',
+      'smokingPipe',
+      'circleShadesRed',
+      'circleShadesPurple',
+      'shades',
+      'shadesPurple',
+      'shadesThreeD',
+      'shadesWhite',
+      'circleNightVision',
+      'baseballCapBlue',
+      'baseballCapRed',
+      'baseballCapWhite',
+      'yellow',
+      'blue(2)',
+      'blue',
+      'cyan',
+      'brown',
+      'silverEthChain',
+      'goldDollarChain',
+      'treeFrog(4)'
+    ]);
 
     // ----------------- helpers -----------------
     function randInt(min, maxInclusive) {
@@ -261,30 +305,27 @@
       return res.json();
     }
 
+    // Try GIF first only for values in ANIMATED_VALUES, then PNG
     async function loadLayerImage(traitType, value) {
-      const v = String(value); // make sure it's a string
-      const pngUrl  = `${BUILD_BASE}/${traitType}/${v}.png`;
+      const v = String(value);
+      const pngUrl = `${BUILD_BASE}/${traitType}/${v}.png`;
 
-      // Only try GIF if this value is in the animated list
       if (ANIMATED_VALUES.has(v)) {
         const animUrl = `${BUILD_BASE}/${traitType}/animations/${v}_animation.gif`;
         try {
           return await loadImage(animUrl);
         } catch (e) {
-          // fall through to PNG if GIF missing/broken
+          // fall through to PNG if GIF missing
         }
       }
 
       try {
         return await loadImage(pngUrl);
       } catch (e) {
-        // non-visual trait or missing asset
-        return null;
+        return null; // non-visual or missing asset
       }
     }
 
-
-    // Build ordered layers for a frog
     async function buildLayersFromMetadata(meta) {
       const layers = [];
       if (!Array.isArray(meta.attributes)) return layers;
@@ -295,7 +336,6 @@
         if (!img) continue;
         layers.push({ img, traitType: attr.trait_type, value: attr.value });
       }
-
       return layers;
     }
 
@@ -308,7 +348,7 @@
       targetCount = Math.max(15, Math.min(maxFrogs, targetCount));
 
       const positions = [];
-      const MIN_DIST = 52; // center-to-center
+      const MIN_DIST = 52;
       const margin = 16;
 
       let safety = targetCount * 50;
@@ -334,26 +374,61 @@
       return positions;
     }
 
-    // Create frog objects with idle/hop state
     async function createFrogs(width, height) {
       frogs = [];
 
       const positions = computeFrogPositions(width, height);
       const tokenIds  = pickRandomTokenIds(positions.length);
 
-      frogs = positions.map((pos, i) => ({
-        tokenId: tokenIds[i],
-        x: pos.x,
-        y: pos.y,
-        baseY: pos.y,
-        vx: randRange(-10, 10),             // gentle sideways drift
-        state: "idle",                      // "idle" | "hopping"
-        idleTime: randRange(0.8, 3.0),      // seconds until next hop
-        hopTime: 0,                         // time spent in current hop
-        hopDuration: randRange(0.35, 0.7),  // hop length in seconds
-        hopHeight: randRange(6, 14),        // hop height
-        layers: [],
-      }));
+      frogs = positions.map((pos, i) => {
+        const personalityRoll = Math.random();
+        let idleMin, idleMax, hopMin, hopMax, heightMin, heightMax, vxRange;
+
+        if (personalityRoll < 0.25) {
+          // hyper
+          idleMin = 0.3; idleMax = 1.0;
+          hopMin = 0.25; hopMax = 0.55;
+          heightMin = 10; heightMax = 22;
+          vxRange = 20;
+        } else if (personalityRoll < 0.6) {
+          // normal
+          idleMin = 0.8; idleMax = 3.0;
+          hopMin = 0.35; hopMax = 0.7;
+          heightMin = 8;  heightMax = 18;
+          vxRange = 12;
+        } else {
+          // lazy
+          idleMin = 2.0; idleMax = 5.0;
+          hopMin = 0.45; hopMax = 0.9;
+          heightMin = 4;  heightMax = 12;
+          vxRange = 8;
+        }
+
+        return {
+          tokenId: tokenIds[i],
+          x: pos.x,
+          y: pos.y,
+          baseY: pos.y,
+          vx: randRange(-vxRange, vxRange),
+          // seek factors: how strongly this frog is attracted to mouse
+          seekFactorX: randRange(0.08, 0.18),
+          seekFactorY: randRange(0.04, 0.10),
+
+          state: "idle",
+          idleTime: randRange(idleMin, idleMax),
+          hopTime: 0,
+          hopDuration: randRange(hopMin, hopMax),
+          hopHeight: randRange(heightMin, heightMax),
+
+          idleMin, idleMax,
+          hopDurMin: hopMin,
+          hopDurMax: hopMax,
+          hopHeightMin: heightMin,
+          hopHeightMax: heightMax,
+
+          layers: []
+        };
+      });
 
       await Promise.all(
         frogs.map(async (frog) => {
@@ -361,7 +436,7 @@
             const meta = await fetchMetadata(frog.tokenId);
             frog.layers = await buildLayersFromMetadata(meta);
           } catch (err) {
-            // if it fails, frog just won't render
+            // invisible if loading fails
           }
         })
       );
@@ -370,8 +445,20 @@
     // ----------------- animation -----------------
     function updateFrogs(dt, width, height) {
       for (const frog of frogs) {
-        // sideways drift always on, very slow
-        frog.x += frog.vx * dt;
+        const centerX = frog.x + FROG_SIZE / 2;
+        const centerBaseY = frog.baseY + FROG_SIZE / 2;
+
+        // Soft attraction toward mouse
+        if (mouse.active) {
+          const dx = mouse.x - centerX;
+          const dy = mouse.y - centerBaseY;
+
+          frog.x     += dx * frog.seekFactorX * dt;
+          frog.baseY += dy * frog.seekFactorY * dt;
+        }
+
+        // gentle sideways drift + edge bounce
+        frog.x += frog.vx * dt * 0.3; // damp vx so seek dominates
         if (frog.x < -FROG_SIZE * 0.25) {
           frog.x = -FROG_SIZE * 0.25;
           frog.vx *= -1;
@@ -380,27 +467,42 @@
           frog.vx *= -1;
         }
 
+        // clamp baseY a bit so they don't wander off-screen vertically
+        const marginY = 24;
+        frog.baseY = Math.max(
+          marginY,
+          Math.min(height - marginY - FROG_SIZE, frog.baseY)
+        );
+
+        // idle / hopping behavior
         if (frog.state === "idle") {
           frog.idleTime -= dt;
           frog.y = frog.baseY;
+
           if (frog.idleTime <= 0) {
-            // start hop
             frog.state = "hopping";
             frog.hopTime = 0;
-            frog.hopDuration = randRange(0.35, 0.7);
-            frog.hopHeight = randRange(8, 18);
+            frog.hopDuration = randRange(frog.hopDurMin, frog.hopDurMax);
+
+            const spice = Math.random();
+            if (spice < 0.1) {
+              frog.hopHeight = randRange(frog.hopHeightMax * 0.9, frog.hopHeightMax * 1.4);
+            } else if (spice < 0.25) {
+              frog.hopHeight = randRange(2, frog.hopHeightMin * 0.7);
+            } else {
+              frog.hopHeight = randRange(frog.hopHeightMin, frog.hopHeightMax);
+            }
           }
         } else if (frog.state === "hopping") {
           frog.hopTime += dt;
           const t = Math.min(1, frog.hopTime / frog.hopDuration);
 
-          // simple parabola: 0 -> peak -> 0, scaled to hopHeight (upwards)
           const offset = -4 * frog.hopHeight * t * (1 - t);
           frog.y = frog.baseY + offset;
 
           if (frog.hopTime >= frog.hopDuration) {
             frog.state = "idle";
-            frog.idleTime = randRange(0.8, 3.0);
+            frog.idleTime = randRange(frog.idleMin, frog.idleMax);
             frog.y = frog.baseY;
           }
         }
@@ -460,6 +562,7 @@
     window.addEventListener("load", resetAndStart);
   })();
 </script>
+
 
   <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
 <script src="/assets/ff-core.js"></script>
