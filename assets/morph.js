@@ -246,6 +246,10 @@
     }
 
     ffSetMorphStatus('Please sign the morph request in your wallet…');
+    // After a morph is saved:
+    if (window.ffScatterFrogsCelebrateMorph) {
+      window.ffScatterFrogsCelebrateMorph(newTraits);
+    }
 
     let signed;
     try {
@@ -270,10 +274,6 @@
       });
 
       ffSetMorphStatus('✅ Morph saved! It will show up with your owned frogs.');
-      // After a morph is saved:
-      if (window.ffScatterFrogsCelebrateMorph) {
-        window.ffScatterFrogsCelebrateMorph(newTraits);
-      }
 
     } catch (err) {
       console.error('Save failed:', err);
