@@ -285,7 +285,7 @@
         // hyper
         idleMin = 0.3; idleMax = 1.0;
         hopMin = 0.25; hopMax = 0.55;
-        heightMin = 14; heightMax = 32;
+        heightMin = 14; heightMax = 48;
         vxRange = 20;
       } else if (personalityRoll < 0.6) {
         // normal
