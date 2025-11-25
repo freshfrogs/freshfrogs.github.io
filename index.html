@@ -170,7 +170,7 @@
   <!-- Frog background logic (wrapped to avoid globals) -->
   <script>
     (function () {
-      const FROG_SIZE    = 64;          // 64x64 frogs again
+      const FROG_SIZE    = 64;          // back to 64x64
       const MAX_TOKEN_ID = 4040;
       const META_BASE    = "/frog/json/";
       const META_EXT     = ".json";
@@ -219,33 +219,44 @@
         return res.json();
       }
 
-      function buildLayerUrl(traitType, value) {
-        // Use traitType and value exactly as folder/file names (case-sensitive)
-        return `${BUILD_BASE}/${traitType}/${value}.png`;
-      }
+      // Try animation first, then static PNG
+      async function loadLayerImage(traitType, value) {
+        const animUrl = `${BUILD_BASE}/${traitType}/animations/${value}_animation.gif`;
+        const pngUrl  = `${BUILD_BASE}/${traitType}/${value}.png`;
 
-      async function buildFrogSpriteFromMetadata(meta) {
-        const off = document.createElement("canvas");
-        off.width = FROG_SIZE;
-        off.height = FROG_SIZE;
-        const octx = off.getContext("2d");
-        octx.imageSmoothingEnabled = false;
-
-        if (!Array.isArray(meta.attributes)) return off;
-
-        // Draw layers in the order they appear in metadata
-        for (const attr of meta.attributes) {
-          if (!attr.trait_type || typeof attr.value === "undefined") continue;
-          const url = buildLayerUrl(attr.trait_type, attr.value);
-          try {
-            const img = await loadImage(url);
-            octx.drawImage(img, 0, 0, FROG_SIZE, FROG_SIZE);
-          } catch (err) {
-            // non-visual traits will just fail here; ignore
-          }
+        // Try animated GIF
+        try {
+          return await loadImage(animUrl);
+        } catch (e) {
+          // ignore, fall back to PNG
         }
 
-        return off;
+        // Try static PNG
+        try {
+          return await loadImage(pngUrl);
+        } catch (e) {
+          // no asset for this trait (could be non-visual), skip
+          return null;
+        }
+      }
+
+      // Build an array of layer images (GIF/PNG) in metadata order
+      async function buildLayersFromMetadata(meta) {
+        const layers = [];
+        if (!Array.isArray(meta.attributes)) return layers;
+
+        for (const attr of meta.attributes) {
+          if (!attr.trait_type || typeof attr.value === "undefined") continue;
+          const img = await loadLayerImage(attr.trait_type, attr.value);
+          if (!img) continue;
+          layers.push({
+            img,
+            traitType: attr.trait_type,
+            value: attr.value
+          });
+        }
+
+        return layers;
       }
 
       // ----------------- layout + frog creation -----------------
@@ -257,7 +268,7 @@
         targetCount = Math.max(15, Math.min(maxFrogs, targetCount));
 
         const positions = [];
-        const MIN_DIST = 52; // min distance between frog centers
+        const MIN_DIST = 52; // center-to-center distance
         const margin = 16;
 
         let safety = targetCount * 50;
@@ -289,28 +300,28 @@
         const positions = computeFrogPositions(width, height);
         const tokenIds  = pickRandomTokenIds(positions.length);
 
-        // create frog objects with movement params
+        // basic motion params
         frogs = positions.map((pos, i) => ({
           tokenId: tokenIds[i],
           x: pos.x,
           y: pos.y,
           baseY: pos.y,
-          vx: randRange(-10, 10),                 // slow sideways drift (px/sec)
-          hopPhase: Math.random() * Math.PI * 2,  // initial phase
-          hopSpeed: randRange(0.8, 1.6),          // hops per second-ish
-          hopAmp: randRange(6, 14),               // hop height in px
-          sprite: null,
+          vx: randRange(-10, 10),                 // px/sec sideways
+          hopPhase: Math.random() * Math.PI * 2,  // phase offset
+          hopSpeed: randRange(0.8, 1.6),          // hops/sec-ish
+          hopAmp: randRange(6, 14),               // hop height
+          layers: [],
           t: 0
         }));
 
-        // load sprites async; frogs will appear as they finish
+        // load each frog's trait layers (GIF or PNG)
         await Promise.all(
           frogs.map(async (frog) => {
             try {
               const meta = await fetchMetadata(frog.tokenId);
-              frog.sprite = await buildFrogSpriteFromMetadata(meta);
+              frog.layers = await buildLayersFromMetadata(meta);
             } catch (err) {
-              // ignore failures; frog just stays invisible
+              // if this frog fails, it just won't render
             }
           })
         );
@@ -323,7 +334,6 @@
 
           // sideways drift
           frog.x += frog.vx * dt;
-          // bounce off edges
           if (frog.x < -FROG_SIZE * 0.25) {
             frog.x = -FROG_SIZE * 0.25;
             frog.vx *= -1;
@@ -332,9 +342,9 @@
             frog.vx *= -1;
           }
 
-          // hopping (vertical sine offset)
+          // hopping
           const phase = frog.hopPhase + frog.t * frog.hopSpeed * Math.PI * 2;
-          const hopOffset = Math.abs(Math.sin(phase)) * frog.hopAmp * -1; // hop up
+          const hopOffset = Math.abs(Math.sin(phase)) * frog.hopAmp * -1;
           frog.y = frog.baseY + hopOffset;
         }
       }
@@ -348,7 +358,6 @@
         const dt = (time - lastTime) / 1000;
         lastTime = time;
 
-        // ensure canvas size & transform are correct
         if (canvas.width !== Math.floor(width * dpr) ||
             canvas.height !== Math.floor(height * dpr)) {
           canvas.width = Math.floor(width * dpr);
@@ -356,22 +365,22 @@
           ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
-        // clear background
         ctx.fillStyle = "#7cc1ff";
         ctx.fillRect(0, 0, width, height);
         ctx.imageSmoothingEnabled = false;
 
-        // update + draw frogs
         updateFrogs(dt, width, height);
+
         for (const frog of frogs) {
-          if (!frog.sprite) continue;
-          ctx.drawImage(
-            frog.sprite,
-            Math.floor(frog.x),
-            Math.floor(frog.y),
-            FROG_SIZE,
-            FROG_SIZE
-          );
+          if (!frog.layers || frog.layers.length === 0) continue;
+          const x = Math.floor(frog.x);
+          const y = Math.floor(frog.y);
+
+          // draw each trait layer in order
+          for (const layer of frog.layers) {
+            if (!layer.img) continue;
+            ctx.drawImage(layer.img, x, y, FROG_SIZE, FROG_SIZE);
+          }
         }
 
         animId = requestAnimationFrame(drawFrame);
@@ -385,13 +394,12 @@
           cancelAnimationFrame(animId);
           animId = null;
         }
-
         lastTime = 0;
+
         await createFrogs(width, height);
         animId = requestAnimationFrame(drawFrame);
       }
 
-      // resize: just rebuild everything (cheap enough)
       window.addEventListener("resize", () => {
         resetAndStart();
       });
@@ -401,7 +409,6 @@
       });
     })();
   </script>
-
 
   <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
 <script src="/assets/ff-core.js"></script>
