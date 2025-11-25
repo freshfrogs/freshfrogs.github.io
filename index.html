@@ -175,6 +175,48 @@
     const META_BASE    = "/frog/json/";
     const META_EXT     = ".json";
     const BUILD_BASE   = "/frog/build_files";
+    const ANIMATED_VALUES = new Set([
+  'witchStraw',
+  'witchBrown',
+  'witchBlack',
+  'goldenDartFrog',
+  'blueDartFrog',
+  'blueTreeFrog',
+  'brownTreeFrog',
+  'redEyedTreeFrog',
+  'tongueSpiderRed',
+  'tongueSpider',
+  'tongue',
+  'tongueFly',
+  'croaking',
+  'peace',
+  'inversedEyes',
+  'closedEyes',
+  'thirdEye',
+  'mask',
+  'smoking',
+  'smokingCigar',
+  'smokingPipe',
+  'circleShadesRed',
+  'circleShadesPurple',
+  'shades',
+  'shadesPurple',
+  'shadesThreeD',
+  'shadesWhite',
+  'circleNightVision',
+  'baseballCapBlue',
+  'baseballCapRed',
+  'baseballCapWhite',
+  'yellow',
+  'blue(2)',
+  'blue',
+  'cyan',
+  'brown',
+  'silverEthChain',
+  'goldDollarChain',
+  'treeFrog(4)'
+]);
+
 
     const canvas = document.getElementById("frog-bg");
     if (!canvas || !canvas.getContext) return;
@@ -219,23 +261,28 @@
       return res.json();
     }
 
-    // Try animation first, then static PNG
     async function loadLayerImage(traitType, value) {
-      const animUrl = `${BUILD_BASE}/${traitType}/animations/${value}_animation.gif`;
-      const pngUrl  = `${BUILD_BASE}/${traitType}/${value}.png`;
+      const v = String(value); // make sure it's a string
+      const pngUrl  = `${BUILD_BASE}/${traitType}/${v}.png`;
 
-      try {
-        return await loadImage(animUrl);
-      } catch (e) {
-        // ignore, fall back to PNG
+      // Only try GIF if this value is in the animated list
+      if (ANIMATED_VALUES.has(v)) {
+        const animUrl = `${BUILD_BASE}/${traitType}/animations/${v}_animation.gif`;
+        try {
+          return await loadImage(animUrl);
+        } catch (e) {
+          // fall through to PNG if GIF missing/broken
+        }
       }
 
       try {
         return await loadImage(pngUrl);
       } catch (e) {
-        return null; // non-visual trait
+        // non-visual trait or missing asset
+        return null;
       }
     }
+
 
     // Build ordered layers for a frog
     async function buildLayersFromMetadata(meta) {
