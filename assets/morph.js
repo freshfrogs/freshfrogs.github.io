@@ -272,7 +272,7 @@
       ffSetMorphStatus('✅ Morph saved! It will show up with your owned frogs.');
       // After a morph is saved:
       if (window.ffScatterFrogsCelebrateMorph) {
-        window.ffScatterFrogsCelebrateMorph(morphedMeta);
+        window.ffScatterFrogsCelebrateMorph(newTraits);
       }
 
     } catch (err) {
