@@ -674,101 +674,54 @@ const name =
   return card;
 }
 
-// ===================================================
-// Animated-first trait layer helper (GIF -> fallback PNG)
-// ===================================================
-function ffAddTraitLayerAnimatedFirst(traitType, value, container, containerId) {
-  if (!traitType || value == null) return;
-
-  // If build system isn't present, just use existing build_trait
-  if (typeof SOURCE_PATH === "undefined") {
-    if (typeof build_trait === "function") build_trait(traitType, value, containerId);
-    return;
-  }
-
-  const attr = encodeURIComponent(String(traitType).trim());
-  const val  = encodeURIComponent(String(value).trim());
-
-  const gifUrl = `${SOURCE_PATH}/frog/build_files/${attr}/animations/${val}_animation.gif`;
-  const pngUrl = `${SOURCE_PATH}/frog/build_files/${attr}/${val}.png`;
-
-  const img = new Image();
-  img.alt = `${traitType}: ${value}`;
-  img.loading = "lazy";
-  img.decoding = "async";
-
-  // stacked layer styling (same as your current layers)
-  img.style.position = "absolute";
-  img.style.left = "0";
-  img.style.top = "0";
-  img.style.width = "100%";
-  img.style.height = "auto";
-  img.style.imageRendering = "pixelated";
-  img.style.pointerEvents = "none";
-
-  img.onload = () => container.appendChild(img);
-
-  img.onerror = () => {
-    // GIF missing -> fall back to your normal pipeline
-    if (typeof build_trait === "function") {
-      build_trait(traitType, value, containerId);
-      return;
-    }
-
-    // final fallback -> raw png
-    const png = new Image();
-    png.alt = img.alt;
-    png.loading = "lazy";
-    png.decoding = "async";
-    png.style.cssText = img.style.cssText;
-    png.src = pngUrl;
-    container.appendChild(png);
-  };
-
-  img.src = gifUrl;
-}
-
-// Build layered frog image (GIF-first, then fallback to png/build_trait)
-async function ffBuildLayeredFrogImage(tokenId, containerId) {
+async function ffBuildLayeredMorphedImage(metadata, containerId, baseTokenId = null) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
   try {
-    const baseUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
-    container.style.position = "relative";
-    container.style.backgroundImage    = `url("${baseUrl}")`;
-    container.style.backgroundRepeat   = "no-repeat";
-    container.style.backgroundSize     = "1000%";
-    container.style.backgroundPosition = "bottom right";
-    container.innerHTML = "";
+    const attrs = Array.isArray(metadata?.attributes) ? metadata.attributes : [];
 
-    // If no build system, just show base.
-    if (typeof SOURCE_PATH === "undefined") {
-      const img = document.createElement("img");
-      img.src = baseUrl;
-      img.alt = `Frog #${tokenId}`;
-      img.className = "recent_sale_img";
-      img.loading = "lazy";
-      container.appendChild(img);
+    const baseId = parseTokenId(baseTokenId ?? metadata?.frogA ?? metadata?.tokenA ?? null);
+    const baseUrl = baseId != null
+      ? `https://freshfrogs.github.io/frog/${baseId}.png`
+      : null;
+
+    // clear whatever fallback <img> is there
+    container.innerHTML = '';
+
+    // Parent A background (same trick as normal frogs)
+    if (baseUrl) {
+      container.style.backgroundImage    = `url("${baseUrl}")`;
+      container.style.backgroundRepeat   = 'no-repeat';
+      container.style.backgroundSize     = '1000%';
+      container.style.backgroundPosition = 'bottom right';
+      container.style.backgroundColor    = 'transparent';
+    }
+
+    // if build_trait is ready, layer it up
+    if (typeof build_trait === 'function' && attrs.length) {
+      for (const attr of attrs) {
+        if (!attr?.trait_type || !attr?.value) continue;
+        build_trait(attr.trait_type, attr.value, containerId);
+      }
       return;
     }
 
-    const metadataUrl = `${SOURCE_PATH}/frog/json/${tokenId}.json`;
-    const metadata = await (await fetch(metadataUrl)).json();
-    const attrs = Array.isArray(metadata.attributes) ? metadata.attributes : [];
+    // fallback if build_trait missing
+    const fallbackImg =
+      metadata?.image ||
+      metadata?.image_url ||
+      (baseUrl || "https://freshfrogs.github.io/assets/blackWhite.png");
 
-    for (const attr of attrs) {
-      if (!attr?.trait_type || attr?.value == null) continue;
-      ffAddTraitLayerAnimatedFirst(attr.trait_type, attr.value, container, containerId);
-    }
+    const img = document.createElement('img');
+    img.src = fallbackImg;
+    img.alt = metadata?.name || "Morphed Frog";
+    img.className = 'recent_sale_img';
+    img.loading = 'lazy';
+    container.appendChild(img);
 
   } catch (err) {
-    console.warn("ffBuildLayeredFrogImage failed:", err);
-    container.innerHTML =
-      `<img src="https://freshfrogs.github.io/frog/${tokenId}.png"
-            class="recent_sale_img"
-            alt="Frog #${tokenId}"
-            loading="lazy" />`;
+    console.warn('ffBuildLayeredMorphedImage failed:', err);
   }
 }
 
