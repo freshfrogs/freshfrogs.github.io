@@ -788,3 +788,30 @@ padding: 0.55rem 1.2rem;
     background: white;
     color: #333;
 }
+
+#frog-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: #7cc1ff; /* your sky */
+  overflow: hidden;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  pointer-events: none; /* don't block clicks on the site */
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+}
+
+.frog-sprite {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  pointer-events: none;
+}
