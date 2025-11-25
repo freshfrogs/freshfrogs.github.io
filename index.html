@@ -170,21 +170,15 @@
   <!-- Frog background logic (wrapped to avoid globals) -->
 <script>
   (function () {
-    const FROG_SIZE    = 64;
-    const MAX_TOKEN_ID = 4040;
-    const META_BASE    = "/frog/json/";
-    const META_EXT     = ".json";
-    const BUILD_BASE   = "/frog/build_files";
-
-    const canvas = document.getElementById("frog-bg");
-    if (!canvas || !canvas.getContext) return;
-    const ctx = canvas.getContext("2d", { alpha: false });
+    const FROG_SIZE = 64;
+    const container = document.getElementById("frog-bg");
+    if (!container) return;
 
     let frogs = [];
     let animId = null;
     let lastTime = 0;
 
-    // ---- click target (where frogs drift) ----
+    // Where frogs drift after you click
     const target = {
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
@@ -233,74 +227,12 @@
       return min + Math.random() * (max - min);
     }
 
-    function pickRandomTokenIds(count) {
-      const set = new Set();
-      while (set.size < count) {
-        set.add(randInt(1, MAX_TOKEN_ID));
-      }
-      return Array.from(set);
-    }
-
-    function loadImage(url) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.decoding = "async";
-        img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error("Failed to load " + url));
-        img.src = url;
-      });
-    }
-
-    async function fetchMetadata(tokenId) {
-      const url = META_BASE + tokenId + META_EXT;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Metadata fetch failed for " + tokenId);
-      return res.json();
-    }
-
-    // Always try GIF first, then PNG, using the metadata value EXACTLY
-    async function loadLayerImage(traitType, value) {
-      const v = String(value); // exact metadata value (case-sensitive!)
-      const animUrl = `${BUILD_BASE}/${traitType}/animations/${v}_animation.gif`;
-      const pngUrl  = `${BUILD_BASE}/${traitType}/${v}.png`;
-
-      // Try GIF
-      try {
-        return await loadImage(animUrl);
-      } catch (e) {
-        // console.warn("[GIF fail]", animUrl);
-      }
-
-      // Fall back to PNG
-      try {
-        return await loadImage(pngUrl);
-      } catch (e) {
-        // console.warn("[PNG fail]", pngUrl);
-        return null; // non-visual trait
-      }
-    }
-
-    async function buildLayersFromMetadata(meta) {
-      const layers = [];
-      if (!Array.isArray(meta.attributes)) return layers;
-
-      for (const attr of meta.attributes) {
-        if (!attr.trait_type || typeof attr.value === "undefined") continue;
-        const img = await loadLayerImage(attr.trait_type, attr.value);
-        if (!img) continue;
-        layers.push({
-          img,
-          traitType: attr.trait_type,
-          value: attr.value
-        });
-      }
-      return layers;
-    }
-
-    // ----------------- layout + frog creation -----------------
-    function computeFrogPositions(width, height) {
+    function computeFrogPositions(width, height, maxCountOverride) {
       const area = width * height;
-      const maxFrogs = 120;
+      const maxFrogs = typeof maxCountOverride === "number"
+        ? maxCountOverride
+        : 120;
+
       const approxPerFrogArea = (FROG_SIZE * FROG_SIZE) * 5;
       let targetCount = Math.floor(area / approxPerFrogArea);
       targetCount = Math.max(15, Math.min(maxFrogs, targetCount));
@@ -332,35 +264,89 @@
       return positions;
     }
 
+    async function fetchMorphedMetadata(limit) {
+      try {
+        if (typeof window.ffFetchRecentMorphedFrogs === "function") {
+          // this hits your morph worker via the function from site.js
+          return await window.ffFetchRecentMorphedFrogs(limit);
+        }
+      } catch (err) {
+        console.warn("fetchMorphedMetadata failed:", err);
+      }
+      return [];
+    }
+
+    function getMorphImageUrl(meta) {
+      if (!meta || typeof meta !== "object") return null;
+      return (
+        meta.image ||
+        meta.image_url ||
+        meta.morphedImage ||
+        meta.animation_url ||
+        null
+      );
+    }
+
     async function createFrogs(width, height) {
       frogs = [];
+      container.innerHTML = "";
 
-      const positions = computeFrogPositions(width, height);
-      const tokenIds  = pickRandomTokenIds(positions.length);
+      // pull a bunch of morphed frogs (newest first)
+      const morphMetas = await fetchMorphedMetadata(300);
+      if (!morphMetas.length) {
+        console.warn("No morphed frogs returned for scatter background.");
+        return;
+      }
 
-      frogs = positions.map((pos, i) => {
+      // limit displayed frogs for performance / clutter
+      const maxScatter = Math.min(morphMetas.length, 150);
+      const positions = computeFrogPositions(width, height, maxScatter);
+      const count = Math.min(positions.length, morphMetas.length);
+
+      for (let i = 0; i < count; i++) {
+        const pos = positions[i];
+        const meta = morphMetas[i];
+
+        const src = getMorphImageUrl(meta);
+        if (!src) continue;
+
+        const el = document.createElement("div");
+        el.className = "frog-sprite";
+        el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
+
+        const img = document.createElement("img");
+        img.src = src;                 // can be GIF → will animate naturally
+        img.alt = meta.name || "";
+        el.appendChild(img);
+
+        container.appendChild(el);
+
         const personalityRoll = Math.random();
         let idleMin, idleMax, hopMin, hopMax, heightMin, heightMax, vxRange;
 
         if (personalityRoll < 0.25) {
+          // hyper
           idleMin = 0.3; idleMax = 1.0;
           hopMin = 0.25; hopMax = 0.55;
-          heightMin = 10; heightMax = 32;
+          heightMin = 14; heightMax = 32;
           vxRange = 20;
         } else if (personalityRoll < 0.6) {
+          // normal
           idleMin = 0.8; idleMax = 3.0;
           hopMin = 0.35; hopMax = 0.7;
-          heightMin = 8;  heightMax = 22;
+          heightMin = 10; heightMax = 26;
           vxRange = 12;
         } else {
+          // lazy
           idleMin = 2.0; idleMax = 5.0;
           hopMin = 0.45; hopMax = 0.9;
-          heightMin = 4;  heightMax = 12;
+          heightMin = 6;  heightMax = 20;
           vxRange = 8;
         }
 
-        return {
-          tokenId: tokenIds[i],
+        frogs.push({
+          meta,
+          el,
           x: pos.x,
           y: pos.y,
           baseY: pos.y,
@@ -378,22 +364,9 @@
           hopDurMin: hopMin,
           hopDurMax: hopMax,
           hopHeightMin: heightMin,
-          hopHeightMax: heightMax,
-
-          layers: []
-        };
-      });
-
-      await Promise.all(
-        frogs.map(async (frog) => {
-          try {
-            const meta = await fetchMetadata(frog.tokenId);
-            frog.layers = await buildLayersFromMetadata(meta);
-          } catch (err) {
-            // invisible if loading fails
-          }
-        })
-      );
+          hopHeightMax: heightMax
+        });
+      }
     }
 
     // ----------------- animation -----------------
@@ -410,6 +383,7 @@
           frog.baseY += dy * frog.seekFactorY * dt;
         }
 
+        // small sideways drift
         frog.x += frog.vx * dt * 0.3;
         if (frog.x < -FROG_SIZE * 0.25) {
           frog.x = -FROG_SIZE * 0.25;
@@ -419,13 +393,14 @@
           frog.vx *= -1;
         }
 
+        // clamp vertical
         const marginY = 24;
         frog.baseY = Math.max(
           marginY,
           Math.min(height - marginY - FROG_SIZE, frog.baseY)
         );
 
-        // idle / hopping
+        // idle / hopping behavior
         if (frog.state === "idle") {
           frog.idleTime -= dt;
           frog.y = frog.baseY;
@@ -437,7 +412,7 @@
 
             const spice = Math.random();
             if (spice < 0.1) {
-              frog.hopHeight = randRange(frog.hopHeightMax * 0.9, frog.hopHeightMax * 1.4);
+              frog.hopHeight = randRange(frog.hopHeightMax * 1.1, frog.hopHeightMax * 1.8);
             } else if (spice < 0.25) {
               frog.hopHeight = randRange(2, frog.hopHeightMin * 0.7);
             } else {
@@ -457,11 +432,13 @@
             frog.y = frog.baseY;
           }
         }
+
+        // apply transform to DOM element
+        frog.el.style.transform = `translate3d(${frog.x}px, ${frog.y}px, 0)`;
       }
     }
 
     function drawFrame(time) {
-      const dpr = window.devicePixelRatio || 1;
       const width = window.innerWidth;
       const height = window.innerHeight;
 
@@ -469,29 +446,7 @@
       const dt = (time - lastTime) / 1000;
       lastTime = time;
 
-      if (canvas.width !== Math.floor(width * dpr) ||
-          canvas.height !== Math.floor(height * dpr)) {
-        canvas.width = Math.floor(width * dpr);
-        canvas.height = Math.floor(height * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-
-      ctx.fillStyle = "#7cc1ff";
-      ctx.fillRect(0, 0, width, height);
-      ctx.imageSmoothingEnabled = false;
-
       updateFrogs(dt, width, height);
-
-      for (const frog of frogs) {
-        if (!frog.layers || frog.layers.length === 0) continue;
-        const x = Math.floor(frog.x);
-        const y = Math.floor(frog.y);
-        for (const layer of frog.layers) {
-          if (!layer.img) continue;
-          ctx.drawImage(layer.img, x, y, FROG_SIZE, FROG_SIZE);
-        }
-      }
-
       animId = requestAnimationFrame(drawFrame);
     }
 
