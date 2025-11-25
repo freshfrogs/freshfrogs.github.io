@@ -2,8 +2,52 @@
 (function () {
   const FROG_SIZE   = 64;
   const BUILD_BASE  = "/frog/build_files";
-  const MAX_MORPHS  = 300;  // how many morphs to fetch
-  const MAX_SCATTER = 150;  // max frogs on screen
+  const MAX_MORPHS  = 150;
+  const MAX_SCATTER = 150;
+
+  // Values that have animation variants for scatter frogs
+  const SCATTER_ANIMATED_VALUES = new Set([
+    // 'witchStraw',
+    // 'witchBrown',
+    // 'witchBlack',
+    'goldenDartFrog',
+    'blueDartFrog',
+    'blueTreeFrog',
+    'brownTreeFrog',
+    'redEyedTreeFrog',
+    'tongueSpiderRed',
+    'tongueSpider',
+    // 'tongue',
+    'tongueFly',
+    'croaking',
+    'peace',
+    'inversedEyes',
+    'closedEyes',
+    'thirdEye',
+    'mask',
+    'smoking',
+    'smokingCigar',
+    'smokingPipe',
+    'circleShadesRed',
+    'circleShadesPurple',
+    'shades',
+    'shadesPurple',
+    'shadesThreeD',
+    'shadesWhite',
+    'circleNightVision',
+    // 'baseballCapBlue',
+    // 'baseballCapRed',
+    // 'baseballCapWhite',
+    'yellow',
+    'blue(2)',
+    'blue',
+    'cyan',
+    'brown',
+    'silverEthChain',
+    'goldDollarChain'
+    // 'treeFrog(4)'
+  ]);
+
 
   const container = document.getElementById("frog-bg");
   if (!container) return;
@@ -209,10 +253,23 @@
     return [];
   }
 
-  // Load a single trait image as <img>, trying GIF first then PNG
+  // Load a single trait image as <img>, trying GIF first only if value is in SCATTER_ANIMATED_VALUES
   async function loadTraitImage(traitType, value) {
-    const v = String(value); // use metadata value EXACTLY (case-sensitive)
+    const v = String(value); // exact metadata value
+    const pngUrl = `${BUILD_BASE}/${traitType}/${v}.png`;
+    const canAnimate = SCATTER_ANIMATED_VALUES.has(v);
+
     return new Promise((resolve) => {
+      if (!canAnimate) {
+        const png = new Image();
+        png.decoding = "async";
+        png.onload = () => resolve(png);
+        png.onerror = () => resolve(null);
+        png.src = pngUrl;
+        return;
+      }
+
+      const gifUrl = `${BUILD_BASE}/${traitType}/animations/${v}_animation.gif`;
       const gif = new Image();
       gif.decoding = "async";
       gif.onload = () => resolve(gif);
@@ -221,9 +278,9 @@
         png.decoding = "async";
         png.onload = () => resolve(png);
         png.onerror = () => resolve(null);
-        png.src = `${BUILD_BASE}/${traitType}/${v}.png`;
+        png.src = pngUrl;
       };
-      gif.src = `${BUILD_BASE}/${traitType}/animations/${v}_animation.gif`;
+      gif.src = gifUrl;
     });
   }
 
