@@ -5,8 +5,20 @@
   <title>freshfrogs.github.io</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="/style.css" />
+  <style>
+    #frog-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: #bfe8ff; /* light blue */
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+  </style>
 </head>
 <body class="layout-4">
+  <!-- Random trait-built frogs background -->
+  <canvas id="frog-bg"></canvas>
   <div class="page">
     <!-- HEADER -->
     <header class="site-header">
@@ -147,6 +159,352 @@
 
   <!-- Web3 for wallet / staking functions -->
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <!-- Frog background logic (wrapped to avoid globals) -->
+  <script>
+    (function () {
+      const FROG_SIZE    = 64;
+      const MAX_TOKEN_ID = 4040;
+      const META_BASE    = "/frog/json/";
+      const META_EXT     = ".json";
+      const BUILD_BASE   = "/frog/build_files";
+
+      const canvas = document.getElementById("frog-bg");
+      if (!canvas || !canvas.getContext) return;
+      const ctx = canvas.getContext("2d", { alpha: false });
+
+      let frogs = [];
+      let animId = null;
+      let lastTime = 0;
+
+      // ---- click target (where frogs drift) ----
+      const target = {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+        active: false
+      };
+
+      // Click: set target + make nearest frog hop
+      window.addEventListener("click", (e) => {
+        const clickX = e.clientX;
+        const clickY = e.clientY;
+
+        target.x = clickX;
+        target.y = clickY;
+        target.active = true;
+
+        let nearest = null;
+        let nearestDist2 = Infinity;
+
+        for (const frog of frogs) {
+          const cx = frog.x + FROG_SIZE / 2;
+          const cy = frog.y + FROG_SIZE / 2;
+          const dx = clickX - cx;
+          const dy = clickY - cy;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < nearestDist2) {
+            nearestDist2 = d2;
+            nearest = frog;
+          }
+        }
+
+        const MAX_CLICK_RADIUS = 120;
+        if (nearest && nearestDist2 <= MAX_CLICK_RADIUS * MAX_CLICK_RADIUS) {
+          nearest.state = "hopping";
+          nearest.hopTime = 0;
+          nearest.hopDuration = randRange(nearest.hopDurMin * 0.6, nearest.hopDurMax * 0.9);
+          nearest.hopHeight = randRange(nearest.hopHeightMax * 1.1, nearest.hopHeightMax * 1.7);
+        }
+      });
+
+      // ----------------- helpers -----------------
+      function randInt(min, maxInclusive) {
+        return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
+      }
+
+      function randRange(min, max) {
+        return min + Math.random() * (max - min);
+      }
+
+      function pickRandomTokenIds(count) {
+        const set = new Set();
+        while (set.size < count) {
+          set.add(randInt(1, MAX_TOKEN_ID));
+        }
+        return Array.from(set);
+      }
+
+      function loadImage(url) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.decoding = "async";
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("Failed to load " + url));
+          img.src = url;
+        });
+      }
+
+      async function fetchMetadata(tokenId) {
+        const url = META_BASE + tokenId + META_EXT;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Metadata fetch failed for " + tokenId);
+        return res.json();
+      }
+
+      // Always try GIF first, then PNG, using the metadata value EXACTLY
+      async function loadLayerImage(traitType, value) {
+        const v = String(value); // exact metadata value (case-sensitive!)
+        const animUrl = `${BUILD_BASE}/${traitType}/animations/${v}_animation.gif`;
+        const pngUrl  = `${BUILD_BASE}/${traitType}/${v}.png`;
+
+        // Try GIF
+        try {
+          return await loadImage(animUrl);
+        } catch (e) {
+          // console.warn("[GIF fail]", animUrl);
+        }
+
+        // Fall back to PNG
+        try {
+          return await loadImage(pngUrl);
+        } catch (e) {
+          // console.warn("[PNG fail]", pngUrl);
+          return null; // non-visual trait
+        }
+      }
+
+      async function buildLayersFromMetadata(meta) {
+        const layers = [];
+        if (!Array.isArray(meta.attributes)) return layers;
+
+        for (const attr of meta.attributes) {
+          if (!attr.trait_type || typeof attr.value === "undefined") continue;
+          const img = await loadLayerImage(attr.trait_type, attr.value);
+          if (!img) continue;
+          layers.push({
+            img,
+            traitType: attr.trait_type,
+            value: attr.value
+          });
+        }
+        return layers;
+      }
+
+      // ----------------- layout + frog creation -----------------
+      function computeFrogPositions(width, height) {
+        const area = width * height;
+        const maxFrogs = 120;
+        const approxPerFrogArea = (FROG_SIZE * FROG_SIZE) * 5;
+        let targetCount = Math.floor(area / approxPerFrogArea);
+        targetCount = Math.max(15, Math.min(maxFrogs, targetCount));
+
+        const positions = [];
+        const MIN_DIST = 52;
+        const margin = 16;
+
+        let safety = targetCount * 50;
+        while (positions.length < targetCount && safety-- > 0) {
+          const x = margin + Math.random() * (width - margin * 2 - FROG_SIZE);
+          const y = margin + Math.random() * (height - margin * 2 - FROG_SIZE);
+          const cx = x + FROG_SIZE / 2;
+          const cy = y + FROG_SIZE / 2;
+
+          let ok = true;
+          for (const p of positions) {
+            const pcx = p.x + FROG_SIZE / 2;
+            const pcy = p.y + FROG_SIZE / 2;
+            const dx = cx - pcx;
+            const dy = cy - pcy;
+            if (dx * dx + dy * dy < MIN_DIST * MIN_DIST) {
+              ok = false;
+              break;
+            }
+          }
+          if (ok) positions.push({ x, y });
+        }
+        return positions;
+      }
+
+      async function createFrogs(width, height) {
+        frogs = [];
+
+        const positions = computeFrogPositions(width, height);
+        const tokenIds  = pickRandomTokenIds(positions.length);
+
+        frogs = positions.map((pos, i) => {
+          const personalityRoll = Math.random();
+          let idleMin, idleMax, hopMin, hopMax, heightMin, heightMax, vxRange;
+
+          if (personalityRoll < 0.25) {
+            idleMin = 0.3; idleMax = 1.0;
+            hopMin = 0.25; hopMax = 0.55;
+            heightMin = 10; heightMax = 32;
+            vxRange = 20;
+          } else if (personalityRoll < 0.6) {
+            idleMin = 0.8; idleMax = 3.0;
+            hopMin = 0.35; hopMax = 0.7;
+            heightMin = 8;  heightMax = 22;
+            vxRange = 12;
+          } else {
+            idleMin = 2.0; idleMax = 5.0;
+            hopMin = 0.45; hopMax = 0.9;
+            heightMin = 4;  heightMax = 12;
+            vxRange = 8;
+          }
+
+          return {
+            tokenId: tokenIds[i],
+            x: pos.x,
+            y: pos.y,
+            baseY: pos.y,
+            vx: randRange(-vxRange, vxRange),
+            seekFactorX: randRange(0.05, 0.15),
+            seekFactorY: randRange(0.03, 0.08),
+
+            state: "idle",
+            idleTime: randRange(idleMin, idleMax),
+            hopTime: 0,
+            hopDuration: randRange(hopMin, hopMax),
+            hopHeight: randRange(heightMin, heightMax),
+
+            idleMin, idleMax,
+            hopDurMin: hopMin,
+            hopDurMax: hopMax,
+            hopHeightMin: heightMin,
+            hopHeightMax: heightMax,
+
+            layers: []
+          };
+        });
+
+        await Promise.all(
+          frogs.map(async (frog) => {
+            try {
+              const meta = await fetchMetadata(frog.tokenId);
+              frog.layers = await buildLayersFromMetadata(meta);
+            } catch (err) {
+              // invisible if loading fails
+            }
+          })
+        );
+      }
+
+      // ----------------- animation -----------------
+      function updateFrogs(dt, width, height) {
+        for (const frog of frogs) {
+          const centerX = frog.x + FROG_SIZE / 2;
+          const centerBaseY = frog.baseY + FROG_SIZE / 2;
+
+          // Drift toward last click target
+          if (target.active) {
+            const dx = target.x - centerX;
+            const dy = target.y - centerBaseY;
+            frog.x     += dx * frog.seekFactorX * dt;
+            frog.baseY += dy * frog.seekFactorY * dt;
+          }
+
+          frog.x += frog.vx * dt * 0.3;
+          if (frog.x < -FROG_SIZE * 0.25) {
+            frog.x = -FROG_SIZE * 0.25;
+            frog.vx *= -1;
+          } else if (frog.x > width - FROG_SIZE * 0.75) {
+            frog.x = width - FROG_SIZE * 0.75;
+            frog.vx *= -1;
+          }
+
+          const marginY = 24;
+          frog.baseY = Math.max(
+            marginY,
+            Math.min(height - marginY - FROG_SIZE, frog.baseY)
+          );
+
+          // idle / hopping
+          if (frog.state === "idle") {
+            frog.idleTime -= dt;
+            frog.y = frog.baseY;
+
+            if (frog.idleTime <= 0) {
+              frog.state = "hopping";
+              frog.hopTime = 0;
+              frog.hopDuration = randRange(frog.hopDurMin, frog.hopDurMax);
+
+              const spice = Math.random();
+              if (spice < 0.1) {
+                frog.hopHeight = randRange(frog.hopHeightMax * 0.9, frog.hopHeightMax * 1.4);
+              } else if (spice < 0.25) {
+                frog.hopHeight = randRange(2, frog.hopHeightMin * 0.7);
+              } else {
+                frog.hopHeight = randRange(frog.hopHeightMin, frog.hopHeightMax);
+              }
+            }
+          } else if (frog.state === "hopping") {
+            frog.hopTime += dt;
+            const t = Math.min(1, frog.hopTime / frog.hopDuration);
+
+            const offset = -4 * frog.hopHeight * t * (1 - t);
+            frog.y = frog.baseY + offset;
+
+            if (frog.hopTime >= frog.hopDuration) {
+              frog.state = "idle";
+              frog.idleTime = randRange(frog.idleMin, frog.idleMax);
+              frog.y = frog.baseY;
+            }
+          }
+        }
+      }
+
+      function drawFrame(time) {
+        const dpr = window.devicePixelRatio || 1;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        if (!lastTime) lastTime = time;
+        const dt = (time - lastTime) / 1000;
+        lastTime = time;
+
+        if (canvas.width !== Math.floor(width * dpr) ||
+            canvas.height !== Math.floor(height * dpr)) {
+          canvas.width = Math.floor(width * dpr);
+          canvas.height = Math.floor(height * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        ctx.fillStyle = "#7cc1ff";
+        ctx.fillRect(0, 0, width, height);
+        ctx.imageSmoothingEnabled = false;
+
+        updateFrogs(dt, width, height);
+
+        for (const frog of frogs) {
+          if (!frog.layers || frog.layers.length === 0) continue;
+          const x = Math.floor(frog.x);
+          const y = Math.floor(frog.y);
+          for (const layer of frog.layers) {
+            if (!layer.img) continue;
+            ctx.drawImage(layer.img, x, y, FROG_SIZE, FROG_SIZE);
+          }
+        }
+
+        animId = requestAnimationFrame(drawFrame);
+      }
+
+      async function resetAndStart() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        if (animId) {
+          cancelAnimationFrame(animId);
+          animId = null;
+        }
+        lastTime = 0;
+
+        await createFrogs(width, height);
+        animId = requestAnimationFrame(drawFrame);
+      }
+
+      window.addEventListener("resize", resetAndStart);
+      window.addEventListener("load", resetAndStart);
+    })();
+  </script>
 
   <!-- ABIs + legacy staking helpers (used for staking level / progress) -->
   <script src="/assets/collection_abi.js"></script>
