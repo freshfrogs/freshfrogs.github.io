@@ -184,24 +184,24 @@
     let animId = null;
     let lastTime = 0;
 
-    // Mouse tracking
-    const mouse = {
+    // ---- click target (where frogs will drift) ----
+    const target = {
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
       active: false
     };
 
-    window.addEventListener("mousemove", (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-      mouse.active = true;
-    });
-
-    // Click to trigger a hop on nearest frog
+    // Click: set target + make nearest frog hop
     window.addEventListener("click", (e) => {
       const clickX = e.clientX;
       const clickY = e.clientY;
 
+      // update global target
+      target.x = clickX;
+      target.y = clickY;
+      target.active = true;
+
+      // find nearest frog to click
       let nearest = null;
       let nearestDist2 = Infinity;
 
@@ -219,6 +219,7 @@
 
       const MAX_CLICK_RADIUS = 120;
       if (nearest && nearestDist2 <= MAX_CLICK_RADIUS * MAX_CLICK_RADIUS) {
+        // force a special hop on the nearest frog
         nearest.state = "hopping";
         nearest.hopTime = 0;
         nearest.hopDuration = randRange(nearest.hopDurMin * 0.6, nearest.hopDurMax * 0.9);
@@ -226,7 +227,7 @@
       }
     });
 
-    // ---- animated trait basenames (file names) ----
+    // ---- animated trait basenames ----
     const ANIMATED_VALUES = new Set([
       'witchStraw',
       'witchBrown',
@@ -269,14 +270,12 @@
       'treeFrog(4)'
     ]);
 
-    // Turn a metadata value like "Golden Dart Frog" into "goldenDartFrog"
+    // Turn metadata value like "Golden Dart Frog" into "goldenDartFrog"
     function toAnimationKey(value) {
       const s = String(value).trim();
 
-      // If it's already exactly one of the keys, just use it.
       if (ANIMATED_VALUES.has(s)) return s;
 
-      // Basic camelCase-ish pass: split on non-alphanumeric, capitalize chunks
       const parts = s.split(/[^a-zA-Z0-9]+/).filter(Boolean);
       if (!parts.length) return s;
 
@@ -284,7 +283,6 @@
       const rest = parts
         .slice(1)
         .map(p => p.charAt(0).toUpperCase() + p.slice(1));
-
       return [first, ...rest].join("");
     }
 
@@ -324,12 +322,11 @@
 
     // Try GIF using the animation key, fall back to PNG using raw metadata value
     async function loadLayerImage(traitType, value) {
-      const raw = String(value);              // exact metadata value (for PNG)
-      const key = toAnimationKey(raw);        // best guess for animated file
+      const raw = String(value);
+      const key = toAnimationKey(raw);
 
       const pngUrl = `${BUILD_BASE}/${traitType}/${raw}.png`;
 
-      // Only try GIF if the derived key is in ANIMATED_VALUES
       if (ANIMATED_VALUES.has(key)) {
         const animUrl = `${BUILD_BASE}/${traitType}/animations/${key}_animation.gif`;
         try {
@@ -342,7 +339,7 @@
       try {
         return await loadImage(pngUrl);
       } catch (e) {
-        return null; // non-visual trait or missing asset
+        return null;
       }
     }
 
@@ -430,6 +427,8 @@
           y: pos.y,
           baseY: pos.y,
           vx: randRange(-vxRange, vxRange),
+
+          // how strongly this frog chases the target
           seekFactorX: randRange(0.08, 0.18),
           seekFactorY: randRange(0.04, 0.10),
 
@@ -467,15 +466,15 @@
         const centerX = frog.x + FROG_SIZE / 2;
         const centerBaseY = frog.baseY + FROG_SIZE / 2;
 
-        // Soft attraction to mouse
-        if (mouse.active) {
-          const dx = mouse.x - centerX;
-          const dy = mouse.y - centerBaseY;
+        // Drift toward last click target (not the live mouse)
+        if (target.active) {
+          const dx = target.x - centerX;
+          const dy = target.y - centerBaseY;
           frog.x     += dx * frog.seekFactorX * dt;
           frog.baseY += dy * frog.seekFactorY * dt;
         }
 
-        // Sideways drift (reduced so seek dominates)
+        // Sideways drift (small)
         frog.x += frog.vx * dt * 0.3;
         if (frog.x < -FROG_SIZE * 0.25) {
           frog.x = -FROG_SIZE * 0.25;
@@ -491,6 +490,7 @@
           Math.min(height - marginY - FROG_SIZE, frog.baseY)
         );
 
+        // idle / hopping behavior
         if (frog.state === "idle") {
           frog.idleTime -= dt;
           frog.y = frog.baseY;
