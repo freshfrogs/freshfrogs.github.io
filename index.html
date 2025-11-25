@@ -202,14 +202,75 @@
     let animId = null;
     let lastTime = 0;
 
-    // Where frogs drift after you click
+    // Where frogs drift after clicks / events
     const target = {
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
       active: false
     };
 
-    // Click: set target + make nearest frog hop
+    // Scroll parallax + group hop throttle
+    let scrollOffsetY = 0;
+    let lastScrollY = window.scrollY || 0;
+    let lastGroupHopTime = 0;
+
+    // --------------------------------
+    // Small public API (for nav / morph events)
+    // --------------------------------
+    function setTargetNormalized(nx, ny) {
+      const width = window.innerWidth || 1;
+      const height = window.innerHeight || 1;
+      target.x = width * nx;
+      target.y = height * ny;
+      target.active = true;
+    }
+
+    function triggerGroupHop(reason) {
+      const now = performance.now ? performance.now() : Date.now();
+      // avoid spamming
+      if (now - lastGroupHopTime < 800) return;
+      lastGroupHopTime = now;
+
+      if (!frogs.length) return;
+      const count = Math.min(8, frogs.length);
+
+      for (let i = 0; i < count; i++) {
+        const frog = frogs[randInt(0, frogs.length - 1)];
+        frog.state = "hopping";
+        frog.hopTime = 0;
+        frog.hopDuration = randRange(frog.hopDurMin * 0.6, frog.hopDurMax * 1.1);
+        frog.hopHeight = randRange(frog.hopHeightMax * 1.2, frog.hopHeightMax * 2.0);
+      }
+    }
+
+    // Expose hooks you can call from site.js / morph.js
+    window.ffScatterFrogsGoto = function (nx, ny) {
+      setTargetNormalized(nx, ny);
+    };
+    window.ffScatterFrogsGotoMorph = function () {
+      // drift toward right-center (morph panel-ish)
+      setTargetNormalized(0.8, 0.45);
+      triggerGroupHop("morph-view");
+    };
+    window.ffScatterFrogsGotoPond = function () {
+      // drift toward bottom-center (pond vibe)
+      setTargetNormalized(0.5, 0.85);
+      triggerGroupHop("pond-view");
+    };
+    window.ffScatterFrogsGotoCenter = function () {
+      setTargetNormalized(0.5, 0.5);
+    };
+    window.ffScatterFrogsCelebrateMorph = function (meta) {
+      // drift up a bit and do a celebration hop burst
+      setTargetNormalized(0.5, 0.3);
+      triggerGroupHop("new-morph");
+    };
+
+    // --------------------------------
+    // Global events
+    // --------------------------------
+
+    // Click: set target + nearest frog big-hop (same as before)
     window.addEventListener("click", (e) => {
       const clickX = e.clientX;
       const clickY = e.clientY;
@@ -239,6 +300,33 @@
         nearest.hopTime = 0;
         nearest.hopDuration = randRange(nearest.hopDurMin * 0.6, nearest.hopDurMax * 0.9);
         nearest.hopHeight = randRange(nearest.hopHeightMax * 1.1, nearest.hopHeightMax * 1.7);
+      }
+    });
+
+    // Scroll: parallax + group hops at extremes
+    window.addEventListener("scroll", () => {
+      const y = window.scrollY || 0;
+      const dy = y - lastScrollY;
+      lastScrollY = y;
+
+      // subtle parallax effect
+      scrollOffsetY -= dy * 0.15;
+      const maxOffset = 80;
+      if (scrollOffsetY > maxOffset) scrollOffsetY = maxOffset;
+      if (scrollOffsetY < -maxOffset) scrollOffsetY = -maxOffset;
+
+      // detect near top / bottom for group hop
+      const doc = document.documentElement || document.body;
+      const maxScroll = (doc.scrollHeight - doc.clientHeight) || 0;
+      if (maxScroll > 0) {
+        const atTop = y <= 5;
+        const atBottom = y + 5 >= maxScroll;
+
+        if (atTop) {
+          triggerGroupHop("scroll-top");
+        } else if (atBottom) {
+          triggerGroupHop("scroll-bottom");
+        }
       }
     });
 
@@ -291,7 +379,6 @@
     async function fetchMorphedMetadata(limit) {
       try {
         if (typeof window.ffFetchRecentMorphedFrogs === "function") {
-          // this hits your morph worker via the function from site.js
           return await window.ffFetchRecentMorphedFrogs(limit);
         }
       } catch (err) {
@@ -315,14 +402,12 @@
       frogs = [];
       container.innerHTML = "";
 
-      // pull a bunch of morphed frogs (newest first)
       const morphMetas = await fetchMorphedMetadata(300);
       if (!morphMetas.length) {
         console.warn("No morphed frogs returned for scatter background.");
         return;
       }
 
-      // limit displayed frogs for performance / clutter
       const maxScatter = Math.min(morphMetas.length, 150);
       const positions = computeFrogPositions(width, height, maxScatter);
       const count = Math.min(positions.length, morphMetas.length);
@@ -339,10 +424,9 @@
         el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
 
         const img = document.createElement("img");
-        img.src = src;                 // can be GIF → will animate naturally
+        img.src = src;                 // GIFs will animate naturally
         img.alt = meta.name || "";
         el.appendChild(img);
-
         container.appendChild(el);
 
         const personalityRoll = Math.random();
@@ -399,7 +483,7 @@
         const centerX = frog.x + FROG_SIZE / 2;
         const centerBaseY = frog.baseY + FROG_SIZE / 2;
 
-        // Drift toward last click target
+        // Drift toward last click / event target
         if (target.active) {
           const dx = target.x - centerX;
           const dy = target.y - centerBaseY;
@@ -457,8 +541,9 @@
           }
         }
 
-        // apply transform to DOM element
-        frog.el.style.transform = `translate3d(${frog.x}px, ${frog.y}px, 0)`;
+        // apply transform with scroll parallax
+        const renderY = frog.y + scrollOffsetY;
+        frog.el.style.transform = `translate3d(${frog.x}px, ${renderY}px, 0)`;
       }
     }
 
@@ -483,6 +568,8 @@
         animId = null;
       }
       lastTime = 0;
+      scrollOffsetY = 0;
+      lastScrollY = window.scrollY || 0;
 
       await createFrogs(width, height);
       animId = requestAnimationFrame(drawFrame);
@@ -492,6 +579,7 @@
     window.addEventListener("load", resetAndStart);
   })();
 </script>
+
 
   <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
 <script src="/assets/site.js"></script>
