@@ -47,23 +47,37 @@
 
     <!-- MAIN DASHBOARD LAYOUT -->
     <main class="dashboard-main">
-      <!-- Recent Activity (sales / mints) -->
+      <!-- Recent Activity (sales / stakes / morphs) -->
       <section
         class="panel dashboard-section"
         id="recent-activity-panel"
-        style="background: transparent; box-shadow: none; padding: 0;"
-      >
-        <h2>Recent Activity</h2>
+        style="background: transparent; box-shadow: none; padding: 0;">
+
+        <!-- Recent Sales -->
+        <h2>Recent Sales</h2>
         <p class="dashboard-note" id="recent-sales-status">
           Loading recent sales...
         </p>
-
         <div class="recent_sales" id="recent-sales"></div>
-
         <button id="load-more-activity" class="btn secondary" type="button">
           Load More
         </button>
+
+        <!-- Recent Stakes -->
+        <h2 style="margin-top: 2rem;">Recent Stakes</h2>
+        <p class="dashboard-note" id="recent-stakes-status">
+          Loading recent stakes...
+        </p>
+        <div class="recent_sales" id="recent-stakes"></div>
+
+        <!-- Recent Morphs (homepage) -->
+        <h2 style="margin-top: 2rem;">Recent Morphs</h2>
+        <p class="dashboard-note" id="recent-home-morphs-status">
+          Loading recent morphs...
+        </p>
+        <div class="recent_sales" id="recent-home-morphs-grid"></div>
       </section>
+
 
       <!-- Rarity Rankings -->
       <section

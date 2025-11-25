@@ -28,7 +28,7 @@ const FF_MORPH_WORKER_URL = 'https://freshfrogs-morphs.danielssouthworth.workers
 
 // Activity mode (sales vs mints) for "Collection" panel
 let FF_ACTIVITY_MODE = 'sales'; // 'sales' or 'mints'
-let FF_RECENT_LIMIT  = 24;
+let FF_RECENT_LIMIT  = 6;
 
 // Toggle to show staking stats on non-wallet cards ff_admin_9f3k2j
 const FF_SHOW_STAKING_STATS_ON_CARDS = true;
@@ -224,11 +224,15 @@ function ffShowView(view) {
   if (stakedPanel)  stakedPanel.style.display  = (view === 'wallet') ? '' : 'none';
 
   if (view === 'collection') {
-    loadRecentActivity();
+    // Homepage: 6 recent sales, 6 recent stakes, 6 recent morphs
+    loadRecentActivity(); // uses FF_RECENT_LIMIT for sales
+    ffLoadRecentStakes(); // new stakes section
+    ffLoadRecentMorphs(6, 'recent-home-morphs-grid', 'recent-home-morphs-status'); // homepage morphs
   } else if (view === 'rarity') {
     ffEnsureRarityLoaded();
   } else if (view === 'pond') {
-    ffEnsureRecentMorphsAbovePond();  // ✅ move section above pond cards
+    // Pond shows staked frogs + the big recent morphs panel
+    ffEnsureRecentMorphsAbovePond();
     ffEnsurePondLoaded();
     ffEnsureRecentMorphsLoaded();
   } else if (view === 'wallet' && ffCurrentAccount) {
@@ -355,6 +359,75 @@ async function loadRecentActivity() {
     if (statusEl) statusEl.textContent = status;
   }
 }
+
+async function ffLoadRecentStakes() {
+  const container = document.getElementById('recent-stakes');
+  const statusEl  = document.getElementById('recent-stakes-status');
+  if (!container) return;
+
+  if (statusEl) statusEl.textContent = 'Loading recent stakes...';
+
+  try {
+    const items = await fetchRecentStakes(6); // show 6 on homepage
+
+    if (!items.length) {
+      if (statusEl) statusEl.textContent = 'No recent stakes found.';
+      container.innerHTML = '';
+      return;
+    }
+
+    container.innerHTML = '';
+    if (statusEl) statusEl.textContent = '';
+
+    for (const item of items) {
+      const rawTokenId =
+        item.erc721TokenId ||
+        item.tokenId ||
+        (item.nft && item.nft.identifier);
+
+      if (!rawTokenId) continue;
+      const tokenId = parseTokenId(rawTokenId);
+      if (tokenId == null) continue;
+
+      let metadata =
+        normalizeMetadata(item.metadata || item.tokenMetadata || item.rawMetadata) ||
+        normalizeMetadata(item.nft && (item.nft.metadata || item.nft.rawMetadata));
+
+      if (!hasUsableMetadata(metadata)) {
+        metadata = await fetchFrogMetadata(tokenId);
+      }
+
+      // Staker = address sending the frog into the controller
+      const staker = item.from || item.fromAddress || item.ownerAddress || null;
+      const ageText = formatMintAge(item); // reuses age formatter based on blockTimestamp
+      const headerRight = ageText ? `Staked · ${ageText}` : 'Staked';
+
+      const card = createFrogCard({
+        tokenId,
+        metadata,
+        headerLeft: '',
+        headerRight,
+        footerHtml: '',
+        actionHtml: '' // no buttons in this mini list
+      });
+
+      container.appendChild(card);
+
+      if (staker) ffSetOwnerLabel(card, staker);
+
+      if (card.dataset.imgContainerId) {
+        ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
+      }
+
+      // Attach staking meta so the bar/level shows up if it’s staked
+      ffAttachStakeMetaIfStaked(card, tokenId);
+    }
+  } catch (err) {
+    console.error('ffLoadRecentStakes failed', err);
+    if (statusEl) statusEl.textContent = 'Unable to load recent stakes right now.';
+  }
+}
+
 
 // Attach staking block to any card (recent, pond, rarity, etc.)
 async function ffAttachStakeMetaIfStaked(card, tokenId) {
@@ -988,6 +1061,42 @@ async function fetchRecentMints(limit = 24) {
   return dedupeByTokenId(transfers, (t) => t.erc721TokenId || t.tokenId);
 }
 
+async function fetchRecentStakes(limit = 24) {
+  // Transfers of frogs into the controller address = stakes
+  const body = {
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'alchemy_getAssetTransfers',
+    params: [
+      {
+        toAddress: FF_CONTROLLER_ADDRESS,
+        contractAddresses: [FF_COLLECTION_ADDRESS],
+        category: ['erc721'],
+        order: 'desc',
+        maxCount: '0x' + limit.toString(16),
+        withMetadata: true
+      }
+    ]
+  };
+
+  const response = await fetch(FF_ALCHEMY_CORE_BASE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Alchemy stake transfers request failed: ${response.status}`);
+  }
+
+  const payload = await response.json();
+  let transfers = payload.result?.transfers || [];
+
+  // Dedupe by tokenId (newest first)
+  return dedupeByTokenId(transfers, (t) => t.erc721TokenId || t.tokenId);
+}
+
+
 async function fetchFrogMetadata(tokenId) {
   try {
     const url = `https://freshfrogs.github.io/frog/json/${tokenId}.json`;
@@ -1311,7 +1420,6 @@ async function ffFetchRecentMorphedFrogs(limit = 24) {
   }
 }
 
-
 function ffEnsureRecentMorphsLoaded() {
   const grid = document.getElementById('recent-morphs-grid');
   if (!grid) return;
@@ -1320,16 +1428,22 @@ function ffEnsureRecentMorphsLoaded() {
   if (grid.dataset.loading === "1") return;
 
   if (!grid.children.length) {
-    ffLoadRecentMorphs();
+    // Pond page: larger batch
+    ffLoadRecentMorphs(24, 'recent-morphs-grid', 'recent-morphs-status');
   } else {
     const status = document.getElementById('recent-morphs-status');
     if (status) status.textContent = 'Latest morphed frogs from the community.';
   }
 }
 
-async function ffLoadRecentMorphs() {
-  const grid = document.getElementById('recent-morphs-grid');
-  const status = document.getElementById('recent-morphs-status');
+// Generic loader so we can reuse on homepage (gridId/statusId/limit)
+async function ffLoadRecentMorphs(
+  limit   = 24,
+  gridId  = 'recent-morphs-grid',
+  statusId = 'recent-morphs-status'
+) {
+  const grid = document.getElementById(gridId);
+  const status = document.getElementById(statusId);
   if (!grid) return;
 
   // in-flight lock + reset
@@ -1337,16 +1451,16 @@ async function ffLoadRecentMorphs() {
   grid.innerHTML = "";
 
   try {
-    let morphs = await ffFetchRecentMorphedFrogs(24);
+    let morphs = await ffFetchRecentMorphedFrogs(limit);
 
     if (!Array.isArray(morphs) || !morphs.length) {
       if (status) status.textContent = 'No morphed frogs have been created yet.';
       return;
     }
 
-    // ✅ DEDUPE morphs by best-available unique key
+    // DEDUPE morphs by a best-guess unique key
     const seen = new Set();
-    morphs = morphs.filter(meta => {
+    morphs = morphs.filter((meta) => {
       const id =
         meta.morphId ||
         meta.id ||
@@ -1382,6 +1496,7 @@ async function ffLoadRecentMorphs() {
     grid.dataset.loading = "";
   }
 }
+
 
 function ffEnsureRecentMorphsAbovePond() {
   const grid = document.getElementById('recent-morphs-grid');
