@@ -170,7 +170,7 @@
   <!-- Frog background logic (wrapped to avoid globals) -->
   <script>
     (function () {
-      const FROG_SIZE = 96;
+      const FROG_SIZE = 128;
       const MAX_TOKEN_ID = 4040;
       const META_BASE = "/frog/json/";
       const META_EXT = ".json";
@@ -251,7 +251,7 @@
         targetCount = Math.max(20, Math.min(maxFrogs, targetCount));
 
         const positions = [];
-        const MIN_DIST = 84;
+        const MIN_DIST = 112;
         const margin = 16;
 
         let safety = targetCount * 50;
