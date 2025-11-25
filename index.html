@@ -170,18 +170,27 @@
   <!-- Frog background logic (wrapped to avoid globals) -->
   <script>
     (function () {
-      const FROG_SIZE = 64;
+      const FROG_SIZE    = 64;          // 64x64 frogs again
       const MAX_TOKEN_ID = 4040;
-      const META_BASE = "/frog/json/";
-      const META_EXT = ".json";
-      const BUILD_BASE = "/frog/build_files";
+      const META_BASE    = "/frog/json/";
+      const META_EXT     = ".json";
+      const BUILD_BASE   = "/frog/build_files";
 
       const canvas = document.getElementById("frog-bg");
-      if (!canvas) return;
+      if (!canvas || !canvas.getContext) return;
       const ctx = canvas.getContext("2d", { alpha: false });
 
+      let frogs = [];
+      let animId = null;
+      let lastTime = 0;
+
+      // ----------------- helpers -----------------
       function randInt(min, maxInclusive) {
         return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
+      }
+
+      function randRange(min, max) {
+        return min + Math.random() * (max - min);
       }
 
       function pickRandomTokenIds(count) {
@@ -190,10 +199,6 @@
           set.add(randInt(1, MAX_TOKEN_ID));
         }
         return Array.from(set);
-      }
-
-      function getSkyColor() {
-        return "#7cc1ff";
       }
 
       function loadImage(url) {
@@ -215,6 +220,7 @@
       }
 
       function buildLayerUrl(traitType, value) {
+        // Use traitType and value exactly as folder/file names (case-sensitive)
         return `${BUILD_BASE}/${traitType}/${value}.png`;
       }
 
@@ -227,6 +233,7 @@
 
         if (!Array.isArray(meta.attributes)) return off;
 
+        // Draw layers in the order they appear in metadata
         for (const attr of meta.attributes) {
           if (!attr.trait_type || typeof attr.value === "undefined") continue;
           const url = buildLayerUrl(attr.trait_type, attr.value);
@@ -234,30 +241,29 @@
             const img = await loadImage(url);
             octx.drawImage(img, 0, 0, FROG_SIZE, FROG_SIZE);
           } catch (err) {
-            // ignore non-visual traits
+            // non-visual traits will just fail here; ignore
           }
         }
+
         return off;
       }
 
-      function computeFrogPositions() {
-        const W = window.innerWidth;
-        const H = window.innerHeight;
-
-        const area = W * H;
-        const maxFrogs = 150;
+      // ----------------- layout + frog creation -----------------
+      function computeFrogPositions(width, height) {
+        const area = width * height;
+        const maxFrogs = 120;
         const approxPerFrogArea = (FROG_SIZE * FROG_SIZE) * 5;
         let targetCount = Math.floor(area / approxPerFrogArea);
-        targetCount = Math.max(20, Math.min(maxFrogs, targetCount));
+        targetCount = Math.max(15, Math.min(maxFrogs, targetCount));
 
         const positions = [];
-        const MIN_DIST = 56;
+        const MIN_DIST = 52; // min distance between frog centers
         const margin = 16;
 
         let safety = targetCount * 50;
         while (positions.length < targetCount && safety-- > 0) {
-          const x = margin + Math.random() * (W - margin * 2 - FROG_SIZE);
-          const y = margin + Math.random() * (H - margin * 2 - FROG_SIZE);
+          const x = margin + Math.random() * (width - margin * 2 - FROG_SIZE);
+          const y = margin + Math.random() * (height - margin * 2 - FROG_SIZE);
           const cx = x + FROG_SIZE / 2;
           const cy = y + FROG_SIZE / 2;
 
@@ -277,46 +283,125 @@
         return positions;
       }
 
-      async function drawScene() {
-        const dpr = window.devicePixelRatio || 1;
-        canvas.width = Math.floor(window.innerWidth * dpr);
-        canvas.height = Math.floor(window.innerHeight * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      async function createFrogs(width, height) {
+        frogs = [];
 
-        const sky = getSkyColor();
-        ctx.fillStyle = sky;
-        ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+        const positions = computeFrogPositions(width, height);
+        const tokenIds  = pickRandomTokenIds(positions.length);
+
+        // create frog objects with movement params
+        frogs = positions.map((pos, i) => ({
+          tokenId: tokenIds[i],
+          x: pos.x,
+          y: pos.y,
+          baseY: pos.y,
+          vx: randRange(-10, 10),                 // slow sideways drift (px/sec)
+          hopPhase: Math.random() * Math.PI * 2,  // initial phase
+          hopSpeed: randRange(0.8, 1.6),          // hops per second-ish
+          hopAmp: randRange(6, 14),               // hop height in px
+          sprite: null,
+          t: 0
+        }));
+
+        // load sprites async; frogs will appear as they finish
+        await Promise.all(
+          frogs.map(async (frog) => {
+            try {
+              const meta = await fetchMetadata(frog.tokenId);
+              frog.sprite = await buildFrogSpriteFromMetadata(meta);
+            } catch (err) {
+              // ignore failures; frog just stays invisible
+            }
+          })
+        );
+      }
+
+      // ----------------- animation -----------------
+      function updateFrogs(dt, width, height) {
+        for (const frog of frogs) {
+          frog.t += dt;
+
+          // sideways drift
+          frog.x += frog.vx * dt;
+          // bounce off edges
+          if (frog.x < -FROG_SIZE * 0.25) {
+            frog.x = -FROG_SIZE * 0.25;
+            frog.vx *= -1;
+          } else if (frog.x > width - FROG_SIZE * 0.75) {
+            frog.x = width - FROG_SIZE * 0.75;
+            frog.vx *= -1;
+          }
+
+          // hopping (vertical sine offset)
+          const phase = frog.hopPhase + frog.t * frog.hopSpeed * Math.PI * 2;
+          const hopOffset = Math.abs(Math.sin(phase)) * frog.hopAmp * -1; // hop up
+          frog.y = frog.baseY + hopOffset;
+        }
+      }
+
+      function drawFrame(time) {
+        const dpr = window.devicePixelRatio || 1;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        if (!lastTime) lastTime = time;
+        const dt = (time - lastTime) / 1000;
+        lastTime = time;
+
+        // ensure canvas size & transform are correct
+        if (canvas.width !== Math.floor(width * dpr) ||
+            canvas.height !== Math.floor(height * dpr)) {
+          canvas.width = Math.floor(width * dpr);
+          canvas.height = Math.floor(height * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        // clear background
+        ctx.fillStyle = "#7cc1ff";
+        ctx.fillRect(0, 0, width, height);
         ctx.imageSmoothingEnabled = false;
 
-        const positions = computeFrogPositions();
-        const tokenIds = pickRandomTokenIds(positions.length);
+        // update + draw frogs
+        updateFrogs(dt, width, height);
+        for (const frog of frogs) {
+          if (!frog.sprite) continue;
+          ctx.drawImage(
+            frog.sprite,
+            Math.floor(frog.x),
+            Math.floor(frog.y),
+            FROG_SIZE,
+            FROG_SIZE
+          );
+        }
 
-        await Promise.all(tokenIds.map(async (tokenId, i) => {
-          const pos = positions[i];
-          try {
-            const meta = await fetchMetadata(tokenId);
-            const frogSprite = await buildFrogSpriteFromMetadata(meta);
-            ctx.drawImage(
-              frogSprite,
-              Math.floor(pos.x),
-              Math.floor(pos.y),
-              FROG_SIZE,
-              FROG_SIZE
-            );
-          } catch (err) {
-            // ignore failures
-          }
-        }));
+        animId = requestAnimationFrame(drawFrame);
       }
 
-      function handleResize() {
-        drawScene();
+      async function resetAndStart() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        if (animId) {
+          cancelAnimationFrame(animId);
+          animId = null;
+        }
+
+        lastTime = 0;
+        await createFrogs(width, height);
+        animId = requestAnimationFrame(drawFrame);
       }
 
-      window.addEventListener("resize", handleResize);
-      window.addEventListener("load", drawScene);
+      // resize: just rebuild everything (cheap enough)
+      window.addEventListener("resize", () => {
+        resetAndStart();
+      });
+
+      window.addEventListener("load", () => {
+        resetAndStart();
+      });
     })();
   </script>
+
 
   <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
 <script src="/assets/ff-core.js"></script>
