@@ -11,11 +11,35 @@
     #frog-bg {
       position: fixed;
       inset: 0;
-      z-index: -1;
-      background: #bfe8ff; /* light blue */
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background: #7cc1ff;
+      overflow: hidden;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
+      pointer-events: none; /* let user interact with the site */
     }
+    .page {
+      position: relative;
+      z-index: 1;
+    }
+    .frog-sprite {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      pointer-events: none;
+    }
+    .frog-sprite img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      image-rendering: inherit;
+    }
+
   </style>
 </head>
 <body class="layout-4">
