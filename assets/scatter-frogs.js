@@ -432,6 +432,64 @@
     animId = requestAnimationFrame(drawFrame);
   }
 
+  function setupNavScatterHooks() {
+    const navLinks = document.querySelectorAll("nav a[data-view]");
+    if (!navLinks.length) return;
+
+    navLinks.forEach((link) => {
+      const view = link.getAttribute("data-view");
+      if (!view) return;
+
+      link.addEventListener(
+        "click",
+        () => {
+          // Only do the animation if the scatter has already started
+          if (!frogs.length) return;
+
+          switch (view) {
+            case "collection":
+              // center of the screen
+              if (window.ffScatterFrogsGotoCenter) {
+                window.ffScatterFrogsGotoCenter();
+              }
+              break;
+
+            case "rarity":
+              // bias a bit left/top for a different feel
+              if (window.ffScatterFrogsGoto) {
+                window.ffScatterFrogsGoto(0.25, 0.35);
+              }
+              break;
+
+            case "pond":
+              if (window.ffScatterFrogsGotoPond) {
+                window.ffScatterFrogsGotoPond();
+              }
+              break;
+
+            case "morph":
+              if (window.ffScatterFrogsGotoMorph) {
+                window.ffScatterFrogsGotoMorph();
+              }
+              break;
+
+            case "wallet":
+              if (window.ffScatterFrogsGoto) {
+                // drift toward upper-left (wallet panel vibe)
+                window.ffScatterFrogsGoto(0.18, 0.3);
+              }
+              break;
+          }
+        },
+        { passive: true }
+      );
+    });
+  }
+
   window.addEventListener("resize", resetAndStart);
-  window.addEventListener("load", resetAndStart);
+  window.addEventListener("load", function () {
+    resetAndStart();
+    setupNavScatterHooks();
+  });
 })();
+
