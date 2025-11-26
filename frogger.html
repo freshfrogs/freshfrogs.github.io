@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fresh Frogs – Scatter Frogger</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body class="layout-4">
+  <!-- Random trait-built frogs background (same as main index) -->
+  <div id="frog-bg"></div>
+
+  <div class="page">
+    <!-- HEADER (same nav as main site) -->
+    <header class="site-header">
+      <nav class="nav">
+        <a href="/" data-view="collection">Collection</a>
+        <a href="/rarity/" data-view="rarity">Rarity</a>
+        <a href="/pond/" data-view="pond">Pond</a>
+        <a href="/morph/" data-view="morph">Morph</a>
+
+        <a href="#" id="header-connect-wallet-btn">Connect</a>
+        <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
+      </nav>
+    </header>
+
+    <!-- SIMPLE HERO FOR THE GAME -->
+    <section class="hero">
+      <div class="hero-main">
+        <div class="hero-media">
+          <!-- you can swap these out later; just decorative -->
+          <img src="https://freshfrogs.github.io/frog/16.png" class="fly" />
+          <img src="https://freshfrogs.github.io/frog/3753.png" class="fly" />
+        </div>
+        <h1 class="hero-title">Scatter Frogger</h1>
+        <p class="hero-subtitle">
+          A mini-game built on the trait-layered Scatter Frogs background.
+          Click once to get the frogs to follow your mouse as they hop around.
+          We can add lanes, hazards, and lives on top of this next.
+        </p>
+      </div>
+    </section>
+
+    <main class="dashboard-main">
+      <section class="panel dashboard-section"
+        style="background: transparent; box-shadow: none; padding: 0;">
+        <p class="dashboard-note">
+          This page uses the same layered, animated Scatter Frogs you see
+          on the homepage. The next step is to turn this into a Frogger-style
+          game by adding obstacles and “lives” on top of these same frogs.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span class="footer-links" style="color: white;">
+        <a href="/">freshfrogs.github.io</a>
+      </span>
+    </footer>
+  </div>
+
+  <!-- Same scripts you already use on index, but we only actually *need* scatter-frogs.js here -->
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
+  <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
+  <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
+  <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+
+  <!-- This is the important one: it builds the layered, hopping scatter frogs -->
+  <script src="/assets/scatter-frogs.js"></script>
+</body>
+</html>
