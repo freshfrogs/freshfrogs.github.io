@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fresh Frogs – Scatterfrogs</title>
+  <title>Fresh Frogs – Snake Scatter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Adjust this path if your style.css is elsewhere -->
+  <!-- Adjust path if your CSS is elsewhere -->
   <link rel="stylesheet" href="/style.css" />
 
   <style>
@@ -14,23 +14,21 @@
       padding: 0;
       height: 100%;
       width: 100%;
-      overflow: hidden; /* keep it as a clean single screen */
-      background: #7cc1ff; /* light blue background */
+      overflow: hidden;
+      background: #7cc1ff; /* light blue */
     }
 
-    /* Make the scatterfrog container fill the screen */
     #frog-bg {
       position: fixed;
       inset: 0;
-      pointer-events: auto; /* so clicks still register for hop behavior */
+      pointer-events: auto;
     }
   </style>
 </head>
 <body>
-  <!-- Scatter frogs container (same as homepage) -->
-  <div id="frog-bg"></div>
+  <!-- data-snake-game turns on snake logic in scatter-frogs.js -->
+  <div id="frog-bg" data-snake-game="1"></div>
 
-  <!-- Scatter frogs logic (same file you're already using on homepage) -->
   <script src="/assets/scatter-frogs.js"></script>
 </body>
 </html>
