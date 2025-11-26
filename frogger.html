@@ -4,69 +4,179 @@
   <meta charset="UTF-8" />
   <title>Fresh Frogs – Scatter Frogger</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Use your existing site styles -->
   <link rel="stylesheet" href="../style.css" />
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #030711;
+      color: #e8f6ff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    /* background scatter frogs container */
+    #frog-bg {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none; /* clicks go through for the game */
+    }
+
+    /* make sure frogs are visible; scatter-frogs.js handles transform */
+    .frog-sprite {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      will-change: transform;
+    }
+
+    /* HUD */
+    #frogger-hud {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 16px;
+      background: rgba(6, 10, 20, 0.88);
+      border-radius: 999px;
+      border: 1px solid #1b2a36;
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      z-index: 20;
+      backdrop-filter: blur(8px);
+    }
+
+    #frogger-hud span.label {
+      opacity: 0.7;
+      margin-right: 4px;
+    }
+
+    #frogger-hud span.value {
+      font-weight: 600;
+    }
+
+    /* Hazards (cars / whatever) */
+    .frogger-hazard {
+      position: absolute;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(255, 122, 122, 0.95);
+      box-shadow: 0 0 10px rgba(255, 90, 90, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+
+    /* Visual feedback for frogs */
+    .frog-lost {
+      opacity: 0.15;
+      filter: grayscale(1) contrast(0.6);
+    }
+    .frog-rescued {
+      opacity: 0.6;
+      filter: brightness(1.4);
+    }
+
+    /* Game-over overlay */
+    #frogger-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      z-index: 30;
+    }
+
+    #frogger-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #frogger-overlay-inner {
+      min-width: 260px;
+      max-width: 360px;
+      padding: 20px 24px;
+      border-radius: 16px;
+      background: radial-gradient(circle at top, #152236 0, #05070d 60%);
+      border: 1px solid #243449;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75);
+      text-align: center;
+    }
+
+    #frogger-overlay-inner h1 {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    #frogger-overlay-inner p {
+      font-size: 14px;
+      opacity: 0.85;
+      margin-bottom: 16px;
+    }
+
+    #frogger-overlay-inner button {
+      margin-top: 4px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6ee7ff, #9bffb1);
+      color: #021018;
+    }
+
+    #frogger-overlay-inner button:hover {
+      filter: brightness(1.06);
+    }
+
+    /* Small hint */
+    #frogger-hint {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      opacity: 0.6;
+      background: rgba(3, 4, 10, 0.85);
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid #1b2a36;
+      z-index: 15;
+    }
+  </style>
 </head>
-<body class="layout-4">
-  <!-- Random trait-built frogs background (same as main index) -->
+<body>
+  <!-- Trait-built, animated frogs from scatter-frogs.js -->
   <div id="frog-bg"></div>
 
-  <div class="page">
-    <!-- HEADER (same nav as main site) -->
-    <header class="site-header">
-      <nav class="nav">
-        <a href="/" data-view="collection">Collection</a>
-        <a href="/rarity/" data-view="rarity">Rarity</a>
-        <a href="/pond/" data-view="pond">Pond</a>
-        <a href="/morph/" data-view="morph">Morph</a>
-
-        <a href="#" id="header-connect-wallet-btn">Connect</a>
-        <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
-      </nav>
-    </header>
-
-    <!-- SIMPLE HERO FOR THE GAME -->
-    <section class="hero">
-      <div class="hero-main">
-        <div class="hero-media">
-          <!-- you can swap these out later; just decorative -->
-          <img src="https://freshfrogs.github.io/frog/16.png" class="fly" />
-          <img src="https://freshfrogs.github.io/frog/3753.png" class="fly" />
-        </div>
-        <h1 class="hero-title">Scatter Frogger</h1>
-        <p class="hero-subtitle">
-          A mini-game built on the trait-layered Scatter Frogs background.
-          Click once to get the frogs to follow your mouse as they hop around.
-          We can add lanes, hazards, and lives on top of this next.
-        </p>
-      </div>
-    </section>
-
-    <main class="dashboard-main">
-      <section class="panel dashboard-section"
-        style="background: transparent; box-shadow: none; padding: 0;">
-        <p class="dashboard-note">
-          This page uses the same layered, animated Scatter Frogs you see
-          on the homepage. The next step is to turn this into a Frogger-style
-          game by adding obstacles and “lives” on top of these same frogs.
-        </p>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <span class="footer-links" style="color: white;">
-        <a href="/">freshfrogs.github.io</a>
-      </span>
-    </footer>
+  <!-- HUD -->
+  <div id="frogger-hud">
+    <div><span class="label">Saved</span> <span class="value" id="frogger-saved">0</span></div>
+    <div><span class="label">Lost</span> <span class="value" id="frogger-lost">0</span></div>
+    <div><span class="label">Frogs Left</span> <span class="value" id="frogger-left">0</span></div>
   </div>
 
-  <!-- Same scripts you already use on index, but we only actually *need* scatter-frogs.js here -->
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-  <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
-  <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
-  <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
-  <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+  <div id="frogger-hint">
+    Move your mouse to guide the frogs. First click starts them following you.
+  </div>
 
-  <!-- This is the important one: it builds the layered, hopping scatter frogs -->
+  <!-- Game over overlay -->
+  <div id="frogger-overlay">
+    <div id="frogger-overlay-inner"></div>
+  </div>
+
+  <!-- Your existing scatter logic: builds layered hopping frogs in #frog-bg -->
   <script src="/assets/scatter-frogs.js"></script>
+  <!-- New: game logic layered on top of scatter frogs -->
+  <script src="/assets/scatter-frogger-game.js"></script>
 </body>
 </html>
