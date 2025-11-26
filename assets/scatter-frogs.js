@@ -1,11 +1,11 @@
 // assets/scatter-frogs.js
 (function () {
-  const FROG_SIZE   = 64;
+  const FROG_SIZE    = 64;
   const MAX_TOKEN_ID = 4040;
-  const META_BASE   = "/frog/json/";
-  const META_EXT    = ".json";
-  const BUILD_BASE  = "/frog/build_files";
-  const MAX_FROGS   = 120;
+  const META_BASE    = "/frog/json/";
+  const META_EXT     = ".json";
+  const BUILD_BASE   = "/frog/build_files";
+  const MAX_FROGS    = 120;
 
   // Values that have animation variants for scatter frogs
   const SCATTER_ANIMATED_VALUES = new Set([
@@ -65,15 +65,15 @@
   let animId = null;
   let lastTime = 0;
 
-  // Mouse tracking: only used for attraction after first click
+  // Mouse tracking: used only to choose hop destination
   const mouse = {
     x: window.innerWidth / 2,
     y: window.innerHeight / 2,
     active: false,
-    follow: false
+    follow: false  // becomes true after first click
   };
 
-  // Optional nav target (for future; only used when not following mouse)
+  // Optional nav/other target (used only if mouse.follow = false)
   const target = {
     x: window.innerWidth / 2,
     y: window.innerHeight / 2,
@@ -86,7 +86,7 @@
   let lastGroupHopTime = 0;
 
   // -----------------------------
-  // Public API (nav hooks are still available if you want)
+  // Public API (still works if you want it)
   // -----------------------------
   function setTargetNormalized(nx, ny) {
     const width = window.innerWidth || 1;
@@ -113,10 +113,16 @@
       frog.hopTime = 0;
       frog.hopDuration = randRange(frog.hopDurMin * 0.6, frog.hopDurMax * 1.1);
       frog.hopHeight = randRange(frog.hopHeightMax * 1.2, frog.hopHeightMax * 2.0);
+
+      // keep hop start/end as "in place" for group hops
+      frog.hopStartX = frog.x;
+      frog.hopStartBaseY = frog.baseY;
+      frog.hopEndX = frog.x;
+      frog.hopEndBaseY = frog.baseY;
     }
   }
 
-  // Expose these if you still want nav to influence frogs
+  // Optional nav hooks
   window.ffScatterFrogsGoto = function (nx, ny) {
     setTargetNormalized(nx, ny);
   };
@@ -139,23 +145,19 @@
   // -----------------------------
   // Events
   // -----------------------------
-
-  // Track mouse position always
   window.addEventListener("mousemove", (e) => {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
     mouse.active = true;
   });
 
-  // First click: enable follow + nearest frog hop
+  // First click: enable following mouse via hops; also hop nearest frog
   window.addEventListener("click", (e) => {
     const clickX = e.clientX;
     const clickY = e.clientY;
 
-    // once you click, frogs start following the mouse
     mouse.follow = true;
 
-    // still keep the fun nearest-frog hop
     let nearest = null;
     let nearestDist2 = Infinity;
 
@@ -177,6 +179,11 @@
       nearest.hopTime = 0;
       nearest.hopDuration = randRange(nearest.hopDurMin * 0.6, nearest.hopDurMax * 0.9);
       nearest.hopHeight = randRange(nearest.hopHeightMax * 1.1, nearest.hopHeightMax * 1.7);
+
+      nearest.hopStartX = nearest.x;
+      nearest.hopStartBaseY = nearest.baseY;
+      nearest.hopEndX = nearest.x;
+      nearest.hopEndBaseY = nearest.baseY;
     }
   });
 
@@ -300,7 +307,7 @@
       const traitType = attr.trait_type;
       const value = attr.value;
       if (!traitType || typeof value === "undefined") continue;
-      if (SKIP_TRAITS.has(traitType)) continue; // no background tiles
+      if (SKIP_TRAITS.has(traitType)) continue;
 
       const img = await loadTraitImage(traitType, value);
       if (!img) continue;
@@ -336,23 +343,20 @@
       container.appendChild(el);
 
       const personalityRoll = Math.random();
-      let idleMin, idleMax, hopMin, hopMax, heightMin, heightMax, vxRange;
+      let idleMin, idleMax, hopMin, hopMax, heightMin, heightMax;
 
       if (personalityRoll < 0.25) {
         idleMin = 0.3; idleMax = 1.0;
         hopMin = 0.25; hopMax = 0.55;
         heightMin = 14; heightMax = 32;
-        vxRange = 20;
       } else if (personalityRoll < 0.6) {
         idleMin = 0.8; idleMax = 3.0;
         hopMin = 0.35; hopMax = 0.7;
         heightMin = 10; heightMax = 26;
-        vxRange = 12;
       } else {
         idleMin = 2.0; idleMax = 5.0;
         hopMin = 0.45; hopMax = 0.9;
         heightMin = 6;  heightMax = 20;
-        vxRange = 8;
       }
 
       const frog = {
@@ -361,9 +365,12 @@
         x: pos.x,
         y: pos.y,
         baseY: pos.y,
-        vx: randRange(-vxRange, vxRange),
-        seekFactorX: randRange(0.05, 0.15),
-        seekFactorY: randRange(0.03, 0.08),
+
+        // hop path
+        hopStartX: pos.x,
+        hopStartBaseY: pos.y,
+        hopEndX: pos.x,
+        hopEndBaseY: pos.y,
 
         state: "idle",
         idleTime: randRange(idleMin, idleMax),
@@ -382,7 +389,6 @@
 
       frogs.push(frog);
 
-      // load base frog metadata and build layers
       fetchMetadata(tokenId)
         .then(meta => buildLayersForFrog(frog, meta))
         .catch(() => {});
@@ -390,43 +396,66 @@
   }
 
   // -----------------------------
+  // Decide hop destination
+  // -----------------------------
+  function chooseHopDestination(frog, width, height) {
+    // default: small jitter in place
+    let targetX = frog.x;
+    let targetBaseY = frog.baseY;
+
+    const marginY = 24;
+    const marginX = 8;
+    const maxStep = 40; // max distance per hop
+
+    let goalX = null;
+    let goalY = null;
+
+    if (mouse.follow && mouse.active) {
+      goalX = mouse.x - FROG_SIZE / 2;
+      goalY = mouse.y - FROG_SIZE / 2;
+    } else if (target.active) {
+      goalX = target.x - FROG_SIZE / 2;
+      goalY = target.y - FROG_SIZE / 2;
+    }
+
+    if (goalX !== null && goalY !== null) {
+      const dx = goalX - frog.x;
+      const dy = goalY - frog.baseY;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const step = Math.min(maxStep, dist);
+
+      const stepX = (dx / dist) * step;
+      const stepY = (dy / dist) * step;
+
+      targetX = frog.x + stepX;
+      targetBaseY = frog.baseY + stepY;
+    } else {
+      // no mouse/target → tiny random shuffle
+      targetX = frog.x + randRange(-12, 12);
+      targetBaseY = frog.baseY + randRange(-6, 6);
+    }
+
+    // clamp to screen bounds
+    targetX = Math.max(marginX, Math.min(width - marginX - FROG_SIZE, targetX));
+    targetBaseY = Math.max(
+      marginY,
+      Math.min(height - marginY - FROG_SIZE, targetBaseY)
+    );
+
+    frog.hopStartX = frog.x;
+    frog.hopStartBaseY = frog.baseY;
+    frog.hopEndX = targetX;
+    frog.hopEndBaseY = targetBaseY;
+  }
+
+  // -----------------------------
   // Animation
   // -----------------------------
   function updateFrogs(dt, width, height) {
+    const marginY = 24;
+    const marginX = 8;
+
     for (const frog of frogs) {
-      const centerX = frog.x + FROG_SIZE / 2;
-      const centerBaseY = frog.baseY + FROG_SIZE / 2;
-
-      // Follow mouse after first click, else optional nav target
-      if (mouse.follow && mouse.active) {
-        const dx = mouse.x - centerX;
-        const dy = mouse.y - centerBaseY;
-        frog.x     += dx * frog.seekFactorX * dt;
-        frog.baseY += dy * frog.seekFactorY * dt;
-      } else if (target.active) {
-        const dx = target.x - centerX;
-        const dy = target.y - centerBaseY;
-        frog.x     += dx * frog.seekFactorX * dt;
-        frog.baseY += dy * frog.seekFactorY * dt;
-      }
-
-      // small sideways drift
-      frog.x += frog.vx * dt * 0.3;
-      if (frog.x < -FROG_SIZE * 0.25) {
-        frog.x = -FROG_SIZE * 0.25;
-        frog.vx *= -1;
-      } else if (frog.x > width - FROG_SIZE * 0.75) {
-        frog.x = width - FROG_SIZE * 0.75;
-        frog.vx *= -1;
-      }
-
-      const marginY = 24;
-      frog.baseY = Math.max(
-        marginY,
-        Math.min(height - marginY - FROG_SIZE, frog.baseY)
-      );
-
-      // idle / hopping
       if (frog.state === "idle") {
         frog.idleTime -= dt;
         frog.y = frog.baseY;
@@ -436,6 +465,7 @@
           frog.hopTime = 0;
           frog.hopDuration = randRange(frog.hopDurMin, frog.hopDurMax);
 
+          // vary hop height a bit
           const spice = Math.random();
           if (spice < 0.1) {
             frog.hopHeight = randRange(frog.hopHeightMax * 1.1, frog.hopHeightMax * 1.8);
@@ -444,18 +474,38 @@
           } else {
             frog.hopHeight = randRange(frog.hopHeightMin, frog.hopHeightMax);
           }
+
+          chooseHopDestination(frog, width, height);
         }
       } else if (frog.state === "hopping") {
         frog.hopTime += dt;
         const t = Math.min(1, frog.hopTime / frog.hopDuration);
 
+        // interpolate along the ground path
+        const groundX = frog.hopStartX + (frog.hopEndX - frog.hopStartX) * t;
+        const groundBaseY = frog.hopStartBaseY + (frog.hopEndBaseY - frog.hopStartBaseY) * t;
+
+        // parabolic hop offset
         const offset = -4 * frog.hopHeight * t * (1 - t);
-        frog.y = frog.baseY + offset;
+
+        frog.x = groundX;
+        frog.baseY = groundBaseY;
+        frog.y = groundBaseY + offset;
 
         if (frog.hopTime >= frog.hopDuration) {
           frog.state = "idle";
           frog.idleTime = randRange(frog.idleMin, frog.idleMax);
+
+          frog.x = frog.hopEndX;
+          frog.baseY = frog.hopEndBaseY;
           frog.y = frog.baseY;
+
+          // clamp final position
+          frog.x = Math.max(marginX, Math.min(width - marginX - FROG_SIZE, frog.x));
+          frog.baseY = Math.max(
+            marginY,
+            Math.min(height - marginY - FROG_SIZE, frog.baseY)
+          );
         }
       }
 
@@ -488,7 +538,7 @@
     lastTime = 0;
     scrollOffsetY = 0;
     lastScrollY = window.scrollY || 0;
-    mouse.follow = false; // reset: they won't follow until user clicks again
+    mouse.follow = false; // they won't follow until user clicks again
 
     await createFrogs(width, height);
     animId = requestAnimationFrame(drawFrame);
