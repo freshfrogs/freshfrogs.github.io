@@ -408,6 +408,9 @@
         }
         frogs.splice(i, 1);
 
+        // play munch sound
+        playSnakeEatSound();
+
         // grow snake and respawn a frog somewhere else
         growSnake(1);
         spawnExtraFrog(width, height);
