@@ -79,7 +79,13 @@
   // -----------------------------
   // Snake + powerups
   // -----------------------------
-  const SNAKE_ENABLED        = true;
+
+  // Only enable the snake game on /snake (not on the main page)
+  const SNAKE_ENABLED =
+    typeof window !== "undefined" &&
+    window.location &&
+    String(window.location.pathname || "").indexOf("/snake") !== -1;
+
   const SNAKE_SEGMENT_SIZE   = 52;
   const SNAKE_INITIAL_SEGMENTS = 9;
   const SNAKE_BASE_SPEED     = 70;  // px/sec baseline
@@ -89,22 +95,69 @@
 
   const POWERUP_RADIUS       = 15;
   const POWERUP_TTL          = 10; // seconds
-  const POWERUP_DROP_CHANCE  = 0.5; // chance a frog drop creates a powerup
+  // Orbs spawn over time, not on frog death
+  const ORB_SPAWN_INTERVAL_MIN = 4;
+  const ORB_SPAWN_INTERVAL_MAX = 9;
+
+  // Buff durations (seconds)
+  const FROG_SUPER_SPEED_DURATION   = 6;
+  const FROG_SUPER_JUMP_DURATION    = 6;
+  const GLOBAL_SPEED_DURATION       = 8;
+  const SNAKE_SLOW_DURATION         = 6;
+  const SNAKE_SLOW_STRONG_DURATION  = 9;
+
+  // Audio helpers
+  function playSound(src) {
+    try {
+      const audio = new Audio(src);
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    } catch (_) {}
+  }
+
+  function playRandomSound(list) {
+    if (!Array.isArray(list) || !list.length) return;
+    const src = list[Math.floor(Math.random() * list.length)];
+    playSound(src);
+  }
+
+  const SFX_ORB_SPAWN = [
+    "/snake/orbSpawn.mp3",
+    "/snake/orbSpawnTwo.mp3"
+  ];
+
+  const SFX_RIBBITS = [
+    "/snake/ribbitOne.mp3",
+    "/snake/ribbitTwo.mp3",
+    "/snake/ribbitThree.mp3",
+    "/snake/ribbitBase.mp3"
+  ];
+
+  const SFX_SUPER_SPEED = "/snake/superSpeed.mp3";
+  const SFX_SLOWED      = "/snake/slowed.mp3";
+  const SFX_SUPER_JUMP  = "/snake/superJump.mp3";
+  const SFX_FROG_DEATH  = "/snake/frogDeath.mp3";
 
   let powerups = [];
+  let nextPowerupSpawnAt = 0;
+
+  // Global buff timers
+  let frogGlobalSpeedTime = 0;
+  let snakeSlowTime = 0;
 
   function rollPowerupType() {
     const r = Math.random();
-    if (r < 0.45) return "frog-speed";
-    if (r < 0.75) return "frog-spawn";
-    if (r < 0.9)  return "snake-slow";
-    return "snake-fast";
+    if (r < 0.25) return "super-speed";      // red
+    if (r < 0.50) return "super-jump";       // blue
+    if (r < 0.75) return "global-speed";     // green
+    if (r < 0.90) return "snake-slow";       // white
+    return "snake-slow-strong";             // black
   }
 
-  function spawnPowerup(centerX, centerY) {
+  function spawnPowerup(centerX, centerY, forcedType) {
     if (!container) return;
 
-    const type = rollPowerupType();
+    const type = forcedType || rollPowerupType();
     const size = POWERUP_RADIUS * 2;
 
     const el = document.createElement("div");
@@ -118,20 +171,26 @@
     el.style.imageRendering = "pixelated";
     el.style.pointerEvents = "none";
     el.style.borderRadius = "50%";
-    el.style.pointerEvents = "none";
     el.style.zIndex = "20";
     el.style.border = "2px solid rgba(0,0,0,0.6)";
     el.style.boxShadow = "0 0 10px rgba(0,0,0,0.35)";
 
-    // Color by type
-    if (type === "frog-speed") {
-      el.style.background = "radial-gradient(circle at 30% 30%, #ffffff, #7bffb1)";
-    } else if (type === "frog-spawn") {
-      el.style.background = "radial-gradient(circle at 30% 30%, #ffffff, #7cc1ff)";
+    // Color by type (solid-ish or gradient)
+    if (type === "super-speed") {
+      // Red
+      el.style.background = "radial-gradient(circle at 30% 30%, #fff4f4, #ff4b4b)";
+    } else if (type === "super-jump") {
+      // Blue
+      el.style.background = "radial-gradient(circle at 30% 30%, #f5fbff, #7cc1ff)";
+    } else if (type === "global-speed") {
+      // Green
+      el.style.background = "radial-gradient(circle at 30% 30%, #f5fff9, #7bffb1)";
     } else if (type === "snake-slow") {
-      el.style.background = "radial-gradient(circle at 30% 30%, #ffffff, #ffd36b)";
-    } else { // snake-fast (debuff)
-      el.style.background = "radial-gradient(circle at 30% 30%, #ffffff, #ff7a7a)";
+      // White
+      el.style.background = "radial-gradient(circle at 30% 30%, #ffffff, #e0e0ff)";
+    } else {
+      // snake-slow-strong – black
+      el.style.background = "radial-gradient(circle at 30% 30%, #444, #050505)";
     }
 
     container.appendChild(el);
@@ -143,6 +202,9 @@
       ttl: POWERUP_TTL,
       el
     });
+
+    // Play spawn sound
+    playRandomSound(SFX_ORB_SPAWN);
   }
 
   function clamp(value, min, max) {
@@ -152,6 +214,14 @@
   // Snake state
   let snake = null;
   let snakeSpeedFactor = 1;
+
+  function updateSnakeSpeedFactor() {
+    if (snakeSlowTime > 0) {
+      snakeSpeedFactor = 0.5;
+    } else {
+      snakeSpeedFactor = 1;
+    }
+  }
 
   function createSnake(width, height) {
     const startX = width * 0.2;
@@ -210,6 +280,8 @@
       },
       segments
     };
+
+    updateSnakeSpeedFactor();
   }
 
   function destroySnake() {
@@ -266,6 +338,33 @@
     }
   }
 
+  function applyPowerupToFrog(type, frog) {
+    if (!frog) return;
+
+    if (type === "super-speed") {
+      frog.speedBuffTime = FROG_SUPER_SPEED_DURATION;
+      updateFrogMovementParams(frog);
+      playSound(SFX_SUPER_SPEED);
+    } else if (type === "super-jump") {
+      frog.jumpBuffTime = FROG_SUPER_JUMP_DURATION;
+      updateFrogMovementParams(frog);
+      playSound(SFX_SUPER_JUMP);
+    } else if (type === "global-speed") {
+      frogGlobalSpeedTime = GLOBAL_SPEED_DURATION;
+      for (const f of frogs) {
+        if (!f) continue;
+        updateFrogMovementParams(f);
+      }
+      playSound(SFX_SUPER_SPEED);
+    } else if (type === "snake-slow" || type === "snake-slow-strong") {
+      snakeSlowTime = (type === "snake-slow-strong")
+        ? SNAKE_SLOW_STRONG_DURATION
+        : SNAKE_SLOW_DURATION;
+      updateSnakeSpeedFactor();
+      playSound(SFX_SLOWED);
+    }
+  }
+
   function updatePowerups(dt, width, height) {
     for (let i = powerups.length - 1; i >= 0; i--) {
       const p = powerups[i];
@@ -284,61 +383,26 @@
       const bob = Math.sin(t * 4) * 4;
       p.el.style.transform = `translate3d(0, ${bob}px, 0)`;
 
-      // Check snake collision
-      if (!snake || !snake.head) continue;
       const cx = p.x + POWERUP_RADIUS;
       const cy = p.baseY + POWERUP_RADIUS;
-      const dx = snake.head.x - cx;
-      const dy = snake.head.y - cy;
-      if ((dx * dx + dy * dy) <= (SNAKE_SEGMENT_SIZE * SNAKE_SEGMENT_SIZE)) {
-        // apply effect
-        if (p.type === "frog-speed") {
-          for (const frog of frogs) {
-            frog.hopDurMin *= 0.85;
-            frog.hopDurMax *= 0.85;
-          }
-        } else if (p.type === "frog-spawn") {
-          // spawn a few extra frogs randomly
-          const extra = 6;
-          for (let j = 0; j < extra; j++) {
-            // choose a random frog and copy its position / behaviour
-            if (!frogs.length) break;
-            const base = frogs[Math.floor(Math.random() * frogs.length)];
-            const clone = {
-              ...base,
-              x: base.x + (Math.random() - 0.5) * 40,
-              y: base.y,
-              baseY: base.baseY,
-              hopStartX: base.x,
-              hopStartBaseY: base.baseY,
-              hopEndX: base.x,
-              hopEndBaseY: base.baseY,
-              state: "idle",
-              idleTime: base.idleTime,
-              hopTime: 0,
-              layers: []
-            };
 
-            const el = document.createElement("div");
-            el.className = "frog-sprite";
-            el.style.transform = `translate3d(${clone.x}px, ${clone.y}px, 0)`;
-            el.style.position = "absolute";
-            el.style.width = FROG_SIZE + "px";
-            el.style.height = FROG_SIZE + "px";
-            el.style.imageRendering = "pixelated";
-            el.style.willChange = "transform";
-            container.appendChild(el);
-            clone.el = el;
-            clone.layers = [];
-
-            frogs.push(clone);
-          }
-        } else if (p.type === "snake-slow") {
-          snakeSpeedFactor *= 0.7;
-        } else if (p.type === "snake-fast") {
-          snakeSpeedFactor *= 1.4;
+      // Check frog collisions
+      let consumed = false;
+      for (const frog of frogs) {
+        if (!frog || !frog.el) continue;
+        const fx = frog.x + FROG_SIZE / 2;
+        const fy = frog.baseY + FROG_SIZE / 2;
+        const dx = fx - cx;
+        const dy = fy - cy;
+        const r  = (FROG_SIZE / 2 + POWERUP_RADIUS);
+        if (dx * dx + dy * dy <= r * r) {
+          applyPowerupToFrog(p.type, frog);
+          consumed = true;
+          break;
         }
+      }
 
+      if (consumed) {
         if (p.el && p.el.parentNode === container) {
           container.removeChild(p.el);
         }
@@ -347,7 +411,27 @@
     }
   }
 
-  function updateSnake(dt, width, height) {
+  function scheduleNextPowerupSpawn(now) {
+    const interval = ORB_SPAWN_INTERVAL_MIN +
+      Math.random() * (ORB_SPAWN_INTERVAL_MAX - ORB_SPAWN_INTERVAL_MIN);
+    nextPowerupSpawnAt = now + interval;
+  }
+
+  function maybeSpawnRandomPowerup(currentTime, width, height) {
+    if (!SNAKE_ENABLED) return;
+    if (!container) return;
+    if (powerups.length > 12) return;
+    if (currentTime < nextPowerupSpawnAt) return;
+
+    const margin = 40;
+    const x = margin + Math.random() * Math.max(10, width - margin * 2);
+    const y = margin + Math.random() * Math.max(10, height - margin * 2);
+
+    spawnPowerup(x, y);
+    scheduleNextPowerupSpawn(currentTime);
+  }
+
+  function updateSnake(dt, width, height, nowSeconds) {
     if (!snake || !snake.head) return;
     const head = snake.head;
 
@@ -413,6 +497,8 @@
     }
 
     // Eat frogs
+    let frogsBefore = frogs.length;
+
     for (let i = frogs.length - 1; i >= 0; i--) {
       const frog = frogs[i];
       if (!frog || !frog.el) continue;
@@ -425,25 +511,23 @@
 
       if (d2 <= SNAKE_EAT_RADIUS * SNAKE_EAT_RADIUS) {
         // eat frog (NO respawn here anymore)
-        const centerX = fx;
-        const centerY = fy;
-
         if (frog.el.parentNode === container) {
           container.removeChild(frog.el);
         }
         frogs.splice(i, 1);
 
-        // play munch sound
+        // play sounds
         playSnakeEatSound();
+        playSound(SFX_FROG_DEATH);
 
         // grow snake
         growSnake(1);
-
-        // chance to drop a power-up at this spot
-        if (Math.random() < POWERUP_DROP_CHANCE) {
-          spawnPowerup(centerX, centerY);
-        }
       }
+    }
+
+    if (frogsBefore > 0 && frogs.length === 0) {
+      // All frogs dead – end game
+      handleGameOver(nowSeconds);
     }
   }
 
@@ -614,6 +698,40 @@
   // -----------------------------
   // Frog simulation
   // -----------------------------
+
+  function updateFrogMovementParams(frog) {
+    if (!frog) return;
+
+    let idleScale = 1;
+    let durScale  = 1;
+    let heightScale = 1;
+
+    if (frogGlobalSpeedTime > 0) {
+      idleScale *= 0.85;
+      durScale  *= 0.8;
+    }
+    if (frog.speedBuffTime > 0) {
+      idleScale *= 0.5;
+      durScale  *= 0.4;
+    }
+    if (frog.jumpBuffTime > 0) {
+      heightScale *= 1.8;
+    }
+
+    frog.idleMin = frog.baseIdleMin * idleScale;
+    frog.idleMax = frog.baseIdleMax * idleScale;
+    frog.hopDurMin = frog.baseHopDurMin * durScale;
+    frog.hopDurMax = frog.baseHopDurMax * durScale;
+    frog.hopHeightMin = frog.baseHopHeightMin * heightScale;
+    frog.hopHeightMax = frog.baseHopHeightMax * heightScale;
+
+    const minDur = 0.15;
+    if (frog.hopDurMin < minDur) frog.hopDurMin = minDur;
+    if (frog.hopDurMax < frog.hopDurMin) {
+      frog.hopDurMax = frog.hopDurMin + 0.05;
+    }
+  }
+
   function chooseHopDestination(frog, width, height) {
     const minX = 8;
     const maxX = width - FROG_SIZE - 8;
@@ -649,9 +767,32 @@
     frog.state          = "hopping";
   }
 
+  function maybePlayFrogJumpSound() {
+    // Randomly ribbit on hops so it doesn't get too spammy
+    if (Math.random() < 0.25) {
+      playRandomSound(SFX_RIBBITS);
+    }
+  }
+
   function updateFrogs(dt, width, height) {
     for (const frog of frogs) {
       if (!frog || !frog.el) continue;
+
+      // Update per-frog buff timers
+      if (frog.speedBuffTime > 0) {
+        frog.speedBuffTime -= dt;
+        if (frog.speedBuffTime <= 0) {
+          frog.speedBuffTime = 0;
+          updateFrogMovementParams(frog);
+        }
+      }
+      if (frog.jumpBuffTime > 0) {
+        frog.jumpBuffTime -= dt;
+        if (frog.jumpBuffTime <= 0) {
+          frog.jumpBuffTime = 0;
+          updateFrogMovementParams(frog);
+        }
+      }
 
       if (frog.state === "idle") {
         frog.idleTime -= dt;
@@ -669,6 +810,7 @@
           }
 
           chooseHopDestination(frog, width, height);
+          maybePlayFrogJumpSound();
         }
       } else if (frog.state === "hopping") {
         frog.hopTime += dt;
@@ -762,6 +904,60 @@
   };
 
   // -----------------------------
+  // Timer / survival UI
+  // -----------------------------
+
+  let gameStartTime = null;
+  let gameOver = false;
+  let timerEl = null;
+
+  function ensureTimerEl() {
+    if (timerEl) return timerEl;
+    const el = document.createElement("div");
+    el.id = "snake-timer";
+    el.style.position = "fixed";
+    el.style.top = "10px";
+    el.style.left = "50%";
+    el.style.transform = "translateX(-50%)";
+    el.style.padding = "4px 10px";
+    el.style.borderRadius = "6px";
+    el.style.background = "rgba(0,0,0,0.6)";
+    el.style.color = "#f8f8ff";
+    el.style.fontFamily = '"Press Start 2P", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    el.style.fontSize = "12px";
+    el.style.zIndex = "9999";
+    el.style.pointerEvents = "none";
+    document.body.appendChild(el);
+    timerEl = el;
+    return el;
+  }
+
+  function formatTimeSeconds(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    const minutes = Math.floor(sec / 60);
+    const seconds = sec % 60;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  }
+
+  function updateTimerDisplay(nowSeconds) {
+    if (!SNAKE_ENABLED) return;
+    if (gameStartTime == null) return;
+    const el = ensureTimerEl();
+    const elapsed = Math.max(0, nowSeconds - gameStartTime);
+    if (!gameOver) {
+      el.textContent = `Time: ${formatTimeSeconds(elapsed)}`;
+    } else {
+      el.textContent = `Game over – ${formatTimeSeconds(elapsed)}`;
+    }
+  }
+
+  function handleGameOver(currentTime) {
+    if (gameOver) return;
+    gameOver = true;
+    updateTimerDisplay(currentTime);
+  }
+
+  // -----------------------------
   // Events
   // -----------------------------
   window.addEventListener("mousemove", (e) => {
@@ -800,6 +996,38 @@
   });
 
   // -----------------------------
+  // Buff timer updates (global)
+  // -----------------------------
+  function updateGlobalBuffTimers(dt) {
+    let globalChanged = false;
+    if (frogGlobalSpeedTime > 0) {
+      frogGlobalSpeedTime -= dt;
+      if (frogGlobalSpeedTime <= 0) {
+        frogGlobalSpeedTime = 0;
+        globalChanged = true;
+      }
+    }
+    if (globalChanged) {
+      for (const f of frogs) {
+        if (!f) continue;
+        updateFrogMovementParams(f);
+      }
+    }
+
+    const prevSnakeSlow = snakeSlowTime;
+    if (snakeSlowTime > 0) {
+      snakeSlowTime -= dt;
+      if (snakeSlowTime <= 0) {
+        snakeSlowTime = 0;
+      }
+    }
+    if ((prevSnakeSlow > 0 && snakeSlowTime === 0) ||
+        (prevSnakeSlow === 0 && snakeSlowTime > 0)) {
+      updateSnakeSpeedFactor();
+    }
+  }
+
+  // -----------------------------
   // Main loop
   // -----------------------------
   function drawFrame(timestamp) {
@@ -809,11 +1037,20 @@
     const dt = lastTime ? (t - lastTime) : 0;
     lastTime = t;
 
+    // Initialize game start once we have a timestamp
+    if (SNAKE_ENABLED && gameStartTime == null) {
+      gameStartTime = t;
+      scheduleNextPowerupSpawn(t);
+    }
+
+    updateGlobalBuffTimers(dt);
     updateFrogs(dt, width, height);
     if (SNAKE_ENABLED) {
-      updateSnake(dt, width, height);
+      updateSnake(dt, width, height, t);
     }
+    maybeSpawnRandomPowerup(t, width, height);
     updatePowerups(dt, width, height);
+    updateTimerDisplay(t);
 
     animId = requestAnimationFrame(drawFrame);
   }
@@ -843,6 +1080,11 @@
       const el = document.createElement("div");
       el.className = "frog-sprite";
       el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
+      el.style.position = "absolute";
+      el.style.width = FROG_SIZE + "px";
+      el.style.height = FROG_SIZE + "px";
+      el.style.imageRendering = "pixelated";
+      el.style.willChange = "transform";
       container.appendChild(el);
 
       const personalityRoll = Math.random();
@@ -886,6 +1128,16 @@
         hopHeightMin: heightMin,
         hopHeightMax: heightMax,
 
+        baseIdleMin: idleMin,
+        baseIdleMax: idleMax,
+        baseHopDurMin: hopMin,
+        baseHopDurMax: hopMax,
+        baseHopHeightMin: heightMin,
+        baseHopHeightMax: heightMax,
+
+        speedBuffTime: 0,
+        jumpBuffTime: 0,
+
         layers: []
       };
 
@@ -893,6 +1145,11 @@
 
       // async build image stack (non-blocking)
       buildFrogLayers(frog);
+    }
+
+    // Apply any global buff to the freshly created frogs
+    if (frogGlobalSpeedTime > 0) {
+      for (const f of frogs) updateFrogMovementParams(f);
     }
   }
 
@@ -909,6 +1166,11 @@
     lastScrollY = window.scrollY || 0;
     mouse.follow = false; // they won't follow until user clicks again
     snakeSpeedFactor = 1; // reset any power-up effects
+    frogGlobalSpeedTime = 0;
+    snakeSlowTime = 0;
+    nextPowerupSpawnAt = 0;
+    gameStartTime = null;
+    gameOver = false;
 
     await createFrogs(width, height);
 
