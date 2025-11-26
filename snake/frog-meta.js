@@ -2,9 +2,9 @@
 (function (global) {
   const FROG_SIZE    = 64;
   const MAX_TOKEN_ID = 4040;
-  const META_BASE    = "./frog/json/";
+  const META_BASE    = "https://freshfrogs.github.io/frog/json/";
   const META_EXT     = ".json";
-  const BUILD_BASE   = "./frog/build_files";
+  const BUILD_BASE   = "https://freshfrogs.github.io/frog/build_files";
 
   // Only these trait values have animation variants
   const SCATTER_ANIMATED_VALUES = new Set([
