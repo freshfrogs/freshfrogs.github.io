@@ -5,77 +5,12 @@
   <title>freshfrogs.github.io</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="../style.css" />
-
-  <style>
-    /* Landing overlay for connect-gate */
-    #landing {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 2rem;
-      pointer-events: auto;
-    }
-    #landing .hero-main {
-      max-width: 720px;
-      margin: 0 auto;
-    }
-    #landing .hero-title {
-      font-size: 2.4rem;
-      margin-bottom: 1rem;
-    }
-    #landing .hero-subtitle {
-      font-size: 1.05rem;
-      line-height: 1.5;
-      max-width: 48rem;
-      margin: 0 auto;
-    }
-    #landing .hero-media {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: center;
-      margin-bottom: 1.5rem;
-    }
-    #landing .hero-media img {
-      width: 64px;
-      height: 64px;
-      image-rendering: pixelated;
-      border-radius: 8px;
-    }
-    /* Make the connect button very visible even without hover */
-    #landing-connect-btn {
-      margin-top: 1.75rem;
-      padding: 0.75rem 1.75rem;
-      font-size: 1.05rem;
-      font-weight: 600;
-      border-radius: 999px;
-      border: 2px solid #ffffff;
-      background: #1a8cff;
-      color: #ffffff;
-      cursor: pointer;
-      box-shadow: 0 0 16px rgba(0,0,0,0.45);
-      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, background 0.08s ease-out;
-    }
-    #landing-connect-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 20px rgba(0,0,0,0.6);
-      background: #46a4ff;
-    }
-    #landing-connect-btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 0 8px rgba(0,0,0,0.4);
-      background: #1475d6;
-    }
-  </style>
 </head>
 <body class="layout-4">
   <!-- Random trait-built frogs background -->
   <div id="frog-bg"></div>
 
-  <!-- Landing overlay shown before wallet connect -->
+  <!-- LANDING SCREEN (shown first) -->
   <div id="landing">
     <section class="hero">
       <div class="hero-main">
@@ -93,13 +28,16 @@
           Stake and earn rewards, level up, unlock custom trait animations and
           more! All secondary sales are entitled to a <b>5%</b> royalty.
         </p>
-        <button id="landing-connect-btn" type="button">
+
+        <!-- Landing connect button -->
+        <button id="landing-connect-btn" class="btn primary" type="button">
           Connect Wallet
         </button>
       </div>
     </section>
   </div>
 
+  <!-- MAIN APP (hidden until wallet is connected) -->
   <div class="page" style="display:none;">
     <!-- HEADER -->
     <header class="site-header">
@@ -114,7 +52,7 @@
       </nav>
     </header>
 
-    <!-- DASHBOARD HERO -->
+    <!-- DASHBOARD HERO (unchanged, this is your current page) -->
     <section class="hero">
       <div class="hero-main">
         <div class="hero-media">
@@ -140,7 +78,8 @@
       <section
         class="panel dashboard-section"
         id="recent-activity-panel"
-        style="background: transparent; box-shadow: none; padding: 0;">
+        style="background: transparent; box-shadow: none; padding: 0;"
+      >
         <!-- Recent Sales -->
         <h2>Recent Sales</h2>
         <p class="dashboard-note" id="recent-sales-status">
@@ -266,14 +205,15 @@
   <!-- Landing -> App gating logic -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const landing       = document.getElementById('landing');
-      const page          = document.querySelector('.page');
-      const landingBtn    = document.getElementById('landing-connect-btn');
+      const landing      = document.getElementById('landing');
+      const page         = document.querySelector('.page');
+      const landingBtn   = document.getElementById('landing-connect-btn');
       const headerConnect = document.getElementById('header-connect-wallet-btn');
-      const walletNav     = document.getElementById('wallet-nav-link');
+      const walletNav    = document.getElementById('wallet-nav-link');
 
       if (!landing || !page || !landingBtn) return;
 
+      // Helper: show full app when wallet appears as connected
       function showAppIfConnected() {
         if (walletNav && walletNav.style.display !== 'none' && walletNav.textContent.trim() !== '') {
           landing.style.display = 'none';
@@ -283,17 +223,23 @@
         return false;
       }
 
-      // If already connected on load (cached session), skip landing
+      // If already connected (e.g. previous session), skip landing
       setTimeout(showAppIfConnected, 1000);
 
+      // Landing connect button: trigger existing header connect + wait for connection
       landingBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        if (headerConnect) headerConnect.click();
 
+        if (headerConnect) {
+          headerConnect.click();
+        }
+
+        // If connection is instant, skip right away
         if (showAppIfConnected()) return;
 
+        // Otherwise poll briefly until the wallet nav link becomes visible
         let tries = 0;
-        const maxTries = 40;
+        const maxTries = 40; // ~10 seconds at 250ms
         const interval = setInterval(function () {
           tries++;
           if (showAppIfConnected() || tries > maxTries) {
@@ -303,6 +249,5 @@
       });
     });
   </script>
-
 </body>
 </html>
