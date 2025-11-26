@@ -2,33 +2,459 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fresh Frogs – Snake Scatter</title>
+  <title>Fresh Frogs – Frog Feast</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Adjust path if your CSS is elsewhere -->
-  <link rel="stylesheet" href="/style.css" />
-
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      background: #7cc1ff; /* light blue */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body {
+      background: #7cc1ff; /* light blue like your scatter background */
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #023047;
     }
-
-    #frog-bg {
+    canvas {
+      display: block;
+    }
+    .overlay {
       position: fixed;
       inset: 0;
-      pointer-events: auto;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: 700;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .hud {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 14px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.13);
+      backdrop-filter: blur(4px);
+      color: #033447;
+    }
+    .hud strong {
+      font-weight: 700;
     }
   </style>
 </head>
 <body>
-  <!-- data-snake-game turns on snake logic in scatter-frogs.js -->
-  <div id="frog-bg" data-snake-game="1"></div>
+  <canvas id="game"></canvas>
+  <div class="hud" id="hud"></div>
+  <div class="overlay" id="overlay" style="display:none;"></div>
 
-  <script src="/assets/scatter-frogs.js"></script>
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const hud = document.getElementById('hud');
+    const overlay = document.getElementById('overlay');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const FROG_COUNT = 35;        // total frogs including player
+    const MAX_HOP_DISTANCE = 90;  // px per hop
+    const PLAYER_BASE_SIZE = 26;
+    const AI_BASE_SIZE = 18;
+    const MAX_SIZE = 80;
+
+    let frogs = [];
+    let player = null;
+    let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+    let gameOver = false;
+
+    // --- helpers ---
+    function rand(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function distanceSq(ax, ay, bx, by) {
+      const dx = ax - bx;
+      const dy = ay - by;
+      return dx * dx + dy * dy;
+    }
+
+    function easeOutQuad(t) {
+      return t * (2 - t);
+    }
+
+    function randomFrogId() {
+      // adjust if you want a specific range; using 1–4040 for Fresh Frogs
+      return Math.floor(Math.random() * 4040) + 1;
+    }
+
+    // --- Frog factory ---
+    function createFrog(isPlayer = false) {
+      const x = rand(50, canvas.width - 50);
+      const y = rand(50, canvas.height - 50);
+      const baseSize = isPlayer ? PLAYER_BASE_SIZE : AI_BASE_SIZE;
+      const frogId = randomFrogId();
+      const img = new Image();
+      img.src = `frog/${frogId}.png`; // relative to your site root
+
+      return {
+        x,
+        y,
+        size: baseSize,
+        baseSize,
+        maxSize: MAX_SIZE,
+        color: isPlayer ? '#ffe66d' : '#0a5f3b',
+        accentColor: isPlayer ? '#ffb703' : '#2a9d8f',
+        isPlayer,
+        alive: true,
+        img,
+        // hop state
+        hopping: false,
+        hopProgress: 0,
+        hopDuration: rand(0.18, 0.3),
+        hopCooldown: rand(0.1, 0.8),
+        startX: x,
+        startY: y,
+        targetX: x,
+        targetY: y,
+        // AI targeting
+        aiRetargetTimer: rand(0.4, 1.2),
+        // stats
+        eatenCount: 0
+      };
+    }
+
+    function respawnFrog(frog) {
+      frog.x = rand(50, canvas.width - 50);
+      frog.y = rand(50, canvas.height - 50);
+      frog.size = frog.baseSize;
+      frog.alive = true;
+      frog.hopping = false;
+      frog.hopCooldown = rand(0.2, 0.9);
+      frog.hopProgress = 0;
+      frog.startX = frog.x;
+      frog.startY = frog.y;
+      frog.targetX = frog.x;
+      frog.targetY = frog.y;
+      frog.aiRetargetTimer = rand(0.5, 1.5);
+    }
+
+    function startHop(frog) {
+      frog.hopping = true;
+      frog.hopProgress = 0;
+      frog.hopDuration = rand(0.18, 0.3);
+      frog.startX = frog.x;
+      frog.startY = frog.y;
+
+      if (frog.isPlayer) {
+        // hop toward mouse
+        const dx = mouse.x - frog.x;
+        const dy = mouse.y - frog.y;
+        const dist = Math.hypot(dx, dy) || 0.0001;
+        const hopDist = Math.min(dist, MAX_HOP_DISTANCE);
+        const nx = frog.x + (dx / dist) * hopDist;
+        const ny = frog.y + (dy / dist) * hopDist;
+        frog.targetX = clamp(nx, 20, canvas.width - 20);
+        frog.targetY = clamp(ny, 20, canvas.height - 20);
+      } else {
+        // AI: mostly wander, sometimes chase smaller frog
+        const chaseChance = 0.5;
+        if (Math.random() < chaseChance) {
+          let best = null;
+          let bestDistSq = Infinity;
+          for (const other of frogs) {
+            if (other === frog || !other.alive) continue;
+            if (other.size >= frog.size * 0.9) continue; // only chase smaller
+            const d2 = distanceSq(frog.x, frog.y, other.x, other.y);
+            if (d2 < bestDistSq) {
+              bestDistSq = d2;
+              best = other;
+            }
+          }
+          if (best) {
+            const dx = best.x - frog.x;
+            const dy = best.y - frog.y;
+            const dist = Math.hypot(dx, dy) || 0.0001;
+            const hopDist = Math.min(dist, MAX_HOP_DISTANCE);
+            const nx = frog.x + (dx / dist) * hopDist;
+            const ny = frog.y + (dy / dist) * hopDist;
+            frog.targetX = clamp(nx, 20, canvas.width - 20);
+            frog.targetY = clamp(ny, 20, canvas.height - 20);
+            return;
+          }
+        }
+
+        // wander
+        const angle = rand(0, Math.PI * 2);
+        const hopDist = rand(40, MAX_HOP_DISTANCE);
+        const nx = frog.x + Math.cos(angle) * hopDist;
+        const ny = frog.y + Math.sin(angle) * hopDist;
+        frog.targetX = clamp(nx, 20, canvas.width - 20);
+        frog.targetY = clamp(ny, 20, canvas.height - 20);
+      }
+    }
+
+    function updateFrog(frog, dt) {
+      if (!frog.alive) return;
+
+      if (frog.hopping) {
+        frog.hopProgress += dt / frog.hopDuration;
+        const t = Math.min(frog.hopProgress, 1);
+        const eased = easeOutQuad(t);
+        frog.x = frog.startX + (frog.targetX - frog.startX) * eased;
+        frog.y = frog.startY + (frog.targetY - frog.startY) * eased;
+        if (t >= 1) {
+          frog.hopping = false;
+          frog.hopCooldown = rand(0.1, 0.4);
+        }
+      } else {
+        frog.hopCooldown -= dt;
+        if (frog.hopCooldown <= 0) {
+          startHop(frog);
+        }
+      }
+
+      if (!frog.isPlayer) {
+        frog.aiRetargetTimer -= dt;
+        if (frog.aiRetargetTimer <= 0 && !frog.hopping) {
+          frog.aiRetargetTimer = rand(0.6, 1.4);
+          startHop(frog);
+        }
+      }
+    }
+
+    function eatFrog(eater, food) {
+      if (!eater.alive || !food.alive) return;
+
+      if (food.isPlayer) {
+        // player dies
+        food.alive = false;
+        gameOver = true;
+        overlay.style.display = 'flex';
+        overlay.textContent = 'You were eaten! Click to restart';
+      }
+
+      if (eater.isPlayer) {
+        eater.eatenCount++;
+      }
+
+      const gain = Math.max(food.baseSize * 0.15, 2);
+      eater.size = Math.min(eater.size + gain, eater.maxSize);
+
+      if (!food.isPlayer) {
+        respawnFrog(food);
+      }
+    }
+
+    function handleCollisions() {
+      const len = frogs.length;
+      for (let i = 0; i < len; i++) {
+        const a = frogs[i];
+        if (!a.alive) continue;
+        for (let j = i + 1; j < len; j++) {
+          const b = frogs[j];
+          if (!b.alive) continue;
+          const minDist = (a.size + b.size) * 0.7;
+          const minDistSq = minDist * minDist;
+          if (distanceSq(a.x, a.y, b.x, b.y) < minDistSq) {
+            const diff = a.size - b.size;
+            if (Math.abs(diff) < 3) continue; // too similar, ignore
+            const eater = diff > 0 ? a : b;
+            const food = diff > 0 ? b : a;
+            eatFrog(eater, food);
+            if (gameOver) return;
+          }
+        }
+      }
+    }
+
+    function drawFrog(frog) {
+      if (!frog.alive) return;
+
+      const shadowOffset = frog.size * 0.2;
+      const shadowSize = frog.size * 0.8;
+
+      // shadow
+      ctx.save();
+      ctx.globalAlpha = 0.35;
+      ctx.beginPath();
+      ctx.ellipse(frog.x, frog.y + shadowOffset, shadowSize, shadowSize * 0.5, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(frog.x, frog.y);
+
+      // slight hop scale
+      let hopScale = 1;
+      if (frog.hopping) {
+        const p = frog.hopProgress;
+        const jump = Math.sin(Math.PI * p);
+        hopScale = 1 + 0.08 * jump;
+      }
+
+      ctx.scale(hopScale, hopScale);
+
+      // glow ring for player
+      if (frog.isPlayer) {
+        ctx.beginPath();
+        ctx.arc(0, 0, frog.size + 6, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+
+      // base circle (in case image doesn't load)
+      ctx.beginPath();
+      ctx.arc(0, 0, frog.size, 0, Math.PI * 2);
+      ctx.fillStyle = frog.color;
+      ctx.fill();
+
+      // sprite
+      const img = frog.img;
+      if (img && img.complete && img.naturalWidth > 0) {
+        const w = frog.size * 2;
+        const h = frog.size * 2;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(0, 0, frog.size, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(img, -w / 2, -h / 2, w, h);
+        ctx.restore();
+      } else {
+        // simple eyes if no sprite yet
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-frog.size * 0.3, -frog.size * 0.2, frog.size * 0.2, 0, Math.PI * 2);
+        ctx.arc( frog.size * 0.3, -frog.size * 0.2, frog.size * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(-frog.size * 0.3, -frog.size * 0.2, frog.size * 0.09, 0, Math.PI * 2);
+        ctx.arc( frog.size * 0.3, -frog.size * 0.2, frog.size * 0.09, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    function drawBackground() {
+      ctx.fillStyle = '#7cc1ff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // subtle “pond” gradient
+      const g = ctx.createRadialGradient(
+        canvas.width / 2, canvas.height / 2, 50,
+        canvas.width / 2, canvas.height / 2, Math.max(canvas.width, canvas.height)
+      );
+      g.addColorStop(0, 'rgba(255,255,255,0.12)');
+      g.addColorStop(1, 'rgba(0,0,50,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function updateHUD() {
+      if (!player) return;
+      hud.innerHTML = `
+        <div><strong>Frog Feast</strong></div>
+        <div>Move mouse to hop. Click other frogs to eat them.</div>
+        <div style="margin-top:4px;">
+          Size: ${player.size.toFixed(1)} &nbsp;|&nbsp;
+          Frogs eaten: ${player.eatenCount}
+        </div>
+      `;
+    }
+
+    function resetGame() {
+      frogs = [];
+      gameOver = false;
+      overlay.style.display = 'none';
+
+      // create player
+      player = createFrog(true);
+      frogs.push(player);
+
+      // create AI frogs
+      for (let i = 1; i < FROG_COUNT; i++) {
+        frogs.push(createFrog(false));
+      }
+    }
+
+    // --- input ---
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+
+      if (gameOver) {
+        resetGame();
+        return;
+      }
+
+      if (!player || !player.alive) return;
+
+      // try to eat frog under cursor
+      let target = null;
+      for (const frog of frogs) {
+        if (frog.isPlayer || !frog.alive) continue;
+        const r = frog.size;
+        if (distanceSq(frog.x, frog.y, mx, my) <= r * r) {
+          target = frog;
+          break;
+        }
+      }
+
+      if (target) {
+        if (player.size >= target.size + 1.5) {
+          eatFrog(player, target);
+        } else if (target.size >= player.size + 1.5) {
+          eatFrog(target, player);
+        }
+      }
+    });
+
+    // --- main loop ---
+    let lastTime = performance.now();
+
+    function loop(timestamp) {
+      const dt = Math.min((timestamp - lastTime) / 1000, 0.033);
+      lastTime = timestamp;
+
+      drawBackground();
+
+      if (!gameOver) {
+        for (const frog of frogs) {
+          updateFrog(frog, dt);
+        }
+        handleCollisions();
+      }
+
+      for (const frog of frogs) {
+        drawFrog(frog);
+      }
+
+      updateHUD();
+
+      requestAnimationFrame(loop);
+    }
+
+    // init
+    resetGame();
+    requestAnimationFrame(loop);
+  </script>
 </body>
 </html>
