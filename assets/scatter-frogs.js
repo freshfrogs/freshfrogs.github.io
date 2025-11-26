@@ -90,13 +90,25 @@
   // -----------------------------
   const SNAKE_ENABLED = container && container.hasAttribute("data-snake-game");
   const SNAKE_SEGMENT_SIZE = 48;
-  const SNAKE_SPEED = 90;          // pixels per second
-  const SNAKE_TURN_RATE = Math.PI * 1.5; // radians per second
-  const SNAKE_SEGMENT_GAP = 6;     // "frames" gap along the path
+  const SNAKE_SPEED = 90;
+  const SNAKE_TURN_RATE = Math.PI * 1.5;
+  const SNAKE_SEGMENT_GAP = 6;
   const SNAKE_INITIAL_SEGMENTS = 6;
-  const SNAKE_EAT_RADIUS = 40;     // collision radius vs frogs
+  const SNAKE_EAT_RADIUS = 40;
 
   let snake = null;
+  let snakeEatSound = null; // <= add this
+
+  function playSnakeEatSound() {
+    if (!snakeEatSound) return;
+    try {
+      snakeEatSound.currentTime = 0;
+      snakeEatSound.play();
+    } catch (e) {
+      // ignore autoplay / other errors
+    }
+  }
+
 
   function initSnake(width, height) {
     if (!SNAKE_ENABLED) return;
@@ -175,6 +187,11 @@
       segments,
       path
     };
+    if (!snakeEatSound) {
+      // change this path if needed
+      snakeEatSound = new Audio("/snake/munch.mp3");
+      snakeEatSound.volume = 0.7;
+    }
   }
 
   function growSnake(extraSegments) {
