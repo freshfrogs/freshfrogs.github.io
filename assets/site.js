@@ -116,6 +116,12 @@ document.addEventListener('DOMContentLoaded', () => {
       ffLoadMorePond();
     });
   }
+
+  // If scatter-frogs background is present, feed it all currently staked frogs
+  if (typeof ffInitScatterFromPond === 'function') {
+    ffInitScatterFromPond();
+  }
+
 });
 
 // ------------------------
@@ -1364,6 +1370,52 @@ async function ffLoadMorePond() {
     if (status) status.textContent = 'Unable to load pond frogs.';
   }
 }
+
+// Utility: fetch all staked frog tokenIds (for scatter-frogs background)
+async function ffFetchAllPondTokenIds() {
+  const collected = [];
+  const seen = new Set();
+  let pageKey = null;
+
+  try {
+    while (true) {
+      const { frogs, pageKey: nextKey } = await ffFetchPondFrogs(100, pageKey);
+
+      if (!Array.isArray(frogs) || !frogs.length) break;
+
+      for (const nft of frogs) {
+        const id = parseTokenId(nft.tokenId || nft.id?.tokenId);
+        if (id == null || seen.has(id)) continue;
+        seen.add(id);
+        collected.push(id);
+      }
+
+      if (!nextKey) break;
+      pageKey = nextKey;
+
+      // Safety cap so we don't endlessly hammer the API
+      if (collected.length >= 1000) break;
+    }
+  } catch (err) {
+    console.warn('ffFetchAllPondTokenIds failed', err);
+  }
+
+  return collected;
+}
+
+async function ffInitScatterFromPond() {
+  if (typeof window.ffScatterSetTokenIds !== 'function') return;
+
+  try {
+    const ids = await ffFetchAllPondTokenIds();
+    if (Array.isArray(ids) && ids.length) {
+      window.ffScatterSetTokenIds(ids);
+    }
+  } catch (err) {
+    console.warn('ffInitScatterFromPond failed', err);
+  }
+}
+
 
 // ------------------------
 // Recent morphs (pond page) — SINGLE SOURCE OF TRUTH
