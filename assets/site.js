@@ -1289,6 +1289,7 @@ async function ffFetchPondFrogs(limit = 24, pageKey = null) {
   const target = FF_COLLECTION_ADDRESS.toLowerCase();
 
   const frogs = all.filter((nft) => nft?.contract?.address?.toLowerCase() === target);
+  console.log(frogs)
   return { frogs, pageKey: data.pageKey || null };
 }
 

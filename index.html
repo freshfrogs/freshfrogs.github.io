@@ -10,37 +10,9 @@
   <!-- Random trait-built frogs background -->
   <div id="frog-bg"></div>
 
-  <!-- LANDING SCREEN (shown first) -->
-  <div id="landing">
-    <section class="hero">
-      <div class="hero-main">
-        <div class="hero-media">
-          <img src="https://freshfrogs.github.io/frog/16.png" class="fly" />
-          <img src="https://freshfrogs.github.io/frog/3753.png" class="fly" />
-          <img src="https://freshfrogs.github.io/frog/467.png" class="fly" />
-          <img src="https://freshfrogs.github.io/frog/594.png" class="fly" />
-        </div>
-        <h1 class="hero-title">freshfrogs.github.io</h1>
-        <p class="hero-subtitle">
-          A collection of 4,040 randomly generated frogs on the Ethereum
-          blockchain, that are each unique with thousands of different
-          combinations!
-          Stake and earn rewards, level up, unlock custom trait animations and
-          more! All secondary sales are entitled to a <b>5%</b> royalty.
-        </p>
-
-        <!-- Landing connect button -->
-        <button id="landing-connect-btn" class="btn primary" type="button">
-          Connect Wallet
-        </button>
-      </div>
-    </section>
-  </div>
-
-  <!-- MAIN APP (hidden until wallet is connected) -->
-  <div class="page" style="display:none;">
-    <!-- HEADER -->
-    <header class="site-header">
+  <div class="page">
+    <!-- HEADER (hidden until wallet is connected) -->
+    <header class="site-header" style="display:none;">
       <nav class="nav">
         <a href="/" data-view="collection">Collection</a>
         <a href="/rarity/" data-view="rarity">Rarity</a>
@@ -52,7 +24,7 @@
       </nav>
     </header>
 
-    <!-- DASHBOARD HERO (unchanged, this is your current page) -->
+    <!-- HERO (ALWAYS VISIBLE) -->
     <section class="hero">
       <div class="hero-main">
         <div class="hero-media">
@@ -69,11 +41,16 @@
           Stake and earn rewards, level up, unlock custom trait animations and
           more! All secondary sales are entitled to a <b>5%</b> royalty.
         </p>
+
+        <!-- NEW: connect button under the description -->
+        <button id="landing-connect-btn" class="btn primary" type="button">
+          Connect Wallet
+        </button>
       </div>
     </section>
 
-    <!-- MAIN DASHBOARD LAYOUT -->
-    <main class="dashboard-main">
+    <!-- MAIN DASHBOARD LAYOUT (hidden until connected) -->
+    <main class="dashboard-main" style="display:none;">
       <!-- Recent Activity (sales / stakes / morphs) -->
       <section
         class="panel dashboard-section"
@@ -177,8 +154,8 @@
       </section>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="site-footer">
+    <!-- FOOTER (hidden until connected) -->
+    <footer class="site-footer" style="display:none;">
       <span class="footer-links" style="color: white;">
         <a href="#">freshfrogs.github.io</a>
       </span>
@@ -202,47 +179,51 @@
   <!-- Scatter Frogs background -->
   <script src="/assets/scatter-frogs.js"></script>
 
-  <!-- Landing -> App gating logic -->
+  <!-- Simple gating: hero always visible, rest shows after wallet connects -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const landing      = document.getElementById('landing');
-      const page         = document.querySelector('.page');
-      const landingBtn   = document.getElementById('landing-connect-btn');
+      const header        = document.querySelector('.site-header');
+      const main          = document.querySelector('.dashboard-main');
+      const footer        = document.querySelector('.site-footer');
+      const landingBtn    = document.getElementById('landing-connect-btn');
       const headerConnect = document.getElementById('header-connect-wallet-btn');
-      const walletNav    = document.getElementById('wallet-nav-link');
+      const walletNav     = document.getElementById('wallet-nav-link');
 
-      if (!landing || !page || !landingBtn) return;
+      if (!landingBtn) return;
 
-      // Helper: show full app when wallet appears as connected
-      function showAppIfConnected() {
-        if (walletNav && walletNav.style.display !== 'none' && walletNav.textContent.trim() !== '') {
-          landing.style.display = 'none';
-          page.style.display = '';
+      function showFullSiteIfConnected() {
+        if (!walletNav) return false;
+        // wallet-nav-link should be visible + have text once connected
+        if (walletNav.style.display !== 'none' && walletNav.textContent.trim() !== '') {
+          if (header) header.style.display = '';
+          if (main)   main.style.display = '';
+          if (footer) footer.style.display = '';
+          landingBtn.style.display = 'none';
           return true;
         }
         return false;
       }
 
-      // If already connected (e.g. previous session), skip landing
-      setTimeout(showAppIfConnected, 1000);
+      // If already connected from a previous session, reveal everything shortly after load
+      setTimeout(showFullSiteIfConnected, 1000);
 
-      // Landing connect button: trigger existing header connect + wait for connection
       landingBtn.addEventListener('click', function (e) {
         e.preventDefault();
 
+        // Trigger your existing wallet connect logic
         if (headerConnect) {
           headerConnect.click();
         }
 
-        // If connection is instant, skip right away
-        if (showAppIfConnected()) return;
+        // If it connects instantly, reveal right away
+        if (showFullSiteIfConnected()) return;
 
-        // Otherwise poll briefly until the wallet nav link becomes visible
+        // Otherwise poll for a few seconds while wallet UI is open
         let tries = 0;
         const maxTries = 40; // ~10 seconds at 250ms
         const interval = setInterval(function () {
           tries++;
-          if (showAppIfConnected() || tries > maxTries) {
+          if (showFullSiteIfConnected() || tries > maxTries) {
             clearInterval(interval);
           }
         }, 250);
