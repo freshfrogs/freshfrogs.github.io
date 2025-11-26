@@ -62,8 +62,12 @@
   if (!container) return;
 
   let frogs = [];
+  let powerups = [];
   let animId = null;
   let lastTime = 0;
+
+  // NEW: optional explicit list of token IDs to use (e.g. all staked frogs)
+  let forcedTokenIds = null;
 
   // Mouse tracking: used only to choose hop destination
   const mouse = {
@@ -110,6 +114,10 @@
   // Types: frog-speed (buff), frog-spawn (buff), snake-slow (buff for frogs), snake-fast (debuff)
   let powerups = [];
 
+  function clamp(value, min, max) {
+    return value < min ? min : (value > max ? max : value);
+  }
+
   function rollPowerupType() {
     const r = Math.random();
     if (r < 0.45) return "frog-speed";
@@ -155,10 +163,6 @@
       ttl: POWERUP_TTL,
       el
     });
-  }
-
-  function clamp(value, min, max) {
-    return value < min ? min : (value > max ? max : value);
   }
 
   function applyPowerup(type) {
@@ -566,7 +570,7 @@
   }
 
   // -----------------------------
-  // Public API (still works if you want it)
+  // Public API (nav hooks + NEW: set token IDs)
   // -----------------------------
   function setTargetNormalized(nx, ny) {
     const width = window.innerWidth || 1;
@@ -620,6 +624,31 @@
   window.ffScatterFrogsCelebrateMorph = function () {
     setTargetNormalized(0.5, 0.3);
     triggerGroupHop("new-morph");
+  };
+
+  // NEW: external hook – call this with ALL currently staked token IDs
+  // Example: if you have [16, 27, 580, 1023] as "pond" tokens:
+  //   if (window.ffScatterSetTokenIds) ffScatterSetTokenIds(allStakedTokenIds);
+  window.ffScatterSetTokenIds = function (tokenIds) {
+    if (!Array.isArray(tokenIds) || !tokenIds.length) return;
+
+    const seen = new Set();
+    const cleaned = [];
+
+    for (const raw of tokenIds) {
+      const n = Number(raw);
+      if (!Number.isFinite(n)) continue;
+      const t = Math.max(1, Math.min(MAX_TOKEN_ID, Math.floor(n)));
+      if (!seen.has(t)) {
+        seen.add(t);
+        cleaned.push(t);
+      }
+    }
+
+    if (!cleaned.length) return;
+
+    forcedTokenIds = cleaned;
+    resetAndStart();
   };
 
   // -----------------------------
@@ -740,6 +769,44 @@
     return positions;
   }
 
+  // NEW: layout for "use exactly this many tokens" (e.g. all staked frogs)
+  function computeFrogPositionsForTokenCount(count, width, height) {
+    const positions = [];
+    if (!count) return positions;
+
+    const marginX = 16;
+    const marginY = 16;
+
+    // rough grid based on width
+    const cols = Math.max(1, Math.floor((width - marginX * 2) / (FROG_SIZE + 8)));
+    const rows = Math.max(1, Math.ceil(count / cols));
+
+    const usableWidth = Math.max(FROG_SIZE, width - marginX * 2);
+    const usableHeight = Math.max(FROG_SIZE, height - marginY * 2);
+
+    const stepX = cols > 1 ? (usableWidth - FROG_SIZE) / (cols - 1) : 0;
+    const stepY = rows > 1 ? (usableHeight - FROG_SIZE) / (rows - 1) : 0;
+
+    for (let i = 0; i < count; i++) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+
+      let x = marginX + col * stepX;
+      let y = marginY + row * stepY;
+
+      // small jitter so it still feels "scattered"
+      x += randRange(-6, 6);
+      y += randRange(-6, 6);
+
+      x = Math.max(marginX, Math.min(width - marginX - FROG_SIZE, x));
+      y = Math.max(marginY, Math.min(height - marginY - FROG_SIZE, y));
+
+      positions.push({ x, y });
+    }
+
+    return positions;
+  }
+
   async function fetchMetadata(tokenId) {
     const url = `${META_BASE}${tokenId}${META_EXT}`;
     const res = await fetch(url);
@@ -804,19 +871,29 @@
   }
 
   // -----------------------------
-  // Create random base frogs
+  // Create frogs (random OR forced token list)
   // -----------------------------
   async function createFrogs(width, height) {
     frogs = [];
     powerups = [];
     container.innerHTML = "";
 
-    const positions = computeFrogPositions(width, height);
-    const tokenIds  = pickRandomTokenIds(positions.length);
+    let positions;
+    let tokenIds;
+
+    const useForced = Array.isArray(forcedTokenIds) && forcedTokenIds.length;
+
+    if (useForced) {
+      tokenIds = forcedTokenIds.slice(); // use exactly these, all staked frogs
+      positions = computeFrogPositionsForTokenCount(tokenIds.length, width, height);
+    } else {
+      positions = computeFrogPositions(width, height);
+      tokenIds  = pickRandomTokenIds(positions.length);
+    }
 
     for (let i = 0; i < positions.length; i++) {
       const pos = positions[i];
-      const tokenId = tokenIds[i];
+      const tokenId = tokenIds[i % tokenIds.length];
 
       const el = document.createElement("div");
       el.className = "frog-sprite";
