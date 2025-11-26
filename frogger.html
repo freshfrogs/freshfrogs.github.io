@@ -1,239 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Fresh Frogs – Hopping Herd Prototype</title>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <title>Fresh Frogs – Scatterfrogs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Adjust this path if your style.css is elsewhere -->
+  <link rel="stylesheet" href="/style.css" />
+
   <style>
     html, body {
-      height: 100%;
       margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden; /* keep it as a clean single screen */
+      background: #7cc1ff; /* light blue background */
     }
-    body {
-      background: #7cc1ff; /* light blue like your main site */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    canvas {
-      border-radius: 16px;
-      box-shadow: 0 18px 45px rgba(0,0,0,0.45);
-      background: #7cc1ff;
+
+    /* Make the scatterfrog container fill the screen */
+    #frog-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: auto; /* so clicks still register for hop behavior */
     }
   </style>
 </head>
 <body>
-<canvas width="624" height="720" id="game"></canvas>
-<script>
-const canvas = document.getElementById('game');
-const context = canvas.getContext('2d');
+  <!-- Scatter frogs container (same as homepage) -->
+  <div id="frog-bg"></div>
 
-const FROG_COUNT = 10;
-const FROG_SIZE  = 48;
-
-// hop behaviour inspired by your scatter frogs: idle, then parabolic hop
-function createFrog(x, y, img) {
-  // personality tweaks
-  const personalityRoll = Math.random();
-  let idleMin, idleMax, hopMin, hopMax, heightMin, heightMax;
-
-  if (personalityRoll < 0.25) {
-    idleMin = 0.3; idleMax = 1.0;
-    hopMin = 0.25; hopMax = 0.55;
-    heightMin = 14; heightMax = 32;
-  } else if (personalityRoll < 0.6) {
-    idleMin = 0.8; idleMax = 3.0;
-    hopMin = 0.35; hopMax = 0.7;
-    heightMin = 10; heightMax = 26;
-  } else {
-    idleMin = 2.0; idleMax = 5.0;
-    hopMin = 0.45; hopMax = 0.9;
-    heightMin = 6;  heightMax = 20;
-  }
-
-  return {
-    x,
-    y,
-    baseY: y,
-    img,
-    state: "idle",
-    idleTime: randRange(idleMin, idleMax),
-    hopTime: 0,
-    hopDuration: randRange(hopMin, hopMax),
-    hopHeight: randRange(heightMin, heightMax),
-    idleMin, idleMax,
-    hopDurMin: hopMin,
-    hopDurMax: hopMax,
-    hopHeightMin: heightMin,
-    hopHeightMax: heightMax,
-    hopStartX: x,
-    hopStartBaseY: y,
-    hopEndX: x,
-    hopEndBaseY: y
-  };
-}
-
-function randRange(min, max) {
-  return min + Math.random() * (max - min);
-}
-
-function chooseHopDestination(frog) {
-  const marginX = 8;
-  const marginY = 24;
-  const maxStep = 80; // how far a single hop can go
-
-  // small bias upward so they gradually move up the screen
-  let targetX = frog.x + randRange(-maxStep, maxStep);
-  let targetBaseY = frog.baseY + randRange(-maxStep * 0.7, maxStep * 0.2);
-
-  targetX = Math.max(marginX, Math.min(canvas.width - marginX - FROG_SIZE, targetX));
-  targetBaseY = Math.max(
-    canvas.height - 160, // don't go below start band
-    Math.min(canvas.height - 2*FROG_SIZE, targetBaseY)
-  );
-
-  frog.hopStartX = frog.x;
-  frog.hopStartBaseY = frog.baseY;
-  frog.hopEndX = targetX;
-  frog.hopEndBaseY = targetBaseY;
-}
-
-function updateFrogs(dt, frogs) {
-  const marginX = 8;
-  const marginYTop = 24;
-
-  for (const frog of frogs) {
-    if (frog.state === "idle") {
-      frog.idleTime -= dt;
-      frog.y = frog.baseY;
-
-      if (frog.idleTime <= 0) {
-        frog.state = "hopping";
-        frog.hopTime = 0;
-        frog.hopDuration = randRange(frog.hopDurMin, frog.hopDurMax);
-
-        // spice hop height a bit
-        const spice = Math.random();
-        if (spice < 0.1) {
-          frog.hopHeight = randRange(frog.hopHeightMax * 1.1, frog.hopHeightMax * 1.8);
-        } else if (spice < 0.25) {
-          frog.hopHeight = randRange(2, frog.hopHeightMin * 0.7);
-        } else {
-          frog.hopHeight = randRange(frog.hopHeightMin, frog.hopHeightMax);
-        }
-
-        chooseHopDestination(frog);
-      }
-    } else if (frog.state === "hopping") {
-      frog.hopTime += dt;
-      const t = Math.min(1, frog.hopTime / frog.hopDuration);
-
-      // interpolate ground path
-      const groundX = frog.hopStartX + (frog.hopEndX - frog.hopStartX) * t;
-      const groundBaseY = frog.hopStartBaseY + (frog.hopEndBaseY - frog.hopStartBaseY) * t;
-
-      // parabolic hop offset
-      const offset = -4 * frog.hopHeight * t * (1 - t);
-
-      frog.x = groundX;
-      frog.baseY = groundBaseY;
-      frog.y = groundBaseY + offset;
-
-      if (frog.hopTime >= frog.hopDuration) {
-        frog.state = "idle";
-        frog.idleTime = randRange(frog.idleMin, frog.idleMax);
-
-        frog.x = frog.hopEndX;
-        frog.baseY = frog.hopEndBaseY;
-        frog.y = frog.baseY;
-
-        // clamp final position
-        frog.x = Math.max(marginX, Math.min(canvas.width - marginX - FROG_SIZE, frog.x));
-        frog.baseY = Math.max(
-          marginYTop,
-          Math.min(canvas.height - FROG_SIZE, frog.baseY)
-        );
-      }
-    }
-  }
-}
-
-function drawBackground() {
-  // light blue already set, but we can draw subtle bands if you want later
-  context.clearRect(0, 0, canvas.width, canvas.height);
-
-  // faint "ground" strip at bottom
-  context.fillStyle = 'rgba(0,0,0,0.06)';
-  context.fillRect(0, canvas.height - 120, canvas.width, 120);
-}
-
-function renderFrogs(frogs) {
-  for (const frog of frogs) {
-    if (frog.img && frog.img.complete) {
-      context.drawImage(frog.img, frog.x, frog.y, FROG_SIZE, FROG_SIZE);
-    } else {
-      // fallback: solid frog so nothing ever looks ghosty
-      context.fillStyle = 'greenyellow';
-      context.beginPath();
-      context.arc(
-        frog.x + FROG_SIZE / 2,
-        frog.y + FROG_SIZE / 2,
-        FROG_SIZE / 2 - 4,
-        0,
-        Math.PI * 2
-      );
-      context.fill();
-    }
-  }
-}
-
-function createRandomFrogImages(count, onDone) {
-  const frogs = [];
-  let loaded = 0;
-
-  for (let i = 0; i < count; i++) {
-    const tokenId = 1 + Math.floor(Math.random() * 4040);
-    const img = new Image();
-    img.src = "https://freshfrogs.github.io/frog/" + tokenId + ".png";
-    img.onload = img.onerror = () => {
-      loaded++;
-      if (loaded === count) onDone();
-    };
-    frogs.push({ tokenId, img });
-  }
-  return frogs;
-}
-
-// --- main ---
-let frogs = [];
-let lastTime = performance.now();
-
-const frogImageSlots = createRandomFrogImages(FROG_COUNT, startGame);
-
-function startGame() {
-  // spawn 10 frogs in a row near bottom, like the sample Frogger start
-  const startY = canvas.height - 140; // bottom band
-  for (let i = 0; i < FROG_COUNT; i++) {
-    const slot = frogImageSlots[i];
-    const x = (canvas.width / (FROG_COUNT + 1)) * (i + 1) - FROG_SIZE / 2;
-    const frog = createFrog(x, startY, slot.img);
-    frogs.push(frog);
-  }
-
-  lastTime = performance.now();
-  requestAnimationFrame(loop);
-}
-
-function loop(timestamp) {
-  const dt = (timestamp - lastTime) / 1000;
-  lastTime = timestamp;
-
-  drawBackground();
-  updateFrogs(dt, frogs);
-  renderFrogs(frogs);
-
-  requestAnimationFrame(loop);
-}
-</script>
+  <!-- Scatter frogs logic (same file you're already using on homepage) -->
+  <script src="/assets/scatter-frogs.js"></script>
 </body>
 </html>
