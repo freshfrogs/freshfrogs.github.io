@@ -85,19 +85,160 @@
   let lastScrollY = window.scrollY || 0;
   let lastGroupHopTime = 0;
 
-    // -----------------------------
+  // -----------------------------
   // Snake game (optional)
   // -----------------------------
-  const SNAKE_ENABLED = container && container.hasAttribute("data-snake-game");
-  const SNAKE_SEGMENT_SIZE = 48;
-  const SNAKE_SPEED = 90;
-  const SNAKE_TURN_RATE = Math.PI * 1.5;
-  const SNAKE_SEGMENT_GAP = 6;
+  const SNAKE_ENABLED       = container && container.hasAttribute("data-snake-game");
+  const SNAKE_SEGMENT_SIZE  = 48;
+  const SNAKE_BASE_SPEED    = 90;
+  const SNAKE_TURN_RATE     = Math.PI * 1.5;
+  const SNAKE_SEGMENT_GAP   = 6;
   const SNAKE_INITIAL_SEGMENTS = 6;
-  const SNAKE_EAT_RADIUS = 40;
+  const SNAKE_EAT_RADIUS    = 40;
 
   let snake = null;
-  let snakeEatSound = null; // <= add this
+  let snakeEatSound = null;
+  let snakeSpeedFactor = 1; // modified by power-ups
+
+  // -----------------------------
+  // Power-up drops
+  // -----------------------------
+  const POWERUP_RADIUS       = 14;
+  const POWERUP_TTL          = 8;   // seconds before it fades
+  const POWERUP_DROP_CHANCE  = 0.7; // chance a power-up appears on frog death
+
+  // Types: frog-speed (buff), frog-spawn (buff), snake-slow (buff for frogs), snake-fast (debuff)
+  let powerups = [];
+
+  function rollPowerupType() {
+    const r = Math.random();
+    if (r < 0.45) return "frog-speed";
+    if (r < 0.75) return "frog-spawn";
+    if (r < 0.9)  return "snake-slow";
+    return "snake-fast";
+  }
+
+  function spawnPowerup(centerX, centerY) {
+    if (!container) return;
+
+    const type = rollPowerupType();
+    const size = POWERUP_RADIUS * 2;
+
+    const el = document.createElement("div");
+    el.className = "frog-powerup";
+    el.style.position = "absolute";
+    el.style.width = size + "px";
+    el.style.height = size + "px";
+    el.style.borderRadius = "50%";
+    el.style.pointerEvents = "none";
+    el.style.zIndex = "20";
+    el.style.border = "2px solid rgba(0,0,0,0.6)";
+    el.style.boxShadow = "0 0 10px rgba(0,0,0,0.35)";
+
+    // Color by type
+    if (type === "frog-speed") {
+      el.style.background = "radial-gradient(circle at 30% 30%, #ffffff, #7bffb1)";
+    } else if (type === "frog-spawn") {
+      el.style.background = "radial-gradient(circle at 30% 30%, #ffffff, #7cc1ff)";
+    } else if (type === "snake-slow") {
+      el.style.background = "radial-gradient(circle at 30% 30%, #ffffff, #ffd36b)";
+    } else { // snake-fast (debuff)
+      el.style.background = "radial-gradient(circle at 30% 30%, #ffffff, #ff7a7a)";
+    }
+
+    container.appendChild(el);
+
+    powerups.push({
+      type,
+      x: centerX - POWERUP_RADIUS,
+      baseY: centerY - POWERUP_RADIUS,
+      ttl: POWERUP_TTL,
+      el
+    });
+  }
+
+  function clamp(value, min, max) {
+    return value < min ? min : (value > max ? max : value);
+  }
+
+  function applyPowerup(type) {
+    const width  = window.innerWidth || 1;
+    const height = window.innerHeight || 1;
+
+    if (type === "frog-speed") {
+      // Frogs hop more often and a bit faster
+      for (const frog of frogs) {
+        frog.idleMin   *= 0.75;
+        frog.idleMax   *= 0.75;
+        frog.hopDurMin *= 0.9;
+        frog.hopDurMax *= 0.9;
+      }
+    } else if (type === "frog-spawn") {
+      // Burst of new frogs appears
+      const extra = 3 + Math.floor(Math.random() * 3); // 3–5
+      for (let i = 0; i < extra; i++) {
+        spawnExtraFrog(width, height);
+      }
+    } else if (type === "snake-slow") {
+      // Snake slows down (good for frogs)
+      snakeSpeedFactor = clamp(snakeSpeedFactor * 0.7, 0.35, 3.0);
+    } else if (type === "snake-fast") {
+      // Snake speeds up (bad for frogs)
+      snakeSpeedFactor = clamp(snakeSpeedFactor * 1.35, 0.35, 3.0);
+    }
+  }
+
+  function updatePowerups(dt, width, height) {
+    for (let i = powerups.length - 1; i >= 0; i--) {
+      const p = powerups[i];
+
+      // Lifetime
+      p.ttl -= dt;
+      if (p.ttl <= 0 || !p.el) {
+        if (p.el && p.el.parentNode === container) {
+          container.removeChild(p.el);
+        }
+        powerups.splice(i, 1);
+        continue;
+      }
+
+      // Float + pulse
+      const lifeT = p.ttl / POWERUP_TTL;
+      const pulse = 1 + 0.15 * Math.sin((1 - lifeT) * Math.PI * 4);
+      const bob   = Math.sin((1 - lifeT) * Math.PI * 2) * 3;
+
+      const renderY = p.baseY + scrollOffsetY + bob;
+      p.el.style.transform =
+        `translate3d(${p.x}px, ${renderY}px, 0) scale(${pulse})`;
+      p.el.style.opacity = String(clamp(lifeT + 0.2, 0, 1));
+
+      // Collision with frogs: frogs collect power-ups
+      const pcx = p.x + POWERUP_RADIUS;
+      const pcy = p.baseY + POWERUP_RADIUS;
+
+      let collected = false;
+
+      for (const frog of frogs) {
+        const fx = frog.x + FROG_SIZE / 2;
+        const fy = frog.baseY + FROG_SIZE / 2;
+        const dx = fx - pcx;
+        const dy = fy - pcy;
+        const rad = FROG_SIZE / 2 + POWERUP_RADIUS;
+        if (dx * dx + dy * dy <= rad * rad) {
+          applyPowerup(p.type);
+          collected = true;
+          break;
+        }
+      }
+
+      if (collected) {
+        if (p.el && p.el.parentNode === container) {
+          container.removeChild(p.el);
+        }
+        powerups.splice(i, 1);
+      }
+    }
+  }
 
   function playSnakeEatSound() {
     if (!snakeEatSound) return;
@@ -108,7 +249,6 @@
       // ignore autoplay / other errors
     }
   }
-
 
   function initSnake(width, height) {
     if (!SNAKE_ENABLED) return;
@@ -340,7 +480,7 @@
     head.angle += angleDiff;
 
     // --- move head
-    const speed = SNAKE_SPEED * (0.8 + Math.random() * 0.4);
+    const speed = SNAKE_BASE_SPEED * (0.8 + Math.random() * 0.4) * snakeSpeedFactor;
     head.x += Math.cos(head.angle) * speed * dt;
     head.y += Math.sin(head.angle) * speed * dt;
 
@@ -402,7 +542,10 @@
       const d2 = dx * dx + dy * dy;
 
       if (d2 <= SNAKE_EAT_RADIUS * SNAKE_EAT_RADIUS) {
-        // eat frog
+        // eat frog (NO respawn here anymore)
+        const centerX = fx;
+        const centerY = fy;
+
         if (frog.el.parentNode === container) {
           container.removeChild(frog.el);
         }
@@ -411,13 +554,16 @@
         // play munch sound
         playSnakeEatSound();
 
-        // grow snake and respawn a frog somewhere else
+        // grow snake
         growSnake(1);
-        spawnExtraFrog(width, height);
+
+        // chance to drop a power-up at this spot
+        if (Math.random() < POWERUP_DROP_CHANCE) {
+          spawnPowerup(centerX, centerY);
+        }
       }
     }
   }
-
 
   // -----------------------------
   // Public API (still works if you want it)
@@ -662,6 +808,7 @@
   // -----------------------------
   async function createFrogs(width, height) {
     frogs = [];
+    powerups = [];
     container.innerHTML = "";
 
     const positions = computeFrogPositions(width, height);
@@ -861,34 +1008,34 @@
     if (SNAKE_ENABLED) {
       updateSnake(dt, width, height);
     }
+    updatePowerups(dt, width, height);
 
     animId = requestAnimationFrame(drawFrame);
   }
 
+  async function resetAndStart() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
-async function resetAndStart() {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+    if (animId) {
+      cancelAnimationFrame(animId);
+      animId = null;
+    }
+    lastTime = 0;
+    scrollOffsetY = 0;
+    lastScrollY = window.scrollY || 0;
+    mouse.follow = false; // they won't follow until user clicks again
+    snakeSpeedFactor = 1; // reset any power-up effects
 
-  if (animId) {
-    cancelAnimationFrame(animId);
-    animId = null;
+    await createFrogs(width, height);
+
+    // init snake only on snake pages
+    if (SNAKE_ENABLED) {
+      initSnake(width, height);
+    }
+
+    animId = requestAnimationFrame(drawFrame);
   }
-  lastTime = 0;
-  scrollOffsetY = 0;
-  lastScrollY = window.scrollY || 0;
-  mouse.follow = false; // they won't follow until user clicks again
-
-  await createFrogs(width, height);
-
-  // NEW: init snake only on snake pages
-  if (SNAKE_ENABLED) {
-    initSnake(width, height);
-  }
-
-  animId = requestAnimationFrame(drawFrame);
-}
-
 
   window.addEventListener("resize", resetAndStart);
   window.addEventListener("load", resetAndStart);
