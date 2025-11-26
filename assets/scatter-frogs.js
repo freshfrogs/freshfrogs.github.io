@@ -1,9 +1,11 @@
 // assets/scatter-frogs.js
 (function () {
   const FROG_SIZE   = 64;
+  const MAX_TOKEN_ID = 4040;
+  const META_BASE   = "/frog/json/";
+  const META_EXT    = ".json";
   const BUILD_BASE  = "/frog/build_files";
-  const MAX_MORPHS  = 150;
-  const MAX_SCATTER = 150;
+  const MAX_FROGS   = 120;
 
   // Values that have animation variants for scatter frogs
   const SCATTER_ANIMATED_VALUES = new Set([
@@ -48,6 +50,13 @@
     // 'treeFrog(4)'
   ]);
 
+  // Trait types to skip (avoid background tiles)
+  const SKIP_TRAITS = new Set([
+    "Background",
+    "background",
+    "BG",
+    "Bg"
+  ]);
 
   const container = document.getElementById("frog-bg");
   if (!container) return;
@@ -56,7 +65,15 @@
   let animId = null;
   let lastTime = 0;
 
-  // Where frogs drift after clicks / events
+  // Mouse tracking: only used for attraction after first click
+  const mouse = {
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
+    active: false,
+    follow: false
+  };
+
+  // Optional nav target (for future; only used when not following mouse)
   const target = {
     x: window.innerWidth / 2,
     y: window.innerHeight / 2,
@@ -68,16 +85,8 @@
   let lastScrollY = window.scrollY || 0;
   let lastGroupHopTime = 0;
 
-  // Trait types to skip (avoids drawing backgrounds)
-  const SKIP_TRAITS = new Set([
-    "Background",
-    "background",
-    "BG",
-    "Bg"
-  ]);
-
   // -----------------------------
-  // Public API (for site.js / morph.js)
+  // Public API (nav hooks are still available if you want)
   // -----------------------------
   function setTargetNormalized(nx, ny) {
     const width = window.innerWidth || 1;
@@ -92,7 +101,6 @@
       ? performance.now()
       : Date.now();
 
-    // don't spam
     if (now - lastGroupHopTime < 800) return;
     lastGroupHopTime = now;
 
@@ -108,42 +116,46 @@
     }
   }
 
-  // expose a few hooks globally
+  // Expose these if you still want nav to influence frogs
   window.ffScatterFrogsGoto = function (nx, ny) {
     setTargetNormalized(nx, ny);
   };
   window.ffScatterFrogsGotoMorph = function () {
-    // drift toward right-center (morph panel-ish)
     setTargetNormalized(0.8, 0.45);
     triggerGroupHop("morph-view");
   };
   window.ffScatterFrogsGotoPond = function () {
-    // drift toward bottom-center (pond vibe)
     setTargetNormalized(0.5, 0.85);
     triggerGroupHop("pond-view");
   };
   window.ffScatterFrogsGotoCenter = function () {
     setTargetNormalized(0.5, 0.5);
   };
-  window.ffScatterFrogsCelebrateMorph = function (meta) {
-    // drift upward and do a celebration burst
+  window.ffScatterFrogsCelebrateMorph = function () {
     setTargetNormalized(0.5, 0.3);
     triggerGroupHop("new-morph");
   };
 
   // -----------------------------
-  // Global events
+  // Events
   // -----------------------------
 
-  // Click: set target + nearest frog big-hop
+  // Track mouse position always
+  window.addEventListener("mousemove", (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    mouse.active = true;
+  });
+
+  // First click: enable follow + nearest frog hop
   window.addEventListener("click", (e) => {
     const clickX = e.clientX;
     const clickY = e.clientY;
 
-    target.x = clickX;
-    target.y = clickY;
-    target.active = true;
+    // once you click, frogs start following the mouse
+    mouse.follow = true;
 
+    // still keep the fun nearest-frog hop
     let nearest = null;
     let nearestDist2 = Infinity;
 
@@ -174,7 +186,6 @@
     const dy = y - lastScrollY;
     lastScrollY = y;
 
-    // subtle parallax
     scrollOffsetY -= dy * 0.15;
     const maxOffset = 80;
     if (scrollOffsetY > maxOffset) scrollOffsetY = maxOffset;
@@ -185,11 +196,8 @@
     if (maxScroll > 0) {
       const atTop = y <= 5;
       const atBottom = y + 5 >= maxScroll;
-      if (atTop) {
-        triggerGroupHop("scroll-top");
-      } else if (atBottom) {
-        triggerGroupHop("scroll-bottom");
-      }
+      if (atTop) triggerGroupHop("scroll-top");
+      else if (atBottom) triggerGroupHop("scroll-bottom");
     }
   });
 
@@ -204,15 +212,19 @@
     return min + Math.random() * (max - min);
   }
 
-  function computeFrogPositions(width, height, maxCountOverride) {
-    const area = width * height;
-    const maxFrogs = typeof maxCountOverride === "number"
-      ? maxCountOverride
-      : 120;
+  function pickRandomTokenIds(count) {
+    const set = new Set();
+    while (set.size < count) {
+      set.add(randInt(1, MAX_TOKEN_ID));
+    }
+    return Array.from(set);
+  }
 
+  function computeFrogPositions(width, height) {
+    const area = width * height;
     const approxPerFrogArea = (FROG_SIZE * FROG_SIZE) * 5;
     let targetCount = Math.floor(area / approxPerFrogArea);
-    targetCount = Math.max(15, Math.min(maxFrogs, targetCount));
+    targetCount = Math.max(15, Math.min(MAX_FROGS, targetCount));
 
     const positions = [];
     const MIN_DIST = 52;
@@ -241,21 +253,16 @@
     return positions;
   }
 
-  async function fetchMorphedMetadata(limit) {
-    try {
-      if (typeof window.ffFetchRecentMorphedFrogs === "function") {
-        // uses your worker via the function from site.js
-        return await window.ffFetchRecentMorphedFrogs(limit);
-      }
-    } catch (err) {
-      console.warn("fetchMorphedMetadata failed:", err);
-    }
-    return [];
+  async function fetchMetadata(tokenId) {
+    const url = `${META_BASE}${tokenId}${META_EXT}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Metadata fetch failed for " + tokenId);
+    return res.json();
   }
 
-  // Load a single trait image as <img>, trying GIF first only if value is in SCATTER_ANIMATED_VALUES
+  // Try GIF only if value is in SCATTER_ANIMATED_VALUES, else just PNG
   async function loadTraitImage(traitType, value) {
-    const v = String(value); // exact metadata value
+    const v = String(value);
     const pngUrl = `${BUILD_BASE}/${traitType}/${v}.png`;
     const canAnimate = SCATTER_ANIMATED_VALUES.has(v);
 
@@ -293,7 +300,7 @@
       const traitType = attr.trait_type;
       const value = attr.value;
       if (!traitType || typeof value === "undefined") continue;
-      if (SKIP_TRAITS.has(traitType)) continue; // don't draw backgrounds
+      if (SKIP_TRAITS.has(traitType)) continue; // no background tiles
 
       const img = await loadTraitImage(traitType, value);
       if (!img) continue;
@@ -310,25 +317,18 @@
   }
 
   // -----------------------------
-  // Create frogs from morphed metadata
+  // Create random base frogs
   // -----------------------------
   async function createFrogs(width, height) {
     frogs = [];
     container.innerHTML = "";
 
-    const morphMetas = await fetchMorphedMetadata(MAX_MORPHS);
-    if (!morphMetas.length) {
-      console.warn("No morphed frogs returned for scatter background.");
-      return;
-    }
+    const positions = computeFrogPositions(width, height);
+    const tokenIds  = pickRandomTokenIds(positions.length);
 
-    const maxScatter = Math.min(morphMetas.length, MAX_SCATTER);
-    const positions = computeFrogPositions(width, height, maxScatter);
-    const count = Math.min(positions.length, morphMetas.length);
-
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < positions.length; i++) {
       const pos = positions[i];
-      const meta = morphMetas[i];
+      const tokenId = tokenIds[i];
 
       const el = document.createElement("div");
       el.className = "frog-sprite";
@@ -339,19 +339,16 @@
       let idleMin, idleMax, hopMin, hopMax, heightMin, heightMax, vxRange;
 
       if (personalityRoll < 0.25) {
-        // hyper
         idleMin = 0.3; idleMax = 1.0;
         hopMin = 0.25; hopMax = 0.55;
-        heightMin = 14; heightMax = 48;
+        heightMin = 14; heightMax = 32;
         vxRange = 20;
       } else if (personalityRoll < 0.6) {
-        // normal
         idleMin = 0.8; idleMax = 3.0;
         hopMin = 0.35; hopMax = 0.7;
         heightMin = 10; heightMax = 26;
         vxRange = 12;
       } else {
-        // lazy
         idleMin = 2.0; idleMax = 5.0;
         hopMin = 0.45; hopMax = 0.9;
         heightMin = 6;  heightMax = 20;
@@ -359,7 +356,7 @@
       }
 
       const frog = {
-        meta,
+        tokenId,
         el,
         x: pos.x,
         y: pos.y,
@@ -384,8 +381,11 @@
       };
 
       frogs.push(frog);
-      // build its layered morph (traits) asynchronously
-      buildLayersForFrog(frog, meta).catch(() => {});
+
+      // load base frog metadata and build layers
+      fetchMetadata(tokenId)
+        .then(meta => buildLayersForFrog(frog, meta))
+        .catch(() => {});
     }
   }
 
@@ -397,8 +397,13 @@
       const centerX = frog.x + FROG_SIZE / 2;
       const centerBaseY = frog.baseY + FROG_SIZE / 2;
 
-      // Drift toward last target (click / nav / morph)
-      if (target.active) {
+      // Follow mouse after first click, else optional nav target
+      if (mouse.follow && mouse.active) {
+        const dx = mouse.x - centerX;
+        const dy = mouse.y - centerBaseY;
+        frog.x     += dx * frog.seekFactorX * dt;
+        frog.baseY += dy * frog.seekFactorY * dt;
+      } else if (target.active) {
         const dx = target.x - centerX;
         const dy = target.y - centerBaseY;
         frog.x     += dx * frog.seekFactorX * dt;
@@ -415,14 +420,13 @@
         frog.vx *= -1;
       }
 
-      // clamp vertical
       const marginY = 24;
       frog.baseY = Math.max(
         marginY,
         Math.min(height - marginY - FROG_SIZE, frog.baseY)
       );
 
-      // idle / hopping behavior
+      // idle / hopping
       if (frog.state === "idle") {
         frog.idleTime -= dt;
         frog.y = frog.baseY;
@@ -484,69 +488,12 @@
     lastTime = 0;
     scrollOffsetY = 0;
     lastScrollY = window.scrollY || 0;
+    mouse.follow = false; // reset: they won't follow until user clicks again
 
     await createFrogs(width, height);
     animId = requestAnimationFrame(drawFrame);
   }
 
-  function setupNavScatterHooks() {
-    const navLinks = document.querySelectorAll("nav a[data-view]");
-    if (!navLinks.length) return;
-
-    navLinks.forEach((link) => {
-      const view = link.getAttribute("data-view");
-      if (!view) return;
-
-      link.addEventListener(
-        "click",
-        () => {
-          // Only do the animation if the scatter has already started
-          if (!frogs.length) return;
-
-          switch (view) {
-            case "collection":
-              // center of the screen
-              if (window.ffScatterFrogsGotoCenter) {
-                window.ffScatterFrogsGotoCenter();
-              }
-              break;
-
-            case "rarity":
-              // bias a bit left/top for a different feel
-              if (window.ffScatterFrogsGoto) {
-                window.ffScatterFrogsGoto(0.25, 0.35);
-              }
-              break;
-
-            case "pond":
-              if (window.ffScatterFrogsGotoPond) {
-                window.ffScatterFrogsGotoPond();
-              }
-              break;
-
-            case "morph":
-              if (window.ffScatterFrogsGotoMorph) {
-                window.ffScatterFrogsGotoMorph();
-              }
-              break;
-
-            case "wallet":
-              if (window.ffScatterFrogsGoto) {
-                // drift toward upper-left (wallet panel vibe)
-                window.ffScatterFrogsGoto(0.18, 0.3);
-              }
-              break;
-          }
-        },
-        { passive: true }
-      );
-    });
-  }
-
   window.addEventListener("resize", resetAndStart);
-  window.addEventListener("load", function () {
-    resetAndStart();
-    setupNavScatterHooks();
-  });
+  window.addEventListener("load", resetAndStart);
 })();
-
