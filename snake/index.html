@@ -5,7 +5,6 @@
   <title>Fresh Frogs – Snake Scatter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Adjust path if your CSS is elsewhere -->
   <link rel="stylesheet" href="../style.css" />
 
   <style>
@@ -15,7 +14,7 @@
       height: 100%;
       width: 100%;
       overflow: hidden;
-      background: #7cc1ff; /* light blue */
+      background: #7cc1ff;
     }
 
     #frog-bg {
@@ -26,9 +25,11 @@
   </style>
 </head>
 <body>
-  <!-- data-snake-game turns on snake logic in scatter-frogs.js -->
-  <div id="frog-bg" data-snake-game="1"></div>
+  <div id="frog-bg"></div>
 
-  <script src="/assets/snake-game.js"></script>
+  <!-- NEW game-only scripts -->
+  <script src="./frog-meta.js"></script>
+  <script src="./frog-field.js"></script>
+  <script src="./snake-game.js"></script>
 </body>
 </html>
