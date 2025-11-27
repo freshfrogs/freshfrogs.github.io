@@ -283,7 +283,7 @@
       prev = seg;
     }
 
-    snakeEatSound = new Audio("snake-munch.mp3");
+    snakeEatSound = new Audio("/audio/snake-munch.mp3");
     snakeEatSound.volume = 0.8;
   }
 
