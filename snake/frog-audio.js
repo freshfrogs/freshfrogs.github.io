@@ -84,7 +84,7 @@
       audioTimeSlow     = new Audio("https://freshfrogs.github.io/snake/audio/timeSlow.mp3");
       audioOrbMagnet    = new Audio("https://freshfrogs.github.io/snake/audio/orbMagnet.mp3");
       audioMegaSpawn    = new Audio("https://freshfrogs.github.io/snake/audio/megaSpawn.mp3");
-      audioScoreMulti   = new Audio("https://freshfrogs.github.io/snake/audio/scoreMultiplier.mp3");
+      audioScoreMulti   = new Audio("https://freshfrogs.github.io/snake/audio/scoreMulti.mp3");
       audioPanicHop     = new Audio("https://freshfrogs.github.io/snake/audio/panicHop.mp3");
       audioCloneSwarm   = new Audio("https://freshfrogs.github.io/snake/audio/cloneSwarm.mp3");
       audioLifeSteal    = new Audio("https://freshfrogs.github.io/snake/audio/lifeSteal.mp3");
