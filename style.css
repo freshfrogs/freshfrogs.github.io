@@ -814,4 +814,5 @@ padding: 0.55rem 1.2rem;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   pointer-events: none;
+  border-radius: 100%;
 }
