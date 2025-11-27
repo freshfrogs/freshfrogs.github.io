@@ -59,10 +59,12 @@ a {
 /* Make hero links look just like nav links */
 .nav a,
 .hero-actions a {
-  color: inherit;
-  text-decoration: none;
-  padding: 0.2rem 0;
-  position: relative;
+    color: inherit;
+    text-decoration: none;
+    padding: 0.2rem 0;
+    position: relative;
+    margin: 8px;
+    border-bottom: 1px solid white;
 }
 
 .nav a::after,
