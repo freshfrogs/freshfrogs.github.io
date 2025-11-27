@@ -770,7 +770,7 @@ function openScoreboardOverlay(topList) {
 
   function getJumpFactor() {
     let factor = frogPermanentJumpFactor;
-    if (jumpBuffTime > 0) factor *= 3.2; // super jump
+    if (jumpBuffTime > 0) factor *= 10.0; // super jump
     return factor;
   }
 
