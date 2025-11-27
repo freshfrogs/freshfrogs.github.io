@@ -100,18 +100,45 @@
   // --------------------------------------------------
   // MOUSE
   // --------------------------------------------------
-  const mouse = {
-    x: window.innerWidth / 2,
-    y: window.innerHeight / 2,
-    active: false,
-    follow: false
-  };
+const mouse = { x: 0, y: 0, down: false };
 
-  window.addEventListener("mousemove", (e) => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-    mouse.active = true;
-  });
+function handlePointerMove(clientX, clientY) {
+  mouse.x = clientX;
+  mouse.y = clientY;
+}
+
+// Desktop mouse
+container.addEventListener("mousemove", (e) => {
+  handlePointerMove(e.clientX, e.clientY);
+});
+
+container.addEventListener("mousedown", () => {
+  mouse.down = true;
+});
+container.addEventListener("mouseup", () => {
+  mouse.down = false;
+});
+
+// Mobile touch
+function handleTouch(e) {
+  if (e.touches && e.touches.length > 0) {
+    const t = e.touches[0];
+    handlePointerMove(t.clientX, t.clientY);
+  }
+  e.preventDefault(); // avoid scrolling
+}
+
+container.addEventListener("touchstart", (e) => {
+  mouse.down = true;
+  handleTouch(e);
+}, { passive: false });
+
+container.addEventListener("touchmove", handleTouch, { passive: false });
+
+container.addEventListener("touchend", () => {
+  mouse.down = false;
+});
+
 
   window.addEventListener("click", () => {
     if (gameOver) {
@@ -659,9 +686,6 @@
       case "panicHop":
         panicHopTime = PANIC_HOP_DURATION * buffDurationFactor * durBoost;
         break;
-      case "cloneSwarm":
-        cloneSwarmTime = CLONE_SWARM_DURATION * buffDurationFactor * durBoost;
-        break;
       case "lifeSteal":
         lifeStealTime = LIFE_STEAL_DURATION * buffDurationFactor * durBoost;
         break;
@@ -864,7 +888,6 @@
       "megaSpawn",
       "scoreMulti",
       "panicHop",
-      "cloneSwarm",
       "lifeSteal",
       "permaFrog"
     ];
