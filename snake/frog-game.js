@@ -382,10 +382,8 @@
       const traitType = att.trait_type;
       const value = att.value;
       if (!value || value === "None") continue;
-
-      const valueSafe = String(value).replace(/\s+/g, "");
-      const url = `${BUILD_BASE}/${traitType}/${valueSafe}.png`;
-      const animated = animatedValues.has(valueSafe);
+      const url = `${BUILD_BASE}/${traitType}/${value}.png`;
+      const animated = animatedValues.has(value);
       layers.push({ url, animated });
     }
 
