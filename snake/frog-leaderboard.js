@@ -4,7 +4,7 @@
 (function () {
   "use strict";
 
-  // Your Cloudflare Worker URL
+  // Cloudflare Worker URL
   const LEADERBOARD_URL =
     "https://lucky-king-0d37.danielssouthworth.workers.dev/leaderboard";
 
@@ -12,53 +12,15 @@
   let scoreboardOverlay = null;
   let scoreboardOverlayInner = null;
 
+  // Last 'myEntry' returned by the worker (for correct tag highlighting)
+  let lastMyEntry = null;
+
   // --------------------------------------------------
   // HELPERS
   // --------------------------------------------------
-  function asNumber(v, fallback = 0) {
-    if (typeof v === "number") {
-      return Number.isFinite(v) ? v : fallback;
-    }
-    if (v == null) return fallback;
-    const n = parseFloat(v);
-    return Number.isFinite(n) ? n : fallback;
-  }
-
-  function getEntryScore(entry) {
-    if (!entry || typeof entry !== "object") return 0;
-    if ("score" in entry) return asNumber(entry.score, 0);
-
-    for (const k of Object.keys(entry)) {
-      if (/score/i.test(k)) return asNumber(entry[k], 0);
-    }
-    for (const k of Object.keys(entry)) {
-      const n = asNumber(entry[k], NaN);
-      if (Number.isFinite(n)) return n;
-    }
-    return 0;
-  }
-
-  function getEntryTime(entry) {
-    if (!entry || typeof entry !== "object") return 0;
-    if ("time" in entry) return asNumber(entry.time, 0);
-
-    for (const k of Object.keys(entry)) {
-      if (/time|second|duration/i.test(k)) {
-        return asNumber(entry[k], 0);
-      }
-    }
-    return 0;
-  }
-
-  function formatTime(t) {
-    const total = Math.max(0, asNumber(t, 0));
-    const m = Math.floor(total / 60);
-    const s = total - m * 60;
-    return `${String(m).padStart(2, "0")}:${s.toFixed(1).padStart(4, "0")}`;
-  }
-
   function escapeHtml(str) {
-    return String(str == null ? "" : str)
+    if (str == null) return "";
+    return String(str)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -66,60 +28,157 @@
       .replace(/'/g, "&#39;");
   }
 
-  // Prefer tag, then userTag, then name, then fallback
-  function getDisplayName(entry, fallbackLabel) {
-    if (!entry || typeof entry !== "object") {
-      return fallbackLabel || "Player";
-    }
-    return (
-      entry.tag ||
-      entry.userTag ||
-      entry.name ||
-      fallbackLabel ||
-      "Player"
-    );
+  function pad2(n) {
+    return n < 10 ? "0" + n : String(n);
   }
 
-  // --------------------------------------------------
-  // INIT
-  // --------------------------------------------------
-  function initLeaderboard(container) {
-    containerEl = container;
+  function formatTime(seconds) {
+    if (!seconds || seconds <= 0) return "00:00.0";
+    const total = Math.max(0, seconds);
+    const m = Math.floor(total / 60);
+    const s = total - m * 60;
+    return `${pad2(m)}:${s.toFixed(1).padStart(4, "0")}`;
+  }
+
+  function getEntryScore(entry) {
+    if (!entry || typeof entry !== "object") return 0;
+    if (typeof entry.bestScore === "number") return entry.bestScore;
+    if (typeof entry.score === "number") return entry.score;
+    // fallback: first numeric field containing "score"
+    for (const [k, v] of Object.entries(entry)) {
+      if (typeof v === "number" && /score/i.test(k)) {
+        return v;
+      }
+    }
+    return 0;
+  }
+
+  function getEntryTime(entry) {
+    if (!entry || typeof entry !== "object") return 0;
+    if (typeof entry.bestTime === "number") return entry.bestTime;
+    if (typeof entry.time === "number") return entry.time;
+    // fallback: first numeric field containing "time" / "second" / "duration"
+    for (const [k, v] of Object.entries(entry)) {
+      if (
+        typeof v === "number" &&
+        /(time|second|duration)/i.test(k)
+      ) {
+        return v;
+      }
+    }
+    return 0;
+  }
+
+  function getDisplayName(entry, fallback) {
+    if (entry && typeof entry.tag === "string" && entry.tag.trim() !== "") {
+      return entry.tag;
+    }
+    if (entry && typeof entry.name === "string" && entry.name.trim() !== "") {
+      return entry.name;
+    }
+    return fallback || "Player";
+  }
+
+  function ensureScoreboardOverlay(container) {
+    if (scoreboardOverlay) return;
+    containerEl = container || document.body;
 
     scoreboardOverlay = document.createElement("div");
     scoreboardOverlay.id = "frog-scoreboard-overlay";
-    scoreboardOverlay.style.position = "absolute";
+    scoreboardOverlay.style.position = "fixed";
     scoreboardOverlay.style.inset = "0";
+    scoreboardOverlay.style.background = "rgba(0,0,0,0.65)";
     scoreboardOverlay.style.display = "none";
     scoreboardOverlay.style.alignItems = "center";
     scoreboardOverlay.style.justifyContent = "center";
-    scoreboardOverlay.style.background = "rgba(0,0,0,0.75)";
-    scoreboardOverlay.style.zIndex = "200";
-    scoreboardOverlay.style.pointerEvents = "auto";
+    scoreboardOverlay.style.zIndex = "9999";
 
     scoreboardOverlayInner = document.createElement("div");
     scoreboardOverlayInner.style.background = "#111";
+    scoreboardOverlayInner.style.borderRadius = "10px";
     scoreboardOverlayInner.style.border = "1px solid #444";
-    scoreboardOverlayInner.style.borderRadius = "12px";
-    scoreboardOverlayInner.style.padding = "18px 22px";
-    scoreboardOverlayInner.style.color = "#fff";
-    scoreboardOverlayInner.style.fontFamily = "monospace";
-    scoreboardOverlayInner.style.fontSize = "13px";
+    scoreboardOverlayInner.style.padding = "14px 18px 10px 18px";
+    scoreboardOverlayInner.style.minWidth = "260px";
     scoreboardOverlayInner.style.maxWidth = "420px";
-    scoreboardOverlayInner.style.maxHeight = "80vh";
-    scoreboardOverlayInner.style.overflowY = "auto";
-    scoreboardOverlayInner.style.boxShadow = "0 0 20px rgba(0,0,0,0.8)";
+    scoreboardOverlayInner.style.color = "#eee";
+    scoreboardOverlayInner.style.fontFamily = "monospace";
+    scoreboardOverlayInner.style.fontSize = "12px";
+    scoreboardOverlayInner.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
     scoreboardOverlayInner.style.textAlign = "left";
 
     scoreboardOverlay.appendChild(scoreboardOverlayInner);
     containerEl.appendChild(scoreboardOverlay);
 
-    // Click outside panel to close
     scoreboardOverlay.addEventListener("click", (e) => {
       if (e.target === scoreboardOverlay) {
         hideScoreboardOverlay();
       }
     });
+  }
+
+  // Find the current user's row in the leaderboard list.
+  // Prefer the exact myEntry.userId from the worker; fall back to
+  // the old "closest score+time" heuristic only if needed.
+  function findMyIndexInList(list, lastRunScore, lastRunTime) {
+    if (!Array.isArray(list) || list.length === 0) {
+      return { index: -1, entry: null };
+    }
+
+    // 1) Prefer matching by userId (most accurate)
+    if (lastMyEntry && lastMyEntry.userId) {
+      for (let i = 0; i < list.length; i++) {
+        const e = list[i];
+        if (e && e.userId && e.userId === lastMyEntry.userId) {
+          return { index: i, entry: e };
+        }
+      }
+    }
+
+    // 2) Fallback: match by tag + score/time (for older data with no userId)
+    if (lastMyEntry && lastMyEntry.tag) {
+      let bestDist = Infinity;
+      let bestIndex = -1;
+      let bestEntry = null;
+      for (let i = 0; i < list.length; i++) {
+        const e = list[i];
+        if (!e) continue;
+        if (e.tag !== lastMyEntry.tag) continue;
+        const es = getEntryScore(e);
+        const et = getEntryTime(e);
+        const ds = es - getEntryScore(lastMyEntry);
+        const dt = et - getEntryTime(lastMyEntry);
+        const dist = ds * ds + dt * dt;
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestIndex = i;
+          bestEntry = e;
+        }
+      }
+      if (bestIndex !== -1) {
+        return { index: bestIndex, entry: bestEntry };
+      }
+    }
+
+    // 3) Old behaviour: pick the row whose score+time is closest to this run
+    let bestDist = Infinity;
+    let bestIndex = -1;
+    let bestEntry = null;
+
+    for (let i = 0; i < list.length; i++) {
+      const e = list[i] || {};
+      const es = getEntryScore(e);
+      const et = getEntryTime(e);
+      const ds = es - lastRunScore;
+      const dt = et - lastRunTime;
+      const dist = ds * ds + dt * dt;
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIndex = i;
+        bestEntry = e;
+      }
+    }
+
+    return { index: bestIndex, entry: bestEntry };
   }
 
   // --------------------------------------------------
@@ -135,10 +194,20 @@
         console.warn("fetchLeaderboard non-OK:", res.status);
         return [];
       }
+
       const data = await res.json();
-      if (Array.isArray(data)) return data;
-      if (data && Array.isArray(data.entries)) return data.entries;
-      return [];
+
+      let entries = [];
+      lastMyEntry = null;
+
+      if (Array.isArray(data)) {
+        entries = data;
+      } else if (data && Array.isArray(data.entries)) {
+        entries = data.entries;
+        if (data.myEntry) lastMyEntry = data.myEntry;
+      }
+
+      return entries;
     } catch (err) {
       console.error("fetchLeaderboard error", err);
       return [];
@@ -164,9 +233,18 @@
       }
 
       const data = await res.json();
-      if (Array.isArray(data)) return data;
-      if (data && Array.isArray(data.entries)) return data.entries;
-      return null;
+
+      let entries = null;
+      lastMyEntry = null;
+
+      if (Array.isArray(data)) {
+        entries = data;
+      } else if (data && Array.isArray(data.entries)) {
+        entries = data.entries;
+        if (data.myEntry) lastMyEntry = data.myEntry;
+      }
+
+      return entries;
     } catch (err) {
       console.error("submitScoreToServer error", err);
       return null;
@@ -187,14 +265,16 @@
 
     const lines = [];
     const maxRows = Math.min(5, topList.length);
+
     for (let i = 0; i < maxRows; i++) {
       const entry = topList[i] || {};
       const rank = i + 1;
       const name = getDisplayName(entry, `Player ${rank}`);
       const score = getEntryScore(entry);
       const time = getEntryTime(entry);
+
       lines.push(
-        `${rank}. ${name} — ${formatTime(time)} · ${Math.floor(score)}`
+        `${rank}. ${name} — ${formatTime(time)}, ${Math.floor(score)}`
       );
     }
 
@@ -218,37 +298,16 @@
     title.style.textAlign = "center";
     scoreboardOverlayInner.appendChild(title);
 
-    // Find the entry that best matches this run by score+time
-    let myIndex = -1;
-    let myEntry = null;
-
-    if (safeList.length > 0) {
-      let bestDist = Infinity;
-      for (let i = 0; i < safeList.length; i++) {
-        const e = safeList[i] || {};
-        const es = getEntryScore(e);
-        const et = getEntryTime(e);
-
-        const ds = es - lastRunScore;
-        const dt = et - lastRunTime;
-        const dist = ds * ds + dt * dt;
-
-        if (dist < bestDist) {
-          bestDist = dist;
-          myIndex = i;
-          myEntry = e;
-        }
-      }
-    }
+    const { index: myIndex, entry: myEntry } =
+      findMyIndexInList(safeList, lastRunScore, lastRunTime);
 
     const myName = getDisplayName(myEntry, "You");
 
-    // Run summary with *user tag* (display name) in bright yellow
     const summary = document.createElement("div");
     summary.style.marginBottom = "12px";
     summary.style.fontSize = "13px";
     summary.innerHTML =
-      `Run summary:<br>` +
+      "Run summary:<br>" +
       `<span style="color:#ffd700;font-weight:bold;">${escapeHtml(
         myName
       )}</span>` +
@@ -261,7 +320,6 @@
     hr.style.margin = "8px 0 10px 0";
     scoreboardOverlayInner.appendChild(hr);
 
-    // Leaderboard table
     const table = document.createElement("table");
     table.style.width = "100%";
     table.style.borderCollapse = "collapse";
@@ -321,7 +379,7 @@
           td.style.borderBottom = "1px solid #222";
         }
 
-        // Highlight THIS run's row (user tag) in bright yellow
+        // Highlight the row that actually belongs to the current user
         if (i === myIndex) {
           nameCell.style.color = "#ffd700";
           nameCell.style.fontWeight = "bold";
@@ -349,7 +407,7 @@
 
     const hint = document.createElement("div");
     hint.textContent = "Click outside this panel to close.";
-    hint.style.marginTop = "10px";
+    hint.style.marginTop = "8px";
     hint.style.fontSize = "11px";
     hint.style.textAlign = "center";
     hint.style.color = "#aaa";
@@ -362,6 +420,13 @@
     if (scoreboardOverlay) {
       scoreboardOverlay.style.display = "none";
     }
+  }
+
+  // --------------------------------------------------
+  // INIT
+  // --------------------------------------------------
+  function initLeaderboard(container) {
+    ensureScoreboardOverlay(container || document.body);
   }
 
   // --------------------------------------------------
