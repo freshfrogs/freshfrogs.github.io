@@ -1526,11 +1526,13 @@ function populateUpgradeOverlayChoices() {
   }
 
   function restartGame() {
+    // Stop old loop
     if (animId) {
       cancelAnimationFrame(animId);
       animId = null;
     }
 
+    // Remove all frogs
     for (const frog of frogs) {
       if (frog.cloneEl && frog.cloneEl.parentNode === container) {
         container.removeChild(frog.cloneEl);
@@ -1541,6 +1543,7 @@ function populateUpgradeOverlayChoices() {
     }
     frogs = [];
 
+    // Remove all orbs
     for (const orb of orbs) {
       if (orb.el && orb.el.parentNode === container) {
         container.removeChild(orb.el);
@@ -1548,6 +1551,7 @@ function populateUpgradeOverlayChoices() {
     }
     orbs = [];
 
+    // Remove snake graphics
     if (snake) {
       if (snake.head && snake.head.el && snake.head.el.parentNode === container) {
         container.removeChild(snake.head.el);
@@ -1562,6 +1566,7 @@ function populateUpgradeOverlayChoices() {
     }
     snake = null;
 
+    // Reset game state
     elapsedTime   = 0;
     lastTime      = 0;
     gameOver      = false;
@@ -1569,31 +1574,50 @@ function populateUpgradeOverlayChoices() {
     score         = 0;
     nextOrbTime   = 0;
     mouse.follow  = false;
+
+    // 🔹 Reset the “starting upgrade” flag + next upgrade time
+    initialUpgradeDone     = false;
     nextPermanentChoiceTime = 60;
 
-    speedBuffTime = jumpBuffTime = 0;
-    snakeSlowTime = snakeConfuseTime = snakeShrinkTime = 0;
-    frogShieldTime = timeSlowTime = orbMagnetTime = 0;
-    scoreMultiTime = panicHopTime = 0;
-    cloneSwarmTime = lifeStealTime = 0;
+    // Reset all temporary buff timers
+    speedBuffTime   = 0;
+    jumpBuffTime    = 0;
+    snakeSlowTime   = 0;
+    snakeConfuseTime= 0;
+    snakeShrinkTime = 0;
+    frogShieldTime  = 0;
+    timeSlowTime    = 0;
+    orbMagnetTime   = 0;
+    scoreMultiTime  = 0;
+    panicHopTime    = 0;
+    cloneSwarmTime  = 0;
+    lifeStealTime   = 0;
 
+    // Reset global permanent buffs
     frogPermanentSpeedFactor = 1.0;
     frogPermanentJumpFactor  = 1.0;
     buffDurationFactor       = 1.0;
     orbSpawnIntervalFactor   = 1.0;
+    snakePermanentSpeedFactor= 1.0;
 
+    // Hide overlays
     hideGameOver();
     if (upgradeOverlay) upgradeOverlay.style.display = "none";
     hideScoreboardOverlay();
 
+    // Recreate frogs + snake
     const width  = window.innerWidth;
     const height = window.innerHeight;
 
     createInitialFrogs(width, height).then(() => {});
     initSnake(width, height);
-    updateHUD();
 
     setNextOrbTime();
+    updateHUD();
+
+    // 🔹 Show the upgrade menu again at the start of a new run
+    openUpgradeOverlay();
+
     animId = requestAnimationFrame(drawFrame);
   }
 
