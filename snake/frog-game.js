@@ -109,27 +109,27 @@
 
   function initAudio() {
     audioRibbits = [
-      new Audio("/snake/audio/ribbitOne.mp3"),
-      new Audio("/snake/audio/ribbitTwo.mp3"),
-      new Audio("/snake/audio/ribbitThree.mp3"),
-      new Audio("/snake/audio/ribbitBase.mp3"),
+      new Audio("https://freshfrogs.github.io/snake/audio/ribbitOne.mp3"),
+      new Audio("https://freshfrogs.github.io/snake/audio/ribbitTwo.mp3"),
+      new Audio("https://freshfrogs.github.io/snake/audio/ribbitThree.mp3"),
+      new Audio("https://freshfrogs.github.io/snake/audio/ribbitBase.mp3"),
     ];
     audioRibbits.forEach(a => a.volume = 0.8);
 
-    audioFrogDeath = new Audio("/frogDeath.mp3");
+    audioFrogDeath = new Audio("https://freshfrogs.github.io/frogDeath.mp3");
     audioFrogDeath.volume = 0.9;
 
-    audioSnakeEat = new Audio("/snake/munch.mp3");
+    audioSnakeEat = new Audio("https://freshfrogs.github.io/snake/audio/munch.mp3");
     audioSnakeEat.volume = 0.7;
 
-    audioOrbSpawn1 = new Audio("/audio/orbSpawn.mp3");
-    audioOrbSpawn2 = new Audio("/audio/orbSpawnTwo.mp3");
+    audioOrbSpawn1 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawn.mp3");
+    audioOrbSpawn2 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawnTwo.mp3");
     audioOrbSpawn1.volume = 0.8;
     audioOrbSpawn2.volume = 0.8;
 
-    audioSuperSpeed = new Audio("/audio/superSpeed.mp3");
-    audioSuperJump  = new Audio("/audio/superJump.mp3");
-    audioFrogSpawn  = new Audio("/audio/frogSpawn.mp3");
+    audioSuperSpeed = new Audio("https://freshfrogs.github.io/snake/audio/superSpeed.mp3");
+    audioSuperJump  = new Audio("https://freshfrogs.github.io/snake/audio/superJump.mp3");
+    audioFrogSpawn  = new Audio("https://freshfrogs.github.io/snake/audio/frogSpawn.mp3");
     audioSuperSpeed.volume = 0.9;
     audioSuperJump.volume  = 0.9;
     audioFrogSpawn.volume  = 0.9;
