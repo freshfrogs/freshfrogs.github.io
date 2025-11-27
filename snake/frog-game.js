@@ -1,17 +1,17 @@
-// assets/scatter-frogs.js
+// /snake/frog-game.js
 (function () {
   const FROG_SIZE    = 64;
   const MAX_TOKEN_ID = 4040;
-  const META_BASE    = "https://freshfrogs.github.io/frog/json/";
+  const META_BASE    = "./frog/json/";
   const META_EXT     = ".json";
-  const BUILD_BASE   = "https://freshfrogs.github.io/frog/build_files";
+  const BUILD_BASE   = "./frog/build_files";
   const MAX_FROGS    = 120;
 
   // Values that have animation variants for scatter frogs
   const SCATTER_ANIMATED_VALUES = new Set([
-    // 'witchStraw',
-    // 'witchBrown',
-    // 'witchBlack',
+    //'witchStraw',
+    //'witchBrown',
+    //'witchBlack',
     'goldenDartFrog',
     'blueDartFrog',
     'blueTreeFrog',
@@ -46,12 +46,11 @@
   ]);
 
   const container = document.getElementById("frog-bg");
-  if (!container) {
-    return;
-  }
+  if (!container) return;
 
   container.classList.add("frog-scatter-container");
 
+  // Basic styles for scatter frogs, snake, and orbs
   const style = document.createElement("style");
   style.textContent = `
     #frog-bg.frog-scatter-container {
@@ -83,28 +82,43 @@
       display: none;
     }
 
-    .frog-snake-head,
-    .frog-snake-body,
-    .frog-snake-tail {
+    .snake-head,
+    .snake-body,
+    .snake-tail {
       position: absolute;
-      width: ${FROG_SIZE}px;
-      height: ${FROG_SIZE}px;
+      width: 48px;
+      height: 48px;
       image-rendering: pixelated;
       pointer-events: none;
       background-repeat: no-repeat;
       background-size: contain;
       background-position: center center;
       transform-origin: 50% 50%;
+      z-index: 30;
     }
 
-    .frog-snake-head {
-      background-image: url("./frog/snake/head.png");
+    .snake-head {
+      background-image: url("/snake/head.png");
+      z-index: 32;
     }
-    .frog-snake-body {
-      background-image: url("./frog/snake/body.png");
+    .snake-body {
+      background-image: url("/snake/body.png");
+      z-index: 31;
     }
-    .frog-snake-tail {
-      background-image: url("./frog/snake/tail.png");
+    .snake-tail {
+      background-image: url("/snake/tail.png");
+      z-index: 30;
+    }
+
+    .frog-buff-orb {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      transform: translate3d(0, 0, 0);
+      z-index: 25;
     }
 
     body {
@@ -113,6 +127,9 @@
   `;
   document.head.appendChild(style);
 
+  // -----------------------------
+  // Global state
+  // -----------------------------
   let frogs = [];
   let animId = null;
   let lastTime = 0;
@@ -132,39 +149,79 @@
 
   let scrollOffsetY = 0;
   let lastScrollY = window.scrollY || 0;
-  let lastGroupHopTime = 0;
 
   // -----------------------------
-  // Snake game (optional)
+  // Snake config + state
   // -----------------------------
-  const SNAKE_ENABLED = container && container.hasAttribute("data-snake-game");
+  const SNAKE_ENABLED = container.hasAttribute("data-snake-game");
   const SNAKE_SEGMENT_SIZE = 48;
   const SNAKE_SPEED = 90;
   const SNAKE_TURN_RATE = Math.PI * 1.5;
-  const SNAKE_SEGMENT_GAP = 6;
-  const SNAKE_INITIAL_SEGMENTS = 6;
+  const SNAKE_SEGMENT_GAP = 12;      // more spacing between segments
+  const SNAKE_INITIAL_SEGMENTS = 10; // longer starting snake
   const SNAKE_EAT_RADIUS = 40;
 
   let snake = null;
   let snakeEatSound = null;
 
-  // Frog jump / death sounds & game timer (snake game only)
+  // -----------------------------
+  // Audio: jumps, deaths, buffs, orbs
+  // -----------------------------
   const FROG_JUMP_SOUNDS = [
-    "/audio/ribbitOne.mp3",
-    "/audio/ribbitTwo.mp3",
-    "/audio/ribbitThree.mp3",
-    "/audio/ribbitBase.mp3"
+    "audio/ribbitOne.mp3",
+    "audio/ribbitTwo.mp3",
+    "audio/ribbitThree.mp3",
+    "audio/ribbitBase.mp3"
   ];
-  const FROG_DEATH_SOUND = "/audio/frogDeath.mp3";
+  const FROG_DEATH_SOUND = "audio/frogDeath.mp3";
+
+  const BUFF_SOUND_SUPER_SPEED = "audio/superSpeed.mp3";
+  const BUFF_SOUND_SUPER_JUMP  = "audio/superJump.mp3";
+  const BUFF_SOUND_FROG_SPAWN  = "audio/frogSpawn.mp3";
+
+  const ORB_SPAWN_SOUNDS = [
+    "audio/orbSpawn.mp3",
+    "audio/orbSpawnTwo.mp3"
+  ];
+
   const MAX_SIMULTANEOUS_FROG_JUMPS = 6;
   const MAX_SIMULTANEOUS_FROG_DEATHS = 4;
   const activeFrogJumpSounds = [];
   const activeFrogDeathSounds = [];
 
+  // throttle ribbits so they don't spam/cut each other
+  let frogJumpLastPlay = 0;
+  const FROG_JUMP_MIN_INTERVAL_MS = 300;
+
+  // -----------------------------
+  // Game timer
+  // -----------------------------
   let gameStartTime = null;
   let gameElapsed = 0;
   let gameEnded = false;
   let timerEl = null;
+
+  // -----------------------------
+  // Buffs & orbs
+  // -----------------------------
+  let buffSpeedActiveUntil = 0;
+  let buffJumpActiveUntil  = 0;
+
+  const ORB_RADIUS = 9;
+  const ORB_MIN_SPAWN_INTERVAL = 6;  // seconds
+  const ORB_MAX_SPAWN_INTERVAL = 14; // seconds
+  const ORB_MAX_ON_SCREEN      = 5;
+
+  let orbs = [];
+  let nextOrbSpawnAt = 0; // in seconds of gameElapsed
+
+  function isSpeedBuffActive() {
+    return SNAKE_ENABLED && gameElapsed < buffSpeedActiveUntil;
+  }
+
+  function isJumpBuffActive() {
+    return SNAKE_ENABLED && gameElapsed < buffJumpActiveUntil;
+  }
 
   function playSnakeEatSound() {
     if (!snakeEatSound) return;
@@ -172,14 +229,21 @@
       snakeEatSound.currentTime = 0;
       snakeEatSound.play();
     } catch (e) {
-      // ignore autoplay / other errors
+      // ignore autoplay errors
     }
   }
 
-  function playFrogJumpSound() {
+  function playFrogJumpSound(force = false) {
     if (!SNAKE_ENABLED || !FROG_JUMP_SOUNDS.length) return;
 
-    // Don't start a new sound if too many are already playing.
+    const now = (window.performance && performance.now) ? performance.now() : Date.now();
+
+    // global cooldown so we don't get machine-gun spam
+    if (!force && now - frogJumpLastPlay < FROG_JUMP_MIN_INTERVAL_MS) {
+      return;
+    }
+    frogJumpLastPlay = now;
+
     if (activeFrogJumpSounds.length >= MAX_SIMULTANEOUS_FROG_JUMPS) {
       return;
     }
@@ -206,7 +270,6 @@
   function playFrogDeathSound() {
     if (!SNAKE_ENABLED || !FROG_DEATH_SOUND) return;
 
-    // Don't start a new sound if too many are already playing.
     if (activeFrogDeathSounds.length >= MAX_SIMULTANEOUS_FROG_DEATHS) {
       return;
     }
@@ -224,16 +287,362 @@
     try {
       audio.play();
     } catch (e) {
-      // ignore autoplay errors
+      // ignore
     }
   }
 
+  function playOneShotSound(src, volume = 1.0) {
+    if (!src) return;
+    const audio = new Audio(src);
+    audio.volume = volume;
+    try {
+      audio.play();
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // -----------------------------
+  // Random helpers
+  // -----------------------------
+  function randInt(min, maxInclusive) {
+    return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
+  }
+
+  function randRange(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  function formatTime(totalSeconds) {
+    const s = Math.max(0, Math.floor(totalSeconds));
+    const minutes = Math.floor(s / 60);
+    const seconds = s % 60;
+    const mm = String(minutes).padStart(2, "0");
+    const ss = String(seconds).padStart(2, "0");
+    return mm + ":" + ss;
+  }
+
+  function updateTimerDisplay(totalSeconds) {
+    if (!SNAKE_ENABLED || !timerEl) return;
+    timerEl.textContent = "Time: " + formatTime(totalSeconds);
+  }
+
+  // -----------------------------
+  // Metadata / image helpers
+  // -----------------------------
+  async function fetchMetadata(tokenId) {
+    const url = META_BASE + tokenId + META_EXT;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error("Metadata fetch failed: " + resp.status);
+    return resp.json();
+  }
+
+  function buildLayeredFrogElement(frog) {
+    const el = frog.el;
+    el.innerHTML = "";
+
+    for (const layer of frog.layers) {
+      const layerEl = document.createElement("div");
+      layerEl.className = "frog-layer";
+
+      let url = layer.url;
+      if (layer.animated) {
+        const parts = url.split(".");
+        const ext = parts.pop();
+        url = parts.join(".") + "_animation.gif";
+      }
+
+      layerEl.style.backgroundImage = `url("${url}")`;
+      el.appendChild(layerEl);
+    }
+  }
+
+  function pickAnimatedValues(attributes) {
+    const body   = attributes.find(a => a.trait_type === "Body");
+    const special= attributes.find(a => a.trait_type === "Special");
+    const eye    = attributes.find(a => a.trait_type === "Eye Accessory");
+    const hat    = attributes.find(a => a.trait_type === "Hat / Head Accessory");
+
+    const animatedValues = [];
+
+    if (body && SCATTER_ANIMATED_VALUES.has(body.value))   animatedValues.push(body.value);
+    if (special && SCATTER_ANIMATED_VALUES.has(special.value)) animatedValues.push(special.value);
+    if (eye && SCATTER_ANIMATED_VALUES.has(eye.value))     animatedValues.push(eye.value);
+    if (hat && SCATTER_ANIMATED_VALUES.has(hat.value))     animatedValues.push(hat.value);
+
+    return new Set(animatedValues);
+  }
+
+  function buildLayersForFrog(frog, meta) {
+    const attrs = meta.attributes || [];
+    const animatedValues = pickAnimatedValues(attrs);
+    const layers = [];
+
+    const basePath = `${BUILD_BASE}/base`;
+    layers.push({ url: `${basePath}/${meta.imageBase || "base"}.png`, animated: false });
+
+    for (const att of attrs) {
+      const traitType = att.trait_type;
+      const value = att.value;
+      if (!value || value === "None") continue;
+
+      let folder = null;
+      switch (traitType) {
+        case "Background": folder = "background"; break;
+        case "Body":       folder = "body";       break;
+        case "Belly":      folder = "belly";      break;
+        case "Spots":      folder = "spots";      break;
+        case "Mouth":      folder = "mouth";      break;
+        case "Eye Accessory": folder = "eye";     break;
+        case "Special":    folder = "special";    break;
+        case "Hat / Head Accessory": folder = "hat"; break;
+        default: continue;
+      }
+
+      const valueSafe = String(value).replace(/\s+/g, "");
+      const url = `${BUILD_BASE}/${folder}/${valueSafe}.png`;
+      const animated = animatedValues.has(valueSafe);
+      layers.push({ url, animated });
+    }
+
+    frog.layers = layers;
+    buildLayeredFrogElement(frog);
+  }
+
+  // -----------------------------
+  // Frog creation
+  // -----------------------------
+  function computeFrogPositions(width, height, desiredCount) {
+    const positions = [];
+    const MIN_DIST = 52;
+    const margin = 16;
+
+    let targetCount;
+    if (typeof desiredCount === "number" && !isNaN(desiredCount)) {
+      targetCount = Math.max(1, Math.min(MAX_FROGS, Math.floor(desiredCount)));
+    } else {
+      const area = width * height;
+      const approxPerFrogArea = (FROG_SIZE * FROG_SIZE) * 5;
+      targetCount = Math.floor(area / approxPerFrogArea);
+      targetCount = Math.max(15, Math.min(MAX_FROGS, targetCount));
+    }
+
+    let safety = targetCount * 50;
+    while (positions.length < targetCount && safety-- > 0) {
+      const x = margin + Math.random() * (width - margin * 2 - FROG_SIZE);
+      const y = margin + Math.random() * (height - margin * 2 - FROG_SIZE);
+      const cx = x + FROG_SIZE / 2;
+      const cy = y + FROG_SIZE / 2;
+
+      let ok = true;
+      for (const p of positions) {
+        const pcx = p.x + FROG_SIZE / 2;
+        const pcy = p.y + FROG_SIZE / 2;
+        const dx = cx - pcx;
+        const dy = cy - pcy;
+        if (dx * dx + dy * dy < MIN_DIST * MIN_DIST) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) positions.push({ x, y });
+    }
+
+    return positions;
+  }
+
+  function createFrogAtPosition(pos) {
+    const x = pos.x;
+    const y = pos.y;
+
+    const el = document.createElement("div");
+    el.className = "frog-sprite";
+    el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    container.appendChild(el);
+
+    const idleMin   = 0.8;
+    const idleMax   = 3.5;
+    const hopMin    = 0.45;
+    const hopMax    = 0.90;
+    const heightMin = 18;
+    const heightMax = 36;
+
+    const frog = {
+      tokenId: randInt(1, MAX_TOKEN_ID),
+      el,
+      x,
+      y,
+      baseY: y,
+
+      hopStartX: x,
+      hopStartBaseY: y,
+      hopEndX: x,
+      hopEndBaseY: y,
+
+      state: "idle",
+      idleTime: randRange(idleMin, idleMax),
+      hopTime: 0,
+      hopDuration: randRange(hopMin, hopMax),
+      hopHeight: randRange(heightMin, heightMax),
+
+      idleMin, idleMax,
+      hopDurMin: hopMin,
+      hopDurMax: hopMax,
+      hopHeightMin: heightMin,
+      hopHeightMax: heightMax,
+
+      layers: []
+    };
+
+    frogs.push(frog);
+
+    // async load metadata & layers
+    fetchMetadata(frog.tokenId)
+      .then(meta => buildLayersForFrog(frog, meta))
+      .catch(() => {});
+
+    return frog;
+  }
+
+  async function createFrogs(width, height) {
+    frogs = [];
+    container.innerHTML = "";
+
+    const positions = computeFrogPositions(width, height, SNAKE_ENABLED ? 50 : null);
+    positions.forEach(pos => createFrogAtPosition(pos));
+  }
+
+  function spawnExtraFrogsRandom(count) {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const margin = 16;
+
+    for (let i = 0; i < count && frogs.length < MAX_FROGS; i++) {
+      const x = margin + Math.random() * (width - margin * 2 - FROG_SIZE);
+      const y = margin + Math.random() * (height - margin * 2 - FROG_SIZE);
+      createFrogAtPosition({ x, y });
+    }
+  }
+
+  // -----------------------------
+  // Frogs animation
+  // -----------------------------
+  function updateFrogs(dt, width, height) {
+    const marginY = 24;
+    const marginX = 8;
+
+    for (const frog of frogs) {
+      if (frog.state === "idle") {
+        frog.idleTime -= dt;
+        frog.y = frog.baseY;
+
+        if (frog.idleTime <= 0) {
+          frog.state = "hopping";
+          frog.hopTime = 0;
+
+          // base hop settings
+          let hopDurMin = frog.hopDurMin;
+          let hopDurMax = frog.hopDurMax;
+          let hopDistMin = 24;
+          let hopDistMax = 96;
+
+          if (isSpeedBuffActive()) {
+            hopDurMin *= 0.6;
+            hopDurMax *= 0.6;
+            hopDistMin *= 1.4;
+            hopDistMax *= 1.4;
+          }
+
+          frog.hopDuration = randRange(hopDurMin, hopDurMax);
+
+          // ribbit on hop start (throttled)
+          if (SNAKE_ENABLED) {
+            playFrogJumpSound(false);
+          }
+
+          let hopHeightMin = frog.hopHeightMin;
+          let hopHeightMax = frog.hopHeightMax;
+
+          const spice = Math.random();
+          if (spice < 0.1) {
+            frog.hopHeight = randRange(hopHeightMax * 1.0, hopHeightMax * 1.6);
+          } else if (spice > 0.9) {
+            frog.hopHeight = randRange(hopHeightMin * 0.7, hopHeightMin * 1.1);
+          } else {
+            frog.hopHeight = randRange(hopHeightMin, hopHeightMax);
+          }
+
+          if (isJumpBuffActive()) {
+            frog.hopHeight *= 2.5; // super jump buff
+          }
+
+          const angle = Math.random() * Math.PI * 2;
+          const dist  = randRange(hopDistMin, hopDistMax);
+
+          let targetX = frog.x + Math.cos(angle) * dist;
+          let targetBaseY = frog.baseY + Math.sin(angle) * dist;
+
+          targetX = Math.max(marginX, Math.min(width - marginX - FROG_SIZE, targetX));
+          targetBaseY = Math.max(
+            marginY,
+            Math.min(height - marginY - FROG_SIZE, targetBaseY)
+          );
+
+          frog.hopStartX = frog.x;
+          frog.hopStartBaseY = frog.baseY;
+          frog.hopEndX = targetX;
+          frog.hopEndBaseY = targetBaseY;
+        }
+      } else if (frog.state === "hopping") {
+        frog.hopTime += dt;
+        const tRaw = frog.hopTime / frog.hopDuration;
+        const t = Math.min(1, Math.max(0, tRaw));
+
+        const groundX = frog.hopStartX + (frog.hopEndX - frog.hopStartX) * t;
+        const groundBaseY = frog.hopStartBaseY + (frog.hopEndBaseY - frog.hopStartBaseY) * t;
+
+        const offset = -4 * frog.hopHeight * t * (1 - t);
+
+        frog.x = groundX;
+        frog.baseY = groundBaseY;
+        frog.y = groundBaseY + offset;
+
+        if (frog.hopTime >= frog.hopDuration) {
+          frog.state = "idle";
+
+          let idleMin = frog.idleMin;
+          let idleMax = frog.idleMax;
+          if (isSpeedBuffActive()) {
+            idleMin *= 0.5;
+            idleMax *= 0.5;
+          }
+          frog.idleTime = randRange(idleMin, idleMax);
+
+          frog.x = frog.hopEndX;
+          frog.baseY = frog.hopEndBaseY;
+          frog.y = frog.baseY;
+
+          frog.x = Math.max(marginX, Math.min(width - marginX - FROG_SIZE, frog.x));
+          frog.baseY = Math.max(
+            marginY,
+            Math.min(height - marginY - FROG_SIZE, frog.baseY)
+          );
+        }
+      }
+
+      const renderY = frog.y + scrollOffsetY;
+      frog.el.style.transform = `translate3d(${frog.x}px, ${renderY}px, 0)`;
+    }
+  }
+
+  // -----------------------------
+  // Snake logic
+  // -----------------------------
   function initSnake(width, height) {
     if (!SNAKE_ENABLED) return;
-    if (!container) return;
 
-    // clean up old snake if present
-    if (snake && snake.head && snake.head.el && snake.head.el.parentNode === container) {
+    // clear any old snake DOM
+    if (snake && snake.segments) {
       for (const seg of snake.segments) {
         if (seg.el && seg.el.parentNode === container) {
           container.removeChild(seg.el);
@@ -247,12 +656,11 @@
       angle: 0,
       speed: SNAKE_SPEED,
       segments: [],
-      targetX: width / 2,
-      targetY: height / 2
+      head: null
     };
 
     const headEl = document.createElement("div");
-    headEl.className = "frog-snake-head";
+    headEl.className = "snake-head";
     container.appendChild(headEl);
 
     const headSeg = {
@@ -262,6 +670,7 @@
       el: headEl,
       isHead: true
     };
+
     snake.head = headSeg;
     snake.segments.push(headSeg);
 
@@ -269,7 +678,7 @@
     for (let i = 1; i < SNAKE_INITIAL_SEGMENTS; i++) {
       const segEl = document.createElement("div");
       const isTail = i === SNAKE_INITIAL_SEGMENTS - 1;
-      segEl.className = isTail ? "frog-snake-tail" : "frog-snake-body";
+      segEl.className = isTail ? "snake-tail" : "snake-body";
       container.appendChild(segEl);
 
       const seg = {
@@ -283,23 +692,25 @@
       prev = seg;
     }
 
-    snakeEatSound = new Audio("/audio/snake-munch.mp3");
+    snakeEatSound = new Audio("audio/snake-munch.mp3");
     snakeEatSound.volume = 0.8;
   }
 
   function growSnake(count) {
     if (!snake) return;
+
     for (let i = 0; i < count; i++) {
       const last = snake.segments[snake.segments.length - 1];
+
       const segEl = document.createElement("div");
-      segEl.className = "frog-snake-tail";
+      segEl.className = "snake-tail";
       container.appendChild(segEl);
 
+      // previous tail becomes body
       if (snake.segments.length >= 2) {
         const prevTail = snake.segments[snake.segments.length - 1];
-        const prevClass = prevTail.el.className;
-        if (prevClass.indexOf("frog-snake-tail") !== -1) {
-          prevTail.el.className = "frog-snake-body";
+        if (prevTail.el && prevTail.el.className === "snake-tail") {
+          prevTail.el.className = "snake-body";
         }
       }
 
@@ -319,21 +730,14 @@
 
     const marginX = 8;
     const marginY = 24;
-
     const head = snake.head;
     if (!head) return;
 
-    let tx = target.x;
-    let ty = target.y;
-    if (!mouse.follow || !mouse.active) {
-      tx = width / 2;
-      ty = height / 2;
-    }
-    snake.targetX = tx;
-    snake.targetY = ty;
+    let tx = mouse.follow && mouse.active ? mouse.x : width / 2;
+    let ty = mouse.follow && mouse.active ? mouse.y : height / 2;
 
-    const dxTarget = snake.targetX - head.x;
-    const dyTarget = snake.targetY - head.y;
+    const dxTarget = tx - head.x;
+    const dyTarget = ty - head.y;
     const desiredAngle = Math.atan2(dyTarget, dxTarget);
 
     let delta = desiredAngle - snake.angle;
@@ -380,6 +784,7 @@
         `translate3d(${seg.x - SNAKE_SEGMENT_SIZE / 2}px, ${seg.y - SNAKE_SEGMENT_SIZE / 2 + scrollOffsetY}px, 0) rotate(${seg.angle}rad)`;
     }
 
+    // Snake eating frogs
     for (let i = frogs.length - 1; i >= 0; i--) {
       const frog = frogs[i];
       const fx = frog.x + FROG_SIZE / 2;
@@ -389,343 +794,124 @@
       const d2 = dx * dx + dy * dy;
 
       if (d2 <= SNAKE_EAT_RADIUS * SNAKE_EAT_RADIUS) {
-        // eat frog
         if (frog.el.parentNode === container) {
           container.removeChild(frog.el);
         }
         frogs.splice(i, 1);
 
-        // play sounds
         playSnakeEatSound();
         playFrogDeathSound();
 
-        // grow snake (no frog respawn)
+        // grow snake; no frog respawn
         growSnake(1);
       }
     }
   }
 
   // -----------------------------
-  // Metadata / image helpers
+  // Orbs & buffs
   // -----------------------------
-  async function fetchMetadata(tokenId) {
-    const url = META_BASE + tokenId + META_EXT;
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error("Metadata fetch failed: " + resp.status);
-    const meta = await resp.json();
-    return meta;
+  function scheduleNextOrb(timeSeconds) {
+    nextOrbSpawnAt = timeSeconds + randRange(ORB_MIN_SPAWN_INTERVAL, ORB_MAX_SPAWN_INTERVAL);
   }
 
-  function buildLayeredFrogElement(frog) {
-    const el = frog.el;
-    el.innerHTML = "";
+  function spawnOrb(width, height) {
+    if (orbs.length >= ORB_MAX_ON_SCREEN) return;
 
-    for (const layer of frog.layers) {
-      const layerEl = document.createElement("div");
-      layerEl.className = "frog-layer";
+    const margin = 24;
+    const x = margin + Math.random() * (width - margin * 2);
+    const y = margin + Math.random() * (height - margin * 2);
 
-      let url = layer.url;
-      if (layer.animated) {
-        const parts = url.split(".");
-        const ext = parts.pop();
-        url = parts.join(".") + "_animation.gif";
-      }
+    const orbEl = document.createElement("div");
+    orbEl.className = "frog-buff-orb";
 
-      layerEl.style.backgroundImage = `url("${url}")`;
+    // random bright color with simple shading
+    const hue = Math.floor(Math.random() * 360);
+    const base = `hsl(${hue}, 90%, 55%)`;
+    const light = `hsl(${hue}, 100%, 80%)`;
+    orbEl.style.background = `radial-gradient(circle at 30% 30%, ${light}, ${base})`;
 
-      el.appendChild(layerEl);
+    container.appendChild(orbEl);
+
+    const orb = {
+      x,
+      y,
+      r: ORB_RADIUS,
+      el: orbEl
+    };
+    orbs.push(orb);
+
+    // orb spawn sound
+    const spawnSrc = ORB_SPAWN_SOUNDS[randInt(0, ORB_SPAWN_SOUNDS.length - 1)];
+    playOneShotSound(spawnSrc, 0.8);
+  }
+
+  function applyRandomBuff() {
+    const buffs = ["speed", "jump", "spawn"];
+    const type = buffs[randInt(0, buffs.length - 1)];
+
+    if (type === "speed") {
+      buffSpeedActiveUntil = Math.max(buffSpeedActiveUntil, gameElapsed + 7);
+      playOneShotSound(BUFF_SOUND_SUPER_SPEED, 0.9);
+    } else if (type === "jump") {
+      buffJumpActiveUntil = Math.max(buffJumpActiveUntil, gameElapsed + 7);
+      playOneShotSound(BUFF_SOUND_SUPER_JUMP, 0.9);
+    } else if (type === "spawn") {
+      const n = randInt(1, 10);
+      spawnExtraFrogsRandom(n);
+      playOneShotSound(BUFF_SOUND_FROG_SPAWN, 0.9);
     }
   }
 
-  function pickAnimatedValues(attributes) {
-    const body = attributes.find(a => a.trait_type === "Body");
-    const special = attributes.find(a => a.trait_type === "Special");
-    const eye = attributes.find(a => a.trait_type === "Eye Accessory");
-    const hat = attributes.find(a => a.trait_type === "Hat / Head Accessory");
+  function updateOrbs(dt, width, height) {
+    if (!SNAKE_ENABLED) return;
+    if (gameEnded) return;
 
-    const animatedValues = [];
-
-    if (body && SCATTER_ANIMATED_VALUES.has(body.value)) {
-      animatedValues.push(body.value);
-    }
-    if (special && SCATTER_ANIMATED_VALUES.has(special.value)) {
-      animatedValues.push(special.value);
-    }
-    if (eye && SCATTER_ANIMATED_VALUES.has(eye.value)) {
-      animatedValues.push(eye.value);
-    }
-    if (hat && SCATTER_ANIMATED_VALUES.has(hat.value)) {
-      animatedValues.push(hat.value);
+    // spawn timing
+    if (gameElapsed >= nextOrbSpawnAt && orbs.length < ORB_MAX_ON_SCREEN) {
+      spawnOrb(width, height);
+      scheduleNextOrb(gameElapsed);
     }
 
-    return new Set(animatedValues);
-  }
-
-  function buildLayersForFrog(frog, meta) {
-    const attrs = meta.attributes || [];
-    const animatedValues = pickAnimatedValues(attrs);
-    const layers = [];
-
-    let basePath = `${BUILD_BASE}/base`;
-    layers.push({ url: `${basePath}/${meta.imageBase || "base"}.png`, animated: false });
-
-    for (const att of attrs) {
-      const traitType = att.trait_type;
-      const value = att.value;
-
-      if (!value || value === "None") continue;
-
-      let folder = null;
-      switch (traitType) {
-        case "Background":
-          folder = "background";
-          break;
-        case "Body":
-          folder = "body";
-          break;
-        case "Belly":
-          folder = "belly";
-          break;
-        case "Spots":
-          folder = "spots";
-          break;
-        case "Mouth":
-          folder = "mouth";
-          break;
-        case "Eye Accessory":
-          folder = "eye";
-          break;
-        case "Special":
-          folder = "special";
-          break;
-        case "Hat / Head Accessory":
-          folder = "hat";
-          break;
-        default:
-          continue;
-      }
-
-      const valueSafe = String(value).replace(/\s+/g, "");
-      const url = `${BUILD_BASE}/${folder}/${valueSafe}.png`;
-      const animated = animatedValues.has(valueSafe);
-      layers.push({ url, animated });
+    // place orbs on screen
+    for (const orb of orbs) {
+      const renderY = orb.y + scrollOffsetY;
+      orb.el.style.transform =
+        `translate3d(${orb.x - orb.r}px, ${renderY - orb.r}px, 0)`;
     }
 
-    frog.layers = layers;
-    buildLayeredFrogElement(frog);
-  }
+    // collisions: orb vs frogs
+    const frogRadius = FROG_SIZE / 2;
+    for (let i = orbs.length - 1; i >= 0; i--) {
+      const orb = orbs[i];
+      const R = frogRadius + orb.r;
+      const R2 = R * R;
 
-  // -----------------------------
-  // Frog creation and animation
-  // -----------------------------
-  function randInt(min, maxInclusive) {
-    return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
-  }
-
-  function randRange(min, max) {
-    return min + Math.random() * (max - min);
-  }
-
-  function formatTime(totalSeconds) {
-    const s = Math.max(0, Math.floor(totalSeconds));
-    const minutes = Math.floor(s / 60);
-    const seconds = s % 60;
-    const mm = String(minutes).padStart(2, "0");
-    const ss = String(seconds).padStart(2, "0");
-    return mm + ":" + ss;
-  }
-
-  function updateTimerDisplay(totalSeconds) {
-    if (!SNAKE_ENABLED || !timerEl) return;
-    timerEl.textContent = "Time: " + formatTime(totalSeconds);
-  }
-
-  function pickRandomTokenIds(count) {
-    const set = new Set();
-    while (set.size < count) {
-      set.add(randInt(1, MAX_TOKEN_ID));
-    }
-    return Array.from(set);
-  }
-
-  function computeFrogPositions(width, height, desiredCount) {
-    const positions = [];
-    const MIN_DIST = 52;
-    const margin = 16;
-
-    let targetCount;
-
-    if (typeof desiredCount === "number" && !isNaN(desiredCount)) {
-      targetCount = Math.max(1, Math.min(MAX_FROGS, Math.floor(desiredCount)));
-    } else {
-      const area = width * height;
-      const approxPerFrogArea = (FROG_SIZE * FROG_SIZE) * 5;
-      targetCount = Math.floor(area / approxPerFrogArea);
-      targetCount = Math.max(15, Math.min(MAX_FROGS, targetCount));
-    }
-
-    let safety = targetCount * 50;
-    while (positions.length < targetCount && safety-- > 0) {
-      const x = margin + Math.random() * (width - margin * 2 - FROG_SIZE);
-      const y = margin + Math.random() * (height - margin * 2 - FROG_SIZE);
-      const cx = x + FROG_SIZE / 2;
-      const cy = y + FROG_SIZE / 2;
-
-      let ok = true;
-      for (const p of positions) {
-        const pcx = p.x + FROG_SIZE / 2;
-        const pcy = p.y + FROG_SIZE / 2;
-        const dx = cx - pcx;
-        const dy = cy - pcy;
-        if (dx * dx + dy * dy < MIN_DIST * MIN_DIST) {
-          ok = false;
+      let collected = false;
+      for (const frog of frogs) {
+        const fx = frog.x + frogRadius;
+        const fy = frog.baseY + frogRadius;
+        const dx = fx - orb.x;
+        const dy = fy - orb.y;
+        if (dx * dx + dy * dy <= R2) {
+          collected = true;
           break;
         }
       }
-      if (ok) positions.push({ x, y });
-    }
-    return positions;
-  }
 
-  async function createFrogs(width, height) {
-    frogs = [];
-    container.innerHTML = "";
-
-    const positions = computeFrogPositions(width, height, SNAKE_ENABLED ? 50 : null);
-    const tokenIds  = pickRandomTokenIds(positions.length);
-
-    for (let i = 0; i < positions.length; i++) {
-      const pos = positions[i];
-      const tokenId = tokenIds[i];
-
-      const el = document.createElement("div");
-      el.className = "frog-sprite";
-
-      el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
-
-      container.appendChild(el);
-
-      const idleMin = 0.8;
-      const idleMax = 3.5;
-      const hopMin  = 0.45;
-      const hopMax  = 0.90;
-      const heightMin = 18;
-      const heightMax = 36;
-
-      const frog = {
-        tokenId,
-        el,
-        x: pos.x,
-        y: pos.y,
-        baseY: pos.y,
-        state: "idle",
-        idleTime: randRange(idleMin, idleMax),
-        hopTime: 0,
-        hopDuration: randRange(hopMin, hopMax),
-        hopHeight: randRange(heightMin, heightMax),
-
-        idleMin, idleMax,
-        hopDurMin: hopMin,
-        hopDurMax: hopMax,
-        hopHeightMin: heightMin,
-        hopHeightMax: heightMax,
-
-        layers: []
-      };
-
-      frogs.push(frog);
-
-      fetchMetadata(tokenId)
-        .then(meta => buildLayersForFrog(frog, meta))
-        .catch(() => {});
-    }
-  }
-
-  // -----------------------------
-  // Animation
-  // -----------------------------
-  function updateFrogs(dt, width, height) {
-    const marginY = 24;
-    const marginX = 8;
-
-    for (const frog of frogs) {
-      if (frog.state === "idle") {
-        frog.idleTime -= dt;
-        frog.y = frog.baseY;
-
-        if (frog.idleTime <= 0) {
-          frog.state = "hopping";
-          frog.hopTime = 0;
-          frog.hopDuration = randRange(frog.hopDurMin, frog.hopDurMax);
-
-          // play ribbit when a frog starts a hop (snake game only)
-          if (SNAKE_ENABLED) {
-            playFrogJumpSound();
-          }
-
-          const spice = Math.random();
-          if (spice < 0.1) {
-            frog.hopHeight = randRange(frog.hopHeightMax * 1.0, frog.hopHeightMax * 1.6);
-          } else if (spice > 0.9) {
-            frog.hopHeight = randRange(frog.hopHeightMin * 0.7, frog.hopHeightMin * 1.1);
-          } else {
-            frog.hopHeight = randRange(frog.hopHeightMin, frog.hopHeightMax);
-          }
-
-          const hopDistMin = 24;
-          const hopDistMax = 96;
-          const angle = Math.random() * Math.PI * 2;
-          const dist  = randRange(hopDistMin, hopDistMax);
-
-          let targetX = frog.x + Math.cos(angle) * dist;
-          let targetBaseY = frog.baseY + Math.sin(angle) * dist;
-
-          targetX = Math.max(marginX, Math.min(width - marginX - FROG_SIZE, targetX));
-          targetBaseY = Math.max(
-            marginY,
-            Math.min(height - marginY - FROG_SIZE, targetBaseY)
-          );
-
-          frog.hopStartX = frog.x;
-          frog.hopStartBaseY = frog.baseY;
-          frog.hopEndX = targetX;
-          frog.hopEndBaseY = targetBaseY;
+      if (collected) {
+        if (orb.el.parentNode === container) {
+          container.removeChild(orb.el);
         }
-      } else if (frog.state === "hopping") {
-        frog.hopTime += dt;
-        const tRaw = frog.hopTime / frog.hopDuration;
-        const t = Math.min(1, Math.max(0, tRaw));
-
-        const groundX = frog.hopStartX + (frog.hopEndX - frog.hopStartX) * t;
-        const groundBaseY = frog.hopStartBaseY + (frog.hopEndBaseY - frog.hopStartBaseY) * t;
-
-        const offset = -4 * frog.hopHeight * t * (1 - t);
-
-        frog.x = groundX;
-        frog.baseY = groundBaseY;
-        frog.y = groundBaseY + offset;
-
-        if (frog.hopTime >= frog.hopDuration) {
-          frog.state = "idle";
-          frog.idleTime = randRange(frog.idleMin, frog.idleMax);
-
-          frog.x = frog.hopEndX;
-          frog.baseY = frog.hopEndBaseY;
-          frog.y = frog.baseY;
-
-          frog.x = Math.max(marginX, Math.min(width - marginX - FROG_SIZE, frog.x));
-          frog.baseY = Math.max(
-            marginY,
-            Math.min(height - marginY - FROG_SIZE, frog.baseY)
-          );
-        }
+        orbs.splice(i, 1);
+        applyRandomBuff();
       }
-
-      const renderY = frog.y + scrollOffsetY;
-      frog.el.style.transform = `translate3d(${frog.x}px, ${renderY}px, 0)`;
     }
   }
 
+  // -----------------------------
+  // Frame loop
+  // -----------------------------
   function drawFrame(time) {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -734,17 +920,20 @@
     const dt = (time - lastTime) / 1000;
     lastTime = time;
 
-    if (SNAKE_ENABLED) {
+    if (SNAKE_ENABLED && !gameEnded) {
       if (gameStartTime === null) {
         gameStartTime = time;
+        scheduleNextOrb(0);
       }
       gameElapsed = (time - gameStartTime) / 1000;
       updateTimerDisplay(gameElapsed);
     }
 
     updateFrogs(dt, width, height);
+
     if (SNAKE_ENABLED) {
       updateSnake(dt, width, height);
+      updateOrbs(dt, width, height);
 
       if (!gameEnded && frogs.length === 0) {
         gameEnded = true;
@@ -769,7 +958,6 @@
     mouse.active = true;
   });
 
-  // First click: enable following mouse via hops; also hop nearest frog
   window.addEventListener("click", (e) => {
     const clickX = e.clientX;
     const clickY = e.clientY;
@@ -785,9 +973,7 @@
       const dx = clickX - cx;
       const dy = clickY - cy;
       const d2 = dx * dx + dy * dy;
-      if (
-        d2 < nearestDist2
-      ) {
+      if (d2 < nearestDist2) {
         nearestDist2 = d2;
         nearest = frog;
       }
@@ -796,7 +982,8 @@
     const MAX_CLICK_RADIUS = 120;
     if (nearest && nearestDist2 <= MAX_CLICK_RADIUS * MAX_CLICK_RADIUS) {
       if (SNAKE_ENABLED) {
-        playFrogJumpSound();
+        // force ribbit on click, ignoring cooldown
+        playFrogJumpSound(true);
       }
 
       nearest.state = "hopping";
@@ -815,7 +1002,6 @@
     const currentScrollY = window.scrollY || 0;
     const deltaY = currentScrollY - lastScrollY;
     lastScrollY = currentScrollY;
-
     scrollOffsetY -= deltaY * 0.15;
   });
 
@@ -835,13 +1021,19 @@
     lastScrollY = window.scrollY || 0;
     mouse.follow = false;
 
+    orbs = [];
+    nextOrbSpawnAt = 0;
+    buffSpeedActiveUntil = 0;
+    buffJumpActiveUntil = 0;
+    gameStartTime = null;
+    gameElapsed = 0;
+    gameEnded = false;
+
     await createFrogs(width, height);
 
-    // init snake only on snake pages
     if (SNAKE_ENABLED) {
       initSnake(width, height);
 
-      // (Re)start timer for snake game
       if (!timerEl) {
         timerEl = document.createElement("div");
         timerEl.id = "snake-timer";
@@ -861,9 +1053,6 @@
         container.appendChild(timerEl);
       }
 
-      gameStartTime = null;
-      gameElapsed = 0;
-      gameEnded = false;
       updateTimerDisplay(0);
     }
 
