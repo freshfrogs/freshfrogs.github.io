@@ -28,9 +28,9 @@
   // -----------------------------
   const FROG_SIZE       = 64;
   const MAX_TOKEN_ID    = 4040;
-  const META_BASE       = "/frog/json/";
+  const META_BASE       = "../frog/json/";
   const META_EXT        = ".json";
-  const BUILD_BASE      = "/frog/build_files";
+  const BUILD_BASE      = "../frog/build_files";
   const STARTING_FROGS  = 50;
   const MAX_FROGS       = 150;
 

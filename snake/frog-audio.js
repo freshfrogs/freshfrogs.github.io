@@ -41,35 +41,35 @@
   function initAudio() {
     try {
       audioRibbits = [
-        new Audio("/snake/audio/ribbitOne.mp3"),
-        new Audio("/snake/audio/ribbitTwo.mp3"),
-        new Audio("/snake/audio/ribbitThree.mp3"),
-        new Audio("/snake/audio/ribbitBase.mp3"),
+        new Audio("https://freshfrogs.github.io/snake/audio/ribbitOne.mp3"),
+        new Audio("https://freshfrogs.github.io/snake/audio/ribbitTwo.mp3"),
+        new Audio("https://freshfrogs.github.io/snake/audio/ribbitThree.mp3"),
+        new Audio("https://freshfrogs.github.io/snake/audio/ribbitBase.mp3"),
       ];
       audioRibbits.forEach(a => a.volume = 0.8);
     } catch (e) {}
 
     try {
-      audioFrogDeath = new Audio("/snake/audio/frogDeath.mp3");
+      audioFrogDeath = new Audio("https://freshfrogs.github.io/snake/audio/frogDeath.mp3");
       audioFrogDeath.volume = 0.9;
     } catch (e) {}
 
     try {
-      audioSnakeEat = new Audio("/snake/audio/munch.mp3");
+      audioSnakeEat = new Audio("https://freshfrogs.github.io/snake/audio/munch.mp3");
       audioSnakeEat.volume = 0.7;
     } catch (e) {}
 
     try {
-      audioOrbSpawn1 = new Audio("/audio/orbSpawn.mp3");
-      audioOrbSpawn2 = new Audio("/audio/orbSpawnTwo.mp3");
+      audioOrbSpawn1 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawn.mp3");
+      audioOrbSpawn2 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawnTwo.mp3");
       audioOrbSpawn1.volume = 0.8;
       audioOrbSpawn2.volume = 0.8;
     } catch (e) {}
 
     try {
-      audioSuperSpeed = new Audio("/audio/superSpeed.mp3");
-      audioSuperJump  = new Audio("/audio/superJump.mp3");
-      audioFrogSpawn  = new Audio("/audio/frogSpawn.mp3");
+      audioSuperSpeed = new Audio("https://freshfrogs.github.io/snake/audio/superSpeed.mp3");
+      audioSuperJump  = new Audio("https://freshfrogs.github.io/snake/audio/superJump.mp3");
+      audioFrogSpawn  = new Audio("https://freshfrogs.github.io/snake/audio/frogSpawn.mp3");
       audioSuperSpeed.volume = 0.9;
       audioSuperJump.volume  = 0.9;
       audioFrogSpawn.volume  = 0.9;
@@ -77,17 +77,17 @@
 
     // temp buff placeholders
     try {
-      audioSnakeSlow    = new Audio("/audio/snakeSlowBuff.mp3");
-      audioSnakeConfuse = new Audio("/audio/snakeConfuseBuff.mp3");
-      audioSnakeShrink  = new Audio("/audio/snakeShrinkBuff.mp3");
-      audioFrogShield   = new Audio("/audio/frogShieldBuff.mp3");
-      audioTimeSlow     = new Audio("/audio/timeSlowBuff.mp3");
-      audioOrbMagnet    = new Audio("/audio/orbMagnetBuff.mp3");
-      audioMegaSpawn    = new Audio("/audio/megaSpawnBuff.mp3");
-      audioScoreMulti   = new Audio("/audio/scoreMultiplierBuff.mp3");
-      audioPanicHop     = new Audio("/audio/panicHopBuff.mp3");
-      audioCloneSwarm   = new Audio("/audio/cloneSwarm.mp3");
-      audioLifeSteal    = new Audio("/audio/lifeSteal.mp3");
+      audioSnakeSlow    = new Audio("https://freshfrogs.github.io/snake/audio/snakeSlowBuff.mp3");
+      audioSnakeConfuse = new Audio("https://freshfrogs.github.io/snake/audio/snakeConfuseBuff.mp3");
+      audioSnakeShrink  = new Audio("https://freshfrogs.github.io/snake/audio/snakeShrinkBuff.mp3");
+      audioFrogShield   = new Audio("https://freshfrogs.github.io/snake/audio/frogShieldBuff.mp3");
+      audioTimeSlow     = new Audio("https://freshfrogs.github.io/snake/audio/timeSlowBuff.mp3");
+      audioOrbMagnet    = new Audio("https://freshfrogs.github.io/snake/audio/orbMagnetBuff.mp3");
+      audioMegaSpawn    = new Audio("https://freshfrogs.github.io/snake/audio/megaSpawnBuff.mp3");
+      audioScoreMulti   = new Audio("https://freshfrogs.github.io/snake/audio/scoreMultiplierBuff.mp3");
+      audioPanicHop     = new Audio("https://freshfrogs.github.io/snake/audio/panicHopBuff.mp3");
+      audioCloneSwarm   = new Audio("https://freshfrogs.github.io/snake/audio/cloneSwarm.mp3");
+      audioLifeSteal    = new Audio("https://freshfrogs.github.io/snake/audio/lifeSteal.mp3");
 
       [
         audioSnakeSlow,
@@ -106,18 +106,18 @@
 
     // per-run permanent choice
     try {
-      audioPermanentChoice = new Audio("/audio/permanentBuffChoice.mp3");
+      audioPermanentChoice = new Audio("https://freshfrogs.github.io/snake/audio/permanentBuffChoice.mp3");
       audioPermanentChoice.volume = 0.9;
     } catch (e) {}
 
     // per-frog permanent upgrades
     try {
-      audioChampionFrog    = new Audio("/audio/championFrog.mp3");
-      audioAuraFrog        = new Audio("/audio/auraFrog.mp3");
-      audioShieldFrogPerma = new Audio("/audio/shieldFrog.mp3");
-      audioMagnetFrogPerma = new Audio("/audio/magnetFrog.mp3");
-      audioLuckyFrogPerma  = new Audio("/audio/luckyFrog.mp3");
-      audioZombieFrogPerma = new Audio("/audio/zombieFrog.mp3");
+      audioChampionFrog    = new Audio("https://freshfrogs.github.io/snake/audio/championFrog.mp3");
+      audioAuraFrog        = new Audio("https://freshfrogs.github.io/snake/audio/auraFrog.mp3");
+      audioShieldFrogPerma = new Audio("https://freshfrogs.github.io/snake/audio/shieldFrog.mp3");
+      audioMagnetFrogPerma = new Audio("https://freshfrogs.github.io/snake/audio/magnetFrog.mp3");
+      audioLuckyFrogPerma  = new Audio("https://freshfrogs.github.io/snake/audio/luckyFrog.mp3");
+      audioZombieFrogPerma = new Audio("https://freshfrogs.github.io/snake/audio/zombieFrog.mp3");
 
       [
         audioChampionFrog,
