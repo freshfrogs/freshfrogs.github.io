@@ -729,7 +729,7 @@
   const SNAKE_SEGMENT_SIZE  = 48;
   const SNAKE_BASE_SPEED    = 90;
   const SNAKE_TURN_RATE     = Math.PI * 1.5;
-  const SNAKE_SEGMENT_GAP   = 12; // CHANGED: was 6 → more spacing between segments
+  const SNAKE_SEGMENT_GAP   = 24; // CHANGED: was 6 → more spacing between segments
   const SNAKE_INITIAL_SEGMENTS = 6;
   const SNAKE_EAT_RADIUS    = 40;
 
