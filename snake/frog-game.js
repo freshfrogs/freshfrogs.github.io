@@ -531,9 +531,9 @@ function snakeShed(stage, speedMultiplier) {
   // Aura / champion / lucky
   const CHAMPION_SPEED_FACTOR    = 0.85;
   const CHAMPION_JUMP_FACTOR     = 1.25;
-  const AURA_SPEED_FACTOR        = 0.9;
   const AURA_JUMP_FACTOR         = 1.15;
   const LUCKY_BUFF_DURATION_BOOST = 1.4;
+  const AURA_SPEED_FACTOR        = 0.9;
   const LUCKY_SCORE_BONUS_PER    = 0.10; // +10% per Lucky frog
 
   let speedBuffTime   = 0;
@@ -573,32 +573,47 @@ function snakeShed(stage, speedMultiplier) {
       const dx = (other.x + FROG_SIZE / 2) - (frog.x + FROG_SIZE / 2);
       const dy = (other.baseY + FROG_SIZE / 2) - (frog.baseY + FROG_SIZE / 2);
       const d2 = dx * dx + dy * dy;
-      if (d2 <= AURA_RADIUS2) auraFactor *= AURA_SPEED_FACTOR;
+      if (d2 <= AURA_RADIUS2) auraFactor *= AURA_SPEED_FACTOR; // 0.9 etc.
     }
     factor *= auraFactor;
 
-    if (speedBuffTime > 0) factor *= SPEED_BUFF_FACTOR;
-    if (panicHopTime > 0) factor *= PANIC_HOP_SPEED_FACTOR;
-
-    return factor;
-  }
-
-  function getJumpFactor(frog) {
-    let factor = frogPermanentJumpFactor * (frog.jumpMult || 1);
-
-    let auraJump = 1.0;
-    for (const other of frogs) {
-      if (!other.isAura) continue;
-      const dx = (other.x + FROG_SIZE / 2) - (frog.x + FROG_SIZE / 2);
-      const dy = (other.baseY + FROG_SIZE / 2) - (frog.baseY + FROG_SIZE / 2);
-      const d2 = dx * dx + dy * dy;
-      if (d2 <= AURA_RADIUS2) auraJump *= 1.15;
+    // champion frogs are a bit faster
+    if (frog.isChampion) {
+      factor *= CHAMPION_SPEED_FACTOR; // 0.85 → ~15% faster cycle
     }
-    factor *= auraJump;
 
-    if (jumpBuffTime > 0) factor *= 3.2;
+    if (speedBuffTime > 0)   factor *= SPEED_BUFF_FACTOR;      // e.g. 0.5
+    if (panicHopTime > 0)    factor *= PANIC_HOP_SPEED_FACTOR; // e.g. 0.6
+
     return factor;
   }
+
+function getJumpFactor(frog) {
+  let factor = frogPermanentJumpFactor * (frog.jumpMult || 1);
+
+  // Aura jump boost
+  for (const other of frogs) {
+    if (!other.isAura) continue;
+    const dx = (other.x + FROG_SIZE / 2) - (frog.x + FROG_SIZE / 2);
+    const dy = (other.baseY + FROG_SIZE / 2) - (frog.baseY + FROG_SIZE / 2);
+    const d2 = dx * dx + dy * dy;
+    if (d2 <= AURA_RADIUS2) {
+      factor *= AURA_JUMP_FACTOR; // 1.15
+    }
+  }
+
+  // Temporary jump buff
+  if (jumpBuffTime > 0) {
+    factor *= JUMP_BUFF_FACTOR; // e.g. 3.2
+  }
+
+  // Champion jump boost
+  if (frog.isChampion) {
+    factor *= CHAMPION_JUMP_FACTOR; // 1.25
+  }
+
+  return factor;
+}
 
   function getSnakeSpeedFactor() {
     let factor = snakePermanentSpeedFactor;
@@ -692,8 +707,12 @@ function snakeShed(stage, speedMultiplier) {
   }
 
   function applyBuff(type, frog) {
-    const isLuckyCollector = frog && frog.isLucky;
-    const durBoost = isLuckyCollector ? 1.4 : 1.0;
+    const durBoost = collector && collector.isLucky
+      ? LUCKY_BUFF_DURATION_BOOST   // 1.4
+      : 1.0;
+
+    buffDuration = baseDur * buffDurationFactor * durBoost;
+
 
     switch (type) {
       case "speed":
