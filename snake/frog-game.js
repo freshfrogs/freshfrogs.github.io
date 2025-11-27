@@ -1813,69 +1813,127 @@ function ensureBuffGuideOverlay() {
   // start on page 0
   setBuffGuidePage(0);
 }
+// Neon color used in the guide text
+const BUFF_GUIDE_NEON = "#4defff";
 
-  function setBuffGuidePage(pageIndex) {
-    if (!buffGuideContentEl || !buffGuidePageLabel) return;
+function formatSeconds(s) {
+  if (typeof s !== "number") return "";
+  return s.toFixed(0) + "s";
+}
 
-    const pages = [
-      // Page 0 – orb buffs
-      `
-  <b>🟢 Orb buffs</b><br><br>
-  ⚡ <b>Speed</b> – frogs act faster for <span style="color:#4defff;">15s</span> (longer with upgrades).<br>
-  🦘 <b>Jump</b> – frogs jump higher for <span style="color:#4defff;">18s</span>.<br>
-  🐸➕ <b>Spawn</b> – spawn <span style="color:#4defff;">1–10</span> frogs (+ extra if Lucky).<br>
-  🧊 <b>Snake slow</b> – snake speed cut to <span style="color:#4defff;">50%</span> for a few seconds.<br>
-  🤪 <b>Confuse</b> – snake steers randomly for a short time.<br>
-  📏 <b>Shrink</b> – snake smaller, eat radius shrinks to <span style="color:#4defff;">24px</span>.<br>
-  🛡️ <b>Team shield</b> – all frogs ignore snake hits for a moment.<br>
-  ⏱️ <b>Time slow</b> – game + snake run at ~<span style="color:#4defff;">40%</span> speed.<br>
-  🧲 <b>Orb magnet</b> – orbs drift toward frogs, preferring magnets.<br>
-  🐸🌊 <b>Mega spawn</b> – spawn <span style="color:#4defff;">15–25</span> frogs (+ bonus if Lucky).<br>
-  💰 <b>Score x2</b> – score gain doubled for <span style="color:#4defff;">10s</span>.<br>
-  😱 <b>Panic hop</b> – frogs hop faster but in random directions.<br>
-  🩸 <b>Life steal</b> – each orb collected spawns <span style="color:#4defff;">+1</span> frog.<br>
-  ⭐ <b>PermaFrog</b> – gives that frog a random permanent role.
-  `,
-      // Page 1 – permanent frog roles
-      `
-  <b>🐸 Permanent frog roles</b><br><br>
-  🏅 <b>Champion</b> – that frog hops ~<span style="color:#4defff;">15%</span> faster, jumps higher, and moves farther.<br>
-  🌈 <b>Aura</b> – nearby frogs get faster + higher jumps in a <span style="color:#4defff;">200px</span> radius.<br>
-  🛡️ <b>Perma shield</b> – survives <span style="color:#4defff;">1</span> snake hit, then shield breaks.<br>
-  🧲 <b>Magnet</b> – orbs within <span style="color:#4defff;">220px</span> home in on this frog.<br>
-  🍀 <b>Lucky</b> – buffs last <span style="color:#4defff;">x1.4</span>, spawns more frogs, and each Lucky frog adds
-  <span style="color:#4defff;">+10%</span> score rate.<br>
-  🧟 <b>Zombie</b> – on death: spawn <span style="color:#4defff;">5</span> frogs and slow the snake.
-  `,
-      // Page 2 – global upgrades + epic/legendary
-      `
-  <b>🏗️ Global upgrades</b><br><br>
-  ⏩ <b>Frogs hop faster forever</b> – each pick makes hops ~<span style="color:#4defff;">10%</span> faster.<br>
-  🦘⬆️ <b>Frogs jump higher forever</b> – each pick adds ~<span style="color:#4defff;">+25%</span> jump height.<br>
-  🐸💥 <b>Spawn 20/50/75 frogs</b> – instant extra frogs from normal / epic / legendary choices.<br>
-  ⏳ <b>Buffs last longer</b> – each pick adds ~<span style="color:#4defff;">+15%</span> duration to all temp buffs.<br>
-  🎯 <b>More orbs</b> – orbs spawn faster every time you pick this.<br>
-  💀 <b>Deathrattle</b> – epic: <span style="color:#4defff;">25%</span> respawn on death; legendary: <span style="color:#4defff;">50%</span>.<br>
-  💥 <b>Legendary Frenzy</b> – at <span style="color:#4defff;">10 min</span>, pick a legendary and the snake turns red,
-  gets <span style="color:#4defff;">+25%</span> speed, and frogs panic-hop for <span style="color:#4defff;">13s</span>.
-  `
-    ];
+function formatMult(x) {
+  if (typeof x !== "number") return "";
+  return x.toFixed(1) + "×";
+}
 
-    const maxPage = pages.length - 1;
-    buffGuidePage = Math.max(0, Math.min(maxPage, pageIndex));
+function formatPercentFromFactor(f) {
+  if (typeof f !== "number") return "";
+  return Math.round(f * 100) + "%";
+}
 
-    buffGuideContentEl.innerHTML = pages[buffGuidePage];
-    buffGuidePageLabel.textContent = `Page ${buffGuidePage + 1} / ${pages.length}`;
+function formatPercentFromBonus(b) {
+  if (typeof b !== "number") return "";
+  return Math.round(b * 100) + "%";
+}
 
-    if (buffGuidePrevBtn) {
-      buffGuidePrevBtn.disabled = buffGuidePage === 0;
-      buffGuidePrevBtn.style.opacity = buffGuidePage === 0 ? "0.5" : "1";
-    }
-    if (buffGuideNextBtn) {
-      buffGuideNextBtn.disabled = buffGuidePage === maxPage;
-      buffGuideNextBtn.style.opacity = buffGuidePage === maxPage ? "0.5" : "1";
-    }
+function setBuffGuidePage(pageIndex) {
+  if (!buffGuideContentEl || !buffGuidePageLabel) return;
+
+  const neon = BUFF_GUIDE_NEON;
+
+  const pages = [
+    // Page 0 – orb buffs
+    () => `
+<b>🟢 Orb buffs</b><br><br>
+⚡ <b>Speed</b> – frogs act faster for 
+<span style="color:${neon};">${formatSeconds(SPEED_BUFF_DURATION)}</span> (longer with upgrades).<br>
+🦘 <b>Jump</b> – frogs jump higher for 
+<span style="color:${neon};">${formatSeconds(JUMP_BUFF_DURATION)}</span> (about 
+<span style="color:${neon};">${formatMult(JUMP_BUFF_FACTOR)}</span> height).<br>
+🐸➕ <b>Spawn</b> – spawn 
+<span style="color:${neon};">1–10</span> frogs (+ extra if Lucky).<br>
+🧊 <b>Snake slow</b> – snake speed cut to 
+<span style="color:${neon};">${formatPercentFromFactor(SNAKE_SLOW_FACTOR)}</span> for a few seconds.<br>
+🤪 <b>Confuse</b> – snake steers randomly for 
+<span style="color:${neon};">${formatSeconds(SNAKE_CONFUSE_DURATION)}</span> (before scaling).<br>
+📏 <b>Shrink</b> – snake smaller, eat radius shrinks for 
+<span style="color:${neon};">${formatSeconds(SNAKE_SHRINK_DURATION)}</span>.<br>
+🛡️ <b>Team shield</b> – all frogs ignore snake hits for 
+<span style="color:${neon};">${formatSeconds(FROG_SHIELD_DURATION)}</span>.<br>
+⏱️ <b>Time slow</b> – game + snake run at ~
+<span style="color:${neon};">${formatPercentFromFactor(TIME_SLOW_FACTOR)}</span> speed for 
+<span style="color:${neon};">${formatSeconds(TIME_SLOW_DURATION)}</span>.<br>
+🧲 <b>Orb magnet</b> – orbs drift toward frogs for 
+<span style="color:${neon};">${formatSeconds(ORB_MAGNET_DURATION)}</span>.<br>
+🐸🌊 <b>Mega spawn</b> – spawn 
+<span style="color:${neon};">15–25</span> frogs (+ bonus if Lucky).<br>
+💰 <b>Score x2</b> – score gain boosted by 
+<span style="color:${neon};">${formatMult(SCORE_MULTI_FACTOR)}</span> for 
+<span style="color:${neon};">${formatSeconds(SCORE_MULTI_DURATION)}</span>.<br>
+😱 <b>Panic hop</b> – frogs hop faster but randomly for 
+<span style="color:${neon};">${formatSeconds(PANIC_HOP_DURATION)}</span> (speed factor 
+<span style="color:${neon};">${formatMult(1 / PANIC_HOP_SPEED_FACTOR)}</span> vs normal cycle).<br>
+🩸 <b>Life steal</b> – each orb collected spawns 
+<span style="color:${neon};">+1</span> frog for 
+<span style="color:${neon};">${formatSeconds(LIFE_STEAL_DURATION)}</span>.<br>
+⭐ <b>PermaFrog</b> – gives that frog a random permanent role.
+`,
+    // Page 1 – permanent frog roles
+    () => `
+<b>🐸 Permanent frog roles</b><br><br>
+🏅 <b>Champion</b> – that frog's hop cycle is ~
+<span style="color:${neon};">${formatPercentFromFactor(1 / CHAMPION_SPEED_FACTOR)}</span> faster and jumps 
+<span style="color:${neon};">${formatMult(CHAMPION_JUMP_FACTOR)}</span> higher.<br>
+🌈 <b>Aura</b> – nearby frogs get faster + higher jumps in a 
+<span style="color:${neon};">${Math.round(Math.sqrt(AURA_RADIUS2))}</span>px radius (speed factor 
+<span style="color:${neon};">${formatMult(1 / AURA_SPEED_FACTOR)}</span>, jump 
+<span style="color:${neon};">${formatMult(AURA_JUMP_FACTOR)}</span>).<br>
+🛡️ <b>Perma shield</b> – survives 
+<span style="color:${neon};">1</span> snake hit, then shield breaks.<br>
+🧲 <b>Magnet</b> – orbs within 
+<span style="color:${neon};">~220px</span> home in on this frog.<br>
+🍀 <b>Lucky</b> – buffs it collects last 
+<span style="color:${neon};">${formatMult(LUCKY_BUFF_DURATION_BOOST)}</span> longer, spawns more frogs, and each Lucky frog adds
+<span style="color:${neon};">${formatPercentFromBonus(LUCKY_SCORE_BONUS_PER)}</span> score rate.<br>
+🧟 <b>Zombie</b> – on death: spawn 
+<span style="color:${neon};">5</span> frogs and slow the snake.
+`,
+    // Page 2 – global upgrades + epic/legendary
+    () => `
+<b>🏗️ Global upgrades</b><br><br>
+⏩ <b>Frogs hop faster forever</b> – each pick makes hops ~
+<span style="color:${neon};">${formatPercentFromBonus(1 - FROG_SPEED_UPGRADE_FACTOR)}</span> faster (stacks).<br>
+🦘⬆️ <b>Frogs jump higher forever</b> – each pick adds about
+<span style="color:${neon};">${formatPercentFromBonus(FROG_JUMP_UPGRADE_FACTOR - 1)}</span> jump height (stacks).<br>
+🐸💥 <b>Spawn 20/50/75 frogs</b> – instant extra frogs from normal / epic / legendary choices.<br>
+⏳ <b>Buffs last longer</b> – each pick multiplies durations by 
+<span style="color:${neon};">${formatMult(BUFF_DURATION_UPGRADE_FACTOR)}</span> (stacks).<br>
+🎯 <b>More orbs</b> – orbs spawn faster every time you pick this (interval factor 
+<span style="color:${neon};">${formatMult(ORB_INTERVAL_FACTOR)}</span> per pick).<br>
+💀 <b>Deathrattle</b> – epic: 
+<span style="color:${neon};">${formatPercentFromBonus(EPIC_DEATHRATTLE_CHANCE)}</span> respawn; legendary: 
+<span style="color:${neon};">${formatPercentFromBonus(LEGENDARY_DEATHRATTLE_CHANCE)}</span> respawn on frog death.<br>
+💥 <b>Legendary Frenzy</b> – at 
+<span style="color:${neon};">${formatSeconds(LEGENDARY_FRENZY_DURATION)}</span>, the snake turns red, gets 
+<span style="color:${neon};">${formatPercentFromBonus(FRENZY_SPEED_FACTOR - 1)}</span> speed, and frogs panic-hop.
+`
+  ];
+
+  const maxPage = pages.length - 1;
+  buffGuidePage = Math.max(0, Math.min(maxPage, pageIndex));
+
+  buffGuideContentEl.innerHTML = pages[buffGuidePage]();
+  buffGuidePageLabel.textContent = `Page ${buffGuidePage + 1} / ${pages.length}`;
+
+  if (buffGuidePrevBtn) {
+    buffGuidePrevBtn.disabled = buffGuidePage === 0;
+    buffGuidePrevBtn.style.opacity = buffGuidePage === 0 ? "0.5" : "1";
   }
+  if (buffGuideNextBtn) {
+    buffGuideNextBtn.disabled = buffGuidePage === maxPage;
+    buffGuideNextBtn.style.opacity = buffGuidePage === maxPage ? "0.5" : "1";
+  }
+}
 
   function openBuffGuideOverlay() {
     ensureBuffGuideOverlay();
