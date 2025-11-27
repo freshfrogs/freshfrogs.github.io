@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Escape the Snake 🐍</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>Fresh Frogs – Snake Scatter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Adjust path if your CSS is elsewhere -->
-  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="/style.css" />
 
   <style>
     html, body {
@@ -14,97 +14,14 @@
       padding: 0;
       height: 100%;
       width: 100%;
-      overflow: hidden;           /* no scrollbars while playing */
-      background: #7cc1ff;        /* same as site bg */
-    }
-
-    #frog-game {
-      position: fixed;            /* full screen on mobile */
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
       overflow: hidden;
-      touch-action: none;         /* let us handle touch ourselves */
-      font-family: monospace;
+      background: #7cc1ff; /* light blue */
     }
 
-    /* HUD at top */
-    #frog-hud {
-      position: absolute;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 12px;
-      padding: 4px 8px;
-      background: rgba(0, 0, 0, 0.4);
-      color: #fff;
-      border-radius: 8px;
-      font-size: 13px;
-      z-index: 20;
-    }
-
-    /* Mini leaderboard in the top-right */
-    #frog-mini-leaderboard {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      max-width: 45vw;
-      padding: 4px 8px;
-      background: rgba(0, 0, 0, 0.4);
-      color: #fff;
-      border-radius: 8px;
-      font-size: 11px;
-      line-height: 1.3;
-      z-index: 20;
-    }
-
-    /* Game over & upgrade overlays: make them mobile-friendly */
-    .frog-overlay-panel {
-      max-width: 420px;
-      width: 90vw;               /* narrow on mobile */
-      max-height: 80vh;
-      overflow-y: auto;
-      padding: 16px 20px;
-      background: #111;
-      border-radius: 12px;
-      border: 1px solid #444;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-      color: #fff;
-      font-size: 13px;
-    }
-
-    /* Buttons inside overlays */
-    .frog-overlay-panel button {
-      width: 100%;
-      margin-top: 6px;
-      padding: 8px 10px;
-      font-size: 13px;
-    }
-
-    /* --- Mobile-specific tweaks --- */
-    @media (max-width: 768px) {
-      #frog-hud {
-        font-size: 11px;
-        gap: 8px;
-        padding: 4px 6px;
-      }
-
-      #frog-mini-leaderboard {
-        font-size: 10px;
-        max-width: 55vw;
-      }
-
-      .frog-overlay-panel {
-        width: 94vw;
-        font-size: 12px;
-        padding: 14px 14px;
-      }
-
-      .frog-overlay-panel button {
-        font-size: 12px;
-        padding: 7px 8px;
-      }
+    #frog-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: auto;
     }
   </style>
 </head>
