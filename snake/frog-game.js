@@ -502,19 +502,19 @@ function snakeShed(stage, speedMultiplier) {
   // --------------------------------------------------
   // BUFFS
   // --------------------------------------------------
-  const SPEED_BUFF_DURATION = 15;
-  const JUMP_BUFF_DURATION  = 18;
+  const SPEED_BUFF_DURATION = 7;
+  const JUMP_BUFF_DURATION  = 7;
 
   const SNAKE_SLOW_DURATION    = 10;
   const SNAKE_CONFUSE_DURATION = 10;
-  const SNAKE_SHRINK_DURATION  = 12;
-  const FROG_SHIELD_DURATION   = 12;
-  const TIME_SLOW_DURATION     = 6;
+  const SNAKE_SHRINK_DURATION  = 10;
+  const FROG_SHIELD_DURATION   = 10;
+  const TIME_SLOW_DURATION     = 7;
   const ORB_MAGNET_DURATION    = 10;
   const SCORE_MULTI_DURATION   = 10;
   const PANIC_HOP_DURATION     = 5;
-  const CLONE_SWARM_DURATION   = 10;
-  const LIFE_STEAL_DURATION    = 12;
+  const CLONE_SWARM_DURATION   = 7;
+  const LIFE_STEAL_DURATION    = 10;
 
   let speedBuffTime   = 0;
   let jumpBuffTime    = 0;
