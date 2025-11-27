@@ -536,6 +536,22 @@ function snakeShed(stage, speedMultiplier) {
   const AURA_SPEED_FACTOR        = 0.9;
   const LUCKY_SCORE_BONUS_PER    = 0.10; // +10% per Lucky frog
 
+  // --------------------------------------------------
+  // UPGRADE CONFIG (permanent choices)
+  // --------------------------------------------------
+
+  // Normal upgrade multipliers
+  const FROG_SPEED_UPGRADE_FACTOR     = 0.85; // each pick ~15% faster hops
+  const FROG_JUMP_UPGRADE_FACTOR      = 1.7;  // each pick +70% jump height
+  const BUFF_DURATION_UPGRADE_FACTOR  = 1.20; // each pick +20% buff duration
+  const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // each pick ~15% faster orb spawns
+
+  // Spawn amounts (so you can tweak easily later)
+  const NORMAL_SPAWN_AMOUNT           = 20;   // "spawn 20"
+  const EPIC_SPAWN_AMOUNT             = 50;   // epic spawn
+  const LEGENDARY_SPAWN_AMOUNT        = 75;   // legendary spawn
+
+
   let speedBuffTime   = 0;
   let jumpBuffTime    = 0;
   let snakeSlowTime   = 0;
@@ -1474,27 +1490,41 @@ function getJumpFactor(frog) {
       {
         id: "frogSpeed",
         label: "Frogs hop a bit faster forever",
-        apply: () => { frogPermanentSpeedFactor *= 0.85; }
+        apply: () => {
+          // global permanent hop speed
+          frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
+        }
       },
       {
         id: "frogJump",
         label: "Frogs jump higher forever",
-        apply: () => { frogPermanentJumpFactor *= 1.7; }
+        apply: () => {
+          // global permanent jump height
+          frogPermanentJumpFactor *= FROG_JUMP_UPGRADE_FACTOR;
+        }
       },
       {
         id: "spawn20",
-        label: "Spawn 20 frogs right now",
-        apply: () => { spawnExtraFrogs(20); }
+        label: `Spawn ${NORMAL_SPAWN_AMOUNT} frogs right now`,
+        apply: () => {
+          spawnExtraFrogs(NORMAL_SPAWN_AMOUNT);
+        }
       },
       {
         id: "buffDuration",
         label: "Temporary buffs last longer",
-        apply: () => { buffDurationFactor *= 1.20; }
+        apply: () => {
+          // all temp buffs get longer
+          buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR;
+        }
       },
       {
         id: "moreOrbs",
         label: "More orbs spawn over time",
-        apply: () => { orbSpawnIntervalFactor *= 0.85; }
+        apply: () => {
+          // shorten orb spawn interval
+          orbSpawnIntervalFactor *= ORB_INTERVAL_UPGRADE_FACTOR;
+        }
       }
     ];
   }
