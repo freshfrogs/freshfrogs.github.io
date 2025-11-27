@@ -431,6 +431,25 @@ function openScoreboardOverlay(topList) {
   hud.style.zIndex = "100";
   hud.style.pointerEvents = "none";
 
+  // Mini on-screen leaderboard (top-right)
+  const miniBoard = document.createElement("div");
+  miniBoard.style.position = "absolute";
+  miniBoard.style.top = "10px";
+  miniBoard.style.right = "10px";
+  miniBoard.style.padding = "6px 10px";
+  miniBoard.style.borderRadius = "8px";
+  miniBoard.style.background = "rgba(0,0,0,0.55)";
+  miniBoard.style.color = "#fff";
+  miniBoard.style.fontFamily = "monospace";
+  miniBoard.style.fontSize = "11px";
+  miniBoard.style.zIndex = "100";
+  miniBoard.style.maxWidth = "220px";
+  miniBoard.style.pointerEvents = "none";
+  miniBoard.id = "frog-mini-leaderboard";
+  miniBoard.textContent = "Loading leaderboard…";
+  container.appendChild(miniBoard);
+
+
   const timerLabel = document.createElement("span");
   const frogsLabel = document.createElement("span");
   const scoreLabel = document.createElement("span");
@@ -491,6 +510,26 @@ function openScoreboardOverlay(topList) {
   function randRange(min, max) {
     return min + Math.random() * (max - min);
   }
+
+  function updateMiniLeaderboard(list) {
+  const el = document.getElementById("frog-mini-leaderboard");
+  if (!el) return;
+
+  if (!Array.isArray(list) || !list.length) {
+    el.textContent = "No scores yet.";
+    return;
+  }
+
+  let text = "Top Scores:\n";
+  list.slice(0, 5).forEach((entry, idx) => {
+    const tag   = entry.tag || "Unknown";
+    const score = entry.bestScore != null ? Math.floor(entry.bestScore) : 0;
+    text += `${idx + 1}. ${tag} — ${score}\n`;
+  });
+
+  el.textContent = text.trim();
+}
+
 
   function pickRandomTokenIds(count) {
     const set = new Set();
