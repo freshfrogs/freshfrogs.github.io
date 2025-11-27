@@ -1,15 +1,152 @@
 // frog-leaderboard.js
-// Handles leaderboard fetch/save and UI overlays for the Frog Snake game.
+// Leaderboard + scoreboard overlay for frog snake game.
 
 (function () {
   "use strict";
 
-  // Update this if your Worker URL changes
-  const LEADERBOARD_URL = "https://lucky-king-0d37.danielssouthworth.workers.dev/leaderboard";
+  const LEADERBOARD_URL =
+    "https://lucky-king-0d37.danielssouthworth.workers.dev/leaderboard";
 
-  let containerEl = null;
+  let containerRef = null;
   let scoreboardOverlay = null;
-  let scoreboardOverlayInner = null;
+
+  function initLeaderboard(container) {
+    containerRef = container;
+  }
+
+  async function submitScoreToServer(score, time) {
+    try {
+      const res = await fetch(LEADERBOARD_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ score, time })
+      });
+      if (!res.ok) throw new Error("submit failed");
+      return await res.json(); // expected top scores array
+    } catch (e) {
+      console.error("submitScoreToServer error", e);
+      return null;
+    }
+  }
+
+  async function fetchLeaderboard() {
+    try {
+      const res = await fetch(LEADERBOARD_URL, { method: "GET" });
+      if (!res.ok) throw new Error("get failed");
+      return await res.json();
+    } catch (e) {
+      console.error("fetchLeaderboard error", e);
+      return null;
+    }
+  }
+
+  function updateMiniLeaderboard(list) {
+    const el = document.getElementById("frog-mini-leaderboard");
+    if (!el) return;
+
+    if (!Array.isArray(list) || !list.length) {
+      el.textContent = "No scores yet.";
+      return;
+    }
+
+    let text = "Top Scores:\n";
+    list.slice(0, 5).forEach((entry, idx) => {
+      const tag   = entry.tag || "Unknown";
+      const score = entry.bestScore != null ? Math.floor(entry.bestScore) : 0;
+      text += `${idx + 1}. ${tag} — ${score}\n`;
+    });
+
+    el.textContent = text.trim();
+  }
+
+  function ensureScoreboardOverlay() {
+    if (scoreboardOverlay || !containerRef) return;
+
+    scoreboardOverlay = document.createElement("div");
+    scoreboardOverlay.style.position = "absolute";
+    scoreboardOverlay.style.inset = "0";
+    scoreboardOverlay.style.background = "rgba(0,0,0,0.78)";
+    scoreboardOverlay.style.display = "none";
+    scoreboardOverlay.style.zIndex = "200";
+    scoreboardOverlay.style.display = "flex";
+    scoreboardOverlay.style.alignItems = "center";
+    scoreboardOverlay.style.justifyContent = "center";
+    scoreboardOverlay.style.pointerEvents = "auto";
+
+    const panel = document.createElement("div");
+    panel.style.background = "#111";
+    panel.style.padding = "16px 20px";
+    panel.style.borderRadius = "10px";
+    panel.style.border = "1px solid #444";
+    panel.style.color = "#fff";
+    panel.style.fontFamily = "monospace";
+    panel.style.textAlign = "center";
+    panel.style.minWidth = "320px";
+    panel.style.maxWidth = "480px";
+
+    const title = document.createElement("div");
+    title.textContent = "Run Summary";
+    title.style.fontSize = "16px";
+    title.style.marginBottom = "8px";
+
+    const summary = document.createElement("div");
+    summary.style.fontSize = "13px";
+    summary.style.marginBottom = "10px";
+    summary.id = "frog-score-summary";
+
+    const leaderboardTitle = document.createElement("div");
+    leaderboardTitle.textContent = "Top Scores";
+    leaderboardTitle.style.fontSize = "14px";
+    leaderboardTitle.style.margin = "10px 0 4px";
+
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.fontSize = "12px";
+    table.id = "frog-score-table";
+
+    const thead = document.createElement("thead");
+    const headRow = document.createElement("tr");
+    ["#", "Tag", "Score", "Time"].forEach((h) => {
+      const th = document.createElement("th");
+      th.textContent = h;
+      th.style.borderBottom = "1px solid #444";
+      th.style.padding = "2px 4px";
+      th.style.textAlign = h === "#" ? "right" : "left";
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    table.appendChild(tbody);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = "Close";
+    closeBtn.style.marginTop = "10px";
+    closeBtn.style.fontFamily = "monospace";
+    closeBtn.style.fontSize = "13px";
+    closeBtn.style.padding = "6px 10px";
+    closeBtn.style.borderRadius = "6px";
+    closeBtn.style.border = "1px solid #555";
+    closeBtn.style.background = "#222";
+    closeBtn.style.color = "#fff";
+    closeBtn.style.cursor = "pointer";
+    closeBtn.onclick = () => {
+      scoreboardOverlay.style.display = "none";
+    };
+    closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
+    closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
+
+    panel.appendChild(title);
+    panel.appendChild(summary);
+    panel.appendChild(leaderboardTitle);
+    panel.appendChild(table);
+    panel.appendChild(closeBtn);
+
+    scoreboardOverlay.appendChild(panel);
+    containerRef.appendChild(scoreboardOverlay);
+  }
 
   function formatTime(t) {
     const total = Math.max(0, t);
@@ -18,266 +155,21 @@
     return `${String(m).padStart(2, "0")}:${s.toFixed(1).padStart(4, "0")}`;
   }
 
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  }
+  function openScoreboardOverlay(topList, runScore, runTime) {
+    ensureScoreboardOverlay();
+    if (!scoreboardOverlay) return;
 
-  // --------------------------------------------------
-  // INIT
-  // --------------------------------------------------
-  function initLeaderboard(container) {
-    containerEl = container;
+    const summary = document.getElementById("frog-score-summary");
+    const table   = document.getElementById("frog-score-table");
+    if (!summary || !table) return;
 
-    // Full-screen overlay for run summary + leaderboard
-    scoreboardOverlay = document.createElement("div");
-    scoreboardOverlay.id = "frog-scoreboard-overlay";
-    scoreboardOverlay.style.position = "absolute";
-    scoreboardOverlay.style.inset = "0";
-    scoreboardOverlay.style.display = "none";
-    scoreboardOverlay.style.alignItems = "center";
-    scoreboardOverlay.style.justifyContent = "center";
-    scoreboardOverlay.style.background = "rgba(0,0,0,0.75)";
-    scoreboardOverlay.style.zIndex = "200";
-    scoreboardOverlay.style.pointerEvents = "auto";
+    summary.textContent =
+      `Time: ${formatTime(runTime)}  |  Score: ${Math.floor(runScore)}`;
 
-    scoreboardOverlayInner = document.createElement("div");
-    scoreboardOverlayInner.style.background = "#111";
-    scoreboardOverlayInner.style.border = "1px solid #444";
-    scoreboardOverlayInner.style.borderRadius = "12px";
-    scoreboardOverlayInner.style.padding = "18px 22px";
-    scoreboardOverlayInner.style.color = "#fff";
-    scoreboardOverlayInner.style.fontFamily = "monospace";
-    scoreboardOverlayInner.style.fontSize = "13px";
-    scoreboardOverlayInner.style.maxWidth = "420px";
-    scoreboardOverlayInner.style.maxHeight = "80vh";
-    scoreboardOverlayInner.style.overflowY = "auto";
-    scoreboardOverlayInner.style.boxShadow = "0 0 20px rgba(0,0,0,0.8)";
-    scoreboardOverlayInner.style.textAlign = "left";
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML = "";
 
-    scoreboardOverlay.appendChild(scoreboardOverlayInner);
-    containerEl.appendChild(scoreboardOverlay);
-
-    // click outside panel to close
-    scoreboardOverlay.addEventListener("click", (e) => {
-      if (e.target === scoreboardOverlay) {
-        hideScoreboardOverlay();
-      }
-    });
-  }
-
-  // --------------------------------------------------
-  // API CALLS
-  // --------------------------------------------------
-  async function fetchLeaderboard() {
-    try {
-      const res = await fetch(LEADERBOARD_URL, {
-        method: "GET",
-        headers: { "Accept": "application/json" }
-      });
-      if (!res.ok) {
-        console.warn("fetchLeaderboard non-OK:", res.status);
-        return [];
-      }
-      const data = await res.json();
-      if (Array.isArray(data)) return data;
-      if (data && Array.isArray(data.entries)) return data.entries;
-      return [];
-    } catch (err) {
-      console.error("fetchLeaderboard error", err);
-      return [];
-    }
-  }
-
-  async function submitScoreToServer(score, time) {
-    try {
-      const payload = {
-        score: Math.floor(score),
-        time: time,
-      };
-
-      const res = await fetch(LEADERBOARD_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) {
-        console.warn("submitScoreToServer non-OK:", res.status);
-        return null;
-      }
-      const data = await res.json();
-      // Allow either raw array or { entries: [...] }
-      if (Array.isArray(data)) return data;
-      if (data && Array.isArray(data.entries)) return data.entries;
-      return null;
-    } catch (err) {
-      console.error("submitScoreToServer error", err);
-      return null;
-    }
-  }
-
-  // --------------------------------------------------
-  // MINI LEADERBOARD (top-right HUD)
-  // --------------------------------------------------
-  function updateMiniLeaderboard(topList) {
-    const mini = document.getElementById("frog-mini-leaderboard");
-    if (!mini) return;
-
-    if (!Array.isArray(topList) || topList.length === 0) {
-      mini.textContent = "No scores yet.";
-      return;
-    }
-
-    const lines = [];
-    const maxRows = Math.min(5, topList.length);
-    for (let i = 0; i < maxRows; i++) {
-      const entry = topList[i];
-      const rank = i + 1;
-      const name = entry.userTag || entry.name || `Player ${rank}`;
-      const score = typeof entry.score === "number" ? entry.score : 0;
-      const time = typeof entry.time === "number" ? entry.time : 0;
-      lines.push(
-        `${rank}. ${name} — ${formatTime(time)} · ${Math.floor(score)}`
-      );
-    }
-
-    mini.innerHTML = lines.map(escapeHtml).join("<br/>");
-  }
-
-  // --------------------------------------------------
-  // BIG OVERLAY (run summary + full leaderboard)
-  // --------------------------------------------------
-  function openScoreboardOverlay(topList, lastRunScore, lastRunTime) {
-    if (!scoreboardOverlay || !scoreboardOverlayInner) return;
-
-    scoreboardOverlayInner.innerHTML = "";
-
-    const title = document.createElement("div");
-    title.textContent = "Run summary & leaderboard";
-    title.style.fontSize = "14px";
-    title.style.marginBottom = "10px";
-    title.style.textAlign = "center";
-    scoreboardOverlayInner.appendChild(title);
-
-    // Find the entry that matches this run (so we can highlight name)
-    let myIndex = -1;
-    let myEntry = null;
-
-    if (Array.isArray(topList)) {
-      const tolScore = 0.0001;
-      const tolTime = 0.05;
-      for (let i = 0; i < topList.length; i++) {
-        const e = topList[i];
-        const es = typeof e.score === "number" ? e.score : 0;
-        const et = typeof e.time === "number" ? e.time : 0;
-        if (Math.abs(es - lastRunScore) < tolScore &&
-            Math.abs(et - lastRunTime) < tolTime) {
-          myIndex = i;
-          myEntry = e;
-          break;
-        }
-      }
-    }
-
-    const myName = myEntry
-      ? (myEntry.userTag || myEntry.name || "You")
-      : "You";
-
-    // Run summary with name in bright yellow
-    const summary = document.createElement("div");
-    summary.style.marginBottom = "12px";
-    summary.style.fontSize = "13px";
-    summary.innerHTML =
-      `Run summary:<br>` +
-      `<span style="color:#ffd700;font-weight:bold;">${escapeHtml(myName)}</span>` +
-      ` — Time ${formatTime(lastRunTime)}, Score ${Math.floor(lastRunScore)}`;
-    scoreboardOverlayInner.appendChild(summary);
-
-    // Horizontal rule
-    const hr = document.createElement("div");
-    hr.style.height = "1px";
-    hr.style.background = "#333";
-    hr.style.margin = "8px 0 10px 0";
-    scoreboardOverlayInner.appendChild(hr);
-
-    // Leaderboard table
-    const table = document.createElement("table");
-    table.style.width = "100%";
-    table.style.borderCollapse = "collapse";
-    table.style.fontSize = "12px";
-
-    const thead = document.createElement("thead");
-    const headRow = document.createElement("tr");
-
-    const thRank = document.createElement("th");
-    const thName = document.createElement("th");
-    const thTime = document.createElement("th");
-    const thScore = document.createElement("th");
-
-    thRank.textContent = "#";
-    thName.textContent = "Name";
-    thTime.textContent = "Time";
-    thScore.textContent = "Score";
-
-    for (const th of [thRank, thName, thTime, thScore]) {
-      th.style.borderBottom = "1px solid #444";
-      th.style.padding = "2px 4px";
-      th.style.textAlign = "left";
-      th.style.fontWeight = "bold";
-    }
-
-    headRow.appendChild(thRank);
-    headRow.appendChild(thName);
-    headRow.appendChild(thTime);
-    headRow.appendChild(thScore);
-    thead.appendChild(headRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement("tbody");
-
-    if (Array.isArray(topList) && topList.length > 0) {
-      for (let i = 0; i < topList.length; i++) {
-        const entry = topList[i];
-        const tr = document.createElement("tr");
-
-        const rankCell = document.createElement("td");
-        const nameCell = document.createElement("td");
-        const timeCell = document.createElement("td");
-        const scoreCell = document.createElement("td");
-
-        const rank = i + 1;
-        const name = entry.userTag || entry.name || `Player ${rank}`;
-        const score = typeof entry.score === "number" ? entry.score : 0;
-        const time = typeof entry.time === "number" ? entry.time : 0;
-
-        rankCell.textContent = String(rank);
-        nameCell.textContent = name;
-        timeCell.textContent = formatTime(time);
-        scoreCell.textContent = String(Math.floor(score));
-
-        for (const td of [rankCell, nameCell, timeCell, scoreCell]) {
-          td.style.padding = "2px 4px";
-          td.style.borderBottom = "1px solid #222";
-        }
-
-        // Highlight THIS run's name in bright yellow
-        if (i === myIndex) {
-          nameCell.style.color = "#ffd700";
-          nameCell.style.fontWeight = "bold";
-        }
-
-        tr.appendChild(rankCell);
-        tr.appendChild(nameCell);
-        tr.appendChild(timeCell);
-        tr.appendChild(scoreCell);
-        tbody.appendChild(tr);
-      }
-    } else {
+    if (!Array.isArray(topList) || !topList.length) {
       const tr = document.createElement("tr");
       const td = document.createElement("td");
       td.colSpan = 4;
@@ -285,19 +177,38 @@
       td.style.padding = "4px";
       tr.appendChild(td);
       tbody.appendChild(tr);
+    } else {
+      topList.forEach((entry, idx) => {
+        const tr = document.createElement("tr");
+
+        const tdRank = document.createElement("td");
+        tdRank.textContent = String(idx + 1);
+        tdRank.style.textAlign = "right";
+        tdRank.style.padding = "2px 4px";
+
+        const tdTag = document.createElement("td");
+        tdTag.textContent = entry.tag || "Unknown";
+        tdTag.style.padding = "2px 4px";
+
+        const tdScore = document.createElement("td");
+        tdScore.textContent = entry.bestScore != null
+          ? String(Math.floor(entry.bestScore))
+          : "-";
+        tdScore.style.padding = "2px 4px";
+
+        const tdTime = document.createElement("td");
+        tdTime.textContent = entry.bestTime != null
+          ? formatTime(entry.bestTime)
+          : "-";
+        tdTime.style.padding = "2px 4px";
+
+        tr.appendChild(tdRank);
+        tr.appendChild(tdTag);
+        tr.appendChild(tdScore);
+        tr.appendChild(tdTime);
+        tbody.appendChild(tr);
+      });
     }
-
-    table.appendChild(tbody);
-    scoreboardOverlayInner.appendChild(table);
-
-    // hint text
-    const hint = document.createElement("div");
-    hint.textContent = "Click outside this panel to close.";
-    hint.style.marginTop = "10px";
-    hint.style.fontSize = "11px";
-    hint.style.textAlign = "center";
-    hint.style.color = "#aaa";
-    scoreboardOverlayInner.appendChild(hint);
 
     scoreboardOverlay.style.display = "flex";
   }
@@ -308,13 +219,10 @@
     }
   }
 
-  // --------------------------------------------------
-  // EXPORT
-  // --------------------------------------------------
   window.FrogGameLeaderboard = {
     initLeaderboard,
-    fetchLeaderboard,
     submitScoreToServer,
+    fetchLeaderboard,
     updateMiniLeaderboard,
     openScoreboardOverlay,
     hideScoreboardOverlay
