@@ -1356,6 +1356,14 @@
   let howToOverlay = null;
   let hasShownHowToOverlay = false;
 
+  // Buff guide (READ ME) overlay
+  let buffGuideOverlay = null;
+  let buffGuideContentEl = null;
+  let buffGuidePageLabel = null;
+  let buffGuidePrevBtn = null;
+  let buffGuideNextBtn = null;
+  let buffGuidePage = 0;
+
   function getUpgradeChoices() {
     return [
       {
@@ -1534,6 +1542,211 @@ function getLegendaryUpgradeChoices() {
     gamePaused = true;
     if (howToOverlay) {
       howToOverlay.style.display = "flex";
+    }
+  }
+
+function ensureBuffGuideOverlay() {
+  if (buffGuideOverlay) return;
+
+  buffGuideOverlay = document.createElement("div");
+  buffGuideOverlay.className = "frog-buff-guide-overlay";
+  buffGuideOverlay.style.position = "absolute";
+  buffGuideOverlay.style.inset = "0";
+  buffGuideOverlay.style.background = "rgba(0,0,0,0.75)";
+  buffGuideOverlay.style.display = "none";
+  buffGuideOverlay.style.zIndex = "170";
+  buffGuideOverlay.style.alignItems = "center";
+  buffGuideOverlay.style.justifyContent = "center";
+  buffGuideOverlay.style.pointerEvents = "auto";
+
+  const panel = document.createElement("div");
+  panel.style.background = "#111";
+  panel.style.padding = "16px 20px 12px 20px";
+  panel.style.borderRadius = "10px";
+  panel.style.border = "1px solid #444";
+  panel.style.color = "#fff";
+  panel.style.fontFamily = "monospace";
+  panel.style.textAlign = "left";
+  panel.style.minWidth = "260px";
+  panel.style.maxWidth = "440px";
+  panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
+
+  const headerRow = document.createElement("div");
+  headerRow.style.display = "flex";
+  headerRow.style.justifyContent = "space-between";
+  headerRow.style.alignItems = "center";
+  headerRow.style.marginBottom = "6px";
+
+  const title = document.createElement("div");
+  title.textContent = "Buffs & upgrades";
+  title.style.fontSize = "14px";
+  title.style.fontWeight = "bold";
+
+  const pageLabel = document.createElement("div");
+  pageLabel.style.fontSize = "11px";
+  pageLabel.style.opacity = "0.8";
+  buffGuidePageLabel = pageLabel;
+
+  headerRow.appendChild(title);
+  headerRow.appendChild(pageLabel);
+
+  const content = document.createElement("div");
+  content.style.fontSize = "13px";
+  content.style.marginTop = "4px";
+  content.style.lineHeight = "1.4";
+  buffGuideContentEl = content;
+
+  const navRow = document.createElement("div");
+  navRow.style.display = "flex";
+  navRow.style.justifyContent = "space-between";
+  navRow.style.alignItems = "center";
+  navRow.style.marginTop = "10px";
+
+  const leftBtns = document.createElement("div");
+  leftBtns.style.display = "flex";
+  leftBtns.style.gap = "6px";
+
+  const prevBtn = document.createElement("button");
+  prevBtn.textContent = "◀ Prev";
+  prevBtn.style.fontFamily = "monospace";
+  prevBtn.style.fontSize = "12px";
+  prevBtn.style.padding = "4px 8px";
+  prevBtn.style.borderRadius = "6px";
+  prevBtn.style.border = "1px solid #555";
+  prevBtn.style.background = "#222";
+  prevBtn.style.color = "#fff";
+  prevBtn.style.cursor = "pointer";
+  prevBtn.onmouseenter = () => { prevBtn.style.background = "#333"; };
+  prevBtn.onmouseleave = () => { prevBtn.style.background = "#222"; };
+  prevBtn.onclick = () => setBuffGuidePage(buffGuidePage - 1);
+  buffGuidePrevBtn = prevBtn;
+
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = "Next ▶";
+  nextBtn.style.fontFamily = "monospace";
+  nextBtn.style.fontSize = "12px";
+  nextBtn.style.padding = "4px 8px";
+  nextBtn.style.borderRadius = "6px";
+  nextBtn.style.border = "1px solid #555";
+  nextBtn.style.background = "#222";
+  nextBtn.style.color = "#fff";
+  nextBtn.style.cursor = "pointer";
+  nextBtn.onmouseenter = () => { nextBtn.style.background = "#333"; };
+  nextBtn.onmouseleave = () => { nextBtn.style.background = "#222"; };
+  nextBtn.onclick = () => setBuffGuidePage(buffGuidePage + 1);
+  buffGuideNextBtn = nextBtn;
+
+  leftBtns.appendChild(prevBtn);
+  leftBtns.appendChild(nextBtn);
+
+  const backBtn = document.createElement("button");
+  backBtn.textContent = "Close ×";
+  backBtn.style.fontFamily = "monospace";
+  backBtn.style.fontSize = "12px";
+  backBtn.style.padding = "4px 8px";
+  backBtn.style.borderRadius = "6px";
+  backBtn.style.border = "1px solid #555";
+  backBtn.style.background = "#222";
+  backBtn.style.color = "#fff";
+  backBtn.style.cursor = "pointer";
+  backBtn.onmouseenter = () => { backBtn.style.background = "#333"; };
+  backBtn.onmouseleave = () => { backBtn.style.background = "#222"; };
+  backBtn.onclick = () => closeBuffGuideOverlay();
+
+  navRow.appendChild(leftBtns);
+  navRow.appendChild(backBtn);
+
+  panel.appendChild(headerRow);
+  panel.appendChild(content);
+  panel.appendChild(navRow);
+
+  buffGuideOverlay.appendChild(panel);
+  container.appendChild(buffGuideOverlay);
+
+  // clicking the dim background also closes it
+  buffGuideOverlay.addEventListener("click", (e) => {
+    if (e.target === buffGuideOverlay) {
+      closeBuffGuideOverlay();
+    }
+  });
+
+  // start on page 0
+  setBuffGuidePage(0);
+}
+
+  function setBuffGuidePage(pageIndex) {
+    if (!buffGuideContentEl || !buffGuidePageLabel) return;
+
+    const pages = [
+      // Page 0 – orb buffs
+      `
+  <b>🟢 Orb buffs</b><br><br>
+  ⚡ <b>Speed</b> – frogs act faster for <span style="color:#4defff;">15s</span> (longer with upgrades).<br>
+  🦘 <b>Jump</b> – frogs jump higher for <span style="color:#4defff;">18s</span>.<br>
+  🐸➕ <b>Spawn</b> – spawn <span style="color:#4defff;">1–10</span> frogs (+ extra if Lucky).<br>
+  🧊 <b>Snake slow</b> – snake speed cut to <span style="color:#4defff;">50%</span> for a few seconds.<br>
+  🤪 <b>Confuse</b> – snake steers randomly for a short time.<br>
+  📏 <b>Shrink</b> – snake smaller, eat radius shrinks to <span style="color:#4defff;">24px</span>.<br>
+  🛡️ <b>Team shield</b> – all frogs ignore snake hits for a moment.<br>
+  ⏱️ <b>Time slow</b> – game + snake run at ~<span style="color:#4defff;">40%</span> speed.<br>
+  🧲 <b>Orb magnet</b> – orbs drift toward frogs, preferring magnets.<br>
+  🐸🌊 <b>Mega spawn</b> – spawn <span style="color:#4defff;">15–25</span> frogs (+ bonus if Lucky).<br>
+  💰 <b>Score x2</b> – score gain doubled for <span style="color:#4defff;">10s</span>.<br>
+  😱 <b>Panic hop</b> – frogs hop faster but in random directions.<br>
+  🩸 <b>Life steal</b> – each orb collected spawns <span style="color:#4defff;">+1</span> frog.<br>
+  ⭐ <b>PermaFrog</b> – gives that frog a random permanent role.
+  `,
+      // Page 1 – permanent frog roles
+      `
+  <b>🐸 Permanent frog roles</b><br><br>
+  🏅 <b>Champion</b> – that frog hops ~<span style="color:#4defff;">15%</span> faster, jumps higher, and moves farther.<br>
+  🌈 <b>Aura</b> – nearby frogs get faster + higher jumps in a <span style="color:#4defff;">200px</span> radius.<br>
+  🛡️ <b>Perma shield</b> – survives <span style="color:#4defff;">1</span> snake hit, then shield breaks.<br>
+  🧲 <b>Magnet</b> – orbs within <span style="color:#4defff;">220px</span> home in on this frog.<br>
+  🍀 <b>Lucky</b> – buffs last <span style="color:#4defff;">x1.4</span>, spawns more frogs, and each Lucky frog adds
+  <span style="color:#4defff;">+10%</span> score rate.<br>
+  🧟 <b>Zombie</b> – on death: spawn <span style="color:#4defff;">5</span> frogs and slow the snake.
+  `,
+      // Page 2 – global upgrades + epic/legendary
+      `
+  <b>🏗️ Global upgrades</b><br><br>
+  ⏩ <b>Frogs hop faster forever</b> – each pick makes hops ~<span style="color:#4defff;">10%</span> faster.<br>
+  🦘⬆️ <b>Frogs jump higher forever</b> – each pick adds ~<span style="color:#4defff;">+25%</span> jump height.<br>
+  🐸💥 <b>Spawn 20/50/75 frogs</b> – instant extra frogs from normal / epic / legendary choices.<br>
+  ⏳ <b>Buffs last longer</b> – each pick adds ~<span style="color:#4defff;">+15%</span> duration to all temp buffs.<br>
+  🎯 <b>More orbs</b> – orbs spawn faster every time you pick this.<br>
+  💀 <b>Deathrattle</b> – epic: <span style="color:#4defff;">25%</span> respawn on death; legendary: <span style="color:#4defff;">50%</span>.<br>
+  💥 <b>Legendary Frenzy</b> – at <span style="color:#4defff;">10 min</span>, pick a legendary and the snake turns red,
+  gets <span style="color:#4defff;">+25%</span> speed, and frogs panic-hop for <span style="color:#4defff;">13s</span>.
+  `
+    ];
+
+    const maxPage = pages.length - 1;
+    buffGuidePage = Math.max(0, Math.min(maxPage, pageIndex));
+
+    buffGuideContentEl.innerHTML = pages[buffGuidePage];
+    buffGuidePageLabel.textContent = `Page ${buffGuidePage + 1} / ${pages.length}`;
+
+    if (buffGuidePrevBtn) {
+      buffGuidePrevBtn.disabled = buffGuidePage === 0;
+      buffGuidePrevBtn.style.opacity = buffGuidePage === 0 ? "0.5" : "1";
+    }
+    if (buffGuideNextBtn) {
+      buffGuideNextBtn.disabled = buffGuidePage === maxPage;
+      buffGuideNextBtn.style.opacity = buffGuidePage === maxPage ? "0.5" : "1";
+    }
+  }
+
+  function openBuffGuideOverlay() {
+    ensureBuffGuideOverlay();
+    if (buffGuideOverlay) {
+      buffGuideOverlay.style.display = "flex";
+    }
+  }
+
+  function closeBuffGuideOverlay() {
+    if (buffGuideOverlay) {
+      buffGuideOverlay.style.display = "none";
     }
   }
 
