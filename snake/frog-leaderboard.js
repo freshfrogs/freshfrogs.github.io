@@ -4,8 +4,9 @@
 (function () {
   "use strict";
 
-  // Update this if your Worker URL changes
-  const LEADERBOARD_URL = "https://lucky-king-0d37.danielssouthworth.workers.dev/leaderboard";
+  // Your Cloudflare Worker URL
+  const LEADERBOARD_URL =
+    "https://lucky-king-0d37.danielssouthworth.workers.dev/leaderboard";
 
   let containerEl = null;
   let scoreboardOverlay = null;
@@ -18,8 +19,47 @@
     if (typeof v === "number") {
       return Number.isFinite(v) ? v : fallback;
     }
+    if (v == null) return fallback;
     const n = parseFloat(v);
     return Number.isFinite(n) ? n : fallback;
+  }
+
+  // Try to infer the score field, even if the key name changes.
+  function getEntryScore(entry) {
+    if (!entry || typeof entry !== "object") return 0;
+
+    // Preferred key
+    if ("score" in entry) return asNumber(entry.score, 0);
+
+    // Look for something with "score" in the key
+    for (const k of Object.keys(entry)) {
+      if (/score/i.test(k)) return asNumber(entry[k], 0);
+    }
+
+    // Fallback: first numeric-ish field
+    for (const k of Object.keys(entry)) {
+      const n = asNumber(entry[k], NaN);
+      if (Number.isFinite(n)) return n;
+    }
+
+    return 0;
+  }
+
+  // Try to infer the time field, even if the key name changes.
+  function getEntryTime(entry) {
+    if (!entry || typeof entry !== "object") return 0;
+
+    // Preferred key
+    if ("time" in entry) return asNumber(entry.time, 0);
+
+    // Look for something with time/seconds/duration in the key
+    for (const k of Object.keys(entry)) {
+      if (/time|second|duration/i.test(k)) {
+        return asNumber(entry[k], 0);
+      }
+    }
+
+    return 0;
   }
 
   function formatTime(t) {
@@ -88,7 +128,7 @@
     try {
       const res = await fetch(LEADERBOARD_URL, {
         method: "GET",
-        headers: { "Accept": "application/json" }
+        headers: { Accept: "application/json" },
       });
       if (!res.ok) {
         console.warn("fetchLeaderboard non-OK:", res.status);
@@ -108,13 +148,13 @@
     try {
       const payload = {
         score: Math.floor(score),
-        time: time
+        time: time,
       };
 
       const res = await fetch(LEADERBOARD_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -150,8 +190,8 @@
       const entry = topList[i] || {};
       const rank = i + 1;
       const name = entry.userTag || entry.name || `Player ${rank}`;
-      const score = asNumber(entry.score, 0);
-      const time  = asNumber(entry.time, 0);
+      const score = getEntryScore(entry);
+      const time = getEntryTime(entry);
       lines.push(
         `${rank}. ${name} — ${formatTime(time)} · ${Math.floor(score)}`
       );
@@ -177,7 +217,7 @@
     title.style.textAlign = "center";
     scoreboardOverlayInner.appendChild(title);
 
-    // Find this run in the list (approx match)
+    // Find this run in the list (approx match by score+time)
     let myIndex = -1;
     let myEntry = null;
     const tolScore = 0.0001;
@@ -185,10 +225,12 @@
 
     for (let i = 0; i < safeList.length; i++) {
       const e = safeList[i] || {};
-      const es = asNumber(e.score, 0);
-      const et = asNumber(e.time, 0);
-      if (Math.abs(es - lastRunScore) < tolScore &&
-          Math.abs(et - lastRunTime) < tolTime) {
+      const es = getEntryScore(e);
+      const et = getEntryTime(e);
+      if (
+        Math.abs(es - lastRunScore) < tolScore &&
+        Math.abs(et - lastRunTime) < tolTime
+      ) {
         myIndex = i;
         myEntry = e;
         break;
@@ -196,7 +238,7 @@
     }
 
     const myName = myEntry
-      ? (myEntry.userTag || myEntry.name || "You")
+      ? myEntry.userTag || myEntry.name || "You"
       : "You";
 
     // Run summary with name in bright yellow
@@ -205,7 +247,9 @@
     summary.style.fontSize = "13px";
     summary.innerHTML =
       `Run summary:<br>` +
-      `<span style="color:#ffd700;font-weight:bold;">${escapeHtml(myName)}</span>` +
+      `<span style="color:#ffd700;font-weight:bold;">${escapeHtml(
+        myName
+      )}</span>` +
       ` — Time ${formatTime(lastRunTime)}, Score ${Math.floor(lastRunScore)}`;
     scoreboardOverlayInner.appendChild(summary);
 
@@ -262,8 +306,8 @@
 
         const rank = i + 1;
         const name = entry.userTag || entry.name || `Player ${rank}`;
-        const score = asNumber(entry.score, 0);
-        const time  = asNumber(entry.time, 0);
+        const score = getEntryScore(entry);
+        const time = getEntryTime(entry);
 
         rankCell.textContent = String(rank);
         nameCell.textContent = name;
@@ -327,6 +371,6 @@
     submitScoreToServer,
     updateMiniLeaderboard,
     openScoreboardOverlay,
-    hideScoreboardOverlay
+    hideScoreboardOverlay,
   };
 })();
