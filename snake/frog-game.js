@@ -92,7 +92,6 @@
   let score         = 0;
   let frogsEatenCount = 0; // grow one segment every 2 frogs
 
-
   let lastRunScore  = 0;
   let lastRunTime   = 0;
 
@@ -101,6 +100,10 @@
 
   // every 180 seconds we pause for an EPIC upgrade
   let nextEpicChoiceTime = 180;
+
+  // Legendary event at 10 minutes
+  const LEGENDARY_EVENT_TIME = 600; // 10 minutes
+  let legendaryEventTriggered = false;
 
   // --------------------------------------------------
   // MOUSE
@@ -484,6 +487,9 @@
   let lifeStealTime   = 0;
   let frogDeathRattleChance = 0.0;  // 0.25 when epic is picked
 
+  // Legendary Frenzy timer (snake + frogs go wild)
+  let snakeFrenzyTime = 0;
+
   // global permanent buffs
   let frogPermanentSpeedFactor = 1.0; // <1 = faster hops
   let frogPermanentJumpFactor  = 1.0; // >1 = higher hops
@@ -534,6 +540,7 @@
     let factor = snakePermanentSpeedFactor;
     if (snakeSlowTime > 0) factor *= 0.5;
     if (timeSlowTime > 0)  factor *= 0.4;
+    if (snakeFrenzyTime > 0) factor *= 1.25; // +25% speed during Frenzy
     return factor;
   }
 
@@ -677,6 +684,27 @@
     }
   }
 
+  // Snake Frenzy visual helper: tint everything red-ish
+  function setSnakeFrenzyVisual(active) {
+    if (!snake || !snake.head || !snake.head.el) return;
+    if (snake.isFrenzyVisual === active) return;
+    snake.isFrenzyVisual = active;
+
+    const filterOn = "hue-rotate(-80deg) saturate(2)";
+    const headEl = snake.head.el;
+    headEl.style.filter = active ? filterOn : "";
+
+    if (Array.isArray(snake.segments)) {
+      for (const seg of snake.segments) {
+        if (!seg.el) continue;
+        seg.el.style.filter = active ? filterOn : "";
+      }
+    }
+
+    // If you prefer custom red PNGs instead of filters,
+    // swap seg/head backgroundImage URLs here.
+  }
+
   function updateBuffTimers(dt) {
     if (speedBuffTime   > 0) speedBuffTime   = Math.max(0, speedBuffTime   - dt);
     if (jumpBuffTime    > 0) jumpBuffTime    = Math.max(0, jumpBuffTime    - dt);
@@ -686,6 +714,14 @@
     if (panicHopTime    > 0) panicHopTime    = Math.max(0, panicHopTime    - dt);
     if (cloneSwarmTime  > 0) cloneSwarmTime  = Math.max(0, cloneSwarmTime  - dt);
     if (lifeStealTime   > 0) lifeStealTime   = Math.max(0, lifeStealTime   - dt);
+
+    // Frenzy timer (not affected by snake resistance)
+    if (snakeFrenzyTime > 0) {
+      snakeFrenzyTime = Math.max(0, snakeFrenzyTime - dt);
+      if (snakeFrenzyTime === 0) {
+        setSnakeFrenzyVisual(false);
+      }
+    }
 
     const snakeResist = getSnakeResistance();
     const debuffTickMultiplier = 1 + snakeResist;
@@ -717,6 +753,12 @@
     if (mouse.follow && mouse.active) {
       goalX = mouse.x - FROG_SIZE / 2;
       goalY = mouse.y - FROG_SIZE / 2;
+    }
+
+    // During panic Hop / Frenzy, frogs ignore the mouse and dart randomly
+    if (panicHopTime > 0) {
+      goalX = null;
+      goalY = null;
     }
 
     if (goalX !== null && goalY !== null) {
@@ -1075,7 +1117,8 @@
     snake = {
       head: { el: headEl, x: startX, y: startY, angle: 0 },
       segments,
-      path
+      path,
+      isFrenzyVisual: false
     };
   }
 
@@ -1115,200 +1158,197 @@
     }
   }
 
-function updateSnake(dt, width, height) {
-  if (!snake) return;
+  function updateSnake(dt, width, height) {
+    if (!snake) return;
 
-  const marginX = 8;
-  const marginY = 24;
+    const marginX = 8;
+    const marginY = 24;
 
-  const head = snake.head;
-  if (!head) return;
+    const head = snake.head;
+    if (!head) return;
 
-  // -----------------------------
-  // Targeting logic
-  // -----------------------------
-  let targetFrog = null;
-  let bestDist2 = Infinity;
+    // -----------------------------
+    // Targeting logic
+    // -----------------------------
+    let targetFrog = null;
+    let bestDist2 = Infinity;
 
-  for (const frog of frogs) {
-    if (!frog || !frog.el) continue;
-    const fx = frog.x + FROG_SIZE / 2;
-    const fy = frog.baseY + FROG_SIZE / 2;
-    const dx = fx - head.x;
-    const dy = fy - head.y;
-    const d2 = dx * dx + dy * dy;
-    if (d2 < bestDist2) {
-      bestDist2 = d2;
-      targetFrog = frog;
+    for (const frog of frogs) {
+      if (!frog || !frog.el) continue;
+      const fx = frog.x + FROG_SIZE / 2;
+      const fy = frog.baseY + FROG_SIZE / 2;
+      const dx = fx - head.x;
+      const dy = fy - head.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < bestDist2) {
+        bestDist2 = d2;
+        targetFrog = frog;
+      }
     }
-  }
 
-  let desiredAngle = head.angle;
+    let desiredAngle = head.angle;
 
-  if (snakeConfuseTime > 0) {
-    // confused: random-ish turning
-    desiredAngle = head.angle + (Math.random() - 0.5) * Math.PI;
-    targetFrog = null;
-  } else if (targetFrog) {
-    const fx = targetFrog.x + FROG_SIZE / 2;
-    const fy = targetFrog.baseY + FROG_SIZE / 2;
-    desiredAngle = Math.atan2(fy - head.y, fx - head.x);
-  } else {
-    // no frogs? just wander
-    desiredAngle += (Math.random() - 0.5) * dt;
-  }
+    if (snakeConfuseTime > 0) {
+      // confused: random-ish turning
+      desiredAngle = head.angle + (Math.random() - 0.5) * Math.PI;
+      targetFrog = null;
+    } else if (targetFrog) {
+      const fx = targetFrog.x + FROG_SIZE / 2;
+      const fy = targetFrog.baseY + FROG_SIZE / 2;
+      desiredAngle = Math.atan2(fy - head.y, fx - head.x);
+    } else {
+      // no frogs? just wander
+      desiredAngle += (Math.random() - 0.5) * dt;
+    }
 
-  let angleDiff =
-    ((desiredAngle - head.angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
-  const maxTurn = SNAKE_TURN_RATE * dt;
-  if (angleDiff > maxTurn) angleDiff = maxTurn;
-  if (angleDiff < -maxTurn) angleDiff = -maxTurn;
-  head.angle += angleDiff;
+    let angleDiff =
+      ((desiredAngle - head.angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+    const maxTurn = SNAKE_TURN_RATE * dt;
+    if (angleDiff > maxTurn) angleDiff = maxTurn;
+    if (angleDiff < -maxTurn) angleDiff = -maxTurn;
+    head.angle += angleDiff;
 
-  const speedFactor = getSnakeSpeedFactor();
-  const speed = SNAKE_BASE_SPEED * speedFactor * (0.8 + Math.random() * 0.4);
-  head.x += Math.cos(head.angle) * speed * dt;
-  head.y += Math.sin(head.angle) * speed * dt;
+    const speedFactor = getSnakeSpeedFactor();
+    const speed = SNAKE_BASE_SPEED * speedFactor * (0.8 + Math.random() * 0.4);
+    head.x += Math.cos(head.angle) * speed * dt;
+    head.y += Math.sin(head.angle) * speed * dt;
 
-  // Keep inside bounds
-  if (head.x < marginX) {
-    head.x = marginX;
-    head.angle = Math.PI - head.angle;
-  } else if (head.x > width - marginX - SNAKE_SEGMENT_SIZE) {
-    head.x = width - marginX - SNAKE_SEGMENT_SIZE;
-    head.angle = Math.PI - head.angle;
-  }
-  if (head.y < marginY) {
-    head.y = marginY;
-    head.angle = -head.angle;
-  } else if (head.y > height - marginY - SNAKE_SEGMENT_SIZE) {
-    head.y = height - marginY - SNAKE_SEGMENT_SIZE;
-    head.angle = -head.angle;
-  }
+    // Keep inside bounds
+    if (head.x < marginX) {
+      head.x = marginX;
+      head.angle = Math.PI - head.angle;
+    } else if (head.x > width - marginX - SNAKE_SEGMENT_SIZE) {
+      head.x = width - marginX - SNAKE_SEGMENT_SIZE;
+      head.angle = Math.PI - head.angle;
+    }
+    if (head.y < marginY) {
+      head.y = marginY;
+      head.angle = -head.angle;
+    } else if (head.y > height - marginY - SNAKE_SEGMENT_SIZE) {
+      head.y = height - marginY - SNAKE_SEGMENT_SIZE;
+      head.angle = -head.angle;
+    }
 
-  // -----------------------------
-  // Path + segments follow
-  // -----------------------------
-  snake.path.unshift({ x: head.x, y: head.y });
-  const maxPathLength = (snake.segments.length + 2) * SNAKE_SEGMENT_GAP + 2;
-  while (snake.path.length > maxPathLength) {
-    snake.path.pop();
-  }
+    // -----------------------------
+    // Path + segments follow
+    // -----------------------------
+    snake.path.unshift({ x: head.x, y: head.y });
+    const maxPathLength = (snake.segments.length + 2) * SNAKE_SEGMENT_GAP + 2;
+    while (snake.path.length > maxPathLength) {
+      snake.path.pop();
+    }
 
-  const shrinkScale = snakeShrinkTime > 0 ? 0.8 : 1.0;
+    const shrinkScale = snakeShrinkTime > 0 ? 0.8 : 1.0;
 
-  head.el.style.transform =
-    `translate3d(${head.x}px, ${head.y}px, 0) rotate(${head.angle}rad) scale(${shrinkScale})`;
+    head.el.style.transform =
+      `translate3d(${head.x}px, ${head.y}px, 0) rotate(${head.angle}rad) scale(${shrinkScale})`;
 
-  for (let i = 0; i < snake.segments.length; i++) {
-    const seg = snake.segments[i];
-    const idx = Math.min(
-      snake.path.length - 1,
-      (i + 1) * SNAKE_SEGMENT_GAP
-    );
-    const p = snake.path[idx] || snake.path[snake.path.length - 1];
+    for (let i = 0; i < snake.segments.length; i++) {
+      const seg = snake.segments[i];
+      const idx = Math.min(
+        snake.path.length - 1,
+        (i + 1) * SNAKE_SEGMENT_GAP
+      );
+      const p = snake.path[idx] || snake.path[snake.path.length - 1];
 
-    const nextIdx = Math.max(0, idx - 2);
-    const q = snake.path[nextIdx] || p;
-    const angle = Math.atan2(p.y - q.y, p.x - q.x);
+      const nextIdx = Math.max(0, idx - 2);
+      const q = snake.path[nextIdx] || p;
+      const angle = Math.atan2(p.y - q.y, p.x - q.x);
 
-    seg.x = p.x;
-    seg.y = p.y;
+      seg.x = p.x;
+      seg.y = p.y;
 
-    seg.el.style.transform =
-      `translate3d(${seg.x}px, ${seg.y}px, 0) rotate(${angle}rad) scale(${shrinkScale})`;
-  }
+      seg.el.style.transform =
+        `translate3d(${seg.x}px, ${seg.y}px, 0) rotate(${angle}rad) scale(${shrinkScale})`;
+    }
 
-  // -----------------------------
-  // Collisions with frogs
-  // -----------------------------
-  const eatRadius = getSnakeEatRadius();
-  const eatR2 = eatRadius * eatRadius;
+    // -----------------------------
+    // Collisions with frogs
+    // -----------------------------
+    const eatRadius = getSnakeEatRadius();
+    const eatR2 = eatRadius * eatRadius;
 
-  for (let i = frogs.length - 1; i >= 0; i--) {
-    const frog = frogs[i];
-    if (!frog || !frog.el) continue;
+    for (let i = frogs.length - 1; i >= 0; i--) {
+      const frog = frogs[i];
+      if (!frog || !frog.el) continue;
 
-    const fx = frog.x + FROG_SIZE / 2;
-    const fy = frog.baseY + FROG_SIZE / 2;
-    const dx = fx - head.x;
-    const dy = fy - head.y;
-    const d2 = dx * dx + dy * dy;
+      const fx = frog.x + FROG_SIZE / 2;
+      const fy = frog.baseY + FROG_SIZE / 2;
+      const dx = fx - head.x;
+      const dy = fy - head.y;
+      const d2 = dx * dx + dy * dy;
 
-    if (d2 <= eatR2) {
-      // temporary global frog shield
-      if (frogShieldTime > 0) {
-        continue;
-      }
-
-      // per-frog permanent shield
-      if (frog.hasPermaShield) {
-        frog.hasPermaShield = false;
-        refreshFrogPermaGlow(frog);
-        playPerFrogUpgradeSound("shield");
-        continue;
-      }
-
-      // 🔹 Clone Swarm: chance that the snake only bites a fake clone
-      if (cloneSwarmTime > 0) {
-        // 65% of hits are "fake" while the buff is active
-        const DECOY_CHANCE = 0.65;
-        if (Math.random() < DECOY_CHANCE) {
-          // Snake thinks it ate something – munch sound – but frog survives
-          playSnakeMunch();
-          // No frogDeath, no removal
+      if (d2 <= eatR2) {
+        // temporary global frog shield
+        if (frogShieldTime > 0) {
           continue;
         }
+
+        // per-frog permanent shield
+        if (frog.hasPermaShield) {
+          frog.hasPermaShield = false;
+          refreshFrogPermaGlow(frog);
+          playPerFrogUpgradeSound("shield");
+          continue;
+        }
+
+        // 🔹 Clone Swarm: chance that the snake only bites a fake clone
+        if (cloneSwarmTime > 0) {
+          // 65% of hits are "fake" while the buff is active
+          const DECOY_CHANCE = 0.65;
+          if (Math.random() < DECOY_CHANCE) {
+            // Snake thinks it ate something – munch sound – but frog survives
+            playSnakeMunch();
+            // No frogDeath, no removal
+            continue;
+          }
+        }
+
+        // remove clone, if any
+        if (frog.cloneEl && frog.cloneEl.parentNode === container) {
+          container.removeChild(frog.cloneEl);
+          frog.cloneEl = null;
+        }
+
+        // remove frog dom + from array
+        if (frog.el.parentNode === container) {
+          container.removeChild(frog.el);
+        }
+        frogs.splice(i, 1);
+
+        // zombie on-death effect
+        if (frog.isZombie) {
+          spawnExtraFrogs(5);
+          snakeSlowTime = Math.max(
+            snakeSlowTime,
+            3 * buffDurationFactor
+          );
+        }
+
+        // EPIC buff: global deathrattle – chance to spawn a replacement frog
+        if (frogDeathRattleChance > 0 && Math.random() < frogDeathRattleChance) {
+          spawnExtraFrogs(1);
+        }
+
+        playSnakeMunch();
+        playFrogDeath();
+
+        // Only grow one segment for every 2 frogs eaten
+        frogsEatenCount++;
+        if (frogsEatenCount % 2 === 0) {
+          growSnake(1);
+        }
       }
-
-      // remove clone, if any
-      if (frog.cloneEl && frog.cloneEl.parentNode === container) {
-        container.removeChild(frog.cloneEl);
-        frog.cloneEl = null;
-      }
-
-      // remove frog dom + from array
-      if (frog.el.parentNode === container) {
-        container.removeChild(frog.el);
-      }
-      frogs.splice(i, 1);
-
-      // zombie on-death effect
-      if (frog.isZombie) {
-        spawnExtraFrogs(5);
-        snakeSlowTime = Math.max(
-          snakeSlowTime,
-          3 * buffDurationFactor
-        );
-      }
-
-      // EPIC buff: global deathrattle – chance to spawn a replacement frog
-      if (frogDeathRattleChance > 0 && Math.random() < frogDeathRattleChance) {
-        spawnExtraFrogs(1);
-      }
-
-      playSnakeMunch();
-      playFrogDeath();
-
-      // Only grow one segment for every 2 frogs eaten
-      frogsEatenCount++;
-      if (frogsEatenCount % 2 === 0) {
-        growSnake(1);
-      }
-
-
     }
   }
-}
-
 
   // --------------------------------------------------
-  // PERMANENT & EPIC UPGRADE OVERLAY
+  // PERMANENT, EPIC & LEGENDARY UPGRADE OVERLAY
   // --------------------------------------------------
   let upgradeOverlay = null;
   let upgradeOverlayButtonsContainer = null;
   let upgradeOverlayTitleEl = null;
-  let currentUpgradeOverlayMode = "normal"; // "normal" | "epic"
+  let currentUpgradeOverlayMode = "normal"; // "normal" | "epic" | "legendary"
   let initialUpgradeDone = false;
 
   function getUpgradeChoices() {
@@ -1361,6 +1401,40 @@ function updateSnake(dt, width, height) {
       }
     ];
   }
+
+  // LEGENDARY choices at 10 minutes (placeholders, TODO)
+function getLegendaryUpgradeChoices() {
+  return [
+    {
+      id: "legendaryDoubleBuffs",
+      label: "Buff durations massively increased (x2)",
+      apply: () => {
+        // All temporary buffs now last twice as long (on top of any previous boosts)
+        buffDurationFactor *= 2;
+        console.log("Legendary: buffDurationFactor doubled to", buffDurationFactor);
+      }
+    },
+    {
+      id: "legendarySpawn75",
+      label: "Spawn 75 frogs right now",
+      apply: () => {
+        // Try to spawn 75 frogs, capped by MAX_FROGS inside spawnExtraFrogs
+        spawnExtraFrogs(75);
+        console.log("Legendary: spawned up to 75 frogs");
+      }
+    },
+    {
+      id: "legendaryDeathrattle50",
+      label: "Every time a frog dies there's a 50% chance they respawn",
+      apply: () => {
+        // Upgrade global deathrattle chance to at least 50%
+        // (If you had 25% from EPIC, this bumps it to 50%)
+        frogDeathRattleChance = Math.max(frogDeathRattleChance, 0.5);
+        console.log("Legendary: frogDeathRattleChance set to", frogDeathRattleChance);
+      }
+    }
+  ];
+}
 
   function ensureUpgradeOverlay() {
     if (upgradeOverlay) return;
@@ -1416,19 +1490,26 @@ function updateSnake(dt, width, height) {
 
     currentUpgradeOverlayMode = mode || "normal";
     const isEpic = currentUpgradeOverlayMode === "epic";
+    const isLegendary = currentUpgradeOverlayMode === "legendary";
 
     containerEl.innerHTML = "";
 
     if (upgradeOverlayTitleEl) {
-      upgradeOverlayTitleEl.textContent = isEpic
-        ? "Choose an EPIC upgrade"
-        : "Choose a permanent upgrade";
+      upgradeOverlayTitleEl.textContent =
+        isEpic
+          ? "Choose an EPIC upgrade"
+          : isLegendary
+            ? "Choose a LEGENDARY upgrade"
+            : "Choose a permanent upgrade";
     }
 
     let choices = [];
     if (isEpic) {
       // show all epic choices
       choices = getEpicUpgradeChoices().slice();
+    } else if (isLegendary) {
+      // show all legendary (placeholders)
+      choices = getLegendaryUpgradeChoices().slice();
     } else {
       // normal per-minute upgrades – random 3
       const pool = getUpgradeChoices().slice();
@@ -1486,6 +1567,13 @@ function updateSnake(dt, width, height) {
     }
   }
 
+  function triggerLegendaryFrenzy() {
+    // 13-second Frenzy: snake faster + frogs panic hop randomly
+    snakeFrenzyTime = 13;
+    panicHopTime = Math.max(panicHopTime, 13);
+    setSnakeFrenzyVisual(true);
+  }
+
   function closeUpgradeOverlay() {
     if (upgradeOverlay) {
       upgradeOverlay.style.display = "none";
@@ -1499,10 +1587,15 @@ function updateSnake(dt, width, height) {
     } else {
       if (currentUpgradeOverlayMode === "normal") {
         // normal per-minute upgrades
-        nextPermanentChoiceTime += 60;
+        nextPermanentChoiceTime = elapsedTime + 60;
       } else if (currentUpgradeOverlayMode === "epic") {
-        // epic every 3 minutes
-        nextEpicChoiceTime += 180;
+        // epic every 3 minutes; also schedule next normal in 60s
+        nextEpicChoiceTime = elapsedTime + 180;
+        nextPermanentChoiceTime = elapsedTime + 60;
+      } else if (currentUpgradeOverlayMode === "legendary") {
+        // one-time 10-minute event
+        nextPermanentChoiceTime = elapsedTime + 60;
+        triggerLegendaryFrenzy();
       }
     }
   }
@@ -1589,6 +1682,7 @@ function updateSnake(dt, width, height) {
     initialUpgradeDone       = false;
     nextPermanentChoiceTime  = 60;
     nextEpicChoiceTime       = 180;
+    legendaryEventTriggered  = false;
 
     // Reset all temporary buff timers
     speedBuffTime   = 0;
@@ -1603,6 +1697,8 @@ function updateSnake(dt, width, height) {
     panicHopTime    = 0;
     cloneSwarmTime  = 0;
     lifeStealTime   = 0;
+    snakeFrenzyTime = 0;
+    setSnakeFrenzyVisual(false);
 
     // Reset EPIC deathrattle
     frogDeathRattleChance = 0.0;
@@ -1656,8 +1752,13 @@ function updateSnake(dt, width, height) {
       if (!gamePaused) {
         elapsedTime += dt;
 
-        // EPIC choices first priority (every 3 minutes)
-        if (elapsedTime >= nextEpicChoiceTime) {
+        // Legendary 10-minute event has top priority
+        if (!legendaryEventTriggered && elapsedTime >= LEGENDARY_EVENT_TIME) {
+          legendaryEventTriggered = true;
+          openUpgradeOverlay("legendary");
+        }
+        // EPIC choices (every 3 minutes)
+        else if (elapsedTime >= nextEpicChoiceTime) {
           openUpgradeOverlay("epic");
         }
         // Normal per-minute permanent choices
@@ -1713,11 +1814,10 @@ function updateSnake(dt, width, height) {
     setNextOrbTime();
     updateHUD();
 
-    // NEW: let the user pick an upgrade before time starts
+    // Starting permanent upgrade before time starts
     openUpgradeOverlay("normal");
 
     animId = requestAnimationFrame(drawFrame);
-
   }
 
   window.addEventListener("load", startGame);
