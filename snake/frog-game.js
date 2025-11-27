@@ -663,9 +663,6 @@
       case "panicHop":
         panicHopTime = PANIC_HOP_DURATION * buffDurationFactor * durBoost;
         break;
-      case "cloneSwarm":
-        cloneSwarmTime = CLONE_SWARM_DURATION * buffDurationFactor * durBoost;
-        break;
       case "lifeSteal":
         lifeStealTime = LIFE_STEAL_DURATION * buffDurationFactor * durBoost;
         break;
@@ -868,7 +865,6 @@
       "megaSpawn",
       "scoreMulti",
       "panicHop",
-      "cloneSwarm",
       "lifeSteal",
       "permaFrog"
     ];
@@ -902,7 +898,6 @@
     else if (type === "megaSpawn")    el.style.boxShadow = "0 0 14px #fd79a8";
     else if (type === "scoreMulti")   el.style.boxShadow = "0 0 14px #fdcb6e";
     else if (type === "panicHop")     el.style.boxShadow = "0 0 14px #fab1a0";
-    else if (type === "cloneSwarm")   el.style.boxShadow = "0 0 14px #ffffff";
     else if (type === "lifeSteal")    el.style.boxShadow = "0 0 14px #00ff88";
     else if (type === "permaFrog")    el.style.boxShadow = "0 0 14px #ffd700";
     else                              el.style.boxShadow = "0 0 10px rgba(0,0,0,0.4)";
@@ -1713,7 +1708,7 @@ function updateSnake(dt, width, height) {
     openUpgradeOverlay("normal");
 
     animId = requestAnimationFrame(drawFrame);
-    
+
   }
 
   window.addEventListener("load", startGame);
