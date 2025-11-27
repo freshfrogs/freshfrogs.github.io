@@ -1302,134 +1302,164 @@
   // -----------------------------
   // PERMANENT UPGRADE OVERLAY (global per-minute)
   // -----------------------------
-  let upgradeOverlay = null;
-  let upgradeOverlayButtonsContainer = null;
+// -----------------------------
+// PERMANENT UPGRADE OVERLAY (global per-minute)
+// -----------------------------
+let upgradeOverlay = null;
+let upgradeOverlayButtonsContainer = null;
 
-  function getUpgradeChoices() {
-    return [
-      {
-        id: "frogSpeed",
-        label: "Frogs hop a bit faster forever",
-        apply: () => { frogPermanentSpeedFactor *= 0.9; }
-      },
-      {
-        id: "frogJump",
-        label: "Frogs jump higher forever",
-        apply: () => { frogPermanentJumpFactor *= 1.25; }
-      },
-      {
-        id: "spawn20",
-        label: "Spawn 20 frogs right now",
-        apply: () => { spawnExtraFrogs(20); }
-      },
-      {
-        id: "buffDuration",
-        label: "Temporary buffs last longer",
-        apply: () => { buffDurationFactor *= 1.15; }
-      },
-      {
-        id: "moreOrbs",
-        label: "More orbs spawn over time",
-        apply: () => { orbSpawnIntervalFactor *= 0.85; }
-      }
-    ];
-  }
-
-  function ensureUpgradeOverlay() {
-    if (upgradeOverlay) return;
-
-    upgradeOverlay = document.createElement("div");
-    upgradeOverlay.style.position = "absolute";
-    upgradeOverlay.style.inset = "0";
-    upgradeOverlay.style.background = "rgba(0,0,0,0.7)";
-    upgradeOverlay.style.display = "none";
-    upgradeOverlay.style.zIndex = "150";
-    upgradeOverlay.style.display = "flex";
-    upgradeOverlay.style.alignItems = "center";
-    upgradeOverlay.style.justifyContent = "center";
-    upgradeOverlay.style.pointerEvents = "auto";
-
-    const panel = document.createElement("div");
-    panel.style.background = "#111";
-    panel.style.padding = "16px 20px";
-    panel.style.borderRadius = "10px";
-    panel.style.border = "1px solid #444";
-    panel.style.color = "#fff";
-    panel.style.fontFamily = "monospace";
-    panel.style.textAlign = "center";
-    panel.style.minWidth = "260px";
-
-    const title = document.createElement("div");
-    title.textContent = "Choose a permanent upgrade";
-    title.style.marginBottom = "12px";
-    title.style.fontSize = "14px";
-
-    const buttonsContainer = document.createElement("div");
-    buttonsContainer.style.display = "flex";
-    buttonsContainer.style.flexDirection = "column";
-    buttonsContainer.style.gap = "8px";
-    upgradeOverlayButtonsContainer = buttonsContainer;
-
-    panel.appendChild(title);
-    panel.appendChild(buttonsContainer);
-    upgradeOverlay.appendChild(panel);
-    container.appendChild(upgradeOverlay);
-  }
-
-  function populateUpgradeOverlayChoices() {
-    if (!upgradeOverlayButtonsContainer) return;
-    const containerEl = upgradeOverlayButtonsContainer;
-    containerEl.innerHTML = "";
-
-    const pool = getUpgradeChoices().slice();
-    const choices = [];
-    while (choices.length < 3 && pool.length) {
-      const idx = Math.floor(Math.random() * pool.length);
-      choices.push(pool.splice(idx, 1)[0]);
+function getUpgradeChoices() {
+  return [
+    {
+      id: "frogSpeed",
+      label: "Frogs hop a bit faster forever",
+      apply: () => { frogPermanentSpeedFactor *= 0.9; }
+    },
+    {
+      id: "frogJump",
+      label: "Frogs jump higher forever",
+      apply: () => { frogPermanentJumpFactor *= 1.25; }
+    },
+    {
+      id: "spawn20",
+      label: "Spawn 20 frogs right now",
+      apply: () => { spawnExtraFrogs(20); }
+    },
+    {
+      id: "buffDuration",
+      label: "Temporary buffs last longer",
+      apply: () => { buffDurationFactor *= 1.15; }
+    },
+    {
+      id: "moreOrbs",
+      label: "More orbs spawn over time",
+      apply: () => { orbSpawnIntervalFactor *= 0.85; }
     }
+  ];
+}
 
-    function makeButton(label, onClick) {
-      const btn = document.createElement("button");
-      btn.textContent = label;
-      btn.style.fontFamily = "monospace";
-      btn.style.fontSize = "13px";
-      btn.style.padding = "6px 8px";
-      btn.style.border = "1px solid #555";
-      btn.style.borderRadius = "6px";
-      btn.style.background = "#222";
-      btn.style.color = "#fff";
-      btn.style.cursor = "pointer";
-      btn.onmouseenter = () => { btn.style.background = "#333"; };
-      btn.onmouseleave = () => { btn.style.background = "#222"; };
-      btn.onclick = () => {
+function ensureUpgradeOverlay() {
+  if (upgradeOverlay) return;
+
+  upgradeOverlay = document.createElement("div");
+  upgradeOverlay.className = "frog-upgrade-overlay";
+
+  // NOTE: display is set to "none" here; we switch to "flex" only when opening.
+  upgradeOverlay.style.position = "absolute";
+  upgradeOverlay.style.inset = "0";
+  upgradeOverlay.style.background = "rgba(0,0,0,0.7)";
+  upgradeOverlay.style.display = "none";
+  upgradeOverlay.style.zIndex = "150";
+  upgradeOverlay.style.alignItems = "center";
+  upgradeOverlay.style.justifyContent = "center";
+  upgradeOverlay.style.pointerEvents = "auto";
+
+  const panel = document.createElement("div");
+  panel.style.background = "#111";
+  panel.style.padding = "16px 20px";
+  panel.style.borderRadius = "10px";
+  panel.style.border = "1px solid #444";
+  panel.style.color = "#fff";
+  panel.style.fontFamily = "monospace";
+  panel.style.textAlign = "center";
+  panel.style.minWidth = "260px";
+  panel.style.maxWidth = "360px";
+  panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
+
+  const title = document.createElement("div");
+  title.textContent = "Choose a permanent upgrade";
+  title.style.marginBottom = "12px";
+  title.style.fontSize = "14px";
+
+  const buttonsContainer = document.createElement("div");
+  buttonsContainer.style.display = "flex";
+  buttonsContainer.style.flexDirection = "column";
+  buttonsContainer.style.gap = "8px";
+  buttonsContainer.style.alignItems = "stretch";
+
+  upgradeOverlayButtonsContainer = buttonsContainer;
+
+  panel.appendChild(title);
+  panel.appendChild(buttonsContainer);
+  upgradeOverlay.appendChild(panel);
+  container.appendChild(upgradeOverlay);
+}
+
+function populateUpgradeOverlayChoices() {
+  // Make sure overlay + buttons container exist
+  ensureUpgradeOverlay();
+  const containerEl = upgradeOverlayButtonsContainer;
+  if (!containerEl) return;
+
+  containerEl.innerHTML = "";
+
+  // Pick 3 random unique upgrades from the pool
+  const pool = getUpgradeChoices().slice();
+  const choices = [];
+
+  while (choices.length < 3 && pool.length) {
+    const idx = Math.floor(Math.random() * pool.length);
+    choices.push(pool.splice(idx, 1)[0]);
+  }
+
+  function makeButton(label, onClick) {
+    const btn = document.createElement("button");
+    btn.textContent = label;
+    btn.style.fontFamily = "monospace";
+    btn.style.fontSize = "13px";
+    btn.style.padding = "6px 8px";
+    btn.style.border = "1px solid #555";
+    btn.style.borderRadius = "6px";
+    btn.style.background = "#222";
+    btn.style.color = "#fff";
+    btn.style.cursor = "pointer";
+    btn.onmouseenter = () => { btn.style.background = "#333"; };
+    btn.onmouseleave = () => { btn.style.background = "#222"; };
+    btn.onclick = () => {
+      try {
         onClick();
-        playPermanentChoiceSound();
-        closeUpgradeOverlay();
-      };
-      return btn;
-    }
-
-    for (const choice of choices) {
-      containerEl.appendChild(makeButton(choice.label, choice.apply));
-    }
+      } catch (e) {
+        console.error("Error applying permanent upgrade:", e);
+      }
+      // play upgrade sound (placeholder handled in frog-audio.js)
+      playPermanentChoiceSound();
+      closeUpgradeOverlay();
+    };
+    return btn;
   }
 
-  function openUpgradeOverlay() {
-    ensureUpgradeOverlay();
-    populateUpgradeOverlayChoices();
-    gamePaused = true;
-    if (upgradeOverlay) {
-      upgradeOverlay.style.display = "flex";
-    }
+  if (!choices.length) {
+    const span = document.createElement("div");
+    span.textContent = "No upgrades available.";
+    span.style.fontSize = "13px";
+    containerEl.appendChild(span);
+    return;
   }
 
-  function closeUpgradeOverlay() {
-    if (upgradeOverlay) {
-      upgradeOverlay.style.display = "none";
-    }
-    gamePaused = false;
-    nextPermanentChoiceTime += 60;
+  for (const choice of choices) {
+    containerEl.appendChild(makeButton(choice.label, choice.apply));
   }
+}
+
+function openUpgradeOverlay() {
+  ensureUpgradeOverlay();
+  populateUpgradeOverlayChoices();
+
+  gamePaused = true;
+  if (upgradeOverlay) {
+    upgradeOverlay.style.display = "flex";
+  }
+}
+
+function closeUpgradeOverlay() {
+  if (upgradeOverlay) {
+    upgradeOverlay.style.display = "none";
+  }
+  gamePaused = false;
+  // Next choice comes 60 seconds later
+  nextPermanentChoiceTime += 60;
+}
+
 
   // -----------------------------
   // SCORE / LEADERBOARD HOOKS
