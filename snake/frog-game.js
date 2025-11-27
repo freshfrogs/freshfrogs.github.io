@@ -1485,104 +1485,149 @@ function getJumpFactor(frog) {
   let buffGuideNextBtn = null;
   let buffGuidePage = 0;
 
-  function getUpgradeChoices() {
-    return [
-      {
-        id: "frogSpeed",
-        label: "Frogs hop a bit faster forever",
-        apply: () => {
-          // global permanent hop speed
-          frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
-        }
-      },
-      {
-        id: "frogJump",
-        label: "Frogs jump higher forever",
-        apply: () => {
-          // global permanent jump height
-          frogPermanentJumpFactor *= FROG_JUMP_UPGRADE_FACTOR;
-        }
-      },
-      {
-        id: "spawn20",
-        label: `Spawn ${NORMAL_SPAWN_AMOUNT} frogs right now`,
-        apply: () => {
-          spawnExtraFrogs(NORMAL_SPAWN_AMOUNT);
-        }
-      },
-      {
-        id: "buffDuration",
-        label: "Temporary buffs last longer",
-        apply: () => {
-          // all temp buffs get longer
-          buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR;
-        }
-      },
-      {
-        id: "moreOrbs",
-        label: "More orbs spawn over time",
-        apply: () => {
-          // shorten orb spawn interval
-          orbSpawnIntervalFactor *= ORB_INTERVAL_UPGRADE_FACTOR;
-        }
-      }
-    ];
-  }
+function getUpgradeChoices() {
+  const neon = "#4defff";
 
-  // EPIC choices every 3 minutes
-  function getEpicUpgradeChoices() {
-    return [
-      {
-        id: "epicSpawn50",
-        label: "Spawn 50 frogs right now",
-        apply: () => { spawnExtraFrogs(50); }
-      },
-      {
-        id: "epicDeathRattle",
-        label: "25% chance a frog respawns upon death",
-        apply: () => { frogDeathRattleChance = 0.25; }
-      },
-      {
-        id: "epicFrogSpeed",
-        label: "All frogs move permanently faster",
-        apply: () => { frogPermanentSpeedFactor *= 0.9; /* small but permanent */ }
-      }
-    ];
-  }
+  const speedPct = Math.round((1 - FROG_SPEED_UPGRADE_FACTOR) * 100);
+  const jumpPct  = Math.round((FROG_JUMP_UPGRADE_FACTOR - 1) * 100);
+  const buffPct  = Math.round((BUFF_DURATION_UPGRADE_FACTOR - 1) * 100);
+  const orbPct   = Math.round((1 - ORB_INTERVAL_UPGRADE_FACTOR) * 100);
 
-  // LEGENDARY choices at 10 minutes (placeholders, TODO)
-function getLegendaryUpgradeChoices() {
   return [
     {
-      id: "legendaryDoubleBuffs",
-      label: "Buff durations massively increased (x2)",
+      id: "frogSpeed",
+      label: `
+        ⏩ Frogs hop faster forever<br>
+        <span style="color:${neon};">~${speedPct}%</span> faster hop cycle
+      `,
       apply: () => {
-        // All temporary buffs now last twice as long (on top of any previous boosts)
-        buffDurationFactor *= 2;
-        console.log("Legendary: buffDurationFactor doubled to", buffDurationFactor);
+        frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
       }
     },
     {
-      id: "legendarySpawn75",
-      label: "Spawn 75 frogs right now",
+      id: "frogJump",
+      label: `
+        🦘⬆️ Frogs jump higher forever<br>
+        ~<span style="color:${neon};">${jumpPct}%</span> taller jumps
+      `,
       apply: () => {
-        // Try to spawn 75 frogs, capped by MAX_FROGS inside spawnExtraFrogs
-        spawnExtraFrogs(75);
-        console.log("Legendary: spawned up to 75 frogs");
+        frogPermanentJumpFactor *= FROG_JUMP_UPGRADE_FACTOR;
       }
     },
     {
-      id: "legendaryDeathrattle50",
-      label: "Every time a frog dies there's a 50% chance they respawn",
+      id: "spawn20",
+      label: `
+        🐸➕ Spawn frogs<br>
+        <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
+      `,
       apply: () => {
-        // Upgrade global deathrattle chance to at least 50%
-        // (If you had 25% from EPIC, this bumps it to 50%)
-        frogDeathRattleChance = Math.max(frogDeathRattleChance, 0.5);
-        console.log("Legendary: frogDeathRattleChance set to", frogDeathRattleChance);
+        spawnExtraFrogs(NORMAL_SPAWN_AMOUNT);
+      }
+    },
+    {
+      id: "buffDuration",
+      label: `
+        ⏳ Buffs last longer<br>
+        +<span style="color:${neon};">${buffPct}%</span> buff duration
+      `,
+      apply: () => {
+        buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR;
+      }
+    },
+    {
+      id: "moreOrbs",
+      label: `
+        🎯 More orbs over time<br>
+        ~<span style="color:${neon};">${orbPct}%</span> faster orb spawns
+      `,
+      apply: () => {
+        orbSpawnIntervalFactor *= ORB_INTERVAL_UPGRADE_FACTOR;
       }
     }
   ];
 }
+
+
+  // EPIC choices every 3 minutes
+function getEpicUpgradeChoices() {
+  const neon = "#4defff";
+  const speedPct = Math.round((1 - FROG_SPEED_UPGRADE_FACTOR) * 100);
+  const deathPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
+
+  return [
+    {
+      id: "epicSpawn50",
+      label: `
+        🐸🌊 EPIC frog wave<br>
+        Spawn <span style="color:${neon};">${EPIC_SPAWN_AMOUNT}</span> frogs now
+      `,
+      apply: () => {
+        spawnExtraFrogs(EPIC_SPAWN_AMOUNT);
+      }
+    },
+    {
+      id: "epicDeathRattle",
+      label: `
+        💀 EPIC deathrattle<br>
+        <span style="color:${neon};">${deathPct}%</span> chance a dead frog respawns
+      `,
+      apply: () => {
+        frogDeathRattleChance = Math.max(frogDeathRattleChance, EPIC_DEATHRATTLE_CHANCE);
+      }
+    },
+    {
+      id: "epicFrogSpeed",
+      label: `
+        ⏩⏩ EPIC frog speed<br>
+        Another <span style="color:${neon};">~${speedPct}%</span> faster forever
+      `,
+      apply: () => {
+        frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
+      }
+    }
+  ];
+}
+
+
+  // LEGENDARY choices at 10 minutes (placeholders, TODO)
+function getLegendaryUpgradeChoices() {
+  const neon = "#4defff";
+  const deathPct = Math.round(LEGENDARY_DEATHRATTLE_CHANCE * 100);
+
+  return [
+    {
+      id: "legendaryBuffDuration",
+      label: `
+        ⏳⏳ LEGENDARY buff surge<br>
+        All buff durations ×<span style="color:${neon};">${LEGENDARY_BUFF_DURATION_FACTOR.toFixed(1)}</span>
+      `,
+      apply: () => {
+        buffDurationFactor *= LEGENDARY_BUFF_DURATION_FACTOR;
+      }
+    },
+    {
+      id: "legendarySpawn75",
+      label: `
+        🐸🌊🌊 LEGENDARY frog wave<br>
+        Spawn <span style="color:${neon};">${LEGENDARY_SPAWN_AMOUNT}</span> frogs now
+      `,
+      apply: () => {
+        spawnExtraFrogs(LEGENDARY_SPAWN_AMOUNT);
+      }
+    },
+    {
+      id: "legendaryDeathRattle",
+      label: `
+        💀💀 LEGENDARY deathrattle<br>
+        <span style="color:${neon};">${deathPct}%</span> chance a dead frog respawns
+      `,
+      apply: () => {
+        frogDeathRattleChance = Math.max(frogDeathRattleChance, LEGENDARY_DEATHRATTLE_CHANCE);
+      }
+    }
+  ];
+}
+
 
 function ensureHowToOverlay() {
   if (howToOverlay) return;
@@ -2043,29 +2088,25 @@ function setBuffGuidePage(pageIndex) {
     if (!containerEl) return;
 
     currentUpgradeOverlayMode = mode || "normal";
-    const isEpic = currentUpgradeOverlayMode === "epic";
+    const isEpic      = currentUpgradeOverlayMode === "epic";
     const isLegendary = currentUpgradeOverlayMode === "legendary";
 
     containerEl.innerHTML = "";
 
     if (upgradeOverlayTitleEl) {
-      upgradeOverlayTitleEl.textContent =
-        isEpic
+      upgradeOverlayTitleEl.textContent = isLegendary
+        ? "Choose a LEGENDARY upgrade"
+        : isEpic
           ? "Choose an EPIC upgrade"
-          : isLegendary
-            ? "Choose a LEGENDARY upgrade"
-            : "Choose a permanent upgrade";
+          : "Choose a permanent upgrade";
     }
 
     let choices = [];
-    if (isEpic) {
-      // show all epic choices
-      choices = getEpicUpgradeChoices().slice();
-    } else if (isLegendary) {
-      // show all legendary (placeholders)
+    if (isLegendary) {
       choices = getLegendaryUpgradeChoices().slice();
+    } else if (isEpic) {
+      choices = getEpicUpgradeChoices().slice();
     } else {
-      // normal per-minute upgrades – random 3
       const pool = getUpgradeChoices().slice();
       while (choices.length < 3 && pool.length) {
         const idx = Math.floor(Math.random() * pool.length);
@@ -2073,9 +2114,22 @@ function setBuffGuidePage(pageIndex) {
       }
     }
 
+    if (!choices.length) {
+      const span = document.createElement("div");
+      span.textContent = "No upgrades available.";
+      span.style.fontSize = "13px";
+      containerEl.appendChild(span);
+      return;
+    }
+
+    for (const choice of choices) {
+      containerEl.appendChild(makeButton(choice.label, choice.apply));
+    }
+  }
+
     function makeButton(label, onClick) {
       const btn = document.createElement("button");
-      btn.textContent = label;
+      btn.innerHTML = label; // ⬅ was textContent
       btn.style.fontFamily = "monospace";
       btn.style.fontSize = "13px";
       btn.style.padding = "6px 8px";
@@ -2097,19 +2151,6 @@ function setBuffGuidePage(pageIndex) {
       };
       return btn;
     }
-
-    if (!choices.length) {
-      const span = document.createElement("div");
-      span.textContent = "No upgrades available.";
-      span.style.fontSize = "13px";
-      containerEl.appendChild(span);
-      return;
-    }
-
-    for (const choice of choices) {
-      containerEl.appendChild(makeButton(choice.label, choice.apply));
-    }
-  }
 
   function openUpgradeOverlay(mode) {
     ensureUpgradeOverlay();
