@@ -101,15 +101,19 @@
   // every 180 seconds we pause for an EPIC upgrade
   let nextEpicChoiceTime = 180;
 
+  // 10-minute legendary choice
   const LEGENDARY_EVENT_TIME = 600; // 10 minutes
-  const SECOND_SHED_TIME     = 900; // 15 minutes
+
+  // Snake sheds
+  const FIRST_SHED_TIME  = 300; // 5 minutes
+  const SECOND_SHED_TIME = 600; // 10 minutes
 
   let legendaryEventTriggered = false;
+  let firstShedTriggered      = false;
   let secondShedTriggered     = false;
 
-  // Snake evolution / shedding stage:
   // 0 = base, 1 = first shed, 2 = second shed
-  let snakeShedStage = 0;
+  let snakeShedStage          = 0;
 
   // --------------------------------------------------
   // MOUSE
@@ -2211,17 +2215,9 @@ function setBuffGuidePage(pageIndex) {
         nextEpicChoiceTime = elapsedTime + 180;
         nextPermanentChoiceTime = elapsedTime + 60;
       } else if (currentUpgradeOverlayMode === "legendary") {
-        // one-time 10-minute event
         nextPermanentChoiceTime = elapsedTime + 60;
-
-        // 13s Legendary Frenzy (red, panic hop, etc.)
+        // still do Frenzy, but NO shedding here anymore
         triggerLegendaryFrenzy();
-
-        // 🐍 First shed:
-        // - halve body length
-        // - change color (stage 1)
-        // - permanent +17% speed
-        snakeShed(1, 1.17);
       }
     }
   }
@@ -2309,9 +2305,10 @@ function setBuffGuidePage(pageIndex) {
     initialUpgradeDone       = false;
     nextPermanentChoiceTime  = 60;
     nextEpicChoiceTime       = 180;
-    legendaryEventTriggered  = false;
-    secondShedTriggered      = false;
-    snakeShedStage           = 0;
+    legendaryEventTriggered = false;
+    firstShedTriggered      = false;
+    secondShedTriggered     = false;
+    snakeShedStage          = 0;
 
     // Reset all temporary buff timers
     speedBuffTime   = 0;
@@ -2381,30 +2378,40 @@ function setBuffGuidePage(pageIndex) {
       if (!gamePaused) {
         elapsedTime += dt;
 
-      // Legendary 10-minute event has top priority
-      if (!legendaryEventTriggered && elapsedTime >= LEGENDARY_EVENT_TIME) {
-        legendaryEventTriggered = true;
-        openUpgradeOverlay("legendary");
-      }
-        // Second shed at 15 minutes (only if we've shed once already)
-        else if (!secondShedTriggered && elapsedTime >= SECOND_SHED_TIME && snakeShedStage >= 1) {
-          secondShedTriggered = true;
+        // inside: if (!gameOver && !gamePaused) { elapsedTime += dt; ... }
 
-          // 🐍 Second shed:
-          // - halve body again
-          // - new color (stage 2)
-          // - permanent +20% speed
+        //
+        // 1) Snake sheds are purely time-based
+        //
+        if (!firstShedTriggered && elapsedTime >= FIRST_SHED_TIME) {
+          firstShedTriggered = true;
+          // 🐍 First shed at 5 minutes: half body, new color, +17% speed
+          snakeShed(1, 1.17);
+        }
+
+        if (!secondShedTriggered && elapsedTime >= SECOND_SHED_TIME) {
+          secondShedTriggered = true;
+          // 🐍 Second shed at 10 minutes: half body again, new color, +20% speed
           snakeShed(2, 1.20);
         }
-        // EPIC choices (every 3 minutes)
+
+        //
+        // 2) Upgrade menus (legendary / epic / normal)
+        //
+        if (!legendaryEventTriggered && elapsedTime >= LEGENDARY_EVENT_TIME) {
+          // One-time 10-minute legendary menu
+          legendaryEventTriggered = true;
+          openUpgradeOverlay("legendary");
+        }
         else if (elapsedTime >= nextEpicChoiceTime) {
           openUpgradeOverlay("epic");
         }
-        // Normal per-minute permanent choices
         else if (elapsedTime >= nextPermanentChoiceTime) {
           openUpgradeOverlay("normal");
-        } else {
-          updateBuffTimers(dt);
+        }
+        else {
+          // ... your normal update logic: buffs, frogs, snake, orbs, score, etc.
+                  updateBuffTimers(dt);
 
           const slowFactor = timeSlowTime > 0 ? 0.4 : 1.0;
 
