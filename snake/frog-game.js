@@ -15,16 +15,6 @@
   const STARTING_FROGS  = 50;
   const MAX_FROGS       = 150;
 
-  // Worker endpoint
-  const LEADERBOARD_URL = "https://lucky-king-0d37.danielssouthworth.workers.dev/leaderboard"; // change this
-
-  let lastRunScore = 0;
-  let lastRunTime  = 0;
-
-  // scoreboard overlay
-  let scoreboardOverlay = null;
-
-
   // Values that have animation variants for frogs (same as scatter-frogs.js)
   const SCATTER_ANIMATED_VALUES = new Set([
     "goldenDartFrog",
@@ -76,12 +66,19 @@
   let gameOver      = false;
   let gamePaused    = false;
   let nextOrbTime   = 0;
-
-  let score = 0;
+  let score         = 0;
 
   // minute-based permanent upgrades
   let nextPermanentChoiceTime = 60; // seconds
-  let upgradeOverlay = null;
+  let upgradeOverlay   = null;
+
+  // scoreboard / leaderboard
+  let scoreboardOverlay = null;
+  let lastRunScore = 0;
+  let lastRunTime  = 0;
+
+  const LEADERBOARD_URL =
+    "https://lucky-king-0d37.danielssouthworth.workers.dev/leaderboard";
 
   // -----------------------------
   // MOUSE TRACKING
@@ -106,179 +103,6 @@
     }
     mouse.follow = true;
   });
-
-  function ensureScoreboardOverlay() {
-  if (scoreboardOverlay) return;
-
-  scoreboardOverlay = document.createElement("div");
-  scoreboardOverlay.style.position = "absolute";
-  scoreboardOverlay.style.inset = "0";
-  scoreboardOverlay.style.background = "rgba(0,0,0,0.78)";
-  scoreboardOverlay.style.display = "none";
-  scoreboardOverlay.style.zIndex = "200";
-  scoreboardOverlay.style.display = "flex";
-  scoreboardOverlay.style.alignItems = "center";
-  scoreboardOverlay.style.justifyContent = "center";
-  scoreboardOverlay.style.pointerEvents = "auto";
-
-  const panel = document.createElement("div");
-  panel.style.background = "#111";
-  panel.style.padding = "16px 20px";
-  panel.style.borderRadius = "10px";
-  panel.style.border = "1px solid #444";
-  panel.style.color = "#fff";
-  panel.style.fontFamily = "monospace";
-  panel.style.textAlign = "center";
-  panel.style.minWidth = "320px";
-  panel.style.maxWidth = "480px";
-
-  const title = document.createElement("div");
-  title.textContent = "Run Summary";
-  title.style.fontSize = "16px";
-  title.style.marginBottom = "8px";
-
-  const summary = document.createElement("div");
-  summary.style.fontSize = "13px";
-  summary.style.marginBottom = "10px";
-  summary.id = "frog-score-summary";
-
-  const leaderboardTitle = document.createElement("div");
-  leaderboardTitle.textContent = "Top Scores";
-  leaderboardTitle.style.fontSize = "14px";
-  leaderboardTitle.style.margin = "10px 0 4px";
-
-  const table = document.createElement("table");
-  table.style.width = "100%";
-  table.style.borderCollapse = "collapse";
-  table.style.fontSize = "12px";
-  table.id = "frog-score-table";
-
-  const thead = document.createElement("thead");
-  const headRow = document.createElement("tr");
-  ["#", "Tag", "Score", "Time"].forEach((h) => {
-    const th = document.createElement("th");
-    th.textContent = h;
-    th.style.borderBottom = "1px solid #444";
-    th.style.padding = "2px 4px";
-    th.style.textAlign = h === "#" ? "right" : "left";
-    headRow.appendChild(th);
-  });
-  thead.appendChild(headRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement("tbody");
-  table.appendChild(tbody);
-
-  const closeBtn = document.createElement("button");
-  closeBtn.textContent = "Close";
-  closeBtn.style.marginTop = "10px";
-  closeBtn.style.fontFamily = "monospace";
-  closeBtn.style.fontSize = "13px";
-  closeBtn.style.padding = "6px 10px";
-  closeBtn.style.borderRadius = "6px";
-  closeBtn.style.border = "1px solid #555";
-  closeBtn.style.background = "#222";
-  closeBtn.style.color = "#fff";
-  closeBtn.style.cursor = "pointer";
-  closeBtn.onclick = () => {
-    scoreboardOverlay.style.display = "none";
-  };
-  closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
-  closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
-
-  panel.appendChild(title);
-  panel.appendChild(summary);
-  panel.appendChild(leaderboardTitle);
-  panel.appendChild(table);
-  panel.appendChild(closeBtn);
-
-  scoreboardOverlay.appendChild(panel);
-  container.appendChild(scoreboardOverlay);
-}
-
-async function submitScoreToServer(score, time) {
-  try {
-    const res = await fetch(LEADERBOARD_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ score, time }),
-    });
-    if (!res.ok) throw new Error("submit failed");
-    return await res.json(); // expect array top scores
-  } catch (e) {
-    console.error("submitScoreToServer error", e);
-    return null;
-  }
-}
-
-async function fetchLeaderboard() {
-  try {
-    const res = await fetch(LEADERBOARD_URL, {
-      method: "GET"
-    });
-    if (!res.ok) throw new Error("get failed");
-    return await res.json();
-  } catch (e) {
-    console.error("fetchLeaderboard error", e);
-    return null;
-  }
-}
-
-function openScoreboardOverlay(topList) {
-  ensureScoreboardOverlay();
-  const summary = document.getElementById("frog-score-summary");
-  const table   = document.getElementById("frog-score-table");
-  if (!summary || !table) return;
-
-  summary.textContent =
-    `Time: ${formatTime(lastRunTime)}  |  Score: ${Math.floor(lastRunScore)}`;
-
-  const tbody = table.querySelector("tbody");
-  tbody.innerHTML = "";
-
-  if (!Array.isArray(topList) || !topList.length) {
-    const tr = document.createElement("tr");
-    const td = document.createElement("td");
-    td.colSpan = 4;
-    td.textContent = "No scores yet.";
-    td.style.padding = "4px";
-    tr.appendChild(td);
-    tbody.appendChild(tr);
-  } else {
-    topList.forEach((entry, idx) => {
-      const tr = document.createElement("tr");
-
-      const tdRank = document.createElement("td");
-      tdRank.textContent = String(idx + 1);
-      tdRank.style.textAlign = "right";
-      tdRank.style.padding = "2px 4px";
-
-      const tdTag = document.createElement("td");
-      tdTag.textContent = entry.tag || "Unknown";
-      tdTag.style.padding = "2px 4px";
-
-      const tdScore = document.createElement("td");
-      tdScore.textContent = entry.bestScore != null
-        ? String(Math.floor(entry.bestScore))
-        : "-";
-      tdScore.style.padding = "2px 4px";
-
-      const tdTime = document.createElement("td");
-      tdTime.textContent = entry.bestTime != null
-        ? formatTime(entry.bestTime)
-        : "-";
-      tdTime.style.padding = "2px 4px";
-
-      tr.appendChild(tdRank);
-      tr.appendChild(tdTag);
-      tr.appendChild(tdScore);
-      tr.appendChild(tdTime);
-      tbody.appendChild(tr);
-    });
-  }
-
-  scoreboardOverlay.style.display = "flex";
-}
 
   // -----------------------------
   // AUDIO
@@ -307,58 +131,72 @@ function openScoreboardOverlay(topList) {
   let audioPermanentChoice = null;
 
   function initAudio() {
-    audioRibbits = [
-      new Audio("https://freshfrogs.github.io/snake/audio/ribbitOne.mp3"),
-      new Audio("https://freshfrogs.github.io/snake/audio/ribbitTwo.mp3"),
-      new Audio("https://freshfrogs.github.io/snake/audio/ribbitThree.mp3"),
-      new Audio("https://freshfrogs.github.io/snake/audio/ribbitBase.mp3"),
-    ];
-    audioRibbits.forEach(a => a.volume = 0.8);
+    try {
+      audioRibbits = [
+        new Audio("https://freshfrogs.github.io/snake/audio/ribbitOne.mp3"),
+        new Audio("https://freshfrogs.github.io/snake/audio/ribbitTwo.mp3"),
+        new Audio("https://freshfrogs.github.io/snake/audio/ribbitThree.mp3"),
+        new Audio("https://freshfrogs.github.io/snake/audio/ribbitBase.mp3"),
+      ];
+      audioRibbits.forEach(a => a.volume = 0.8);
+    } catch (e) {}
 
-    audioFrogDeath = new Audio("https://freshfrogs.github.io/snake/audio/frogDeath.mp3");
-    audioFrogDeath.volume = 0.9;
+    try {
+      audioFrogDeath = new Audio("https://freshfrogs.github.io/snake/audio/frogDeath.mp3");
+      audioFrogDeath.volume = 0.9;
+    } catch (e) {}
 
-    audioSnakeEat = new Audio("https://freshfrogs.github.io/snake/audio/munch4.mp3");
-    audioSnakeEat.volume = 0.7;
+    try {
+      audioSnakeEat = new Audio("https://freshfrogs.github.io/snake/audio/munch.mp3");
+      audioSnakeEat.volume = 0.7;
+    } catch (e) {}
 
-    audioOrbSpawn1 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawn.mp3");
-    audioOrbSpawn2 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawnTwo.mp3");
-    audioOrbSpawn1.volume = 0.8;
-    audioOrbSpawn2.volume = 0.8;
+    try {
+      audioOrbSpawn1 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawn.mp3");
+      audioOrbSpawn2 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawnTwo.mp3");
+      audioOrbSpawn1.volume = 0.8;
+      audioOrbSpawn2.volume = 0.8;
+    } catch (e) {}
 
-    audioSuperSpeed = new Audio("https://freshfrogs.github.io/snake/audio/superSpeed.mp3");
-    audioSuperJump  = new Audio("https://freshfrogs.github.io/snake/audio/superJump.mp3");
-    audioFrogSpawn  = new Audio("https://freshfrogs.github.io/snake/audio/frogSpawn.mp3");
-    audioSuperSpeed.volume = 0.9;
-    audioSuperJump.volume  = 0.9;
-    audioFrogSpawn.volume  = 0.9;
+    try {
+      audioSuperSpeed = new Audio("https://freshfrogs.github.io/snake/audio/superSpeed.mp3");
+      audioSuperJump  = new Audio("https://freshfrogs.github.io/snake/audio/superJump.mp3");
+      audioFrogSpawn  = new Audio("https://freshfrogs.github.io/snake/audio/frogSpawn.mp3");
+      audioSuperSpeed.volume = 0.9;
+      audioSuperJump.volume  = 0.9;
+      audioFrogSpawn.volume  = 0.9;
+    } catch (e) {}
 
     // new buff audios (placeholders)
-    audioSnakeSlow    = new Audio("https://freshfrogs.github.io/snake/audio/snakeSlow.mp3");
-    audioSnakeConfuse = new Audio("https://freshfrogs.github.io/snake/audio/snakeConfuse.mp3");
-    audioSnakeShrink  = new Audio("https://freshfrogs.github.io/snake/audio/snakeShrink.mp3");
-    audioFrogShield   = new Audio("https://freshfrogs.github.io/snake/audio/frogShield.mp3");
-    audioTimeSlow     = new Audio("https://freshfrogs.github.io/snake/audio/timeSlow.mp3");
-    audioOrbMagnet    = new Audio("https://freshfrogs.github.io/snake/audio/orbMagnet.mp3");
-    audioMegaSpawn    = new Audio("https://freshfrogs.github.io/snake/audio/megaSpawn.mp3");
-    audioScoreMulti   = new Audio("https://freshfrogs.github.io/snake/audio/scoreMulti.mp3");
-    audioPanicHop     = new Audio("https://freshfrogs.github.io/snake/audio/panicHop.mp3");
+    try {
+      audioSnakeSlow    = new Audio("https://freshfrogs.github.io/snake/audio/snakeSlowBuff.mp3");
+      audioSnakeConfuse = new Audio("https://freshfrogs.github.io/snake/audio/snakeConfuseBuff.mp3");
+      audioSnakeShrink  = new Audio("https://freshfrogs.github.io/snake/audio/snakeShrinkBuff.mp3");
+      audioFrogShield   = new Audio("https://freshfrogs.github.io/snake/audio/frogShieldBuff.mp3");
+      audioTimeSlow     = new Audio("https://freshfrogs.github.io/snake/audio/timeSlowBuff.mp3");
+      audioOrbMagnet    = new Audio("https://freshfrogs.github.io/snake/audio/orbMagnetBuff.mp3");
+      audioMegaSpawn    = new Audio("https://freshfrogs.github.io/snake/audio/megaSpawnBuff.mp3");
+      audioScoreMulti   = new Audio("https://freshfrogs.github.io/snake/audio/scoreMultiplierBuff.mp3");
+      audioPanicHop     = new Audio("https://freshfrogs.github.io/snake/audio/panicHopBuff.mp3");
 
-    const allNew = [
-      audioSnakeSlow,
-      audioSnakeConfuse,
-      audioSnakeShrink,
-      audioFrogShield,
-      audioTimeSlow,
-      audioOrbMagnet,
-      audioMegaSpawn,
-      audioScoreMulti,
-      audioPanicHop
-    ];
-    allNew.forEach(a => { if (a) a.volume = 0.9; });
+      const allNew = [
+        audioSnakeSlow,
+        audioSnakeConfuse,
+        audioSnakeShrink,
+        audioFrogShield,
+        audioTimeSlow,
+        audioOrbMagnet,
+        audioMegaSpawn,
+        audioScoreMulti,
+        audioPanicHop
+      ];
+      allNew.forEach(a => { if (a) a.volume = 0.9; });
+    } catch (e) {}
 
-    audioPermanentChoice = new Audio("/audio/permanentBuffChoice.mp3");
-    if (audioPermanentChoice) audioPermanentChoice.volume = 0.9;
+    try {
+      audioPermanentChoice = new Audio("https://freshfrogs.github.io/snake/audio/permanentBuffChoice.mp3");
+      audioPermanentChoice.volume = 0.9;
+    } catch (e) {}
   }
 
   function playClone(base) {
@@ -366,7 +204,10 @@ function openScoreboardOverlay(topList) {
     try {
       const clone = base.cloneNode();
       clone.volume = base.volume;
-      clone.play();
+      const p = clone.play();
+      if (p && typeof p.catch === "function") {
+        p.catch(() => {}); // swallow NotSupportedError, 404, autoplay, etc.
+      }
     } catch (e) {}
   }
 
@@ -394,18 +235,18 @@ function openScoreboardOverlay(topList) {
   function playBuffSound(type) {
     let base = null;
     switch (type) {
-      case "speed":       base = audioSuperSpeed;    break;
-      case "jump":        base = audioSuperJump;     break;
-      case "spawn":       base = audioFrogSpawn;     break;
-      case "snakeSlow":   base = audioSnakeSlow;     break;
-      case "snakeConfuse":base = audioSnakeConfuse;  break;
-      case "snakeShrink": base = audioSnakeShrink;   break;
-      case "frogShield":  base = audioFrogShield;    break;
-      case "timeSlow":    base = audioTimeSlow;      break;
-      case "orbMagnet":   base = audioOrbMagnet;     break;
-      case "megaSpawn":   base = audioMegaSpawn;     break;
-      case "scoreMulti":  base = audioScoreMulti;    break;
-      case "panicHop":    base = audioPanicHop;      break;
+      case "speed":        base = audioSuperSpeed;    break;
+      case "jump":         base = audioSuperJump;     break;
+      case "spawn":        base = audioFrogSpawn;     break;
+      case "snakeSlow":    base = audioSnakeSlow;     break;
+      case "snakeConfuse": base = audioSnakeConfuse;  break;
+      case "snakeShrink":  base = audioSnakeShrink;   break;
+      case "frogShield":   base = audioFrogShield;    break;
+      case "timeSlow":     base = audioTimeSlow;      break;
+      case "orbMagnet":    base = audioOrbMagnet;     break;
+      case "megaSpawn":    base = audioMegaSpawn;     break;
+      case "scoreMulti":   base = audioScoreMulti;    break;
+      case "panicHop":     base = audioPanicHop;      break;
     }
     if (base) playClone(base);
   }
@@ -431,6 +272,17 @@ function openScoreboardOverlay(topList) {
   hud.style.zIndex = "100";
   hud.style.pointerEvents = "none";
 
+  const timerLabel = document.createElement("span");
+  const frogsLabel = document.createElement("span");
+  const scoreLabel = document.createElement("span");
+  frogsLabel.style.marginLeft = "12px";
+  scoreLabel.style.marginLeft = "12px";
+
+  hud.appendChild(timerLabel);
+  hud.appendChild(frogsLabel);
+  hud.appendChild(scoreLabel);
+  container.appendChild(hud);
+
   // Mini on-screen leaderboard (top-right)
   const miniBoard = document.createElement("div");
   miniBoard.style.position = "absolute";
@@ -448,18 +300,6 @@ function openScoreboardOverlay(topList) {
   miniBoard.id = "frog-mini-leaderboard";
   miniBoard.textContent = "Loading leaderboard…";
   container.appendChild(miniBoard);
-
-
-  const timerLabel = document.createElement("span");
-  const frogsLabel = document.createElement("span");
-  const scoreLabel = document.createElement("span");
-  frogsLabel.style.marginLeft = "12px";
-  scoreLabel.style.marginLeft = "12px";
-
-  hud.appendChild(timerLabel);
-  hud.appendChild(frogsLabel);
-  hud.appendChild(scoreLabel);
-  container.appendChild(hud);
 
   const gameOverBanner = document.createElement("div");
   gameOverBanner.style.position = "absolute";
@@ -510,26 +350,6 @@ function openScoreboardOverlay(topList) {
   function randRange(min, max) {
     return min + Math.random() * (max - min);
   }
-
-  function updateMiniLeaderboard(list) {
-  const el = document.getElementById("frog-mini-leaderboard");
-  if (!el) return;
-
-  if (!Array.isArray(list) || !list.length) {
-    el.textContent = "No scores yet.";
-    return;
-  }
-
-  let text = "Top Scores:\n";
-  list.slice(0, 5).forEach((entry, idx) => {
-    const tag   = entry.tag || "Unknown";
-    const score = entry.bestScore != null ? Math.floor(entry.bestScore) : 0;
-    text += `${idx + 1}. ${tag} — ${score}\n`;
-  });
-
-  el.textContent = text.trim();
-}
-
 
   function pickRandomTokenIds(count) {
     const set = new Set();
@@ -730,6 +550,16 @@ function openScoreboardOverlay(topList) {
   }
 
   // -----------------------------
+  // SNAKE CONSTANTS
+  // -----------------------------
+  const SNAKE_SEGMENT_SIZE  = 48;
+  const SNAKE_BASE_SPEED    = 90;
+  const SNAKE_TURN_RATE     = Math.PI * 1.5;
+  const SNAKE_SEGMENT_GAP   = 24; // more spacing between segments
+  const SNAKE_INITIAL_SEGMENTS = 6;
+  const SNAKE_EAT_RADIUS_BASE = 40;
+
+  // -----------------------------
   // BUFFS
   // -----------------------------
   const SPEED_BUFF_DURATION = 15;
@@ -770,7 +600,7 @@ function openScoreboardOverlay(topList) {
 
   function getJumpFactor() {
     let factor = frogPermanentJumpFactor;
-    if (jumpBuffTime > 0) factor *= 10.0; // super jump
+    if (jumpBuffTime > 0) factor *= 3.2; // tweak this for more/less super jump
     return factor;
   }
 
@@ -781,9 +611,17 @@ function openScoreboardOverlay(topList) {
     return factor;
   }
 
-  const SNAKE_EAT_RADIUS_BASE = 40;
   function getSnakeEatRadius() {
     return snakeShrinkTime > 0 ? 24 : SNAKE_EAT_RADIUS_BASE;
+  }
+
+  function getSnakeResistance() {
+    // 0.0 = no resistance, 0.8 = very high resistance
+    if (!snake || !snake.segments) return 0;
+    const extraSegments = Math.max(0, snake.segments.length - SNAKE_INITIAL_SEGMENTS);
+    const RESIST_PER_SEGMENT = 0.04;   // 4% resistance per extra segment
+    const maxResist = 0.8;             // cap at 80% resistance
+    return Math.max(0, Math.min(maxResist, extraSegments * RESIST_PER_SEGMENT));
   }
 
   function applyBuff(type) {
@@ -829,16 +667,30 @@ function openScoreboardOverlay(topList) {
   }
 
   function updateBuffTimers(dt) {
+    // frog-side buffs
     if (speedBuffTime   > 0) speedBuffTime   = Math.max(0, speedBuffTime   - dt);
     if (jumpBuffTime    > 0) jumpBuffTime    = Math.max(0, jumpBuffTime    - dt);
-    if (snakeSlowTime   > 0) snakeSlowTime   = Math.max(0, snakeSlowTime   - dt);
-    if (snakeConfuseTime> 0) snakeConfuseTime= Math.max(0, snakeConfuseTime- dt);
-    if (snakeShrinkTime > 0) snakeShrinkTime = Math.max(0, snakeShrinkTime - dt);
     if (frogShieldTime  > 0) frogShieldTime  = Math.max(0, frogShieldTime  - dt);
-    if (timeSlowTime    > 0) timeSlowTime    = Math.max(0, timeSlowTime    - dt);
     if (orbMagnetTime   > 0) orbMagnetTime   = Math.max(0, orbMagnetTime   - dt);
     if (scoreMultiTime  > 0) scoreMultiTime  = Math.max(0, scoreMultiTime  - dt);
     if (panicHopTime    > 0) panicHopTime    = Math.max(0, panicHopTime    - dt);
+
+    // snake-targeting debuffs get resisted as snake grows
+    const snakeResist = getSnakeResistance(); // 0.0–0.8
+    const debuffTickMultiplier = 1 + snakeResist; // up to 1.8x
+
+    if (snakeSlowTime    > 0) {
+      snakeSlowTime = Math.max(0, snakeSlowTime - dt * debuffTickMultiplier);
+    }
+    if (snakeConfuseTime > 0) {
+      snakeConfuseTime = Math.max(0, snakeConfuseTime - dt * debuffTickMultiplier);
+    }
+    if (snakeShrinkTime  > 0) {
+      snakeShrinkTime = Math.max(0, snakeShrinkTime - dt * debuffTickMultiplier);
+    }
+    if (timeSlowTime     > 0) {
+      timeSlowTime = Math.max(0, timeSlowTime - dt * debuffTickMultiplier);
+    }
   }
 
   // -----------------------------
@@ -963,7 +815,7 @@ function openScoreboardOverlay(topList) {
   // ORBS
   // -----------------------------
   const ORB_RADIUS  = 12;
-  const ORB_TTL     = 24;
+  const ORB_TTL     = 24; // seconds before disappearing (longer)
   const ORB_SPAWN_INTERVAL_MIN = 4;
   const ORB_SPAWN_INTERVAL_MAX = 9;
 
@@ -1036,7 +888,6 @@ function openScoreboardOverlay(topList) {
     } else {
       el.style.boxShadow = "0 0 10px rgba(0,0,0,0.4)";
     }
-
 
     container.appendChild(el);
     orbs.push({
@@ -1126,12 +977,6 @@ function openScoreboardOverlay(topList) {
   // -----------------------------
   // SNAKE
   // -----------------------------
-  const SNAKE_SEGMENT_SIZE  = 48;
-  const SNAKE_BASE_SPEED    = 90;
-  const SNAKE_TURN_RATE     = Math.PI * 1.5;
-  const SNAKE_SEGMENT_GAP   = 24; // more spacing between segments
-  const SNAKE_INITIAL_SEGMENTS = 6;
-
   function initSnake(width, height) {
     if (snake) {
       if (snake.head && snake.head.el && snake.head.el.parentNode === container) {
@@ -1471,6 +1316,199 @@ function openScoreboardOverlay(topList) {
   }
 
   // -----------------------------
+  // SCOREBOARD OVERLAY
+  // -----------------------------
+  function ensureScoreboardOverlay() {
+    if (scoreboardOverlay) return;
+
+    scoreboardOverlay = document.createElement("div");
+    scoreboardOverlay.style.position = "absolute";
+    scoreboardOverlay.style.inset = "0";
+    scoreboardOverlay.style.background = "rgba(0,0,0,0.78)";
+    scoreboardOverlay.style.display = "none";
+    scoreboardOverlay.style.zIndex = "200";
+    scoreboardOverlay.style.display = "flex";
+    scoreboardOverlay.style.alignItems = "center";
+    scoreboardOverlay.style.justifyContent = "center";
+    scoreboardOverlay.style.pointerEvents = "auto";
+
+    const panel = document.createElement("div");
+    panel.style.background = "#111";
+    panel.style.padding = "16px 20px";
+    panel.style.borderRadius = "10px";
+    panel.style.border = "1px solid #444";
+    panel.style.color = "#fff";
+    panel.style.fontFamily = "monospace";
+    panel.style.textAlign = "center";
+    panel.style.minWidth = "320px";
+    panel.style.maxWidth = "480px";
+
+    const title = document.createElement("div");
+    title.textContent = "Run Summary";
+    title.style.fontSize = "16px";
+    title.style.marginBottom = "8px";
+
+    const summary = document.createElement("div");
+    summary.style.fontSize = "13px";
+    summary.style.marginBottom = "10px";
+    summary.id = "frog-score-summary";
+
+    const leaderboardTitle = document.createElement("div");
+    leaderboardTitle.textContent = "Top Scores";
+    leaderboardTitle.style.fontSize = "14px";
+    leaderboardTitle.style.margin = "10px 0 4px";
+
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.fontSize = "12px";
+    table.id = "frog-score-table";
+
+    const thead = document.createElement("thead");
+    const headRow = document.createElement("tr");
+    ["#", "Tag", "Score", "Time"].forEach((h) => {
+      const th = document.createElement("th");
+      th.textContent = h;
+      th.style.borderBottom = "1px solid #444";
+      th.style.padding = "2px 4px";
+      th.style.textAlign = h === "#" ? "right" : "left";
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    table.appendChild(tbody);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = "Close";
+    closeBtn.style.marginTop = "10px";
+    closeBtn.style.fontFamily = "monospace";
+    closeBtn.style.fontSize = "13px";
+    closeBtn.style.padding = "6px 10px";
+    closeBtn.style.borderRadius = "6px";
+    closeBtn.style.border = "1px solid #555";
+    closeBtn.style.background = "#222";
+    closeBtn.style.color = "#fff";
+    closeBtn.style.cursor = "pointer";
+    closeBtn.onclick = () => {
+      scoreboardOverlay.style.display = "none";
+    };
+    closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
+    closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
+
+    panel.appendChild(title);
+    panel.appendChild(summary);
+    panel.appendChild(leaderboardTitle);
+    panel.appendChild(table);
+    panel.appendChild(closeBtn);
+
+    scoreboardOverlay.appendChild(panel);
+    container.appendChild(scoreboardOverlay);
+  }
+
+  function openScoreboardOverlay(topList) {
+    ensureScoreboardOverlay();
+    const summary = document.getElementById("frog-score-summary");
+    const table   = document.getElementById("frog-score-table");
+    if (!summary || !table) return;
+
+    summary.textContent =
+      `Time: ${formatTime(lastRunTime)}  |  Score: ${Math.floor(lastRunScore)}`;
+
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML = "";
+
+    if (!Array.isArray(topList) || !topList.length) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 4;
+      td.textContent = "No scores yet.";
+      td.style.padding = "4px";
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    } else {
+      topList.forEach((entry, idx) => {
+        const tr = document.createElement("tr");
+
+        const tdRank = document.createElement("td");
+        tdRank.textContent = String(idx + 1);
+        tdRank.style.textAlign = "right";
+        tdRank.style.padding = "2px 4px";
+
+        const tdTag = document.createElement("td");
+        tdTag.textContent = entry.tag || "Unknown";
+        tdTag.style.padding = "2px 4px";
+
+        const tdScore = document.createElement("td");
+        tdScore.textContent = entry.bestScore != null
+          ? String(Math.floor(entry.bestScore))
+          : "-";
+        tdScore.style.padding = "2px 4px";
+
+        const tdTime = document.createElement("td");
+        tdTime.textContent = entry.bestTime != null
+          ? formatTime(entry.bestTime)
+          : "-";
+        tdTime.style.padding = "2px 4px";
+
+        tr.appendChild(tdRank);
+        tr.appendChild(tdTag);
+        tr.appendChild(tdScore);
+        tr.appendChild(tdTime);
+        tbody.appendChild(tr);
+      });
+    }
+
+    scoreboardOverlay.style.display = "flex";
+  }
+
+  function updateMiniLeaderboard(list) {
+    const el = document.getElementById("frog-mini-leaderboard");
+    if (!el) return;
+
+    if (!Array.isArray(list) || !list.length) {
+      el.textContent = "No scores yet.";
+      return;
+    }
+
+    let text = "Top Scores:\n";
+    list.slice(0, 5).forEach((entry, idx) => {
+      const tag   = entry.tag || "Unknown";
+      const score = entry.bestScore != null ? Math.floor(entry.bestScore) : 0;
+      text += `${idx + 1}. ${tag} — ${score}\n`;
+    });
+
+    el.textContent = text.trim();
+  }
+
+  async function submitScoreToServer(score, time) {
+    try {
+      const res = await fetch(LEADERBOARD_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ score, time }),
+      });
+      if (!res.ok) throw new Error("submit failed");
+      return await res.json(); // top scores array
+    } catch (e) {
+      console.error("submitScoreToServer error", e);
+      return null;
+    }
+  }
+
+  async function fetchLeaderboard() {
+    try {
+      const res = await fetch(LEADERBOARD_URL, { method: "GET" });
+      if (!res.ok) throw new Error("get failed");
+      return await res.json();
+    } catch (e) {
+      console.error("fetchLeaderboard error", e);
+      return null;
+    }
+  }
+
+  // -----------------------------
   // GAME LOOP
   // -----------------------------
   function endGame() {
@@ -1486,10 +1524,7 @@ function openScoreboardOverlay(topList) {
                     || await fetchLeaderboard()
                     || [];
 
-      // 🔹 update the small HUD leaderboard
       updateMiniLeaderboard(topList);
-
-      // 🔹 open the big end-of-run overlay
       openScoreboardOverlay(topList);
     })();
 
@@ -1549,6 +1584,7 @@ function openScoreboardOverlay(topList) {
 
     hideGameOver();
     if (upgradeOverlay) upgradeOverlay.style.display = "none";
+    if (scoreboardOverlay) scoreboardOverlay.style.display = "none";
 
     const width  = window.innerWidth;
     const height = window.innerHeight;
@@ -1609,25 +1645,25 @@ function openScoreboardOverlay(topList) {
   // -----------------------------
   // INIT
   // -----------------------------
-async function startGame() {
-  initAudio();
-  ensureUpgradeOverlay();
-  ensureScoreboardOverlay();
+  async function startGame() {
+    initAudio();
+    ensureUpgradeOverlay();
+    ensureScoreboardOverlay();
 
-  // 🔹 load leaderboard once when the game boots
-  const topList = await fetchLeaderboard();
-  if (topList) updateMiniLeaderboard(topList);
+    // load leaderboard once when the game boots
+    const topList = await fetchLeaderboard();
+    if (topList) updateMiniLeaderboard(topList);
 
-  const width  = window.innerWidth;
-  const height = window.innerHeight;
+    const width  = window.innerWidth;
+    const height = window.innerHeight;
 
-  await createInitialFrogs(width, height);
-  initSnake(width, height);
+    await createInitialFrogs(width, height);
+    initSnake(width, height);
 
-  nextOrbTime = randRange(ORB_SPAWN_INTERVAL_MIN, ORB_SPAWN_INTERVAL_MAX);
-  updateHUD();
-  animId = requestAnimationFrame(drawFrame);
-}
+    nextOrbTime = randRange(ORB_SPAWN_INTERVAL_MIN, ORB_SPAWN_INTERVAL_MAX);
+    updateHUD();
+    animId = requestAnimationFrame(drawFrame);
+  }
 
   window.addEventListener("load", startGame);
 })();
