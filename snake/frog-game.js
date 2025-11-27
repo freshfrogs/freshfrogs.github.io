@@ -1520,7 +1520,7 @@ function getUpgradeChoices() {
     {
       id: "frogSpeed",
       label: `
-        ⏩ Frogs hop faster forever<br>
+        Frogs hop faster forever<br>
         <span style="color:${neon};">~${speedPct}%</span> faster hop cycle
       `,
       apply: () => {
@@ -1530,7 +1530,7 @@ function getUpgradeChoices() {
     {
       id: "frogJump",
       label: `
-        🦘⬆️ Frogs jump higher forever<br>
+        Frogs jump higher forever<br>
         ~<span style="color:${neon};">${jumpPct}%</span> taller jumps
       `,
       apply: () => {
@@ -1540,7 +1540,7 @@ function getUpgradeChoices() {
     {
       id: "spawn20",
       label: `
-        🐸➕ Spawn frogs<br>
+        Spawn frogs<br>
         <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
       `,
       apply: () => {
@@ -1550,7 +1550,7 @@ function getUpgradeChoices() {
     {
       id: "buffDuration",
       label: `
-        ⏳ Buffs last longer<br>
+        Buffs last longer<br>
         +<span style="color:${neon};">${buffPct}%</span> buff duration
       `,
       apply: () => {
@@ -1560,7 +1560,7 @@ function getUpgradeChoices() {
     {
       id: "moreOrbs",
       label: `
-        🎯 More orbs over time<br>
+        More orbs over time<br>
         ~<span style="color:${neon};">${orbPct}%</span> faster orb spawns
       `,
       apply: () => {
