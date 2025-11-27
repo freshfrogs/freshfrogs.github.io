@@ -441,7 +441,7 @@
   // --------------------------------------------------
   // SNAKE CONSTANTS
   // --------------------------------------------------
-  const SNAKE_SEGMENT_SIZE  = 48;
+  const SNAKE_SEGMENT_SIZE  = 64;
   const SNAKE_BASE_SPEED    = 90;
   const SNAKE_TURN_RATE     = Math.PI * 1.5;
   const SNAKE_SEGMENT_GAP   = 24;
