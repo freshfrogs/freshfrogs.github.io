@@ -1,9 +1,5 @@
 // frog-game.js
 // Frog Snake survival game for FreshFrogs.
-// - Uses the same frog layering + hop behavior as scatter-frogs
-// - Start with 50 frogs, no auto-respawn on death (only via buff)
-// - Snake eats frogs and grows, game ends when all frogs are gone
-// - Random orbs give temporary buffs when collected by frogs
 
 (function () {
   "use strict";
@@ -54,11 +50,11 @@
     "goldDollarChain"
   ]);
 
-  // Trait types to skip (avoid backgrounds) – same as scatter-frogs.js
+  // Trait types to skip (avoid backgrounds)
   const SKIP_TRAITS = new Set(["Background", "background", "BG", "Bg"]);
 
   const container = document.getElementById("frog-game");
-  if (!container) return; // only run on the game page
+  if (!container) return;
 
   let frogs = [];
   let snake = null;
@@ -68,16 +64,23 @@
   let lastTime      = 0;
   let elapsedTime   = 0;
   let gameOver      = false;
-  let nextOrbTime   = 0; // seconds until next orb spawn
+  let gamePaused    = false;
+  let nextOrbTime   = 0;
+
+  let score = 0;
+
+  // minute-based permanent upgrades
+  let nextPermanentChoiceTime = 60; // seconds
+  let upgradeOverlay = null;
 
   // -----------------------------
-  // MOUSE TRACKING (follow like scatter frogs)
+  // MOUSE TRACKING
   // -----------------------------
   const mouse = {
     x: window.innerWidth / 2,
     y: window.innerHeight / 2,
     active: false,
-    follow: false // becomes true after first click
+    follow: false
   };
 
   window.addEventListener("mousemove", (e) => {
@@ -88,7 +91,6 @@
 
   window.addEventListener("click", () => {
     if (gameOver) {
-      // Click after game over → restart
       restartGame();
       return;
     }
@@ -107,6 +109,20 @@
   let audioSuperJump  = null;
   let audioFrogSpawn  = null;
 
+  // New buff audio placeholders
+  let audioSnakeSlow    = null;
+  let audioSnakeConfuse = null;
+  let audioSnakeShrink  = null;
+  let audioFrogShield   = null;
+  let audioTimeSlow     = null;
+  let audioOrbMagnet    = null;
+  let audioMegaSpawn    = null;
+  let audioScoreMulti   = null;
+  let audioPanicHop     = null;
+
+  // Permanent upgrade audio
+  let audioPermanentChoice = null;
+
   function initAudio() {
     audioRibbits = [
       new Audio("https://freshfrogs.github.io/snake/audio/ribbitOne.mp3"),
@@ -116,7 +132,7 @@
     ];
     audioRibbits.forEach(a => a.volume = 0.8);
 
-    audioFrogDeath = new Audio("https://freshfrogs.github.io/frogDeath.mp3");
+    audioFrogDeath = new Audio("https://freshfrogs.github.io/snake/audio/frogDeath.mp3");
     audioFrogDeath.volume = 0.9;
 
     audioSnakeEat = new Audio("https://freshfrogs.github.io/snake/audio/munch.mp3");
@@ -133,53 +149,36 @@
     audioSuperSpeed.volume = 0.9;
     audioSuperJump.volume  = 0.9;
     audioFrogSpawn.volume  = 0.9;
+
+    // new buff audios (placeholders)
+    audioSnakeSlow    = new Audio("https://freshfrogs.github.io/snake/audio/snakeSlowBuff.mp3");
+    audioSnakeConfuse = new Audio("https://freshfrogs.github.io/snake/audio/snakeConfuseBuff.mp3");
+    audioSnakeShrink  = new Audio("https://freshfrogs.github.io/snake/audio/snakeShrinkBuff.mp3");
+    audioFrogShield   = new Audio("https://freshfrogs.github.io/snake/audio/frogShieldBuff.mp3");
+    audioTimeSlow     = new Audio("https://freshfrogs.github.io/snake/audio/timeSlowBuff.mp3");
+    audioOrbMagnet    = new Audio("https://freshfrogs.github.io/snake/audio/orbMagnetBuff.mp3");
+    audioMegaSpawn    = new Audio("https://freshfrogs.github.io/snake/audio/megaSpawnBuff.mp3");
+    audioScoreMulti   = new Audio("https://freshfrogs.github.io/snake/audio/scoreMultiplierBuff.mp3");
+    audioPanicHop     = new Audio("https://freshfrogs.github.io/snake/audio/panicHopBuff.mp3");
+
+    const allNew = [
+      audioSnakeSlow,
+      audioSnakeConfuse,
+      audioSnakeShrink,
+      audioFrogShield,
+      audioTimeSlow,
+      audioOrbMagnet,
+      audioMegaSpawn,
+      audioScoreMulti,
+      audioPanicHop
+    ];
+    allNew.forEach(a => { if (a) a.volume = 0.9; });
+
+    audioPermanentChoice = new Audio("/audio/permanentBuffChoice.mp3");
+    if (audioPermanentChoice) audioPermanentChoice.volume = 0.9;
   }
 
-  function playRandomRibbit() {
-    if (!audioRibbits.length) return;
-    const base = audioRibbits[Math.floor(Math.random() * audioRibbits.length)];
-    try {
-      const clone = base.cloneNode();
-      clone.volume = base.volume;
-      clone.play();
-    } catch (e) {}
-  }
-
-  function playFrogDeath() {
-    if (!audioFrogDeath) return;
-    try {
-      const clone = audioFrogDeath.cloneNode();
-      clone.volume = audioFrogDeath.volume;
-      clone.play();
-    } catch (e) {}
-  }
-
-  function playSnakeMunch() {
-    if (!audioSnakeEat) return;
-    try {
-      const clone = audioSnakeEat.cloneNode();
-      clone.volume = audioSnakeEat.volume;
-      clone.play();
-    } catch (e) {}
-  }
-
-  function playRandomOrbSpawnSound() {
-    const choices = [audioOrbSpawn1, audioOrbSpawn2].filter(Boolean);
-    if (!choices.length) return;
-    const base = choices[Math.floor(Math.random() * choices.length)];
-    try {
-      const clone = base.cloneNode();
-      clone.volume = base.volume;
-      clone.play();
-    } catch (e) {}
-  }
-
-  function playBuffSound(type) {
-    let base = null;
-    if (type === "speed") base = audioSuperSpeed;
-    else if (type === "jump") base = audioSuperJump;
-    else if (type === "spawn") base = audioFrogSpawn;
-
+  function playClone(base) {
     if (!base) return;
     try {
       const clone = base.cloneNode();
@@ -188,8 +187,52 @@
     } catch (e) {}
   }
 
+  function playRandomRibbit() {
+    if (!audioRibbits.length) return;
+    const base = audioRibbits[Math.floor(Math.random() * audioRibbits.length)];
+    playClone(base);
+  }
+
+  function playFrogDeath() {
+    playClone(audioFrogDeath);
+  }
+
+  function playSnakeMunch() {
+    playClone(audioSnakeEat);
+  }
+
+  function playRandomOrbSpawnSound() {
+    const choices = [audioOrbSpawn1, audioOrbSpawn2].filter(Boolean);
+    if (!choices.length) return;
+    const base = choices[Math.floor(Math.random() * choices.length)];
+    playClone(base);
+  }
+
+  function playBuffSound(type) {
+    let base = null;
+    switch (type) {
+      case "speed":       base = audioSuperSpeed;    break;
+      case "jump":        base = audioSuperJump;     break;
+      case "spawn":       base = audioFrogSpawn;     break;
+      case "snakeSlow":   base = audioSnakeSlow;     break;
+      case "snakeConfuse":base = audioSnakeConfuse;  break;
+      case "snakeShrink": base = audioSnakeShrink;   break;
+      case "frogShield":  base = audioFrogShield;    break;
+      case "timeSlow":    base = audioTimeSlow;      break;
+      case "orbMagnet":   base = audioOrbMagnet;     break;
+      case "megaSpawn":   base = audioMegaSpawn;     break;
+      case "scoreMulti":  base = audioScoreMulti;    break;
+      case "panicHop":    base = audioPanicHop;      break;
+    }
+    if (base) playClone(base);
+  }
+
+  function playPermanentChoiceSound() {
+    playClone(audioPermanentChoice);
+  }
+
   // -----------------------------
-  // HUD (TIMER + STATUS)
+  // HUD
   // -----------------------------
   const hud = document.createElement("div");
   hud.style.position = "absolute";
@@ -207,10 +250,13 @@
 
   const timerLabel = document.createElement("span");
   const frogsLabel = document.createElement("span");
+  const scoreLabel = document.createElement("span");
   frogsLabel.style.marginLeft = "12px";
+  scoreLabel.style.marginLeft = "12px";
 
   hud.appendChild(timerLabel);
   hud.appendChild(frogsLabel);
+  hud.appendChild(scoreLabel);
   container.appendChild(hud);
 
   const gameOverBanner = document.createElement("div");
@@ -241,6 +287,7 @@
   function updateHUD() {
     timerLabel.textContent = `Time: ${formatTime(elapsedTime)}`;
     frogsLabel.textContent = `Frogs left: ${frogs.length}`;
+    scoreLabel.textContent = `Score: ${Math.floor(score)}`;
   }
 
   function showGameOver() {
@@ -337,7 +384,7 @@
   }
 
   // -----------------------------
-  // FROG CREATION (same hop behavior)
+  // FROG CREATION
   // -----------------------------
   function computeInitialPositions(width, height, count) {
     const positions = [];
@@ -463,41 +510,117 @@
   // -----------------------------
   // BUFFS
   // -----------------------------
-  const SPEED_BUFF_DURATION = 15; // CHANGED: was 8
-  const JUMP_BUFF_DURATION  = 18; // CHANGED: was 8
+  const SPEED_BUFF_DURATION = 15;
+  const JUMP_BUFF_DURATION  = 18;
 
-  let speedBuffTime = 0;
-  let jumpBuffTime  = 0;
+  const SNAKE_SLOW_DURATION    = 8;
+  const SNAKE_CONFUSE_DURATION = 6;
+  const SNAKE_SHRINK_DURATION  = 8;
+  const FROG_SHIELD_DURATION   = 6;
+  const TIME_SLOW_DURATION     = 6;
+  const ORB_MAGNET_DURATION    = 10;
+  const SCORE_MULTI_DURATION   = 10;
+  const PANIC_HOP_DURATION     = 8;
+
+  let speedBuffTime   = 0;
+  let jumpBuffTime    = 0;
+  let snakeSlowTime   = 0;
+  let snakeConfuseTime= 0;
+  let snakeShrinkTime = 0;
+  let frogShieldTime  = 0;
+  let timeSlowTime    = 0;
+  let orbMagnetTime   = 0;
+  let scoreMultiTime  = 0;
+  let panicHopTime    = 0;
+
+  // permanent (milder) buffs
+  let frogPermanentSpeedFactor = 1.0; // <1 = faster hops
+  let frogPermanentJumpFactor  = 1.0; // >1 = higher hops
+  let snakePermanentSpeedFactor= 1.0; // reserved if you want to use later
 
   function getSpeedFactor() {
-    // Smaller durations → faster hopping rhythm
-    return speedBuffTime > 0 ? 0.5 : 1.0; // CHANGED: a bit faster during buff
+    // smaller factor = faster hopping rhythm
+    let factor = frogPermanentSpeedFactor;
+    if (speedBuffTime > 0) factor *= 0.5;
+    if (panicHopTime > 0) factor *= 0.6;
+    return factor;
   }
 
   function getJumpFactor() {
-    // Make super jump very noticeable
-    return jumpBuffTime > 0 ? 6.2 : 1.0; // CHANGED: was 1.8
+    let factor = frogPermanentJumpFactor;
+    if (jumpBuffTime > 0) factor *= 3.2; // super jump
+    return factor;
+  }
+
+  function getSnakeSpeedFactor() {
+    let factor = snakePermanentSpeedFactor;
+    if (snakeSlowTime > 0) factor *= 0.5;
+    if (timeSlowTime > 0)  factor *= 0.4; // time dilation
+    return factor;
+  }
+
+  const SNAKE_EAT_RADIUS_BASE = 40;
+  function getSnakeEatRadius() {
+    return snakeShrinkTime > 0 ? 24 : SNAKE_EAT_RADIUS_BASE;
   }
 
   function applyBuff(type) {
-    if (type === "speed") {
-      speedBuffTime = SPEED_BUFF_DURATION;
-    } else if (type === "jump") {
-      jumpBuffTime = JUMP_BUFF_DURATION;
-    } else if (type === "spawn") {
-      const extra = randInt(1, 10);
-      spawnExtraFrogs(extra);
+    switch (type) {
+      case "speed":
+        speedBuffTime = SPEED_BUFF_DURATION;
+        break;
+      case "jump":
+        jumpBuffTime = JUMP_BUFF_DURATION;
+        break;
+      case "spawn":
+        spawnExtraFrogs(randInt(1, 10));
+        break;
+      case "snakeSlow":
+        snakeSlowTime = SNAKE_SLOW_DURATION;
+        break;
+      case "snakeConfuse":
+        snakeConfuseTime = SNAKE_CONFUSE_DURATION;
+        break;
+      case "snakeShrink":
+        snakeShrinkTime = SNAKE_SHRINK_DURATION;
+        break;
+      case "frogShield":
+        frogShieldTime = FROG_SHIELD_DURATION;
+        break;
+      case "timeSlow":
+        timeSlowTime = TIME_SLOW_DURATION;
+        break;
+      case "orbMagnet":
+        orbMagnetTime = ORB_MAGNET_DURATION;
+        break;
+      case "megaSpawn":
+        spawnExtraFrogs(randInt(15, 25));
+        break;
+      case "scoreMulti":
+        scoreMultiTime = SCORE_MULTI_DURATION;
+        break;
+      case "panicHop":
+        panicHopTime = PANIC_HOP_DURATION;
+        break;
     }
     playBuffSound(type);
   }
 
   function updateBuffTimers(dt) {
-    if (speedBuffTime > 0) speedBuffTime = Math.max(0, speedBuffTime - dt);
-    if (jumpBuffTime > 0)  jumpBuffTime  = Math.max(0, jumpBuffTime - dt);
+    if (speedBuffTime   > 0) speedBuffTime   = Math.max(0, speedBuffTime   - dt);
+    if (jumpBuffTime    > 0) jumpBuffTime    = Math.max(0, jumpBuffTime    - dt);
+    if (snakeSlowTime   > 0) snakeSlowTime   = Math.max(0, snakeSlowTime   - dt);
+    if (snakeConfuseTime> 0) snakeConfuseTime= Math.max(0, snakeConfuseTime- dt);
+    if (snakeShrinkTime > 0) snakeShrinkTime = Math.max(0, snakeShrinkTime - dt);
+    if (frogShieldTime  > 0) frogShieldTime  = Math.max(0, frogShieldTime  - dt);
+    if (timeSlowTime    > 0) timeSlowTime    = Math.max(0, timeSlowTime    - dt);
+    if (orbMagnetTime   > 0) orbMagnetTime   = Math.max(0, orbMagnetTime   - dt);
+    if (scoreMultiTime  > 0) scoreMultiTime  = Math.max(0, scoreMultiTime  - dt);
+    if (panicHopTime    > 0) panicHopTime    = Math.max(0, panicHopTime    - dt);
   }
 
   // -----------------------------
-  // FROG MOVEMENT (matches scatter-frogs, with buff multipliers)
+  // FROG MOVEMENT
   // -----------------------------
   function chooseHopDestination(frog, width, height) {
     let targetX = frog.x;
@@ -506,9 +629,8 @@
     const marginY = 24;
     const marginX = 8;
 
-    // base step distance, scaled by speed buff
     const baseMaxStep = 40;
-    const maxStep = baseMaxStep * (speedBuffTime > 0 ? 1.7 : 1.0);
+    const maxStep = baseMaxStep * (speedBuffTime > 0 || panicHopTime > 0 ? 1.7 : 1.0);
 
     let goalX = null;
     let goalY = null;
@@ -559,11 +681,9 @@
           frog.state = "hopping";
           frog.hopTime = 0;
 
-          // hop duration, adjusted by speed buff
           const baseDur = randRange(frog.hopDurMin, frog.hopDurMax);
           frog.hopDuration = baseDur * getSpeedFactor();
 
-          // vary hop height a bit, and apply jump buff multiplier
           const spice = Math.random();
           let hopHeight;
           if (spice < 0.1) {
@@ -576,7 +696,7 @@
           } else {
             hopHeight = randRange(frog.hopHeightMin, frog.hopHeightMax);
           }
-          frog.hopHeight = hopHeight * getJumpFactor(); // CHANGED: stronger multiplier during buff
+          frog.hopHeight = hopHeight * getJumpFactor();
 
           chooseHopDestination(frog, width, height);
           playRandomRibbit();
@@ -598,7 +718,6 @@
         if (frog.hopTime >= frog.hopDuration) {
           frog.state = "idle";
 
-          // idle duration, adjusted by speed buff
           const baseIdle = randRange(frog.idleMin, frog.idleMax);
           frog.idleTime = baseIdle * getSpeedFactor();
 
@@ -619,10 +738,10 @@
   }
 
   // -----------------------------
-  // ORBS (BUFF PICKUPS)
+  // ORBS
   // -----------------------------
   const ORB_RADIUS  = 12;
-  const ORB_TTL     = 12; // seconds before disappearing
+  const ORB_TTL     = 12;
   const ORB_SPAWN_INTERVAL_MIN = 4;
   const ORB_SPAWN_INTERVAL_MAX = 9;
 
@@ -635,7 +754,20 @@
     const x = marginX + Math.random() * (width - marginX * 2);
     const y = marginY + Math.random() * (height - marginY * 2);
 
-    const types = ["speed", "jump", "spawn"];
+    const types = [
+      "speed",
+      "jump",
+      "spawn",
+      "snakeSlow",
+      "snakeConfuse",
+      "snakeShrink",
+      "frogShield",
+      "timeSlow",
+      "orbMagnet",
+      "megaSpawn",
+      "scoreMulti",
+      "panicHop"
+    ];
     const type = types[Math.floor(Math.random() * types.length)];
 
     const size = ORB_RADIUS * 2;
@@ -656,9 +788,36 @@
     } else if (type === "jump") {
       el.style.background =
         "radial-gradient(circle at 30% 30%, #ffffff, #b857ff)";
-    } else {
+    } else if (type === "spawn") {
       el.style.background =
         "radial-gradient(circle at 30% 30%, #ffffff, #ffe66b)";
+    } else if (type === "snakeSlow") {
+      el.style.background =
+        "radial-gradient(circle at 30% 30%, #ffffff, #ff6b6b)";
+    } else if (type === "snakeConfuse") {
+      el.style.background =
+        "radial-gradient(circle at 30% 30%, #ffffff, #ff9ff3)";
+    } else if (type === "snakeShrink") {
+      el.style.background =
+        "radial-gradient(circle at 30% 30%, #ffffff, #74b9ff)";
+    } else if (type === "frogShield") {
+      el.style.background =
+        "radial-gradient(circle at 30% 30%, #ffffff, #55efc4)";
+    } else if (type === "timeSlow") {
+      el.style.background =
+        "radial-gradient(circle at 30% 30%, #ffffff, #ffeaa7)";
+    } else if (type === "orbMagnet") {
+      el.style.background =
+        "radial-gradient(circle at 30% 30%, #ffffff, #a29bfe)";
+    } else if (type === "megaSpawn") {
+      el.style.background =
+        "radial-gradient(circle at 30% 30%, #ffffff, #fd79a8)";
+    } else if (type === "scoreMulti") {
+      el.style.background =
+        "radial-gradient(circle at 30% 30%, #ffffff, #fdcb6e)";
+    } else if (type === "panicHop") {
+      el.style.background =
+        "radial-gradient(circle at 30% 30%, #ffffff, #fab1a0)";
     }
 
     container.appendChild(el);
@@ -686,7 +845,31 @@
         continue;
       }
 
-      // Simple float + fade
+      // Magnet effect
+      if (orbMagnetTime > 0 && frogs.length > 0) {
+        let target = null;
+        let bestD2 = Infinity;
+        for (const frog of frogs) {
+          const fx = frog.x + FROG_SIZE / 2;
+          const fy = frog.baseY + FROG_SIZE / 2;
+          const dx = fx - orb.x;
+          const dy = fy - orb.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < bestD2) {
+            bestD2 = d2;
+            target = { fx, fy };
+          }
+        }
+        if (target) {
+          const dx = target.fx - orb.x;
+          const dy = target.fy - orb.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          const pull = 80 * dt;
+          orb.x += (dx / dist) * pull;
+          orb.y += (dy / dist) * pull;
+        }
+      }
+
       const lifeT = orb.ttl / ORB_TTL;
       const bob   = Math.sin((1 - lifeT) * Math.PI * 2) * 3;
       const scale = 1 + 0.1 * Math.sin((1 - lifeT) * Math.PI * 4);
@@ -696,7 +879,6 @@
         `translate3d(${orb.x - ORB_RADIUS}px, ${renderY - ORB_RADIUS}px, 0) scale(${scale})`;
       orb.el.style.opacity = String(Math.max(0, Math.min(1, lifeT + 0.2)));
 
-      // Collision with frogs
       const ocx = orb.x;
       const ocy = orb.y;
 
@@ -729,12 +911,10 @@
   const SNAKE_SEGMENT_SIZE  = 48;
   const SNAKE_BASE_SPEED    = 90;
   const SNAKE_TURN_RATE     = Math.PI * 1.5;
-  const SNAKE_SEGMENT_GAP   = 24; // CHANGED: was 6 → more spacing between segments
+  const SNAKE_SEGMENT_GAP   = 24; // more spacing between segments
   const SNAKE_INITIAL_SEGMENTS = 6;
-  const SNAKE_EAT_RADIUS    = 40;
 
   function initSnake(width, height) {
-    // cleanup if restarting
     if (snake) {
       if (snake.head && snake.head.el && snake.head.el.parentNode === container) {
         container.removeChild(snake.head.el);
@@ -869,9 +1049,13 @@
       }
     }
 
-    // Steering
     let desiredAngle = head.angle;
-    if (targetFrog) {
+
+    if (snakeConfuseTime > 0) {
+      // snake is confused: wander erratically
+      desiredAngle = head.angle + (Math.random() - 0.5) * Math.PI;
+      targetFrog = null;
+    } else if (targetFrog) {
       const fx = targetFrog.x + FROG_SIZE / 2;
       const fy = targetFrog.baseY + FROG_SIZE / 2;
       desiredAngle = Math.atan2(fy - head.y, fx - head.x);
@@ -886,11 +1070,11 @@
     if (angleDiff < -maxTurn) angleDiff = -maxTurn;
     head.angle += angleDiff;
 
-    const speed = SNAKE_BASE_SPEED * (0.8 + Math.random() * 0.4);
+    const speedFactor = getSnakeSpeedFactor();
+    const speed = SNAKE_BASE_SPEED * speedFactor * (0.8 + Math.random() * 0.4);
     head.x += Math.cos(head.angle) * speed * dt;
     head.y += Math.sin(head.angle) * speed * dt;
 
-    // Bounce off edges
     if (head.x < marginX) {
       head.x = marginX;
       head.angle = Math.PI - head.angle;
@@ -906,7 +1090,6 @@
       head.angle = -head.angle;
     }
 
-    // Update path
     snake.path.unshift({ x: head.x, y: head.y });
     const maxPathLength =
       (snake.segments.length + 2) * SNAKE_SEGMENT_GAP + 2;
@@ -914,11 +1097,11 @@
       snake.path.pop();
     }
 
-    // Render head
-    head.el.style.transform =
-      `translate3d(${head.x}px, ${head.y}px, 0) rotate(${head.angle}rad)`;
+    const shrinkScale = snakeShrinkTime > 0 ? 0.8 : 1.0;
 
-    // Render segments with more spacing
+    head.el.style.transform =
+      `translate3d(${head.x}px, ${head.y}px, 0) rotate(${head.angle}rad) scale(${shrinkScale})`;
+
     for (let i = 0; i < snake.segments.length; i++) {
       const seg = snake.segments[i];
       const idx = Math.min(
@@ -935,10 +1118,13 @@
       seg.y = p.y;
 
       seg.el.style.transform =
-        `translate3d(${seg.x}px, ${seg.y}px, 0) rotate(${angle}rad)`;
+        `translate3d(${seg.x}px, ${seg.y}px, 0) rotate(${angle}rad) scale(${shrinkScale})`;
     }
 
-    // Check collisions with frogs (no respawn here; only buff can spawn new ones)
+    // Frog collisions
+    const eatRadius = getSnakeEatRadius();
+    const eatR2 = eatRadius * eatRadius;
+
     for (let i = frogs.length - 1; i >= 0; i--) {
       const frog = frogs[i];
       if (!frog || !frog.el) continue;
@@ -949,7 +1135,12 @@
       const dy = fy - head.y;
       const d2 = dx * dx + dy * dy;
 
-      if (d2 <= SNAKE_EAT_RADIUS * SNAKE_EAT_RADIUS) {
+      if (d2 <= eatR2) {
+        if (frogShieldTime > 0) {
+          // shield active: snake can't eat right now
+          continue;
+        }
+
         if (frog.el.parentNode === container) {
           container.removeChild(frog.el);
         }
@@ -960,6 +1151,105 @@
         growSnake(1);
       }
     }
+  }
+
+  // -----------------------------
+  // PERMANENT UPGRADE OVERLAY
+  // -----------------------------
+  function ensureUpgradeOverlay() {
+    if (upgradeOverlay) return;
+
+    upgradeOverlay = document.createElement("div");
+    upgradeOverlay.style.position = "absolute";
+    upgradeOverlay.style.inset = "0";
+    upgradeOverlay.style.background = "rgba(0,0,0,0.7)";
+    upgradeOverlay.style.display = "none";
+    upgradeOverlay.style.zIndex = "150";
+    upgradeOverlay.style.display = "flex";
+    upgradeOverlay.style.alignItems = "center";
+    upgradeOverlay.style.justifyContent = "center";
+    upgradeOverlay.style.pointerEvents = "auto";
+
+    const panel = document.createElement("div");
+    panel.style.background = "#111";
+    panel.style.padding = "16px 20px";
+    panel.style.borderRadius = "10px";
+    panel.style.border = "1px solid #444";
+    panel.style.color = "#fff";
+    panel.style.fontFamily = "monospace";
+    panel.style.textAlign = "center";
+    panel.style.minWidth = "260px";
+
+    const title = document.createElement("div");
+    title.textContent = "Choose a permanent upgrade";
+    title.style.marginBottom = "12px";
+    title.style.fontSize = "14px";
+
+    const buttonsContainer = document.createElement("div");
+    buttonsContainer.style.display = "flex";
+    buttonsContainer.style.flexDirection = "column";
+    buttonsContainer.style.gap = "8px";
+
+    function makeButton(label, onClick) {
+      const btn = document.createElement("button");
+      btn.textContent = label;
+      btn.style.fontFamily = "monospace";
+      btn.style.fontSize = "13px";
+      btn.style.padding = "6px 8px";
+      btn.style.border = "1px solid #555";
+      btn.style.borderRadius = "6px";
+      btn.style.background = "#222";
+      btn.style.color = "#fff";
+      btn.style.cursor = "pointer";
+      btn.onmouseenter = () => { btn.style.background = "#333"; };
+      btn.onmouseleave = () => { btn.style.background = "#222"; };
+      btn.onclick = () => {
+        onClick();
+        closeUpgradeOverlay();
+      };
+      return btn;
+    }
+
+    const btnSpeed = makeButton(
+      "Frogs hop a bit faster forever",
+      () => { frogPermanentSpeedFactor *= 0.9; }
+    );
+
+    const btnJump = makeButton(
+      "Frogs jump higher forever",
+      () => { frogPermanentJumpFactor *= 1.25; }
+    );
+
+    const btnSpawn = makeButton(
+      "Spawn 20 frogs right now",
+      () => { spawnExtraFrogs(20); }
+    );
+
+    buttonsContainer.appendChild(btnSpeed);
+    buttonsContainer.appendChild(btnJump);
+    buttonsContainer.appendChild(btnSpawn);
+
+    panel.appendChild(title);
+    panel.appendChild(buttonsContainer);
+    upgradeOverlay.appendChild(panel);
+    container.appendChild(upgradeOverlay);
+  }
+
+  function openUpgradeOverlay() {
+    ensureUpgradeOverlay();
+    gamePaused = true;
+    if (upgradeOverlay) {
+      upgradeOverlay.style.display = "flex";
+    }
+  }
+
+  function closeUpgradeOverlay() {
+    if (upgradeOverlay) {
+      upgradeOverlay.style.display = "none";
+    }
+    gamePaused = false;
+    nextPermanentChoiceTime += 60;
+    playPermanentChoiceSound();
   }
 
   // -----------------------------
@@ -976,7 +1266,6 @@
       animId = null;
     }
 
-    // Clear frogs
     for (const frog of frogs) {
       if (frog.el && frog.el.parentNode === container) {
         container.removeChild(frog.el);
@@ -984,7 +1273,6 @@
     }
     frogs = [];
 
-    // Clear orbs
     for (const orb of orbs) {
       if (orb.el && orb.el.parentNode === container) {
         container.removeChild(orb.el);
@@ -992,7 +1280,6 @@
     }
     orbs = [];
 
-    // Clear snake
     if (snake) {
       if (snake.head && snake.head.el && snake.head.el.parentNode === container) {
         container.removeChild(snake.head.el);
@@ -1010,11 +1297,22 @@
     elapsedTime   = 0;
     lastTime      = 0;
     gameOver      = false;
-    speedBuffTime = 0;
-    jumpBuffTime  = 0;
+    gamePaused    = false;
+    score         = 0;
     nextOrbTime   = 0;
     mouse.follow  = false;
+    nextPermanentChoiceTime = 60;
+
+    speedBuffTime = jumpBuffTime = 0;
+    snakeSlowTime = snakeConfuseTime = snakeShrinkTime = 0;
+    frogShieldTime = timeSlowTime = orbMagnetTime = 0;
+    scoreMultiTime = panicHopTime = 0;
+
+    frogPermanentSpeedFactor = 1.0;
+    frogPermanentJumpFactor  = 1.0;
+
     hideGameOver();
+    if (upgradeOverlay) upgradeOverlay.style.display = "none";
 
     const width  = window.innerWidth;
     const height = window.innerHeight;
@@ -1035,22 +1333,36 @@
     lastTime = time;
 
     if (!gameOver) {
-      elapsedTime += dt;
-      updateBuffTimers(dt);
+      if (!gamePaused) {
+        elapsedTime += dt;
 
-      updateFrogs(dt, width, height);
-      updateSnake(dt, width, height);
-      updateOrbs(dt);
+        // minute-based permanent upgrade pause
+        if (elapsedTime >= nextPermanentChoiceTime) {
+          openUpgradeOverlay();
+        } else {
+          updateBuffTimers(dt);
 
-      // Orb spawn timer
-      nextOrbTime -= dt;
-      if (nextOrbTime <= 0) {
-        spawnOrbRandom(width, height);
-        nextOrbTime = randRange(ORB_SPAWN_INTERVAL_MIN, ORB_SPAWN_INTERVAL_MAX);
-      }
+          // time slow: only snake + orbs
+          const slowFactor = timeSlowTime > 0 ? 0.4 : 1.0;
 
-      if (frogs.length === 0) {
-        endGame();
+          updateFrogs(dt, width, height);
+          updateSnake(dt * slowFactor, width, height);
+          updateOrbs(dt * slowFactor);
+
+          // score (buff affects score per second)
+          const scoreFactor = scoreMultiTime > 0 ? 2 : 1;
+          score += dt * scoreFactor;
+
+          nextOrbTime -= dt;
+          if (nextOrbTime <= 0) {
+            spawnOrbRandom(width, height);
+            nextOrbTime = randRange(ORB_SPAWN_INTERVAL_MIN, ORB_SPAWN_INTERVAL_MAX);
+          }
+
+          if (frogs.length === 0) {
+            endGame();
+          }
+        }
       }
     }
 
@@ -1063,6 +1375,7 @@
   // -----------------------------
   async function startGame() {
     initAudio();
+    ensureUpgradeOverlay();
 
     const width  = window.innerWidth;
     const height = window.innerHeight;
