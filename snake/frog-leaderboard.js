@@ -11,8 +11,19 @@
   let scoreboardOverlay = null;
   let scoreboardOverlayInner = null;
 
+  // --------------------------------------------------
+  // HELPERS
+  // --------------------------------------------------
+  function asNumber(v, fallback = 0) {
+    if (typeof v === "number") {
+      return Number.isFinite(v) ? v : fallback;
+    }
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
   function formatTime(t) {
-    const total = Math.max(0, Number.isFinite(t) ? t : 0);
+    const total = Math.max(0, asNumber(t, 0));
     const m = Math.floor(total / 60);
     const s = total - m * 60;
     return `${String(m).padStart(2, "0")}:${s.toFixed(1).padStart(4, "0")}`;
@@ -139,8 +150,8 @@
       const entry = topList[i] || {};
       const rank = i + 1;
       const name = entry.userTag || entry.name || `Player ${rank}`;
-      const score = Number.isFinite(entry.score) ? entry.score : 0;
-      const time = Number.isFinite(entry.time) ? entry.time : 0;
+      const score = asNumber(entry.score, 0);
+      const time  = asNumber(entry.time, 0);
       lines.push(
         `${rank}. ${name} — ${formatTime(time)} · ${Math.floor(score)}`
       );
@@ -174,8 +185,8 @@
 
     for (let i = 0; i < safeList.length; i++) {
       const e = safeList[i] || {};
-      const es = Number.isFinite(e.score) ? e.score : 0;
-      const et = Number.isFinite(e.time) ? e.time : 0;
+      const es = asNumber(e.score, 0);
+      const et = asNumber(e.time, 0);
       if (Math.abs(es - lastRunScore) < tolScore &&
           Math.abs(et - lastRunTime) < tolTime) {
         myIndex = i;
@@ -251,8 +262,8 @@
 
         const rank = i + 1;
         const name = entry.userTag || entry.name || `Player ${rank}`;
-        const score = Number.isFinite(entry.score) ? entry.score : 0;
-        const time = Number.isFinite(entry.time) ? entry.time : 0;
+        const score = asNumber(entry.score, 0);
+        const time  = asNumber(entry.time, 0);
 
         rankCell.textContent = String(rank);
         nameCell.textContent = name;
@@ -261,7 +272,7 @@
 
         for (const td of [rankCell, nameCell, timeCell, scoreCell]) {
           td.style.padding = "2px 4px";
-          td.style.borderBottom = "1px solid #222";
+          td.style.borderBottom = "1px solid "#222";
         }
 
         // Highlight THIS run's name in bright yellow
