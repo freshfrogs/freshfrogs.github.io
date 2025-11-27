@@ -1576,13 +1576,14 @@ function updateSnake(dt, width, height) {
     snake = null;
 
     // Reset game state
-    elapsedTime   = 0;
-    lastTime      = 0;
-    gameOver      = false;
-    gamePaused    = false;
-    score         = 0;
-    nextOrbTime   = 0;
-    mouse.follow  = false;
+    elapsedTime     = 0;
+    lastTime        = 0;
+    gameOver        = false;
+    gamePaused      = false;
+    score           = 0;
+    frogsEatenCount = 0;
+    nextOrbTime     = 0;
+    mouse.follow    = false;
 
     // Reset upgrade timing
     initialUpgradeDone       = false;
