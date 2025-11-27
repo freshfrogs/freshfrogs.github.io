@@ -519,6 +519,8 @@ function snakeShed(stage, speedMultiplier) {
   const PANIC_HOP_DURATION     = 5;
   const CLONE_SWARM_DURATION   = 7;
   const LIFE_STEAL_DURATION    = 23;
+  // Permanent lifesteal upgrade: how many orbs it affects
+  const PERMA_LIFESTEAL_ORB_COUNT = 30;
 
   // How strong each buff is
   const SPEED_BUFF_FACTOR        = 0.5;  // frogs act 2× faster (0.5 = half their cycle)
@@ -575,6 +577,7 @@ function snakeShed(stage, speedMultiplier) {
   let cloneSwarmTime  = 0;
   let lifeStealTime   = 0;
   let frogDeathRattleChance = 0.0;  // 0.25 when epic is picked
+  let permaLifeStealOrbsRemaining = 0;
 
   // Legendary Frenzy timer (snake + frogs go wild)
   let snakeFrenzyTime = 0;
@@ -1188,8 +1191,23 @@ function applyBuff(type, frog) {
           grantRandomPermaFrogUpgrade(collectedBy);
         } else {
           applyBuff(orb.type, collectedBy);
+
+          // Life steal handling (temporary + permanent upgrade)
+          let extraFrogsFromLifeSteal = 0;
+
+          // Time-based lifesteal buff
           if (lifeStealTime > 0) {
-            spawnExtraFrogs(1);
+            extraFrogsFromLifeSteal += 1;
+          }
+
+          // Permanent lifesteal upgrade: next N orbs
+          if (permaLifeStealOrbsRemaining > 0) {
+            permaLifeStealOrbsRemaining -= 1;
+            extraFrogsFromLifeSteal += 1;
+          }
+
+          if (extraFrogsFromLifeSteal > 0) {
+            spawnExtraFrogs(extraFrogsFromLifeSteal);
           }
         }
 
@@ -1198,6 +1216,7 @@ function applyBuff(type, frog) {
         }
         orbs.splice(i, 1);
       }
+
     }
   }
 
@@ -1497,8 +1516,10 @@ function applyBuff(type, frog) {
   let upgradeOverlay = null;
   let upgradeOverlayButtonsContainer = null;
   let upgradeOverlayTitleEl = null;
-  let currentUpgradeOverlayMode = "normal"; // "normal" | "epic"
-  let initialUpgradeDone = false;
+  let currentUpgradeOverlayMode = "normal"; // "normal" | "epic" | "legendary"
+  let initialUpgradeDone = false;          // starting upgrade before timer
+  let firstTimedNormalChoiceDone = false;  // first 1-minute panel
+
 
   // How-to-play overlay shown once before the very first buff choice
   let howToOverlay = null;
@@ -1513,67 +1534,61 @@ function applyBuff(type, frog) {
   let buffGuidePage = 0;
 
 function getUpgradeChoices() {
-  const neon = "#4defff";
+    const neon = "#4defff";
 
-  const speedPct = Math.round((1 - FROG_SPEED_UPGRADE_FACTOR) * 100);
-  const jumpPct  = Math.round((FROG_JUMP_UPGRADE_FACTOR - 1) * 100);
-  const buffPct  = Math.round((BUFF_DURATION_UPGRADE_FACTOR - 1) * 100);
-  const orbPct   = Math.round((1 - ORB_INTERVAL_UPGRADE_FACTOR) * 100);
-
-  return [
-    {
-      id: "frogSpeed",
-      label: `
-        Frogs hop faster forever<br>
-        <span style="color:${neon};">~${speedPct}%</span> faster hop cycle
-      `,
-      apply: () => {
-        frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
+    return [
+      {
+        id: "frogSpeed",
+        label: `
+          ⏩ Frogs hop faster forever<br>
+          ~<span style="color:${neon};">10%</span> faster hop cycle
+        `,
+        apply: () => { frogPermanentSpeedFactor *= 0.9; }
+      },
+      {
+        id: "frogJump",
+        label: `
+          🦘⬆️ Frogs jump higher forever<br>
+          ~<span style="color:${neon};">+25%</span> jump height
+        `,
+        apply: () => { frogPermanentJumpFactor *= 1.25; }
+      },
+      {
+        id: "spawn20",
+        label: `
+          🐸➕ Spawn frogs<br>
+          <span style="color:${neon};">20</span> frogs right now
+        `,
+        apply: () => { spawnExtraFrogs(20); }
+      },
+      {
+        id: "buffDuration",
+        label: `
+          ⏳ Buffs last longer<br>
+          +<span style="color:${neon};">15%</span> buff duration
+        `,
+        apply: () => { buffDurationFactor *= 1.15; }
+      },
+      {
+        id: "moreOrbs",
+        label: `
+          🎯 More orbs over time<br>
+          ~<span style="color:${neon};">15%</span> faster orb spawns
+        `,
+        apply: () => { orbSpawnIntervalFactor *= 0.85; }
+      },
+      {
+        id: "permaLifeSteal",
+        label: `
+          🩸 Lifesteal (upgrade)<br>
+          Next <span style="color:${neon};">${PERMA_LIFESTEAL_ORB_COUNT}</span> orbs also spawn frogs
+        `,
+        apply: () => {
+          permaLifeStealOrbsRemaining += PERMA_LIFESTEAL_ORB_COUNT;
+        }
       }
-    },
-    {
-      id: "frogJump",
-      label: `
-        Frogs jump higher forever<br>
-        ~<span style="color:${neon};">${jumpPct}%</span> taller jumps
-      `,
-      apply: () => {
-        frogPermanentJumpFactor *= FROG_JUMP_UPGRADE_FACTOR;
-      }
-    },
-    {
-      id: "spawn20",
-      label: `
-        Spawn frogs<br>
-        <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
-      `,
-      apply: () => {
-        spawnExtraFrogs(NORMAL_SPAWN_AMOUNT);
-      }
-    },
-    {
-      id: "buffDuration",
-      label: `
-        Buffs last longer<br>
-        +<span style="color:${neon};">${buffPct}%</span> buff duration
-      `,
-      apply: () => {
-        buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR;
-      }
-    },
-    {
-      id: "moreOrbs",
-      label: `
-        More orbs over time<br>
-        ~<span style="color:${neon};">${orbPct}%</span> faster orb spawns
-      `,
-      apply: () => {
-        orbSpawnIntervalFactor *= ORB_INTERVAL_UPGRADE_FACTOR;
-      }
-    }
-  ];
-}
-
+    ];
+  }
 
   // EPIC choices every 3 minutes
 function getEpicUpgradeChoices() {
@@ -2109,7 +2124,7 @@ function setBuffGuidePage(pageIndex) {
     container.appendChild(upgradeOverlay);
   }
 
-  function populateUpgradeOverlayChoices(mode) {
+function populateUpgradeOverlayChoices(mode) {
     ensureUpgradeOverlay();
     const containerEl = upgradeOverlayButtonsContainer;
     if (!containerEl) return;
@@ -2119,26 +2134,96 @@ function setBuffGuidePage(pageIndex) {
     const isLegendary = currentUpgradeOverlayMode === "legendary";
 
     containerEl.innerHTML = "";
+    const neon = "#4defff";
 
     if (upgradeOverlayTitleEl) {
-      upgradeOverlayTitleEl.textContent = isLegendary
-        ? "Choose a LEGENDARY upgrade"
-        : isEpic
-          ? "Choose an EPIC upgrade"
-          : "Choose a permanent upgrade";
+      if (isLegendary) {
+        upgradeOverlayTitleEl.textContent = "Choose a LEGENDARY upgrade";
+      } else if (isEpic) {
+        upgradeOverlayTitleEl.textContent = "Choose an EPIC upgrade";
+      } else {
+        upgradeOverlayTitleEl.textContent = "Choose a permanent upgrade";
+      }
     }
 
     let choices = [];
-    if (isLegendary) {
-      choices = getLegendaryUpgradeChoices().slice();
-    } else if (isEpic) {
+
+    if (isEpic) {
       choices = getEpicUpgradeChoices().slice();
+    } else if (isLegendary && typeof getLegendaryUpgradeChoices === "function") {
+      choices = getLegendaryUpgradeChoices().slice();
     } else {
-      const pool = getUpgradeChoices().slice();
-      while (choices.length < 3 && pool.length) {
-        const idx = Math.floor(Math.random() * pool.length);
-        choices.push(pool.splice(idx, 1)[0]);
+      // normal per-minute upgrades
+      let pool = getUpgradeChoices().slice();
+
+      // Starting pre-game upgrade: no perma lifesteal yet
+      if (!initialUpgradeDone) {
+        pool = pool.filter(c => c.id !== "permaLifeSteal");
       }
+
+      const isFirstTimedNormal = initialUpgradeDone && !firstTimedNormalChoiceDone;
+
+      if (isFirstTimedNormal) {
+        firstTimedNormalChoiceDone = true;
+
+        // guarantee spawn20 is one of the options
+        let spawnChoiceIndex = pool.findIndex(c => c.id === "spawn20");
+        let spawnChoice;
+
+        if (spawnChoiceIndex !== -1) {
+          spawnChoice = pool.splice(spawnChoiceIndex, 1)[0];
+        } else {
+          // fallback: create spawn20 choice if it somehow went missing
+          spawnChoice = {
+            id: "spawn20",
+            label: `
+              🐸➕ Spawn frogs<br>
+              <span style="color:${neon};">20</span> frogs right now
+            `,
+            apply: () => { spawnExtraFrogs(20); }
+          };
+        }
+
+        choices.push(spawnChoice);
+
+        // fill remaining slots randomly until we have 3 choices total
+        while (choices.length < 3 && pool.length) {
+          const idx = Math.floor(Math.random() * pool.length);
+          choices.push(pool.splice(idx, 1)[0]);
+        }
+      } else {
+        // regular case: pick any 3 at random
+        while (choices.length < 3 && pool.length) {
+          const idx = Math.floor(Math.random() * pool.length);
+          choices.push(pool.splice(idx, 1)[0]);
+        }
+      }
+    }
+
+    function makeButton(label, onClick) {
+      const btn = document.createElement("button");
+      btn.innerHTML = label; // allow emojis + <span> highlight
+      btn.style.fontFamily = "monospace";
+      btn.style.fontSize = "13px";
+      btn.style.padding = "6px 8px";
+      btn.style.border = "1px solid #555";
+      btn.style.borderRadius = "6px";
+      btn.style.background = "#222";
+      btn.style.color = "#fff";
+      btn.style.cursor = "pointer";
+      btn.style.textAlign = "left";
+      btn.onmouseenter = () => { btn.style.background = "#333"; };
+      btn.onmouseleave = () => { btn.style.background = "#222"; };
+      btn.onclick = () => {
+        try {
+          onClick();
+        } catch (e) {
+          console.error("Error applying upgrade:", e);
+        }
+        playPermanentChoiceSound();
+        closeUpgradeOverlay();
+      };
+      return btn;
     }
 
     if (!choices.length) {
@@ -2309,6 +2394,7 @@ function setBuffGuidePage(pageIndex) {
     firstShedTriggered      = false;
     secondShedTriggered     = false;
     snakeShedStage          = 0;
+    firstTimedNormalChoiceDone  = false;
 
     // Reset all temporary buff timers
     speedBuffTime   = 0;
@@ -2323,6 +2409,7 @@ function setBuffGuidePage(pageIndex) {
     panicHopTime    = 0;
     cloneSwarmTime  = 0;
     lifeStealTime   = 0;
+    permaLifeStealOrbsRemaining = 0;
     snakeFrenzyTime = 0;
     setSnakeFrenzyVisual(false);
 
