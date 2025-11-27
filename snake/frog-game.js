@@ -600,9 +600,11 @@ function snakeShed(stage, speedMultiplier) {
 
   function getSnakeSpeedFactor() {
     let factor = snakePermanentSpeedFactor;
-    if (snakeSlowTime > 0) factor *= 0.5;
-    if (timeSlowTime > 0)  factor *= 0.4;
-    if (snakeFrenzyTime > 0) factor *= 1.25; // +25% speed during Frenzy
+
+    if (snakeSlowTime > 0)   factor *= SNAKE_SLOW_FACTOR;
+    if (timeSlowTime > 0)    factor *= TIME_SLOW_FACTOR;
+    if (snakeFrenzyTime > 0) factor *= FRENZY_SPEED_FACTOR; // +25% speed during Frenzy
+
     return factor;
   }
 
@@ -2047,7 +2049,7 @@ function ensureBuffGuideOverlay() {
     for (const frog of frogs) {
       if (frog.isLucky) count++;
     }
-    return 1 + 0.1 * count;
+    return 1 + LUCKY_SCORE_BONUS_PER * count;
   }
 
   function endGame() {
