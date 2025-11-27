@@ -1281,35 +1281,99 @@ function updateSnake(dt, width, height) {
   // --------------------------------------------------
   let upgradeOverlay = null;
   let upgradeOverlayButtonsContainer = null;
+  let initialUpgradeDone = false;
 
-  function getUpgradeChoices() {
-    return [
-      {
-        id: "frogSpeed",
-        label: "Frogs hop a bit faster forever",
-        apply: () => { frogPermanentSpeedFactor *= 0.9; }
-      },
-      {
-        id: "frogJump",
-        label: "Frogs jump higher forever",
-        apply: () => { frogPermanentJumpFactor *= 1.25; }
-      },
-      {
-        id: "spawn20",
-        label: "Spawn 20 frogs right now",
-        apply: () => { spawnExtraFrogs(20); }
-      },
-      {
-        id: "buffDuration",
-        label: "Temporary buffs last longer",
-        apply: () => { buffDurationFactor *= 1.15; }
-      },
-      {
-        id: "moreOrbs",
-        label: "More orbs spawn over time",
-        apply: () => { orbSpawnIntervalFactor *= 0.85; }
-      }
-    ];
+function getUpgradeChoices() {
+  return [
+    {
+      id: "frogSpeed",
+      label: "Frogs hop a bit faster forever",
+      apply: () => { frogPermanentSpeedFactor *= 0.9; }
+    },
+    {
+      id: "frogJump",
+      label: "Frogs jump higher forever",
+      apply: () => { frogPermanentJumpFactor *= 1.25; }
+    },
+    {
+      id: "spawn20",
+      label: "Spawn 20 frogs right now",
+      apply: () => { spawnExtraFrogs(20); }
+    },
+    {
+      id: "buffDuration",
+      label: "Temporary buffs last longer",
+      apply: () => { buffDurationFactor *= 1.15; }
+    },
+    {
+      id: "moreOrbs",
+      label: "More orbs spawn over time",
+      apply: () => { orbSpawnIntervalFactor *= 0.85; }
+    }
+  ];
+}
+
+function populateUpgradeOverlayChoices() {
+  ensureUpgradeOverlay();
+  const containerEl = upgradeOverlayButtonsContainer;
+  if (!containerEl) return;
+
+  containerEl.innerHTML = "";
+
+  const all = getUpgradeChoices();
+
+  // Always include spawn20 if it exists
+  const spawnChoice = all.find(c => c.id === "spawn20");
+  const pool = all.filter(c => c.id !== "spawn20");
+
+  const choices = [];
+
+  if (spawnChoice) {
+    choices.push(spawnChoice);
+  }
+
+  // Fill remaining slots (up to 3 total) with random unique choices
+  while (choices.length < 3 && pool.length) {
+    const idx = Math.floor(Math.random() * pool.length);
+    choices.push(pool.splice(idx, 1)[0]);
+  }
+
+    function makeButton(label, onClick) {
+      const btn = document.createElement("button");
+      btn.textContent = label;
+      btn.style.fontFamily = "monospace";
+      btn.style.fontSize = "13px";
+      btn.style.padding = "6px 8px";
+      btn.style.border = "1px solid #555";
+      btn.style.borderRadius = "6px";
+      btn.style.background = "#222";
+      btn.style.color = "#fff";
+      btn.style.cursor = "pointer";
+      btn.onmouseenter = () => { btn.style.background = "#333"; };
+      btn.onmouseleave = () => { btn.style.background = "#222"; };
+      btn.onclick = () => {
+        try {
+          onClick();
+        } catch (e) {
+          console.error("Error applying permanent upgrade:", e);
+        }
+        playPermanentChoiceSound();
+        closeUpgradeOverlay();
+      };
+      return btn;
+    }
+
+    if (!choices.length) {
+      const span = document.createElement("div");
+      span.textContent = "No upgrades available.";
+      span.style.fontSize = "13px";
+      containerEl.appendChild(span);
+      return;
+    }
+
+    for (const choice of choices) {
+      containerEl.appendChild(makeButton(choice.label, choice.apply));
+    }
   }
 
   function ensureUpgradeOverlay() {
@@ -1423,7 +1487,15 @@ function updateSnake(dt, width, height) {
       upgradeOverlay.style.display = "none";
     }
     gamePaused = false;
-    nextPermanentChoiceTime += 60;
+
+    if (!initialUpgradeDone) {
+      // This was the "starting" upgrade
+      initialUpgradeDone = true;
+      nextPermanentChoiceTime = 60;  // first timed choice 60s after play begins
+    } else {
+      // Normal per-minute upgrades
+      nextPermanentChoiceTime += 60;
+    }
   }
 
   // --------------------------------------------------
@@ -1597,6 +1669,10 @@ function updateSnake(dt, width, height) {
 
     setNextOrbTime();
     updateHUD();
+
+    // NEW: let the user pick an upgrade before time starts
+    openUpgradeOverlay();
+
     animId = requestAnimationFrame(drawFrame);
   }
 
