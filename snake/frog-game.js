@@ -98,15 +98,15 @@
     }
 
     .snake-head {
-      background-image: url("head.png");
+      background-image: url("https://freshfrogs.github.io/snake/head.png");
       z-index: 32;
     }
     .snake-body {
-      background-image: url("body.png");
+      background-image: url("https://freshfrogs.github.io/snake/body.png");
       z-index: 31;
     }
     .snake-tail {
-      background-image: url("tail.png");
+      background-image: url("https://freshfrogs.github.io/snake/tail.png");
       z-index: 30;
     }
 
