@@ -516,6 +516,24 @@ function snakeShed(stage, speedMultiplier) {
   const CLONE_SWARM_DURATION   = 7;
   const LIFE_STEAL_DURATION    = 10;
 
+  // How strong each buff is
+  const SPEED_BUFF_FACTOR        = 0.5;  // frogs act 2× faster (0.5 = half their cycle)
+  const PANIC_HOP_SPEED_FACTOR   = 0.6;  // panic hop speed factor
+  const JUMP_BUFF_FACTOR         = 3.2;  // jump buff height multiplier
+
+  const SNAKE_SLOW_FACTOR        = 0.5;  // snake at 50% speed
+  const TIME_SLOW_FACTOR         = 0.4;  // global/time slow ~40% speed
+
+  const SCORE_MULTI_FACTOR       = 2.0;  // score x2
+
+  // Aura / champion / lucky
+  const CHAMPION_SPEED_FACTOR    = 0.85;
+  const CHAMPION_JUMP_FACTOR     = 1.25;
+  const AURA_SPEED_FACTOR        = 0.9;
+  const AURA_JUMP_FACTOR         = 1.15;
+  const LUCKY_BUFF_DURATION_BOOST = 1.4;
+  const LUCKY_SCORE_BONUS_PER    = 0.10; // +10% per Lucky frog
+
   let speedBuffTime   = 0;
   let jumpBuffTime    = 0;
   let snakeSlowTime   = 0;
@@ -553,12 +571,13 @@ function snakeShed(stage, speedMultiplier) {
       const dx = (other.x + FROG_SIZE / 2) - (frog.x + FROG_SIZE / 2);
       const dy = (other.baseY + FROG_SIZE / 2) - (frog.baseY + FROG_SIZE / 2);
       const d2 = dx * dx + dy * dy;
-      if (d2 <= AURA_RADIUS2) auraFactor *= 0.9;
+      if (d2 <= AURA_RADIUS2) auraFactor *= AURA_SPEED_FACTOR;
     }
     factor *= auraFactor;
 
-    if (speedBuffTime > 0) factor *= 0.5;
-    if (panicHopTime > 0) factor *= 0.6;
+    if (speedBuffTime > 0) factor *= SPEED_BUFF_FACTOR;
+    if (panicHopTime > 0) factor *= PANIC_HOP_SPEED_FACTOR;
+
     return factor;
   }
 
