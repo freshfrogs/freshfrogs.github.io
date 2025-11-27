@@ -24,28 +24,22 @@
     return Number.isFinite(n) ? n : fallback;
   }
 
-  // Try to infer the score field, even if the key name changes.
   function getEntryScore(entry) {
     if (!entry || typeof entry !== "object") return 0;
-
     if ("score" in entry) return asNumber(entry.score, 0);
 
     for (const k of Object.keys(entry)) {
       if (/score/i.test(k)) return asNumber(entry[k], 0);
     }
-
     for (const k of Object.keys(entry)) {
       const n = asNumber(entry[k], NaN);
       if (Number.isFinite(n)) return n;
     }
-
     return 0;
   }
 
-  // Try to infer the time field, even if the key name changes.
   function getEntryTime(entry) {
     if (!entry || typeof entry !== "object") return 0;
-
     if ("time" in entry) return asNumber(entry.time, 0);
 
     for (const k of Object.keys(entry)) {
@@ -53,7 +47,6 @@
         return asNumber(entry[k], 0);
       }
     }
-
     return 0;
   }
 
@@ -73,11 +66,11 @@
       .replace(/'/g, "&#39;");
   }
 
+  // Prefer tag, then userTag, then name, then fallback
   function getDisplayName(entry, fallbackLabel) {
     if (!entry || typeof entry !== "object") {
       return fallbackLabel || "Player";
     }
-    // Prefer tag, then userTag, then name
     return (
       entry.tag ||
       entry.userTag ||
@@ -93,7 +86,6 @@
   function initLeaderboard(container) {
     containerEl = container;
 
-    // Full-screen overlay for run summary + leaderboard
     scoreboardOverlay = document.createElement("div");
     scoreboardOverlay.id = "frog-scoreboard-overlay";
     scoreboardOverlay.style.position = "absolute";
@@ -122,7 +114,7 @@
     scoreboardOverlay.appendChild(scoreboardOverlayInner);
     containerEl.appendChild(scoreboardOverlay);
 
-    // click outside panel to close
+    // Click outside panel to close
     scoreboardOverlay.addEventListener("click", (e) => {
       if (e.target === scoreboardOverlay) {
         hideScoreboardOverlay();
@@ -226,29 +218,32 @@
     title.style.textAlign = "center";
     scoreboardOverlayInner.appendChild(title);
 
-    // Find this run in the list (approx match by score+time)
+    // Find the entry that best matches this run by score+time
     let myIndex = -1;
     let myEntry = null;
-    const tolScore = 0.0001;
-    const tolTime = 0.05;
 
-    for (let i = 0; i < safeList.length; i++) {
-      const e = safeList[i] || {};
-      const es = getEntryScore(e);
-      const et = getEntryTime(e);
-      if (
-        Math.abs(es - lastRunScore) < tolScore &&
-        Math.abs(et - lastRunTime) < tolTime
-      ) {
-        myIndex = i;
-        myEntry = e;
-        break;
+    if (safeList.length > 0) {
+      let bestDist = Infinity;
+      for (let i = 0; i < safeList.length; i++) {
+        const e = safeList[i] || {};
+        const es = getEntryScore(e);
+        const et = getEntryTime(e);
+
+        const ds = es - lastRunScore;
+        const dt = et - lastRunTime;
+        const dist = ds * ds + dt * dt;
+
+        if (dist < bestDist) {
+          bestDist = dist;
+          myIndex = i;
+          myEntry = e;
+        }
       }
     }
 
     const myName = getDisplayName(myEntry, "You");
 
-    // Run summary with name in bright yellow
+    // Run summary with *user tag* (display name) in bright yellow
     const summary = document.createElement("div");
     summary.style.marginBottom = "12px";
     summary.style.fontSize = "13px";
@@ -326,7 +321,7 @@
           td.style.borderBottom = "1px solid #222";
         }
 
-        // Highlight THIS run's name in bright yellow
+        // Highlight THIS run's row (user tag) in bright yellow
         if (i === myIndex) {
           nameCell.style.color = "#ffd700";
           nameCell.style.fontWeight = "bold";
