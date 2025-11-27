@@ -98,15 +98,15 @@
     }
 
     .snake-head {
-      background-image: url("/snake/head.png");
+      background-image: url("head.png");
       z-index: 32;
     }
     .snake-body {
-      background-image: url("/snake/body.png");
+      background-image: url("body.png");
       z-index: 31;
     }
     .snake-tail {
-      background-image: url("/snake/tail.png");
+      background-image: url("tail.png");
       z-index: 30;
     }
 
