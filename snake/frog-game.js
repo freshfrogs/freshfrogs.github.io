@@ -1,21 +1,40 @@
 // frog-game.js
-// Frog Snake survival game for FreshFrogs.
+// Main Frog Snake survival game logic for FreshFrogs.
 
 (function () {
   "use strict";
+
+  // Hook up helper modules (with safe fallbacks)
+  const AudioMod = window.FrogGameAudio || {};
+  const initAudio                = AudioMod.initAudio                || function(){};
+  const playRandomRibbit         = AudioMod.playRandomRibbit         || function(){};
+  const playFrogDeath            = AudioMod.playFrogDeath            || function(){};
+  const playSnakeMunch           = AudioMod.playSnakeMunch           || function(){};
+  const playRandomOrbSpawnSound  = AudioMod.playRandomOrbSpawnSound  || function(){};
+  const playBuffSound            = AudioMod.playBuffSound            || function(){};
+  const playPermanentChoiceSound = AudioMod.playPermanentChoiceSound || function(){};
+  const playPerFrogUpgradeSound  = AudioMod.playPerFrogUpgradeSound  || function(){};
+
+  const LMod = window.FrogGameLeaderboard || {};
+  const initLeaderboard        = LMod.initLeaderboard        || function(){};
+  const submitScoreToServer    = LMod.submitScoreToServer    || (async () => null);
+  const fetchLeaderboard       = LMod.fetchLeaderboard       || (async () => null);
+  const updateMiniLeaderboard  = LMod.updateMiniLeaderboard  || function(){};
+  const openScoreboardOverlay  = LMod.openScoreboardOverlay  || function(){};
+  const hideScoreboardOverlay  = LMod.hideScoreboardOverlay  || function(){};
 
   // -----------------------------
   // FROG + METADATA CONSTANTS
   // -----------------------------
   const FROG_SIZE       = 64;
   const MAX_TOKEN_ID    = 4040;
-  const META_BASE       = "../frog/json/";
+  const META_BASE       = "/frog/json/";
   const META_EXT        = ".json";
-  const BUILD_BASE      = "../frog/build_files";
+  const BUILD_BASE      = "/frog/build_files";
   const STARTING_FROGS  = 50;
   const MAX_FROGS       = 150;
 
-  // Values that have animation variants for frogs (same as scatter-frogs.js)
+  // Values that have animation variants for frogs (match scatter-frogs.js)
   const SCATTER_ANIMATED_VALUES = new Set([
     "goldenDartFrog",
     "blueDartFrog",
@@ -68,18 +87,12 @@
   let nextOrbTime   = 0;
   let score         = 0;
 
-  // minute-based permanent upgrades
+  // minute-based global permanent upgrades
   let nextPermanentChoiceTime = 60; // seconds
-  let upgradeOverlay   = null;
-  let upgradeOverlayButtonsContainer = null;
 
-  // scoreboard / leaderboard
-  let scoreboardOverlay = null;
+  // last run info (for scoreboard)
   let lastRunScore = 0;
   let lastRunTime  = 0;
-
-  const LEADERBOARD_URL =
-    "https://lucky-king-0d37.danielssouthworth.workers.dev/leaderboard";
 
   // -----------------------------
   // MOUSE TRACKING
@@ -104,207 +117,6 @@
     }
     mouse.follow = true;
   });
-
-  // -----------------------------
-  // AUDIO
-  // -----------------------------
-  let audioRibbits = [];
-  let audioFrogDeath = null;
-  let audioSnakeEat  = null;
-  let audioOrbSpawn1 = null;
-  let audioOrbSpawn2 = null;
-  let audioSuperSpeed = null;
-  let audioSuperJump  = null;
-  let audioFrogSpawn  = null;
-
-  // temp buff audio placeholders
-  let audioSnakeSlow    = null;
-  let audioSnakeConfuse = null;
-  let audioSnakeShrink  = null;
-  let audioFrogShield   = null;
-  let audioTimeSlow     = null;
-  let audioOrbMagnet    = null;
-  let audioMegaSpawn    = null;
-  let audioScoreMulti   = null;
-  let audioPanicHop     = null;
-  let audioCloneSwarm   = null;
-  let audioLifeSteal    = null;
-
-  // Permanent upgrade audio (global overlay)
-  let audioPermanentChoice = null;
-
-  // Per-frog permanent upgrade audio
-  let audioChampionFrog    = null;
-  let audioAuraFrog        = null;
-  let audioShieldFrogPerma = null;
-  let audioMagnetFrogPerma = null;
-  let audioLuckyFrogPerma  = null;
-  let audioZombieFrogPerma = null;
-
-  function initAudio() {
-    try {
-      audioRibbits = [
-        new Audio("https://freshfrogs.github.io/snake/audio/ribbitOne.mp3"),
-        new Audio("https://freshfrogs.github.io/snake/audio/ribbitTwo.mp3"),
-        new Audio("https://freshfrogs.github.io/snake/audio/ribbitThree.mp3"),
-        new Audio("https://freshfrogs.github.io/snake/audio/ribbitBase.mp3"),
-        new Audio("https://freshfrogs.github.io/snake/audio/ribbitFour.mp3"),
-        new Audio("https://freshfrogs.github.io/snake/audio/ribbitFive.mp3"),
-      ];
-      audioRibbits.forEach(a => a.volume = 0.8);
-    } catch (e) {}
-
-    try {
-      audioFrogDeath = new Audio("https://freshfrogs.github.io/snake/audio/frogDeath.mp3");
-      audioFrogDeath.volume = 0.9;
-    } catch (e) {}
-
-    try {
-      audioSnakeEat = new Audio("https://freshfrogs.github.io/snake/audio/munch.mp3");
-      audioSnakeEat.volume = 0.7;
-    } catch (e) {}
-
-    try {
-      audioOrbSpawn1 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawn.mp3");
-      audioOrbSpawn2 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawnTwo.mp3");
-      audioOrbSpawn1.volume = 0.8;
-      audioOrbSpawn2.volume = 0.8;
-    } catch (e) {}
-
-    try {
-      audioSuperSpeed = new Audio("https://freshfrogs.github.io/snake/audio/superSpeed.mp3");
-      audioSuperJump  = new Audio("https://freshfrogs.github.io/snake/audio/superJump.mp3");
-      audioFrogSpawn  = new Audio("https://freshfrogs.github.io/snake/audio/frogSpawn.mp3");
-      audioSuperSpeed.volume = 0.9;
-      audioSuperJump.volume  = 0.9;
-      audioFrogSpawn.volume  = 0.9;
-    } catch (e) {}
-
-    // new temp buff audios (placeholders)
-    try {
-      audioSnakeSlow    = new Audio("https://freshfrogs.github.io/snake/audio/snakeSlow.mp3");
-      audioSnakeConfuse = new Audio("https://freshfrogs.github.io/snake/audio/snakeConfuse.mp3");
-      audioSnakeShrink  = new Audio("https://freshfrogs.github.io/snake/audio/snakeShrink.mp3");
-      audioFrogShield   = new Audio("https://freshfrogs.github.io/snake/audio/frogShield.mp3");
-      audioTimeSlow     = new Audio("https://freshfrogs.github.io/snake/audio/timeSlow.mp3");
-      audioOrbMagnet    = new Audio("https://freshfrogs.github.io/snake/audio/orbMagnet.mp3");
-      audioMegaSpawn    = new Audio("https://freshfrogs.github.io/snake/audio/megaSpawn.mp3");
-      audioScoreMulti   = new Audio("https://freshfrogs.github.io/snake/audio/scoreMultiplier.mp3");
-      audioPanicHop     = new Audio("https://freshfrogs.github.io/snake/audio/panicHopBuff.mp3");
-      audioCloneSwarm   = new Audio("https://freshfrogs.github.io/snake/audio/cloneSwarm.mp3");
-      audioLifeSteal    = new Audio("https://freshfrogs.github.io/snake/audio/lifeSteal.mp3");
-
-      [
-        audioSnakeSlow,
-        audioSnakeConfuse,
-        audioSnakeShrink,
-        audioFrogShield,
-        audioTimeSlow,
-        audioOrbMagnet,
-        audioMegaSpawn,
-        audioScoreMulti,
-        audioPanicHop,
-        audioCloneSwarm,
-        audioLifeSteal
-      ].forEach(a => { if (a) a.volume = 0.9; });
-    } catch (e) {}
-
-    // per-run permanent choice (overlay)
-    try {
-      audioPermanentChoice = new Audio("https://freshfrogs.github.io/snake/audio/permanentBuffChoice.mp3");
-      audioPermanentChoice.volume = 0.9;
-    } catch (e) {}
-
-    // per-frog permanent upgrade audios
-    try {
-      audioChampionFrog    = new Audio("https://freshfrogs.github.io/snake/audio/championFrog.mp3");
-      audioAuraFrog        = new Audio("https://freshfrogs.github.io/snake/audio/auraFrog.mp3");
-      audioShieldFrogPerma = new Audio("https://freshfrogs.github.io/snake/audio/shieldFrog.mp3");
-      audioMagnetFrogPerma = new Audio("https://freshfrogs.github.io/snake/audio/magnetFrog.mp3");
-      audioLuckyFrogPerma  = new Audio("https://freshfrogs.github.io/snake/audio/luckyFrog.mp3");
-      audioZombieFrogPerma = new Audio("https://freshfrogs.github.io/snake/audio/zombieFrog.mp3");
-
-      [
-        audioChampionFrog,
-        audioAuraFrog,
-        audioShieldFrogPerma,
-        audioMagnetFrogPerma,
-        audioLuckyFrogPerma,
-        audioZombieFrogPerma
-      ].forEach(a => { if (a) a.volume = 0.9; });
-    } catch (e) {}
-  }
-
-  function playClone(base) {
-    if (!base) return;
-    try {
-      const clone = base.cloneNode();
-      clone.volume = base.volume;
-      const p = clone.play();
-      if (p && typeof p.catch === "function") {
-        p.catch(() => {}); // ignore autoplay / 404 / codec errors
-      }
-    } catch (e) {}
-  }
-
-  function playRandomRibbit() {
-    if (!audioRibbits.length) return;
-    const base = audioRibbits[Math.floor(Math.random() * audioRibbits.length)];
-    playClone(base);
-  }
-
-  function playFrogDeath() {
-    playClone(audioFrogDeath);
-  }
-
-  function playSnakeMunch() {
-    playClone(audioSnakeEat);
-  }
-
-  function playRandomOrbSpawnSound() {
-    const choices = [audioOrbSpawn1, audioOrbSpawn2].filter(Boolean);
-    if (!choices.length) return;
-    const base = choices[Math.floor(Math.random() * choices.length)];
-    playClone(base);
-  }
-
-  function playBuffSound(type) {
-    let base = null;
-    switch (type) {
-      case "speed":        base = audioSuperSpeed;    break;
-      case "jump":         base = audioSuperJump;     break;
-      case "spawn":        base = audioFrogSpawn;     break;
-      case "snakeSlow":    base = audioSnakeSlow;     break;
-      case "snakeConfuse": base = audioSnakeConfuse;  break;
-      case "snakeShrink":  base = audioSnakeShrink;   break;
-      case "frogShield":   base = audioFrogShield;    break;
-      case "timeSlow":     base = audioTimeSlow;      break;
-      case "orbMagnet":    base = audioOrbMagnet;     break;
-      case "megaSpawn":    base = audioMegaSpawn;     break;
-      case "scoreMulti":   base = audioScoreMulti;    break;
-      case "panicHop":     base = audioPanicHop;      break;
-      case "cloneSwarm":   base = audioCloneSwarm;    break;
-      case "lifeSteal":    base = audioLifeSteal;     break;
-    }
-    if (base) playClone(base);
-  }
-
-  function playPermanentChoiceSound() {
-    playClone(audioPermanentChoice);
-  }
-
-  function playPerFrogUpgradeSound(role) {
-    let base = null;
-    switch (role) {
-      case "champion": base = audioChampionFrog;    break;
-      case "aura":     base = audioAuraFrog;        break;
-      case "shield":   base = audioShieldFrogPerma; break;
-      case "magnet":   base = audioMagnetFrogPerma; break;
-      case "lucky":    base = audioLuckyFrogPerma;  break;
-      case "zombie":   base = audioZombieFrogPerma; break;
-    }
-    if (base) playClone(base);
-  }
 
   // -----------------------------
   // HUD
@@ -336,6 +148,7 @@
 
   // Mini on-screen leaderboard (top-right)
   const miniBoard = document.createElement("div");
+  miniBoard.id = "frog-mini-leaderboard";
   miniBoard.style.position = "absolute";
   miniBoard.style.top = "10px";
   miniBoard.style.right = "10px";
@@ -348,7 +161,6 @@
   miniBoard.style.zIndex = "100";
   miniBoard.style.maxWidth = "220px";
   miniBoard.style.pointerEvents = "none";
-  miniBoard.id = "frog-mini-leaderboard";
   miniBoard.textContent = "Loading leaderboard…";
   container.appendChild(miniBoard);
 
@@ -582,7 +394,6 @@
       isZombie: false,
 
       cloneEl: null,
-
       layers: []
     };
 
@@ -630,7 +441,7 @@
   const SNAKE_SEGMENT_SIZE  = 48;
   const SNAKE_BASE_SPEED    = 90;
   const SNAKE_TURN_RATE     = Math.PI * 1.5;
-  const SNAKE_SEGMENT_GAP   = 24; // more spacing between segments
+  const SNAKE_SEGMENT_GAP   = 24;
   const SNAKE_INITIAL_SEGMENTS = 6;
   const SNAKE_EAT_RADIUS_BASE = 40;
 
@@ -664,12 +475,12 @@
   let cloneSwarmTime  = 0;
   let lifeStealTime   = 0;
 
-  // permanent (milder) buffs
+  // global permanent (milder) buffs
   let frogPermanentSpeedFactor = 1.0; // <1 = faster hops
   let frogPermanentJumpFactor  = 1.0; // >1 = higher hops
-  let snakePermanentSpeedFactor= 1.0; // reserved if you want to use later
-  let buffDurationFactor       = 1.0; // >1 = longer buff durations
-  let orbSpawnIntervalFactor   = 1.0; // <1 = more orbs (shorter delay)
+  let snakePermanentSpeedFactor= 1.0; // reserved if needed
+  let buffDurationFactor       = 1.0; // >1 = longer temp buffs
+  let orbSpawnIntervalFactor   = 1.0; // <1 = more orbs
 
   const AURA_RADIUS  = 200;
   const AURA_RADIUS2 = AURA_RADIUS * AURA_RADIUS;
@@ -685,7 +496,7 @@
       const dy = (other.baseY + FROG_SIZE / 2) - (frog.baseY + FROG_SIZE / 2);
       const d2 = dx * dx + dy * dy;
       if (d2 <= AURA_RADIUS2) {
-        auraFactor *= 0.9; // up to ~10% faster per aura frog nearby
+        auraFactor *= 0.9;
       }
     }
     factor *= auraFactor;
@@ -698,7 +509,6 @@
   function getJumpFactor(frog) {
     let factor = frogPermanentJumpFactor * (frog.jumpMult || 1);
 
-    // aura frogs boost jump height a bit
     let auraJump = 1.0;
     for (const other of frogs) {
       if (!other.isAura) continue;
@@ -711,14 +521,14 @@
     }
     factor *= auraJump;
 
-    if (jumpBuffTime > 0) factor *= 3.2; // super jump multiplier
+    if (jumpBuffTime > 0) factor *= 3.2; // super jump
     return factor;
   }
 
   function getSnakeSpeedFactor() {
     let factor = snakePermanentSpeedFactor;
     if (snakeSlowTime > 0) factor *= 0.5;
-    if (timeSlowTime > 0)  factor *= 0.4; // time dilation
+    if (timeSlowTime > 0)  factor *= 0.4;
     return factor;
   }
 
@@ -727,19 +537,19 @@
   }
 
   function getSnakeResistance() {
-    // 0.0 = no resistance, 0.8 = very high resistance
     if (!snake || !snake.segments) return 0;
     const extraSegments = Math.max(0, snake.segments.length - SNAKE_INITIAL_SEGMENTS);
-    const RESIST_PER_SEGMENT = 0.04;   // 4% resistance per extra segment
-    const maxResist = 0.8;             // cap at 80% resistance
+    const RESIST_PER_SEGMENT = 0.04;
+    const maxResist = 0.8;
     return Math.max(0, Math.min(maxResist, extraSegments * RESIST_PER_SEGMENT));
   }
 
+  // Per-frog permanent upgrades
   function grantChampionFrog(frog) {
     if (frog.isChampion) return;
     frog.isChampion = true;
-    frog.speedMult *= 0.85;  // faster rhythm
-    frog.jumpMult  *= 1.25;  // higher hops
+    frog.speedMult *= 0.85;
+    frog.jumpMult  *= 1.25;
     refreshFrogPermaGlow(frog);
     playPerFrogUpgradeSound("champion");
   }
@@ -877,25 +687,17 @@
     if (lifeStealTime   > 0) lifeStealTime   = Math.max(0, lifeStealTime   - dt);
 
     // snake-targeting debuffs get resisted as snake grows
-    const snakeResist = getSnakeResistance(); // 0.0–0.8
-    const debuffTickMultiplier = 1 + snakeResist; // up to 1.8x
+    const snakeResist = getSnakeResistance();
+    const debuffTickMultiplier = 1 + snakeResist;
 
-    if (snakeSlowTime    > 0) {
-      snakeSlowTime = Math.max(0, snakeSlowTime - dt * debuffTickMultiplier);
-    }
-    if (snakeConfuseTime > 0) {
-      snakeConfuseTime = Math.max(0, snakeConfuseTime - dt * debuffTickMultiplier);
-    }
-    if (snakeShrinkTime  > 0) {
-      snakeShrinkTime = Math.max(0, snakeShrinkTime - dt * debuffTickMultiplier);
-    }
-    if (timeSlowTime     > 0) {
-      timeSlowTime = Math.max(0, timeSlowTime - dt * debuffTickMultiplier);
-    }
+    if (snakeSlowTime    > 0) snakeSlowTime    = Math.max(0, snakeSlowTime    - dt * debuffTickMultiplier);
+    if (snakeConfuseTime > 0) snakeConfuseTime = Math.max(0, snakeConfuseTime - dt * debuffTickMultiplier);
+    if (snakeShrinkTime  > 0) snakeShrinkTime  = Math.max(0, snakeShrinkTime  - dt * debuffTickMultiplier);
+    if (timeSlowTime     > 0) timeSlowTime     = Math.max(0, timeSlowTime     - dt * debuffTickMultiplier);
   }
 
   // -----------------------------
-  // FROG MOVEMENT
+  // FROG MOVEMENT (matches scatter-frogs feel)
   // -----------------------------
   function chooseHopDestination(frog, width, height) {
     let targetX = frog.x;
@@ -1012,7 +814,7 @@
 
       frog.el.style.transform = `translate3d(${frog.x}px, ${frog.y}px, 0)`;
 
-      // Clone Swarm visual: ghost frogs
+      // Clone Swarm visuals
       if (cloneSwarmTime > 0) {
         if (!frog.cloneEl) {
           const cloneEl = frog.el.cloneNode(true);
@@ -1065,8 +867,8 @@
       "megaSpawn",
       "scoreMulti",
       "panicHop",
-      "cloneSwarm", // new temp buff
-      "lifeSteal",  // new temp team buff
+      "cloneSwarm",
+      "lifeSteal",
       "permaFrog"   // random per-frog permanent upgrade
     ];
     const type = types[Math.floor(Math.random() * types.length)];
@@ -1087,7 +889,7 @@
     el.style.backgroundRepeat = "no-repeat";
     el.style.backgroundPosition = "center";
 
-    // colored glow per type
+    // color glow
     if (type === "speed") {
       el.style.boxShadow = "0 0 14px #32ff9b";
     } else if (type === "jump") {
@@ -1156,7 +958,6 @@
         let target = null;
         let bestD2 = Infinity;
 
-        // magnet frog priority
         for (const mf of magnetFrogs) {
           const fx = mf.x + FROG_SIZE / 2;
           const fy = mf.baseY + FROG_SIZE / 2;
@@ -1169,7 +970,6 @@
           }
         }
 
-        // if no magnet frog in range, fall back to normal nearest frog when orbMagnet buff is active
         if (!target && orbMagnetTime > 0) {
           for (const frog of frogs) {
             const fx = frog.x + FROG_SIZE / 2;
@@ -1225,7 +1025,6 @@
         } else {
           applyBuff(orb.type, collectedBy);
           if (lifeStealTime > 0) {
-            // Life Steal: each orb collected spawns +1 frog
             spawnExtraFrogs(1);
           }
         }
@@ -1359,7 +1158,6 @@
     const head = snake.head;
     if (!head) return;
 
-    // Pick nearest frog as target
     let targetFrog = null;
     let bestDist2 = Infinity;
 
@@ -1379,7 +1177,6 @@
     let desiredAngle = head.angle;
 
     if (snakeConfuseTime > 0) {
-      // snake is confused: wander erratically
       desiredAngle = head.angle + (Math.random() - 0.5) * Math.PI;
       targetFrog = null;
     } else if (targetFrog) {
@@ -1468,7 +1265,7 @@
           continue;
         }
 
-        // per-frog permanent shield: one-time save
+        // per-frog permanent shield
         if (frog.hasPermaShield) {
           frog.hasPermaShield = false;
           refreshFrogPermaGlow(frog);
@@ -1476,7 +1273,6 @@
           continue;
         }
 
-        // remove clone, if any
         if (frog.cloneEl && frog.cloneEl.parentNode === container) {
           container.removeChild(frog.cloneEl);
           frog.cloneEl = null;
@@ -1487,7 +1283,7 @@
         }
         frogs.splice(i, 1);
 
-        // Zombie frog on-death effect
+        // Zombie Frog on-death effect
         if (frog.isZombie) {
           spawnExtraFrogs(5);
           snakeSlowTime = Math.max(
@@ -1504,8 +1300,11 @@
   }
 
   // -----------------------------
-  // PERMANENT UPGRADE OVERLAY
+  // PERMANENT UPGRADE OVERLAY (global per-minute)
   // -----------------------------
+  let upgradeOverlay = null;
+  let upgradeOverlayButtonsContainer = null;
+
   function getUpgradeChoices() {
     return [
       {
@@ -1633,200 +1432,7 @@
   }
 
   // -----------------------------
-  // SCOREBOARD OVERLAY
-  // -----------------------------
-  function ensureScoreboardOverlay() {
-    if (scoreboardOverlay) return;
-
-    scoreboardOverlay = document.createElement("div");
-    scoreboardOverlay.style.position = "absolute";
-    scoreboardOverlay.style.inset = "0";
-    scoreboardOverlay.style.background = "rgba(0,0,0,0.78)";
-    scoreboardOverlay.style.display = "none";
-    scoreboardOverlay.style.zIndex = "200";
-    scoreboardOverlay.style.display = "flex";
-    scoreboardOverlay.style.alignItems = "center";
-    scoreboardOverlay.style.justifyContent = "center";
-    scoreboardOverlay.style.pointerEvents = "auto";
-
-    const panel = document.createElement("div");
-    panel.style.background = "#111";
-    panel.style.padding = "16px 20px";
-    panel.style.borderRadius = "10px";
-    panel.style.border = "1px solid #444";
-    panel.style.color = "#fff";
-    panel.style.fontFamily = "monospace";
-    panel.style.textAlign = "center";
-    panel.style.minWidth = "320px";
-    panel.style.maxWidth = "480px";
-
-    const title = document.createElement("div");
-    title.textContent = "Run Summary";
-    title.style.fontSize = "16px";
-    title.style.marginBottom = "8px";
-
-    const summary = document.createElement("div");
-    summary.style.fontSize = "13px";
-    summary.style.marginBottom = "10px";
-    summary.id = "frog-score-summary";
-
-    const leaderboardTitle = document.createElement("div");
-    leaderboardTitle.textContent = "Top Scores";
-    leaderboardTitle.style.fontSize = "14px";
-    leaderboardTitle.style.margin = "10px 0 4px";
-
-    const table = document.createElement("table");
-    table.style.width = "100%";
-    table.style.borderCollapse = "collapse";
-    table.style.fontSize = "12px";
-    table.id = "frog-score-table";
-
-    const thead = document.createElement("thead");
-    const headRow = document.createElement("tr");
-    ["#", "Tag", "Score", "Time"].forEach((h) => {
-      const th = document.createElement("th");
-      th.textContent = h;
-      th.style.borderBottom = "1px solid #444";
-      th.style.padding = "2px 4px";
-      th.style.textAlign = h === "#" ? "right" : "left";
-      headRow.appendChild(th);
-    });
-    thead.appendChild(headRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement("tbody");
-    table.appendChild(tbody);
-
-    const closeBtn = document.createElement("button");
-    closeBtn.textContent = "Close";
-    closeBtn.style.marginTop = "10px";
-    closeBtn.style.fontFamily = "monospace";
-    closeBtn.style.fontSize = "13px";
-    closeBtn.style.padding = "6px 10px";
-    closeBtn.style.borderRadius = "6px";
-    closeBtn.style.border = "1px solid #555";
-    closeBtn.style.background = "#222";
-    closeBtn.style.color = "#fff";
-    closeBtn.style.cursor = "pointer";
-    closeBtn.onclick = () => {
-      scoreboardOverlay.style.display = "none";
-    };
-    closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
-    closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
-
-    panel.appendChild(title);
-    panel.appendChild(summary);
-    panel.appendChild(leaderboardTitle);
-    panel.appendChild(table);
-    panel.appendChild(closeBtn);
-
-    scoreboardOverlay.appendChild(panel);
-    container.appendChild(scoreboardOverlay);
-  }
-
-  function openScoreboardOverlay(topList) {
-    ensureScoreboardOverlay();
-    const summary = document.getElementById("frog-score-summary");
-    const table   = document.getElementById("frog-score-table");
-    if (!summary || !table) return;
-
-    summary.textContent =
-      `Time: ${formatTime(lastRunTime)}  |  Score: ${Math.floor(lastRunScore)}`;
-
-    const tbody = table.querySelector("tbody");
-    tbody.innerHTML = "";
-
-    if (!Array.isArray(topList) || !topList.length) {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = 4;
-      td.textContent = "No scores yet.";
-      td.style.padding = "4px";
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-    } else {
-      topList.forEach((entry, idx) => {
-        const tr = document.createElement("tr");
-
-        const tdRank = document.createElement("td");
-        tdRank.textContent = String(idx + 1);
-        tdRank.style.textAlign = "right";
-        tdRank.style.padding = "2px 4px";
-
-        const tdTag = document.createElement("td");
-        tdTag.textContent = entry.tag || "Unknown";
-        tdTag.style.padding = "2px 4px";
-
-        const tdScore = document.createElement("td");
-        tdScore.textContent = entry.bestScore != null
-          ? String(Math.floor(entry.bestScore))
-          : "-";
-        tdScore.style.padding = "2px 4px";
-
-        const tdTime = document.createElement("td");
-        tdTime.textContent = entry.bestTime != null
-          ? formatTime(entry.bestTime)
-          : "-";
-        tdTime.style.padding = "2px 4px";
-
-        tr.appendChild(tdRank);
-        tr.appendChild(tdTag);
-        tr.appendChild(tdScore);
-        tr.appendChild(tdTime);
-        tbody.appendChild(tr);
-      });
-    }
-
-    scoreboardOverlay.style.display = "flex";
-  }
-
-  function updateMiniLeaderboard(list) {
-    const el = document.getElementById("frog-mini-leaderboard");
-    if (!el) return;
-
-    if (!Array.isArray(list) || !list.length) {
-      el.textContent = "No scores yet.";
-      return;
-    }
-
-    let text = "Top Scores:\n";
-    list.slice(0, 5).forEach((entry, idx) => {
-      const tag   = entry.tag || "Unknown";
-      const score = entry.bestScore != null ? Math.floor(entry.bestScore) : 0;
-      text += `${idx + 1}. ${tag} — ${score}\n`;
-    });
-
-    el.textContent = text.trim();
-  }
-
-  async function submitScoreToServer(score, time) {
-    try {
-      const res = await fetch(LEADERBOARD_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ score, time }),
-      });
-      if (!res.ok) throw new Error("submit failed");
-      return await res.json(); // top scores array
-    } catch (e) {
-      console.error("submitScoreToServer error", e);
-      return null;
-    }
-  }
-
-  async function fetchLeaderboard() {
-    try {
-      const res = await fetch(LEADERBOARD_URL, { method: "GET" });
-      if (!res.ok) throw new Error("get failed");
-      return await res.json();
-    } catch (e) {
-      console.error("fetchLeaderboard error", e);
-      return null;
-    }
-  }
-
-  // -----------------------------
-  // GAME LOOP
+  // SCORE / LEADERBOARD HOOKS
   // -----------------------------
   function getLuckyScoreBonusFactor() {
     let count = 0;
@@ -1839,18 +1445,14 @@
   function endGame() {
     gameOver = true;
 
-    // capture last run
     lastRunTime  = elapsedTime;
     lastRunScore = score;
 
-    // submit score, then show scoreboard overlay + refresh mini leaderboard
     (async () => {
-      const topList = await submitScoreToServer(lastRunScore, lastRunTime)
-                    || await fetchLeaderboard()
-                    || [];
-
+      const posted = await submitScoreToServer(lastRunScore, lastRunTime);
+      const topList = posted || await fetchLeaderboard() || [];
       updateMiniLeaderboard(topList);
-      openScoreboardOverlay(topList);
+      openScoreboardOverlay(topList, lastRunScore, lastRunTime);
     })();
 
     showGameOver();
@@ -1915,7 +1517,7 @@
 
     hideGameOver();
     if (upgradeOverlay) upgradeOverlay.style.display = "none";
-    if (scoreboardOverlay) scoreboardOverlay.style.display = "none";
+    hideScoreboardOverlay();
 
     const width  = window.innerWidth;
     const height = window.innerHeight;
@@ -1934,6 +1536,9 @@
     nextOrbTime = randRange(min, max);
   }
 
+  // -----------------------------
+  // GAME LOOP
+  // -----------------------------
   function drawFrame(time) {
     const width  = window.innerWidth;
     const height = window.innerHeight;
@@ -1946,20 +1551,17 @@
       if (!gamePaused) {
         elapsedTime += dt;
 
-        // minute-based permanent upgrade pause
         if (elapsedTime >= nextPermanentChoiceTime) {
           openUpgradeOverlay();
         } else {
           updateBuffTimers(dt);
 
-          // time slow: only snake + orbs
           const slowFactor = timeSlowTime > 0 ? 0.4 : 1.0;
 
           updateFrogs(dt, width, height);
           updateSnake(dt * slowFactor, width, height);
           updateOrbs(dt * slowFactor);
 
-          // score (buff + lucky frogs affects score per second)
           let scoreFactor = scoreMultiTime > 0 ? 2 : 1;
           scoreFactor *= getLuckyScoreBonusFactor();
           score += dt * scoreFactor;
@@ -1986,10 +1588,9 @@
   // -----------------------------
   async function startGame() {
     initAudio();
+    initLeaderboard(container);
     ensureUpgradeOverlay();
-    ensureScoreboardOverlay();
 
-    // load leaderboard once when the game boots
     const topList = await fetchLeaderboard();
     if (topList) updateMiniLeaderboard(topList);
 
