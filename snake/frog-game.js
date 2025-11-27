@@ -541,9 +541,9 @@ function snakeShed(stage, speedMultiplier) {
   // --------------------------------------------------
 
   // Normal upgrade multipliers
-  const FROG_SPEED_UPGRADE_FACTOR     = 0.85; // each pick ~15% faster hops
-  const FROG_JUMP_UPGRADE_FACTOR      = 1.7;  // each pick +70% jump height
-  const BUFF_DURATION_UPGRADE_FACTOR  = 1.20; // each pick +20% buff duration
+  const FROG_SPEED_UPGRADE_FACTOR     = 0.90; // each pick ~15% faster hops
+  const FROG_JUMP_UPGRADE_FACTOR      = 1.70;  // each pick +70% jump height
+  const BUFF_DURATION_UPGRADE_FACTOR  = 1.10; // each pick +20% buff duration
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // each pick ~15% faster orb spawns
 
   // Spawn amounts (so you can tweak easily later)
