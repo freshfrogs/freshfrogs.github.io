@@ -99,6 +99,25 @@
   let snake = null;
   let snakeEatSound = null; // <= add this
 
+  // Frog jump / death sounds & game timer (snake game only)
+  const FROG_JUMP_SOUNDS = [
+    "/snake/audio/ribbitOne.mp3",
+    "/snake/audio/ribbitTwo.mp3",
+    "/snake/audio/ribbitThree.mp3",
+    "/snake/audio/ribbitBase.mp3"
+  ];
+  const FROG_DEATH_SOUND = "/snake/audio/frogDeath.mp3";
+  const MAX_SIMULTANEOUS_FROG_JUMPS = 6;
+  const MAX_SIMULTANEOUS_FROG_DEATHS = 4;
+  const activeFrogJumpSounds = [];
+  const activeFrogDeathSounds = [];
+
+  let gameStartTime = null;
+  let gameElapsed = 0;
+  let gameEnded = false;
+  let timerEl = null;
+
+
   function playSnakeEatSound() {
     if (!snakeEatSound) return;
     try {
@@ -109,8 +128,64 @@
     }
   }
 
+  function playFrogJumpSound() {
+    if (!SNAKE_ENABLED || !FROG_JUMP_SOUNDS.length) return;
+
+    const idx = Math.floor(Math.random() * FROG_JUMP_SOUNDS.length);
+    const src = FROG_JUMP_SOUNDS[idx];
+    const audio = new Audio(src);
+    audio.volume = 0.7;
+
+    audio.addEventListener("ended", () => {
+      const i = activeFrogJumpSounds.indexOf(audio);
+      if (i !== -1) activeFrogJumpSounds.splice(i, 1);
+    });
+
+    activeFrogJumpSounds.push(audio);
+    if (activeFrogJumpSounds.length > MAX_SIMULTANEOUS_FROG_JUMPS) {
+      const oldest = activeFrogJumpSounds.shift();
+      try {
+        oldest.pause();
+        oldest.currentTime = 0;
+      } catch (e) {}
+    }
+
+    try {
+      audio.play();
+    } catch (e) {
+      // ignore autoplay errors
+    }
+  }
+
+  function playFrogDeathSound() {
+    if (!SNAKE_ENABLED || !FROG_DEATH_SOUND) return;
+
+    const audio = new Audio(FROG_DEATH_SOUND);
+    audio.volume = 0.8;
+
+    audio.addEventListener("ended", () => {
+      const i = activeFrogDeathSounds.indexOf(audio);
+      if (i !== -1) activeFrogDeathSounds.splice(i, 1);
+    });
+
+    activeFrogDeathSounds.push(audio);
+    if (activeFrogDeathSounds.length > MAX_SIMULTANEOUS_FROG_DEATHS) {
+      const oldest = activeFrogDeathSounds.shift();
+      try {
+        oldest.pause();
+        oldest.currentTime = 0;
+      } catch (e) {}
+    }
+
+    try {
+      audio.play();
+    } catch (e) {
+      // ignore autoplay errors
+    }
+  }
 
   function initSnake(width, height) {
+
     if (!SNAKE_ENABLED) return;
     if (!container) return;
 
@@ -189,7 +264,7 @@
     };
     if (!snakeEatSound) {
       // change this path if needed
-      snakeEatSound = new Audio("/snake/munch.mp3");
+      snakeEatSound = new Audio("/snake/audio/munch.mp3");
       snakeEatSound.volume = 0.7;
     }
   }
@@ -408,12 +483,12 @@
         }
         frogs.splice(i, 1);
 
-        // play munch sound
+        // play sounds
         playSnakeEatSound();
+        playFrogDeathSound();
 
-        // grow snake and respawn a frog somewhere else
+        // grow snake (frogs do NOT respawn)
         growSnake(1);
-        spawnExtraFrog(width, height);
       }
     }
   }
@@ -553,6 +628,21 @@
     return min + Math.random() * (max - min);
   }
 
+  function formatTime(totalSeconds) {
+    const s = Math.max(0, Math.floor(totalSeconds));
+    const minutes = Math.floor(s / 60);
+    const seconds = s % 60;
+    const mm = String(minutes).padStart(2, "0");
+    const ss = String(seconds).padStart(2, "0");
+    return mm + ":" + ss;
+  }
+
+  function updateTimerDisplay(totalSeconds) {
+    if (!SNAKE_ENABLED || !timerEl) return;
+    timerEl.textContent = "Time: " + formatTime(totalSeconds);
+  }
+
+
   function pickRandomTokenIds(count) {
     const set = new Set();
     while (set.size < count) {
@@ -561,15 +651,21 @@
     return Array.from(set);
   }
 
-  function computeFrogPositions(width, height) {
-    const area = width * height;
-    const approxPerFrogArea = (FROG_SIZE * FROG_SIZE) * 5;
-    let targetCount = Math.floor(area / approxPerFrogArea);
-    targetCount = Math.max(15, Math.min(MAX_FROGS, targetCount));
-
+function computeFrogPositions(width, height, desiredCount) {
     const positions = [];
     const MIN_DIST = 52;
     const margin = 16;
+
+    let targetCount;
+
+    if (typeof desiredCount === "number" && !isNaN(desiredCount)) {
+      targetCount = Math.max(1, Math.min(MAX_FROGS, Math.floor(desiredCount)));
+    } else {
+      const area = width * height;
+      const approxPerFrogArea = (FROG_SIZE * FROG_SIZE) * 5;
+      targetCount = Math.floor(area / approxPerFrogArea);
+      targetCount = Math.max(15, Math.min(MAX_FROGS, targetCount));
+    }
 
     let safety = targetCount * 50;
     while (positions.length < targetCount && safety-- > 0) {
@@ -591,8 +687,10 @@
       }
       if (ok) positions.push({ x, y });
     }
+
     return positions;
   }
+
 
   async function fetchMetadata(tokenId) {
     const url = `${META_BASE}${tokenId}${META_EXT}`;
@@ -660,11 +758,11 @@
   // -----------------------------
   // Create random base frogs
   // -----------------------------
-  async function createFrogs(width, height) {
+async function createFrogs(width, height) {
     frogs = [];
     container.innerHTML = "";
 
-    const positions = computeFrogPositions(width, height);
+    const positions = computeFrogPositions(width, height, SNAKE_ENABLED ? 50 : null);
     const tokenIds  = pickRandomTokenIds(positions.length);
 
     for (let i = 0; i < positions.length; i++) {
@@ -799,6 +897,11 @@
           frog.hopTime = 0;
           frog.hopDuration = randRange(frog.hopDurMin, frog.hopDurMax);
 
+          // play a random ribbit when a frog starts a hop (snake game only)
+          if (SNAKE_ENABLED) {
+            playFrogJumpSound();
+          }
+
           // vary hop height a bit
           const spice = Math.random();
           if (spice < 0.1) {
@@ -849,7 +952,7 @@
     }
   }
 
-  function drawFrame(time) {
+function drawFrame(time) {
     const width = window.innerWidth;
     const height = window.innerHeight;
 
@@ -857,12 +960,29 @@
     const dt = (time - lastTime) / 1000;
     lastTime = time;
 
+    if (SNAKE_ENABLED) {
+      if (gameStartTime === null) {
+        gameStartTime = time;
+      }
+      gameElapsed = (time - gameStartTime) / 1000;
+      updateTimerDisplay(gameElapsed);
+    }
+
     updateFrogs(dt, width, height);
     if (SNAKE_ENABLED) {
       updateSnake(dt, width, height);
+
+      if (!gameEnded && frogs.length === 0) {
+        gameEnded = true;
+        if (timerEl) {
+          timerEl.textContent = "Time: " + formatTime(gameElapsed) + " – All frogs eaten!";
+        }
+      }
     }
 
-    animId = requestAnimationFrame(drawFrame);
+    if (!SNAKE_ENABLED || !gameEnded) {
+      animId = requestAnimationFrame(drawFrame);
+    }
   }
 
 
@@ -884,11 +1004,35 @@ async function resetAndStart() {
   // NEW: init snake only on snake pages
   if (SNAKE_ENABLED) {
     initSnake(width, height);
+
+    // (Re)start timer for snake game
+    if (!timerEl) {
+      timerEl = document.createElement("div");
+      timerEl.id = "snake-timer";
+      timerEl.style.position = "fixed";
+      timerEl.style.top = "10px";
+      timerEl.style.left = "50%";
+      timerEl.style.transform = "translateX(-50%)";
+      timerEl.style.padding = "4px 10px";
+      timerEl.style.background = "rgba(0, 0, 0, 0.6)";
+      timerEl.style.color = "#ffffff";
+      timerEl.style.fontFamily =
+        "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+      timerEl.style.fontSize = "14px";
+      timerEl.style.borderRadius = "4px";
+      timerEl.style.zIndex = "50";
+      timerEl.style.pointerEvents = "none";
+      container.appendChild(timerEl);
+    }
+
+    gameStartTime = null;
+    gameElapsed = 0;
+    gameEnded = false;
+    updateTimerDisplay(0);
   }
 
   animId = requestAnimationFrame(drawFrame);
 }
-
 
   window.addEventListener("resize", resetAndStart);
   window.addEventListener("load", resetAndStart);
