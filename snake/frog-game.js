@@ -1449,93 +1449,128 @@ function getLegendaryUpgradeChoices() {
   ];
 }
 
-  function ensureHowToOverlay() {
-    if (howToOverlay) return;
+function ensureHowToOverlay() {
+  if (howToOverlay) return;
 
-    howToOverlay = document.createElement("div");
-    howToOverlay.className = "frog-howto-overlay";
+  howToOverlay = document.createElement("div");
+  howToOverlay.className = "frog-howto-overlay";
 
-    howToOverlay.style.position = "absolute";
-    howToOverlay.style.inset = "0";
-    howToOverlay.style.background = "rgba(0,0,0,0.7)";
-    howToOverlay.style.display = "none";
-    howToOverlay.style.zIndex = "160";
-    howToOverlay.style.alignItems = "center";
-    howToOverlay.style.justifyContent = "center";
-    howToOverlay.style.pointerEvents = "auto";
+  howToOverlay.style.position = "absolute";
+  howToOverlay.style.inset = "0";
+  howToOverlay.style.background = "rgba(0,0,0,0.7)";
+  howToOverlay.style.display = "none";
+  howToOverlay.style.zIndex = "160";
+  howToOverlay.style.alignItems = "center";
+  howToOverlay.style.justifyContent = "center";
+  howToOverlay.style.pointerEvents = "auto";
 
-    const panel = document.createElement("div");
-    panel.style.background = "#111";
-    panel.style.padding = "18px 22px";
-    panel.style.borderRadius = "10px";
-    panel.style.border = "1px solid #444";
-    panel.style.color = "#fff";
-    panel.style.fontFamily = "monospace";
-    panel.style.textAlign = "left";
-    panel.style.minWidth = "260px";
-    panel.style.maxWidth = "420px";
-    panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
+  const panel = document.createElement("div");
+  panel.style.background = "#111";
+  panel.style.padding = "18px 22px";
+  panel.style.borderRadius = "10px";
+  panel.style.border = "1px solid #444";
+  panel.style.color = "#fff";
+  panel.style.fontFamily = "monospace";
+  panel.style.textAlign = "left";
+  panel.style.minWidth = "260px";
+  panel.style.maxWidth = "420px";
+  panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
 
-    const title = document.createElement("div");
-    title.textContent = "escape the snake 🐍";
-    title.style.fontSize = "18px";
-    title.style.fontWeight = "bold";
-    title.style.marginBottom = "4px";
+  const title = document.createElement("div");
+  title.textContent = "escape the snake 🐍";
+  title.style.fontSize = "18px";
+  title.style.fontWeight = "bold";
+  title.style.marginBottom = "4px";
 
-    const subtitle = document.createElement("div");
-    subtitle.textContent = "-- How to Play --";
-    subtitle.style.marginBottom = "10px";
-    subtitle.style.fontSize = "13px";
-    subtitle.style.opacity = "0.9";
+  const subtitle = document.createElement("div");
+  subtitle.textContent = "-- How to Play --";
+  subtitle.style.marginBottom = "10px";
+  subtitle.style.fontSize = "13px";
+  subtitle.style.opacity = "0.9";
 
-    const list = document.createElement("ul");
-    list.style.paddingLeft = "18px";
-    list.style.margin = "0 0 14px 0";
-    list.style.fontSize = "13px";
-    list.style.lineHeight = "1.4";
+  const list = document.createElement("ul");
+  list.style.paddingLeft = "18px";
+  list.style.margin = "0 0 14px 0";
+  list.style.fontSize = "13px";
+  list.style.lineHeight = "1.4";
 
-    [
-      "Avoid the snake and stay alive as long as possible!",
-      "Collect orbs to gain buffs and upgrades.",
-      "Beat the high score to get on the leaderboard.",
-      "Control frogs with your mouse."
-    ].forEach(text => {
-      const li = document.createElement("li");
-      li.textContent = text;
-      list.appendChild(li);
-    });
+  [
+    "Avoid the snake and stay alive as long as possible!",
+    "Collect orbs to gain buffs and upgrades.",
+    "Beat the high score to get on the leaderboard.",
+    "Control frogs with your mouse."
+  ].forEach(text => {
+    const li = document.createElement("li");
+    li.textContent = text;
+    list.appendChild(li);
+  });
 
-    const button = document.createElement("button");
-    button.textContent = "Start & Choose Buff";
-    button.style.fontFamily = "monospace";
-    button.style.fontSize = "13px";
-    button.style.padding = "6px 10px";
-    button.style.borderRadius = "6px";
-    button.style.border = "1px solid #555";
-    button.style.background = "#222";
-    button.style.color = "#fff";
-    button.style.cursor = "pointer";
-    button.style.display = "block";
-    button.style.margin = "0 auto";
-    button.onmouseenter = () => { button.style.background = "#333"; };
-    button.onmouseleave = () => { button.style.background = "#222"; };
-    button.onclick = () => {
-      hasShownHowToOverlay = true;
-      if (howToOverlay) {
-        howToOverlay.style.display = "none";
-      }
-      // When the player is ready, open the first buff menu.
-      openUpgradeOverlay("normal");
-    };
+  // Buttons row: Start & Learn more
+  const btnRow = document.createElement("div");
+  btnRow.style.display = "flex";
+  btnRow.style.justifyContent = "space-between";
+  btnRow.style.gap = "8px";
+  btnRow.style.marginTop = "4px";
 
-    panel.appendChild(title);
-    panel.appendChild(subtitle);
-    panel.appendChild(list);
-    panel.appendChild(button);
+  const startBtn = document.createElement("button");
+  startBtn.textContent = "Start & choose buff";
+  startBtn.style.fontFamily = "monospace";
+  startBtn.style.fontSize = "13px";
+  startBtn.style.padding = "6px 10px";
+  startBtn.style.borderRadius = "6px";
+  startBtn.style.border = "1px solid #555";
+  startBtn.style.background = "#222";
+  startBtn.style.color = "#fff";
+  startBtn.style.cursor = "pointer";
+  startBtn.style.flex = "1";
+  startBtn.onmouseenter = () => { startBtn.style.background = "#333"; };
+  startBtn.onmouseleave = () => { startBtn.style.background = "#222"; };
+  startBtn.onclick = () => {
+    hasShownHowToOverlay = true;
+    if (howToOverlay) {
+      howToOverlay.style.display = "none";
+    }
+    openUpgradeOverlay("normal");
+  };
 
-    howToOverlay.appendChild(panel);
-    container.appendChild(howToOverlay);
+  const learnBtn = document.createElement("button");
+  learnBtn.textContent = "Learn buffs 📖";
+  learnBtn.style.fontFamily = "monospace";
+  learnBtn.style.fontSize = "13px";
+  learnBtn.style.padding = "6px 10px";
+  learnBtn.style.borderRadius = "6px";
+  learnBtn.style.border = "1px solid #555";
+  learnBtn.style.background = "#222";
+  learnBtn.style.color = "#fff";
+  learnBtn.style.cursor = "pointer";
+  learnBtn.style.flex = "0 0 auto";
+  learnBtn.onmouseenter = () => { learnBtn.style.background = "#333"; };
+  learnBtn.onmouseleave = () => { learnBtn.style.background = "#222"; };
+  learnBtn.onclick = () => {
+    ensureBuffGuideOverlay();
+    openBuffGuideOverlay();
+  };
+
+  btnRow.appendChild(startBtn);
+  btnRow.appendChild(learnBtn);
+
+  panel.appendChild(title);
+  panel.appendChild(subtitle);
+  panel.appendChild(list);
+  panel.appendChild(btnRow);
+
+  howToOverlay.appendChild(panel);
+  container.appendChild(howToOverlay);
+}
+
+function openHowToOverlay() {
+  ensureHowToOverlay();
+  gamePaused = true;
+  if (howToOverlay) {
+    howToOverlay.style.display = "flex";
   }
+}
+
 
   function openHowToOverlay() {
     ensureHowToOverlay();
