@@ -1357,12 +1357,12 @@
       {
         id: "frogSpeed",
         label: "Frogs hop a bit faster forever",
-        apply: () => { frogPermanentSpeedFactor *= 0.9; }
+        apply: () => { frogPermanentSpeedFactor *= 0.85; }
       },
       {
         id: "frogJump",
         label: "Frogs jump higher forever",
-        apply: () => { frogPermanentJumpFactor *= 1.25; }
+        apply: () => { frogPermanentJumpFactor *= 1.7; }
       },
       {
         id: "spawn20",
@@ -1372,7 +1372,7 @@
       {
         id: "buffDuration",
         label: "Temporary buffs last longer",
-        apply: () => { buffDurationFactor *= 1.15; }
+        apply: () => { buffDurationFactor *= 1.20; }
       },
       {
         id: "moreOrbs",
