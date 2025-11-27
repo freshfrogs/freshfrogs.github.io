@@ -101,9 +101,15 @@
   // every 180 seconds we pause for an EPIC upgrade
   let nextEpicChoiceTime = 180;
 
-  // Legendary event at 10 minutes
   const LEGENDARY_EVENT_TIME = 600; // 10 minutes
+  const SECOND_SHED_TIME     = 900; // 15 minutes
+
   let legendaryEventTriggered = false;
+  let secondShedTriggered     = false;
+
+  // Snake evolution / shedding stage:
+  // 0 = base, 1 = first shed, 2 = second shed
+  let snakeShedStage = 0;
 
   // --------------------------------------------------
   // MOUSE
@@ -217,6 +223,43 @@
   // --------------------------------------------------
   // HELPERS
   // --------------------------------------------------
+
+function snakeShed(stage, speedMultiplier) {
+  if (!snake) return;
+
+  snakeShedStage = stage;
+
+  // 1) Cut body length in half (keep at least 3 segments)
+  const segs = snake.segments;
+  const desiredCount = Math.max(3, Math.ceil(segs.length / 2));
+
+  while (segs.length > desiredCount) {
+    const seg = segs.pop();
+    if (seg && seg.el && seg.el.parentNode === container) {
+      container.removeChild(seg.el);
+    }
+  }
+
+  // Ensure last segment is tail sprite, others are body
+  if (segs.length > 0) {
+    for (let i = 0; i < segs.length; i++) {
+      const segEl = segs[i].el;
+      if (!segEl) continue;
+      const isTail = (i === segs.length - 1);
+      segEl.style.backgroundImage = isTail
+        ? "url(/snake/tail.png)"
+        : "url(/snake/body.png)";
+    }
+  }
+
+  // 2) Permanently increase snake speed
+  snakePermanentSpeedFactor *= speedMultiplier;
+
+  // 3) Update color based on new stage
+  applySnakeAppearance();
+}
+
+
   function randInt(min, maxInclusive) {
     return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
   }
@@ -684,25 +727,43 @@
     }
   }
 
-  // Snake Frenzy visual helper: tint everything red-ish
-  function setSnakeFrenzyVisual(active) {
-    if (!snake || !snake.head || !snake.head.el) return;
-    if (snake.isFrenzyVisual === active) return;
-    snake.isFrenzyVisual = active;
+  function applySnakeAppearance() {
+    if (!snake) return;
 
-    const filterOn = "hue-rotate(-80deg) saturate(2)";
-    const headEl = snake.head.el;
-    headEl.style.filter = active ? filterOn : "";
-
+    const elements = [];
+    if (snake.head && snake.head.el) elements.push(snake.head.el);
     if (Array.isArray(snake.segments)) {
       for (const seg of snake.segments) {
-        if (!seg.el) continue;
-        seg.el.style.filter = active ? filterOn : "";
+        if (seg.el) elements.push(seg.el);
       }
     }
 
-    // If you prefer custom red PNGs instead of filters,
-    // swap seg/head backgroundImage URLs here.
+    let filter = "";
+
+    // Base color per shed stage
+    // (tweak these filters or swap to new PNGs later if you want)
+    if (snakeShedStage === 1) {
+      // 1st shed: aqua/teal-ish
+      filter = "hue-rotate(80deg) saturate(1.4)";
+    } else if (snakeShedStage === 2) {
+      // 2nd shed: purple-ish
+      filter = "hue-rotate(150deg) saturate(1.6)";
+    }
+
+    // Legendary Frenzy overlay (red tint)
+    if (snakeFrenzyTime > 0) {
+      filter += (filter ? " " : "") + "hue-rotate(-80deg) saturate(2)";
+    }
+
+    for (const el of elements) {
+      el.style.filter = filter;
+    }
+  }
+
+  function setSnakeFrenzyVisual(active) {
+    if (!snake) return;
+    snake.isFrenzyVisual = active;
+    applySnakeAppearance();
   }
 
   function updateBuffTimers(dt) {
@@ -1121,6 +1182,8 @@
       path,
       isFrenzyVisual: false
     };
+    // apply current stage color on fresh snake
+    applySnakeAppearance();
   }
 
   function growSnake(extraSegments) {
@@ -1944,7 +2007,15 @@ function ensureBuffGuideOverlay() {
       } else if (currentUpgradeOverlayMode === "legendary") {
         // one-time 10-minute event
         nextPermanentChoiceTime = elapsedTime + 60;
+
+        // 13s Legendary Frenzy (red, panic hop, etc.)
         triggerLegendaryFrenzy();
+
+        // 🐍 First shed:
+        // - halve body length
+        // - change color (stage 1)
+        // - permanent +17% speed
+        snakeShed(1, 1.17);
       }
     }
   }
@@ -2028,10 +2099,13 @@ function ensureBuffGuideOverlay() {
     mouse.follow    = false;
 
     // Reset upgrade timing
+    // Reset upgrade timing / sheds
     initialUpgradeDone       = false;
     nextPermanentChoiceTime  = 60;
     nextEpicChoiceTime       = 180;
     legendaryEventTriggered  = false;
+    secondShedTriggered      = false;
+    snakeShedStage           = 0;
 
     // Reset all temporary buff timers
     speedBuffTime   = 0;
@@ -2101,10 +2175,20 @@ function ensureBuffGuideOverlay() {
       if (!gamePaused) {
         elapsedTime += dt;
 
-        // Legendary 10-minute event has top priority
-        if (!legendaryEventTriggered && elapsedTime >= LEGENDARY_EVENT_TIME) {
-          legendaryEventTriggered = true;
-          openUpgradeOverlay("legendary");
+      // Legendary 10-minute event has top priority
+      if (!legendaryEventTriggered && elapsedTime >= LEGENDARY_EVENT_TIME) {
+        legendaryEventTriggered = true;
+        openUpgradeOverlay("legendary");
+      }
+        // Second shed at 15 minutes (only if we've shed once already)
+        else if (!secondShedTriggered && elapsedTime >= SECOND_SHED_TIME && snakeShedStage >= 1) {
+          secondShedTriggered = true;
+
+          // 🐍 Second shed:
+          // - halve body again
+          // - new color (stage 2)
+          // - permanent +20% speed
+          snakeShed(2, 1.20);
         }
         // EPIC choices (every 3 minutes)
         else if (elapsedTime >= nextEpicChoiceTime) {
