@@ -1473,24 +1473,28 @@ function openScoreboardOverlay(topList) {
   // -----------------------------
   // GAME LOOP
   // -----------------------------
-function endGame() {
-  gameOver = true;
+  function endGame() {
+    gameOver = true;
 
-  // capture last run
-  lastRunTime  = elapsedTime;
-  lastRunScore = score;
+    // capture last run
+    lastRunTime  = elapsedTime;
+    lastRunScore = score;
 
-  // submit score, then show scoreboard overlay
-  (async () => {
-    const topList = await submitScoreToServer(lastRunScore, lastRunTime)
-                  || await fetchLeaderboard()
-                  || [];
-    openScoreboardOverlay(topList);
-  })();
+    // submit score, then show scoreboard overlay + refresh mini leaderboard
+    (async () => {
+      const topList = await submitScoreToServer(lastRunScore, lastRunTime)
+                    || await fetchLeaderboard()
+                    || [];
 
-  showGameOver();
-}
+      // 🔹 update the small HUD leaderboard
+      updateMiniLeaderboard(topList);
 
+      // 🔹 open the big end-of-run overlay
+      openScoreboardOverlay(topList);
+    })();
+
+    showGameOver();
+  }
 
   function restartGame() {
     if (animId) {
@@ -1608,7 +1612,11 @@ function endGame() {
 async function startGame() {
   initAudio();
   ensureUpgradeOverlay();
-  ensureScoreboardOverlay();  // <-- add this
+  ensureScoreboardOverlay();
+
+  // 🔹 load leaderboard once when the game boots
+  const topList = await fetchLeaderboard();
+  if (topList) updateMiniLeaderboard(topList);
 
   const width  = window.innerWidth;
   const height = window.innerHeight;
@@ -1620,7 +1628,6 @@ async function startGame() {
   updateHUD();
   animId = requestAnimationFrame(drawFrame);
 }
-
 
   window.addEventListener("load", startGame);
 })();
