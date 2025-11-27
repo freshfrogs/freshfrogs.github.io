@@ -97,6 +97,9 @@
   // every 60 seconds we pause for a global permanent upgrade
   let nextPermanentChoiceTime = 60;
 
+  // every 180 seconds we pause for an EPIC upgrade
+  let nextEpicChoiceTime = 180;
+
   // --------------------------------------------------
   // MOUSE
   // --------------------------------------------------
@@ -477,6 +480,7 @@
   let panicHopTime    = 0;
   let cloneSwarmTime  = 0;
   let lifeStealTime   = 0;
+  let frogDeathRattleChance = 0.0;  // 0.25 when epic is picked
 
   // global permanent buffs
   let frogPermanentSpeedFactor = 1.0; // <1 = faster hops
@@ -1281,112 +1285,78 @@ function updateSnake(dt, width, height) {
         );
       }
 
+      // EPIC buff: global deathrattle – chance to spawn a replacement frog
+      if (frogDeathRattleChance > 0 && Math.random() < frogDeathRattleChance) {
+        spawnExtraFrogs(1);
+      }
+
       playSnakeMunch();
       playFrogDeath();
       growSnake(1);
+
     }
   }
 }
 
 
   // --------------------------------------------------
-  // PERMANENT UPGRADE OVERLAY (GLOBAL PER-MINUTE)
+  // PERMANENT & EPIC UPGRADE OVERLAY
   // --------------------------------------------------
   let upgradeOverlay = null;
   let upgradeOverlayButtonsContainer = null;
+  let upgradeOverlayTitleEl = null;
+  let currentUpgradeOverlayMode = "normal"; // "normal" | "epic"
   let initialUpgradeDone = false;
 
-function getUpgradeChoices() {
-  return [
-    {
-      id: "frogSpeed",
-      label: "Frogs hop a bit faster forever",
-      apply: () => { frogPermanentSpeedFactor *= 0.9; }
-    },
-    {
-      id: "frogJump",
-      label: "Frogs jump higher forever",
-      apply: () => { frogPermanentJumpFactor *= 1.25; }
-    },
-    {
-      id: "spawn20",
-      label: "Spawn 20 frogs right now",
-      apply: () => { spawnExtraFrogs(20); }
-    },
-    {
-      id: "buffDuration",
-      label: "Temporary buffs last longer",
-      apply: () => { buffDurationFactor *= 1.15; }
-    },
-    {
-      id: "moreOrbs",
-      label: "More orbs spawn over time",
-      apply: () => { orbSpawnIntervalFactor *= 0.85; }
-    }
-  ];
-}
-
-function populateUpgradeOverlayChoices() {
-  ensureUpgradeOverlay();
-  const containerEl = upgradeOverlayButtonsContainer;
-  if (!containerEl) return;
-
-  containerEl.innerHTML = "";
-
-  const all = getUpgradeChoices();
-
-  // Always include spawn20 if it exists
-  const spawnChoice = all.find(c => c.id === "spawn20");
-  const pool = all.filter(c => c.id !== "spawn20");
-
-  const choices = [];
-
-  if (spawnChoice) {
-    choices.push(spawnChoice);
+  function getUpgradeChoices() {
+    return [
+      {
+        id: "frogSpeed",
+        label: "Frogs hop a bit faster forever",
+        apply: () => { frogPermanentSpeedFactor *= 0.9; }
+      },
+      {
+        id: "frogJump",
+        label: "Frogs jump higher forever",
+        apply: () => { frogPermanentJumpFactor *= 1.25; }
+      },
+      {
+        id: "spawn20",
+        label: "Spawn 20 frogs right now",
+        apply: () => { spawnExtraFrogs(20); }
+      },
+      {
+        id: "buffDuration",
+        label: "Temporary buffs last longer",
+        apply: () => { buffDurationFactor *= 1.15; }
+      },
+      {
+        id: "moreOrbs",
+        label: "More orbs spawn over time",
+        apply: () => { orbSpawnIntervalFactor *= 0.85; }
+      }
+    ];
   }
 
-  // Fill remaining slots (up to 3 total) with random unique choices
-  while (choices.length < 3 && pool.length) {
-    const idx = Math.floor(Math.random() * pool.length);
-    choices.push(pool.splice(idx, 1)[0]);
-  }
-
-    function makeButton(label, onClick) {
-      const btn = document.createElement("button");
-      btn.textContent = label;
-      btn.style.fontFamily = "monospace";
-      btn.style.fontSize = "13px";
-      btn.style.padding = "6px 8px";
-      btn.style.border = "1px solid #555";
-      btn.style.borderRadius = "6px";
-      btn.style.background = "#222";
-      btn.style.color = "#fff";
-      btn.style.cursor = "pointer";
-      btn.onmouseenter = () => { btn.style.background = "#333"; };
-      btn.onmouseleave = () => { btn.style.background = "#222"; };
-      btn.onclick = () => {
-        try {
-          onClick();
-        } catch (e) {
-          console.error("Error applying permanent upgrade:", e);
-        }
-        playPermanentChoiceSound();
-        closeUpgradeOverlay();
-      };
-      return btn;
-    }
-
-    if (!choices.length) {
-      const span = document.createElement("div");
-      span.textContent = "No upgrades available.";
-      span.style.fontSize = "13px";
-      containerEl.appendChild(span);
-      return;
-    }
-
-    for (const choice of choices) {
-      containerEl.appendChild(makeButton(choice.label, choice.apply));
-    }
+  // EPIC choices every 3 minutes
+  function getEpicUpgradeChoices() {
+    return [
+      {
+        id: "epicSpawn50",
+        label: "EPIC: Spawn 50 frogs right now",
+        apply: () => { spawnExtraFrogs(50); }
+      },
+      {
+        id: "epicDeathRattle",
+        label: "EPIC: Deathrattle – 25% chance a dead frog respawns",
+        apply: () => { frogDeathRattleChance = 0.25; }
+      },
+      {
+        id: "epicFrogSpeed",
+        label: "EPIC: All frogs move permanently faster",
+        apply: () => { frogPermanentSpeedFactor *= 0.9; /* small but permanent */ }
+      }
+    ];
   }
 
   function ensureUpgradeOverlay() {
@@ -1420,6 +1390,7 @@ function populateUpgradeOverlayChoices() {
     title.textContent = "Choose a permanent upgrade";
     title.style.marginBottom = "12px";
     title.style.fontSize = "14px";
+    upgradeOverlayTitleEl = title;
 
     const buttonsContainer = document.createElement("div");
     buttonsContainer.style.display = "flex";
@@ -1435,18 +1406,33 @@ function populateUpgradeOverlayChoices() {
     container.appendChild(upgradeOverlay);
   }
 
-  function populateUpgradeOverlayChoices() {
+  function populateUpgradeOverlayChoices(mode) {
     ensureUpgradeOverlay();
     const containerEl = upgradeOverlayButtonsContainer;
     if (!containerEl) return;
 
+    currentUpgradeOverlayMode = mode || "normal";
+    const isEpic = currentUpgradeOverlayMode === "epic";
+
     containerEl.innerHTML = "";
 
-    const pool = getUpgradeChoices().slice();
-    const choices = [];
-    while (choices.length < 3 && pool.length) {
-      const idx = Math.floor(Math.random() * pool.length);
-      choices.push(pool.splice(idx, 1)[0]);
+    if (upgradeOverlayTitleEl) {
+      upgradeOverlayTitleEl.textContent = isEpic
+        ? "Choose an EPIC upgrade"
+        : "Choose a permanent upgrade";
+    }
+
+    let choices = [];
+    if (isEpic) {
+      // show all epic choices
+      choices = getEpicUpgradeChoices().slice();
+    } else {
+      // normal per-minute upgrades – random 3
+      const pool = getUpgradeChoices().slice();
+      while (choices.length < 3 && pool.length) {
+        const idx = Math.floor(Math.random() * pool.length);
+        choices.push(pool.splice(idx, 1)[0]);
+      }
     }
 
     function makeButton(label, onClick) {
@@ -1463,8 +1449,10 @@ function populateUpgradeOverlayChoices() {
       btn.onmouseenter = () => { btn.style.background = "#333"; };
       btn.onmouseleave = () => { btn.style.background = "#222"; };
       btn.onclick = () => {
-        try { onClick(); } catch (e) {
-          console.error("Error applying permanent upgrade:", e);
+        try {
+          onClick();
+        } catch (e) {
+          console.error("Error applying upgrade:", e);
         }
         playPermanentChoiceSound();
         closeUpgradeOverlay();
@@ -1485,9 +1473,9 @@ function populateUpgradeOverlayChoices() {
     }
   }
 
-  function openUpgradeOverlay() {
+  function openUpgradeOverlay(mode) {
     ensureUpgradeOverlay();
-    populateUpgradeOverlayChoices();
+    populateUpgradeOverlayChoices(mode);
 
     gamePaused = true;
     if (upgradeOverlay) {
@@ -1501,13 +1489,18 @@ function populateUpgradeOverlayChoices() {
     }
     gamePaused = false;
 
-    if (!initialUpgradeDone) {
+    if (!initialUpgradeDone && currentUpgradeOverlayMode === "normal") {
       // This was the "starting" upgrade
       initialUpgradeDone = true;
-      nextPermanentChoiceTime = 60;  // first timed choice 60s after play begins
+      nextPermanentChoiceTime = elapsedTime + 60; // first timed choice 60s after game actually starts
     } else {
-      // Normal per-minute upgrades
-      nextPermanentChoiceTime += 60;
+      if (currentUpgradeOverlayMode === "normal") {
+        // normal per-minute upgrades
+        nextPermanentChoiceTime += 60;
+      } else if (currentUpgradeOverlayMode === "epic") {
+        // epic every 3 minutes
+        nextEpicChoiceTime += 180;
+      }
     }
   }
 
@@ -1588,9 +1581,10 @@ function populateUpgradeOverlayChoices() {
     nextOrbTime   = 0;
     mouse.follow  = false;
 
-    // 🔹 Reset the “starting upgrade” flag + next upgrade time
-    initialUpgradeDone     = false;
-    nextPermanentChoiceTime = 60;
+    // Reset upgrade timing
+    initialUpgradeDone       = false;
+    nextPermanentChoiceTime  = 60;
+    nextEpicChoiceTime       = 180;
 
     // Reset all temporary buff timers
     speedBuffTime   = 0;
@@ -1605,6 +1599,9 @@ function populateUpgradeOverlayChoices() {
     panicHopTime    = 0;
     cloneSwarmTime  = 0;
     lifeStealTime   = 0;
+
+    // Reset EPIC deathrattle
+    frogDeathRattleChance = 0.0;
 
     // Reset global permanent buffs
     frogPermanentSpeedFactor = 1.0;
@@ -1628,8 +1625,8 @@ function populateUpgradeOverlayChoices() {
     setNextOrbTime();
     updateHUD();
 
-    // 🔹 Show the upgrade menu again at the start of a new run
-    openUpgradeOverlay();
+    // Show the upgrade menu again at the start of a new run
+    openUpgradeOverlay("normal");
 
     animId = requestAnimationFrame(drawFrame);
   }
@@ -1655,8 +1652,13 @@ function populateUpgradeOverlayChoices() {
       if (!gamePaused) {
         elapsedTime += dt;
 
-        if (elapsedTime >= nextPermanentChoiceTime) {
-          openUpgradeOverlay();
+        // EPIC choices first priority (every 3 minutes)
+        if (elapsedTime >= nextEpicChoiceTime) {
+          openUpgradeOverlay("epic");
+        }
+        // Normal per-minute permanent choices
+        else if (elapsedTime >= nextPermanentChoiceTime) {
+          openUpgradeOverlay("normal");
         } else {
           updateBuffTimers(dt);
 
@@ -1708,9 +1710,10 @@ function populateUpgradeOverlayChoices() {
     updateHUD();
 
     // NEW: let the user pick an upgrade before time starts
-    openUpgradeOverlay();
+    openUpgradeOverlay("normal");
 
     animId = requestAnimationFrame(drawFrame);
+    
   }
 
   window.addEventListener("load", startGame);
