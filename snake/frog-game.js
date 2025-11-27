@@ -135,7 +135,7 @@
     audioFrogDeath = new Audio("https://freshfrogs.github.io/snake/audio/frogDeath.mp3");
     audioFrogDeath.volume = 0.9;
 
-    audioSnakeEat = new Audio("https://freshfrogs.github.io/snake/audio/munch.mp3");
+    audioSnakeEat = new Audio("https://freshfrogs.github.io/snake/audio/munch4.mp3");
     audioSnakeEat.volume = 0.7;
 
     audioOrbSpawn1 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawn.mp3");
