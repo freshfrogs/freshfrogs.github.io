@@ -1,7 +1,7 @@
 // /snake/snake-game.js
 (function () {
   // -----------------------------
-  // Config & constants
+  // Basic config
   // -----------------------------
   const FROG_SIZE    = 64;
   const MAX_TOKEN_ID = 4040;
@@ -11,6 +11,7 @@
 
   const FROG_COUNT   = 100;
 
+  // Values that have animation variants for scatter frogs
   const SCATTER_ANIMATED_VALUES = new Set([
     "goldenDartFrog",
     "blueDartFrog",
@@ -42,67 +43,62 @@
     "wizardHatBlue"
   ]);
 
-  // Traits we don’t render as layers
+  // Traits we don't render as layers
   const SKIP_TRAITS = new Set(["Background", "background", "BG", "Bg"]);
 
-  // Power-up settings
+  // Snake config (keyboard controlled)
+  const SNAKE_SEGMENT_SIZE = 48;
+  const SNAKE_SPEED        = 160; // px/s
+  const SNAKE_SEG_SPACING  = 12;
+  const SNAKE_SEGMENTS_INIT = 6;
+  const SNAKE_EAT_RADIUS   = 40;
+
+  // Power-ups (still simple, can refine later)
   const POWERUP_RADIUS      = 14;
   const POWERUP_TTL         = 8;
-  const POWERUP_SPAWN_EVERY = 4;  // seconds between spawn attempts
+  const POWERUP_SPAWN_EVERY = 6; // seconds between spawn tries
   const POWERUP_MAX_ACTIVE  = 4;
-  const BUFF_DURATION       = 6;  // seconds
+  const BUFF_DURATION       = 6;
 
-  // Snake settings
-  const SNAKE_SEGMENT_SIZE     = 48;
-  const SNAKE_BASE_SPEED       = 110;
-  const SNAKE_SEGMENT_GAP      = 7;
-  const SNAKE_INITIAL_SEGMENTS = 6;
-  const SNAKE_EAT_RADIUS       = 40;
-
-  // -----------------------------
-  // DOM & global state
-  // -----------------------------
   const container = document.getElementById("frog-bg");
   if (!container) return;
 
-  const frogs = [];
-  const powerups = [];
-  let snake = null;
+  // -----------------------------
+  // State
+  // -----------------------------
+  let frogs    = [];
+  let powerups = [];
+  let snake    = null;
 
-  // Mouse
-  const mouse = {
-    x: 0,
-    y: 0,
-    seen: false
-  };
-
-  // Scroll offset (if page ever scrolls)
   let scrollOffsetY = 0;
   let lastScrollY   = window.scrollY || 0;
 
-  // Buff timers (affect frogs)
+  // Keyboard direction for snake (no mouse)
+  const dir = { x: 1, y: 0 }; // starts moving right
+
+  // Buff timers
   let frogSpeedBuffTime = 0;
   let frogJumpBuffTime  = 0;
   let frogSlowBuffTime  = 0;
 
-  // Power-up spawn timer
+  // Powerup spawn timer
   let powerupSpawnTimer = 0;
 
-  // Game timer
+  // Timer / game state
+  let timerEl         = null;
   let gameElapsedTime = 0;
   let gameOver        = false;
-  let timerEl         = null;
 
   // Animation
   let lastTime = 0;
   let rafId    = null;
 
   // Metadata caches
-  const metaCache        = new Map();
-  const traitImageCache  = new Map();
+  const metaCache       = new Map();
+  const traitImageCache = new Map();
 
   // -----------------------------
-  // Utility helpers
+  // Helpers
   // -----------------------------
   function randRange(min, max) {
     return min + Math.random() * (max - min);
@@ -123,12 +119,12 @@
   // -----------------------------
   // Sound pools (no queuing)
   // -----------------------------
-  function makeSoundPool(srcs, volume, poolPerSrc) {
+  function makeSoundPool(srcs, volume, perSrc) {
+    const vol = volume == null ? 1 : volume;
+    const per = perSrc || 3;
     const audios = [];
-    const per    = poolPerSrc || 3;
-    const vol    = volume == null ? 1 : volume;
 
-    srcs.forEach(function (src) {
+    srcs.forEach((src) => {
       for (let i = 0; i < per; i++) {
         const a = new Audio(src);
         a.volume = vol;
@@ -145,15 +141,14 @@
           try {
             a.currentTime = 0;
             a.play();
-          } catch (e) {}
+          } catch (_) {}
           return;
         }
       }
-      // all voices busy → drop this event, do NOT queue
+      // all busy -> drop this sound (no queue)
     };
   }
 
-  // audio instances
   let playFrogHop       = null;
   let playFrogDeath     = null;
   let playFrogSpeedBuff = null;
@@ -163,8 +158,7 @@
 
   function initAudio() {
     if (playFrogHop) return;
-
-    const base = "."; // sounds live next to snake-game.js in /snake/
+    const base = "."; // /snake
 
     playFrogHop = makeSoundPool(
       [
@@ -180,7 +174,7 @@
     playFrogSpeedBuff = makeSoundPool([base + "/superSpeed.mp3"],  0.85, 2);
     playFrogJumpBuff  = makeSoundPool([base + "/superJump.mp3"],   0.85, 2);
     playFrogSlowBuff  = makeSoundPool([base + "/slowed.mp3"],      0.85, 2);
-    playSnakeEat      = makeSoundPool([base + "/munch.mp3"],       0.7,  4);
+    playSnakeEat      = makeSoundPool([base + "/munch.mp3"],       0.7,  3);
   }
 
   // -----------------------------
@@ -194,17 +188,17 @@
     document.body.appendChild(timerEl);
   }
 
-  function formatTime(seconds) {
-    const total = Math.floor(seconds);
-    const mins  = Math.floor(total / 60);
-    const secs  = total % 60;
-    return String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+  function formatTime(secs) {
+    const t   = Math.floor(secs);
+    const min = Math.floor(t / 60);
+    const s   = t % 60;
+    return String(min).padStart(2, "0") + ":" + String(s).padStart(2, "0");
   }
 
   function updateTimerText() {
     if (!timerEl) return;
     const label = gameOver ? "Final Time" : "Time";
-    timerEl.textContent = label + " " + formatTime(gameElapsedTime);
+    timerEl.textContent = `${label} ${formatTime(gameElapsedTime)}`;
   }
 
   function endGame() {
@@ -217,56 +211,49 @@
   }
 
   // -----------------------------
-  // Metadata & layering
+  // Metadata & trait images
   // -----------------------------
   function fetchMetadata(tokenId) {
-    if (metaCache.has(tokenId)) {
-      return metaCache.get(tokenId);
-    }
+    if (metaCache.has(tokenId)) return metaCache.get(tokenId);
     const url = META_BASE + tokenId + META_EXT;
     const p = fetch(url)
-      .then(function (res) {
-        if (!res.ok) throw new Error("Metadata HTTP " + res.status);
+      .then((res) => {
+        if (!res.ok) throw new Error("HTTP " + res.status);
         return res.json();
       })
-      .catch(function () {
-        return { attributes: [] };
-      });
+      .catch(() => ({ attributes: [] }));
     metaCache.set(tokenId, p);
     return p;
   }
 
   function loadTraitImage(traitType, value) {
-    const v   = String(value);
+    const v = String(value);
     const key = traitType + "::" + v;
+    if (traitImageCache.has(key)) return traitImageCache.get(key);
 
-    if (traitImageCache.has(key)) {
-      return traitImageCache.get(key);
-    }
+    const pngUrl = `${BUILD_BASE}/${traitType}/${v}.png`;
+    const canAnim = SCATTER_ANIMATED_VALUES.has(v);
 
-    const pngUrl = BUILD_BASE + "/" + traitType + "/" + v + ".png";
-    const canAnimate = SCATTER_ANIMATED_VALUES.has(v);
-
-    const p = new Promise(function (resolve) {
-      if (!canAnimate) {
-        const png = new Image();
-        png.decoding = "async";
-        png.onload   = function () { resolve(png); };
-        png.onerror  = function () { resolve(null); };
-        png.src      = pngUrl;
+    const p = new Promise((resolve) => {
+      if (!canAnim) {
+        const img = new Image();
+        img.decoding = "async";
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = pngUrl;
         return;
       }
 
-      const gifUrl = BUILD_BASE + "/" + traitType + "/animations/" + v + "_animation.gif";
+      const gifUrl = `${BUILD_BASE}/${traitType}/animations/${v}_animation.gif`;
       const gif = new Image();
       gif.decoding = "async";
-      gif.onload   = function () { resolve(gif); };
-      gif.onerror  = function () {
-        const png = new Image();
-        png.decoding = "async";
-        png.onload   = function () { resolve(png); };
-        png.onerror  = function () { resolve(null); };
-        png.src      = pngUrl;
+      gif.onload = () => resolve(gif);
+      gif.onerror = () => {
+        const img = new Image();
+        img.decoding = "async";
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = pngUrl;
       };
       gif.src = gifUrl;
     });
@@ -281,8 +268,7 @@
     frog.layers = [];
 
     const attrs = Array.isArray(meta.attributes) ? meta.attributes : [];
-    for (let i = 0; i < attrs.length; i++) {
-      const attr = attrs[i];
+    for (const attr of attrs) {
       if (!attr) continue;
       const traitType = attr.trait_type;
       const value     = attr.value;
@@ -304,23 +290,29 @@
       frog.el.appendChild(img);
       frog.layers.push(img);
     }
+
+    // Fallback: if no layers, show a simple colored tile so the frog is visible
+    if (!frog.layers.length) {
+      frog.el.style.background =
+        "linear-gradient(135deg, #4caf50, #8bc34a)";
+    }
   }
 
   function hydrateFrogAppearance(frog) {
     fetchMetadata(frog.tokenId)
-      .then(function (meta) { return buildLayersForFrog(frog, meta); })
-      .catch(function () {});
+      .then((meta) => buildLayersForFrog(frog, meta))
+      .catch(() => {});
   }
 
   // -----------------------------
-  // Frogs: creation & hopping
+  // Frogs & hopping
   // -----------------------------
   function computeFrogPositions(width, height, count) {
     const positions = [];
     const MIN_DIST  = 52;
     const margin    = 16;
+    let safety      = count * 100;
 
-    let safety = count * 80;
     while (positions.length < count && safety-- > 0) {
       const x = margin + Math.random() * (width  - margin * 2 - FROG_SIZE);
       const y = margin + Math.random() * (height - margin * 2 - FROG_SIZE);
@@ -328,8 +320,7 @@
       const cy = y + FROG_SIZE / 2;
 
       let ok = true;
-      for (let i = 0; i < positions.length; i++) {
-        const p  = positions[i];
+      for (const p of positions) {
         const px = p.x + FROG_SIZE / 2;
         const py = p.y + FROG_SIZE / 2;
         const dx = px - cx;
@@ -339,16 +330,16 @@
           break;
         }
       }
-      if (ok) positions.push({ x: x, y: y });
+      if (ok) positions.push({ x, y });
     }
+
     return positions;
   }
 
   function createFrogs(width, height) {
-    while (container.firstChild) {
-      container.removeChild(container.firstChild);
-    }
-    frogs.length = 0;
+    frogs = [];
+    powerups = [];
+    container.innerHTML = "";
 
     const positions = computeFrogPositions(width, height, FROG_COUNT);
     const tokenIds  = pickRandomTokenIds(positions.length);
@@ -361,10 +352,9 @@
       el.className = "frog-sprite";
       el.style.width  = FROG_SIZE + "px";
       el.style.height = FROG_SIZE + "px";
-      el.style.transform = "translate3d(" + pos.x + "px," + pos.y + "px,0)";
+      el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
       container.appendChild(el);
 
-      // Frog "personality" for timing
       const roll = Math.random();
       let idleMin, idleMax, hopMin, hopMax, hMin, hMax;
       if (roll < 0.25) {
@@ -382,8 +372,8 @@
       }
 
       const frog = {
-        tokenId: tokenId,
-        el: el,
+        tokenId,
+        el,
         x: pos.x,
         y: pos.y,
         baseY: pos.y,
@@ -399,8 +389,7 @@
         hopDuration: randRange(hopMin, hopMax),
         hopHeight: randRange(hMin, hMax),
 
-        idleMin: idleMin,
-        idleMax: idleMax,
+        idleMin, idleMax,
         hopDurMin: hopMin,
         hopDurMax: hopMax,
         hopHeightMin: hMin,
@@ -414,40 +403,7 @@
     }
   }
 
-  function chooseHopDestination(frog, width, height) {
-    const marginX = 8;
-    const marginY = 24;
-    const maxStep = 40;
-
-    let targetX = frog.x;
-    let targetBaseY = frog.baseY;
-
-    if (mouse.seen) {
-      const goalX = mouse.x - FROG_SIZE / 2;
-      const goalY = mouse.y - FROG_SIZE / 2;
-
-      const dx = goalX - frog.x;
-      const dy = goalY - frog.baseY;
-      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      const step = Math.min(maxStep, dist);
-
-      targetX     = frog.x     + (dx / dist) * step;
-      targetBaseY = frog.baseY + (dy / dist) * step;
-    } else {
-      targetX     = frog.x     + randRange(-12, 12);
-      targetBaseY = frog.baseY + randRange(-6,  6);
-    }
-
-    targetX     = clamp(targetX,     marginX,                 width  - marginX - FROG_SIZE);
-    targetBaseY = clamp(targetBaseY, marginY,                 height - marginY - FROG_SIZE);
-
-    frog.hopStartX      = frog.x;
-    frog.hopStartBaseY  = frog.baseY;
-    frog.hopEndX        = targetX;
-    frog.hopEndBaseY    = targetBaseY;
-  }
-
-  function getBuffState() {
+  function getFrogBuffState() {
     let hopDurationMul = 1;
     let idleTimeMul    = 1;
     let hopHeightMul   = 1;
@@ -464,21 +420,15 @@
       hopHeightMul   *= 2.5;
     }
 
-    return {
-      hopDurationMul: hopDurationMul,
-      idleTimeMul:    idleTimeMul,
-      hopHeightMul:   hopHeightMul
-    };
+    return { hopDurationMul, idleTimeMul, hopHeightMul };
   }
 
   function updateFrogs(dt, width, height) {
-    const marginX = 8;
     const marginY = 24;
-    const buff    = getBuffState();
+    const marginX = 8;
+    const buff    = getFrogBuffState();
 
-    for (let i = 0; i < frogs.length; i++) {
-      const frog = frogs[i];
-
+    for (const frog of frogs) {
       if (frog.state === "idle") {
         frog.idleTime -= dt;
         frog.y = frog.baseY;
@@ -505,7 +455,17 @@
 
           if (playFrogHop && !gameOver) playFrogHop();
 
-          chooseHopDestination(frog, width, height);
+          // random small hop direction
+          frog.hopStartX     = frog.x;
+          frog.hopStartBaseY = frog.baseY;
+          let targetX        = frog.x + randRange(-16, 16);
+          let targetBaseY    = frog.baseY + randRange(-10, 10);
+
+          targetX     = clamp(targetX,     marginX,                 width  - marginX - FROG_SIZE);
+          targetBaseY = clamp(targetBaseY, marginY,                 height - marginY - FROG_SIZE);
+
+          frog.hopEndX      = targetX;
+          frog.hopEndBaseY  = targetBaseY;
         }
       } else if (frog.state === "hopping") {
         frog.hopTime += dt;
@@ -539,13 +499,12 @@
       }
 
       const renderY = frog.y + scrollOffsetY;
-      frog.el.style.transform =
-        "translate3d(" + frog.x + "px," + renderY + "px,0)";
+      frog.el.style.transform = `translate3d(${frog.x}px, ${renderY}px, 0)`;
     }
   }
 
   // -----------------------------
-  // Power-ups
+  // Powerups (collected by frogs)
   // -----------------------------
   function rollPowerupType() {
     const r = Math.random();
@@ -557,43 +516,40 @@
   function spawnPowerup(width, height) {
     if (powerups.length >= POWERUP_MAX_ACTIVE) return;
 
-    const type = rollPowerupType();
-    const size = POWERUP_RADIUS * 2;
+    const size   = POWERUP_RADIUS * 2;
     const margin = 40;
+    const x      = margin + Math.random() * (width  - margin * 2 - size);
+    const y      = margin + Math.random() * (height - margin * 2 - size);
 
-    const x = margin + Math.random() * (width  - margin * 2 - size);
-    const y = margin + Math.random() * (height - margin * 2 - size);
+    const type = rollPowerupType();
 
     const el = document.createElement("div");
     el.className = "frog-powerup";
-    el.style.position      = "absolute";
-    el.style.width         = size + "px";
-    el.style.height        = size + "px";
-    el.style.borderRadius  = "50%";
-    el.style.border        = "2px solid rgba(0,0,0,0.6)";
-    el.style.boxShadow     = "0 0 10px rgba(0,0,0,0.4)";
+    el.style.position = "absolute";
+    el.style.width    = size + "px";
+    el.style.height   = size + "px";
+    el.style.borderRadius = "50%";
     el.style.pointerEvents = "none";
-    el.style.zIndex        = "20";
+    el.style.zIndex       = "20";
+    el.style.border       = "2px solid rgba(0,0,0,0.6)";
+    el.style.boxShadow    = "0 0 10px rgba(0,0,0,0.35)";
 
     if (type === "frog-speed") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #7bffb1)";
+      el.style.background = "radial-gradient(circle at 30% 30%, #ffffff, #7bffb1)";
     } else if (type === "frog-jump") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #7cc1ff)";
-    } else {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #ffd36b)";
+      el.style.background = "radial-gradient(circle at 30% 30%, #ffffff, #7cc1ff)";
+    } else { // frog-slow
+      el.style.background = "radial-gradient(circle at 30% 30%, #ffffff, #ffd36b)";
     }
 
     container.appendChild(el);
 
     powerups.push({
-      type: type,
-      x: x,
+      type,
+      x,
       baseY: y,
       ttl: POWERUP_TTL,
-      el: el
+      el
     });
   }
 
@@ -632,22 +588,20 @@
 
       const renderY = p.baseY + scrollOffsetY + bob;
       p.el.style.transform =
-        "translate3d(" + p.x + "px," + renderY + "px,0) scale(" + pulse + ")";
+        `translate3d(${p.x}px, ${renderY}px, 0) scale(${pulse})`;
       p.el.style.opacity = String(clamp(lifeT + 0.2, 0, 1));
 
-      // collision with frogs
+      // frog collects powerup
       const pcx = p.x + POWERUP_RADIUS;
       const pcy = p.baseY + POWERUP_RADIUS;
-
       let collected = false;
-      for (let j = 0; j < frogs.length; j++) {
-        const frog = frogs[j];
-        const fx   = frog.x + FROG_SIZE / 2;
-        const fy   = frog.baseY + FROG_SIZE / 2;
-        const dx   = fx - pcx;
-        const dy   = fy - pcy;
-        const rad  = FROG_SIZE / 2 + POWERUP_RADIUS;
 
+      for (const frog of frogs) {
+        const fx  = frog.x + FROG_SIZE / 2;
+        const fy  = frog.baseY + FROG_SIZE / 2;
+        const dx  = fx - pcx;
+        const dy  = fy - pcy;
+        const rad = FROG_SIZE / 2 + POWERUP_RADIUS;
         if (dx * dx + dy * dy <= rad * rad) {
           applyPowerup(p.type);
           collected = true;
@@ -665,25 +619,24 @@
   }
 
   // -----------------------------
-  // Snake
+  // Snake (keyboard controlled)
   // -----------------------------
   function initSnake(width, height) {
-    // clear any existing snake dom
+    // remove old snake
     if (snake) {
       if (snake.head && snake.head.el && snake.head.el.parentNode === container) {
         container.removeChild(snake.head.el);
       }
       if (Array.isArray(snake.segments)) {
-        for (let i = 0; i < snake.segments.length; i++) {
-          const seg = snake.segments[i];
-          if (seg && seg.el && seg.el.parentNode === container) {
-            container.removeChild(seg.el);
+        for (const s of snake.segments) {
+          if (s && s.el && s.el.parentNode === container) {
+            container.removeChild(s.el);
           }
         }
       }
     }
 
-    const startX = width * 0.25;
+    const startX = width * 0.2;
     const startY = height * 0.5;
 
     const headEl = document.createElement("div");
@@ -692,7 +645,7 @@
     container.appendChild(headEl);
 
     const segments = [];
-    for (let i = 0; i < SNAKE_INITIAL_SEGMENTS; i++) {
+    for (let i = 0; i < SNAKE_SEGMENTS_INIT; i++) {
       const segEl = document.createElement("div");
       segEl.className = "snake-body";
       segEl.style.backgroundImage = "url(./body.png)";
@@ -700,158 +653,122 @@
 
       segments.push({
         el: segEl,
-        x: startX - (i + 1) * SNAKE_SEGMENT_GAP,
+        x: startX - (i + 1) * SNAKE_SEG_SPACING,
         y: startY
       });
-    }
-
-    const path = [];
-    for (let i = 0; i < (SNAKE_INITIAL_SEGMENTS + 4) * SNAKE_SEGMENT_GAP; i++) {
-      path.push({ x: startX - i, y: startY });
     }
 
     snake = {
       head: {
         el: headEl,
         x: startX,
-        y: startY,
-        angle: 0
+        y: startY
       },
-      segments: segments,
-      path: path
+      segments
     };
   }
 
-  function growSnake(extraSegments) {
+  function growSnake(extra) {
     if (!snake) return;
-    const segments = snake.segments;
-    const count    = extraSegments || 1;
-
+    const count = extra || 1;
     for (let i = 0; i < count; i++) {
-      const tailIndex = segments.length - 1;
-      const tailSeg   = segments[tailIndex];
-
+      const tail = snake.segments[snake.segments.length - 1] || snake.head;
       const segEl = document.createElement("div");
       segEl.className = "snake-body";
       segEl.style.backgroundImage = "url(./body.png)";
       container.appendChild(segEl);
 
-      segments.push({
+      snake.segments.push({
         el: segEl,
-        x: tailSeg ? tailSeg.x : snake.head.x,
-        y: tailSeg ? tailSeg.y : snake.head.y
+        x: tail.x,
+        y: tail.y
       });
-    }
-
-    const desiredLen = (segments.length + 4) * SNAKE_SEGMENT_GAP + 2;
-    while (snake.path.length < desiredLen) {
-      const last = snake.path[snake.path.length - 1];
-      snake.path.push({ x: last.x, y: last.y });
     }
   }
 
   function updateSnake(dt, width, height, scrollDelta) {
     if (!snake) return;
 
-    const head     = snake.head;
-    const segments = snake.segments;
-    const path     = snake.path;
+    const margin = 24;
 
-    const speed = SNAKE_BASE_SPEED;
+    // Move head by keyboard dir
+    snake.head.x += dir.x * SNAKE_SPEED * dt;
+    snake.head.y += dir.y * SNAKE_SPEED * dt;
 
-    // Smooth follow mouse; if we never saw the mouse, wander right
-    const targetX = mouse.seen ? mouse.x : head.x + 1;
-    const targetY = mouse.seen ? mouse.y : head.y;
+    // Clamp inside screen
+    snake.head.x = clamp(
+      snake.head.x,
+      margin + SNAKE_SEGMENT_SIZE / 2,
+      width - margin - SNAKE_SEGMENT_SIZE / 2
+    );
+    snake.head.y = clamp(
+      snake.head.y,
+      margin + SNAKE_SEGMENT_SIZE / 2,
+      height - margin - SNAKE_SEGMENT_SIZE / 2
+    );
 
-    head.x += (targetX - head.x) * dt * 4;
-    head.y += (targetY - head.y) * dt * 4;
+    // Scroll influence (if any)
+    snake.head.y += scrollDelta * 0.1;
 
-    head.y += scrollDelta * 0.1;
+    // Body segments follow previous segment
+    const all = [snake.head, ...snake.segments];
+    for (let i = 1; i < all.length; i++) {
+      const prev = all[i - 1];
+      const seg  = all[i];
 
-    // Path history
-    if (!gameOver) {
-      path.push({ x: head.x, y: head.y });
-      while (path.length > (segments.length + 4) * SNAKE_SEGMENT_GAP) {
-        path.shift();
+      const dx = prev.x - seg.x;
+      const dy = prev.y - seg.y;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
+
+      const desired = SNAKE_SEG_SPACING;
+      if (dist > desired) {
+        const step = dist - desired;
+        seg.x += (dx / dist) * step;
+        seg.y += (dy / dist) * step;
       }
     }
 
-    // Direction along path
-    let closestIndex = 0;
-    let closestDist  = Infinity;
-    for (let i = 0; i < path.length; i++) {
-      const dx = path[i].x - head.x;
-      const dy = path[i].y - head.y;
-      const d2 = dx * dx + dy * dy;
-      if (d2 < closestDist) {
-        closestDist  = d2;
-        closestIndex = i;
-      }
-    }
+    // Render snake
+    const angle = Math.atan2(
+      all[1].y - snake.head.y,
+      all[1].x - snake.head.x
+    );
+    const headRenderY = snake.head.y + scrollOffsetY - SNAKE_SEGMENT_SIZE / 2;
+    snake.head.el.style.transform =
+      `translate3d(${snake.head.x - SNAKE_SEGMENT_SIZE / 2}px, ${headRenderY}px, 0) rotate(${angle}rad)`;
 
-    const nextIndex = Math.min(path.length - 1, closestIndex + 1);
-    const dirX = path[nextIndex].x - head.x;
-    const dirY = path[nextIndex].y - head.y;
-    const angle = Math.atan2(dirY, dirX);
-    head.angle = angle;
-
-    if (!gameOver) {
-      head.x += Math.cos(angle) * speed * dt;
-      head.y += Math.sin(angle) * speed * dt;
-    }
-
-    const headRenderY = head.y + scrollOffsetY - SNAKE_SEGMENT_SIZE / 2;
-    head.el.style.transform =
-      "translate3d(" +
-      (head.x - SNAKE_SEGMENT_SIZE / 2) + "px," +
-      headRenderY + "px,0) rotate(" + angle + "rad)";
-
-    // position segments
-    let segIndex = closestIndex;
-    for (let i = 0; i < segments.length; i++) {
-      const seg = segments[i];
-      segIndex = Math.min(path.length - 1, segIndex + SNAKE_SEGMENT_GAP);
-      const p = path[segIndex];
-      if (!p) continue;
-
-      seg.x = p.x;
-      seg.y = p.y;
-
+    for (let i = 0; i < snake.segments.length; i++) {
+      const seg = snake.segments[i];
       const segY = seg.y + scrollOffsetY - SNAKE_SEGMENT_SIZE / 2;
       seg.el.style.transform =
-        "translate3d(" +
-        (seg.x - SNAKE_SEGMENT_SIZE / 2) + "px," +
-        segY + "px,0) rotate(" + angle + "rad)";
+        `translate3d(${seg.x - SNAKE_SEGMENT_SIZE / 2}px, ${segY}px, 0) rotate(${angle}rad)`;
     }
 
     if (gameOver) return;
 
-    // Eat frogs
+    // Eat frogs (never respawn)
     for (let i = frogs.length - 1; i >= 0; i--) {
       const frog = frogs[i];
-
+      if (!frog || !frog.el) continue;
       const fx = frog.x + FROG_SIZE / 2;
       const fy = frog.baseY + FROG_SIZE / 2;
-      const dx = fx - head.x;
-      const dy = fy - head.y;
-      const d2 = dx * dx + dy * dy;
+      const dx = fx - snake.head.x;
+      const dy = fy - snake.head.y;
+      if (dx * dx + dy * dy <= SNAKE_EAT_RADIUS * SNAKE_EAT_RADIUS) {
+        const centerX = fx;
+        const centerY = fy;
 
-      if (d2 <= SNAKE_EAT_RADIUS * SNAKE_EAT_RADIUS) {
-        const cx = fx;
-        const cy = fy;
-
-        if (frog.el && frog.el.parentNode === container) {
+        if (frog.el.parentNode === container) {
           container.removeChild(frog.el);
         }
-        frogs.splice(i, 1); // never respawn
+        frogs.splice(i, 1);
 
         if (playFrogDeath) playFrogDeath();
         if (playSnakeEat)  playSnakeEat();
-
         growSnake(1);
 
-        // chance to drop an extra power-up on death
-        if (Math.random() < 0.5) {
+        // small chance to spawn extra buff on death
+        if (Math.random() < 0.4) {
           spawnPowerup(width, height);
         }
       }
@@ -859,15 +776,31 @@
   }
 
   // -----------------------------
-  // Input & scroll
+  // Keyboard controls (NO mouse)
   // -----------------------------
-  window.addEventListener("mousemove", function (e) {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-    mouse.seen = true;
+  window.addEventListener("keydown", (e) => {
+    const key = e.key.toLowerCase();
+
+    if (key === "arrowup" || key === "w") {
+      if (dir.y === 1) return; // prevent instant reverse
+      dir.x = 0; dir.y = -1;
+    } else if (key === "arrowdown" || key === "s") {
+      if (dir.y === -1) return;
+      dir.x = 0; dir.y = 1;
+    } else if (key === "arrowleft" || key === "a") {
+      if (dir.x === 1) return;
+      dir.x = -1; dir.y = 0;
+    } else if (key === "arrowright" || key === "d") {
+      if (dir.x === -1) return;
+      dir.x = 1; dir.y = 0;
+    }
+
+    // user interaction -> make sure audio is unmuted
+    initAudio();
   });
 
-  window.addEventListener("scroll", function () {
+  // Track scroll for simple parallax
+  window.addEventListener("scroll", () => {
     const y  = window.scrollY || 0;
     const dy = y - lastScrollY;
     lastScrollY   = y;
@@ -886,7 +819,6 @@
     const width  = window.innerWidth;
     const height = window.innerHeight;
 
-    // Scroll delta for snake/powerups
     const y  = window.scrollY || 0;
     const dy = y - lastScrollY;
     lastScrollY   = y;
@@ -915,7 +847,7 @@
         endGame();
       }
     } else {
-      // keep snake & powerups glued to scroll even after game over
+      // freeze frogs; keep snake/powerups stuck to scroll only
       updateSnake(0, width, height, dy);
       updatePowerups(0);
     }
@@ -927,24 +859,26 @@
     const width  = window.innerWidth;
     const height = window.innerHeight;
 
-    if (rafId) {
-      window.cancelAnimationFrame(rafId);
-      rafId = null;
-    }
+    if (rafId) window.cancelAnimationFrame(rafId);
 
-    lastTime         = 0;
-    scrollOffsetY    = 0;
-    lastScrollY      = window.scrollY || 0;
-    frogSpeedBuffTime = 0;
-    frogJumpBuffTime  = 0;
-    frogSlowBuffTime  = 0;
-    powerupSpawnTimer = 0;
-    gameElapsedTime   = 0;
-    gameOver          = false;
+    // Reset everything
+    scrollOffsetY      = 0;
+    lastScrollY        = window.scrollY || 0;
+    frogSpeedBuffTime  = 0;
+    frogJumpBuffTime   = 0;
+    frogSlowBuffTime   = 0;
+    powerupSpawnTimer  = 0;
+    gameElapsedTime    = 0;
+    gameOver           = false;
+    lastTime           = 0;
+
+    // Reset direction
+    dir.x = 1; dir.y = 0;
 
     initAudio();
     ensureTimer();
     updateTimerText();
+
     createFrogs(width, height);
     initSnake(width, height);
 
