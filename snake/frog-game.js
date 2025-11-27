@@ -745,7 +745,8 @@
     const baseMaxStep = 40;
     const speedBuffed = (speedBuffTime > 0 || panicHopTime > 0) ? 1.7 : 1.0;
     const championBoost = frog.isChampion ? 1.4 : 1.0;
-    const maxStep = baseMaxStep * speedBuffed * championBoost;
+    const jumpFactor = getJumpFactor(frog);  // <-- add this line
+    const maxStep = baseMaxStep * speedBuffed * championBoost * jumpFactor;
 
     let goalX = null;
     let goalY = null;
