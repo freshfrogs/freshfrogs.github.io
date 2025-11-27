@@ -1813,116 +1813,128 @@ function ensureBuffGuideOverlay() {
   // start on page 0
   setBuffGuidePage(0);
 }
-// Neon color used in the guide text
-const BUFF_GUIDE_NEON = "#4defff";
-
-function formatSeconds(s) {
-  if (typeof s !== "number") return "";
-  return s.toFixed(0) + "s";
-}
-
-function formatMult(x) {
-  if (typeof x !== "number") return "";
-  return x.toFixed(1) + "×";
-}
-
-function formatPercentFromFactor(f) {
-  if (typeof f !== "number") return "";
-  return Math.round(f * 100) + "%";
-}
-
-function formatPercentFromBonus(b) {
-  if (typeof b !== "number") return "";
-  return Math.round(b * 100) + "%";
-}
-
 function setBuffGuidePage(pageIndex) {
   if (!buffGuideContentEl || !buffGuidePageLabel) return;
 
-  const neon = BUFF_GUIDE_NEON;
+  const neon = "#4defff";
+
+  // --- local helpers that safely use constants or fall back ---
+
+  function secFromConst(constVal, fallback) {
+    const v = (typeof constVal !== "undefined" ? constVal : fallback);
+    return Math.max(0, Math.round(v)) + "s";
+  }
+
+  function percentFromFactor(f, fallback) {
+    const v = (typeof f !== "undefined" ? f : fallback);
+    return Math.round(v * 100) + "%";
+  }
+
+  function multFromFactor(f, fallback) {
+    const v = (typeof f !== "undefined" ? f : fallback);
+    return v.toFixed(1) + "×";
+  }
+
+  function percentFromBonus(b, fallback) {
+    const v = (typeof b !== "undefined" ? b : fallback);
+    return Math.round(v * 100) + "%";
+  }
+
+  // how much faster vs factor (e.g. 0.85 → ~15% faster)
+  function fasterPercentFromFactor(f, fallback) {
+    const v = (typeof f !== "undefined" ? f : fallback);
+    const pct = (1 - v) * 100;
+    return Math.round(pct) + "%";
+  }
+
+  // radius from AURA_RADIUS2 if present
+  const auraRadiusPx = (typeof AURA_RADIUS2 !== "undefined")
+    ? Math.round(Math.sqrt(AURA_RADIUS2))
+    : 200;
+
+  // --- resolve constants / defaults we care about ---
+
+  const speedDur       = typeof SPEED_BUFF_DURATION       !== "undefined" ? SPEED_BUFF_DURATION       : 15;
+  const jumpDur        = typeof JUMP_BUFF_DURATION        !== "undefined" ? JUMP_BUFF_DURATION        : 18;
+  const slowDur        = typeof SNAKE_SLOW_DURATION       !== "undefined" ? SNAKE_SLOW_DURATION       : 8;
+  const confuseDur     = typeof SNAKE_CONFUSE_DURATION    !== "undefined" ? SNAKE_CONFUSE_DURATION    : 6;
+  const shrinkDur      = typeof SNAKE_SHRINK_DURATION     !== "undefined" ? SNAKE_SHRINK_DURATION     : 8;
+  const shieldDur      = typeof FROG_SHIELD_DURATION      !== "undefined" ? FROG_SHIELD_DURATION      : 6;
+  const timeSlowDur    = typeof TIME_SLOW_DURATION        !== "undefined" ? TIME_SLOW_DURATION        : 6;
+  const orbMagDur      = typeof ORB_MAGNET_DURATION       !== "undefined" ? ORB_MAGNET_DURATION       : 10;
+  const scoreDur       = typeof SCORE_MULTI_DURATION      !== "undefined" ? SCORE_MULTI_DURATION      : 10;
+  const panicDur       = typeof PANIC_HOP_DURATION        !== "undefined" ? PANIC_HOP_DURATION        : 8;
+  const lifeStealDur   = typeof LIFE_STEAL_DURATION       !== "undefined" ? LIFE_STEAL_DURATION       : 12;
+
+  const jumpBuffFactor = typeof JUMP_BUFF_FACTOR          !== "undefined" ? JUMP_BUFF_FACTOR          : 3.2;
+  const snakeSlowFact  = typeof SNAKE_SLOW_FACTOR         !== "undefined" ? SNAKE_SLOW_FACTOR         : 0.5;
+  const timeSlowFact   = typeof TIME_SLOW_FACTOR          !== "undefined" ? TIME_SLOW_FACTOR          : 0.4;
+  const scoreMultiFact = typeof SCORE_MULTI_FACTOR        !== "undefined" ? SCORE_MULTI_FACTOR        : 2.0;
+  const panicSpeedFact = typeof PANIC_HOP_SPEED_FACTOR    !== "undefined" ? PANIC_HOP_SPEED_FACTOR    : 0.6;
+
+  const champSpeedFact = typeof CHAMPION_SPEED_FACTOR     !== "undefined" ? CHAMPION_SPEED_FACTOR     : 0.85;
+  const champJumpFact  = typeof CHAMPION_JUMP_FACTOR      !== "undefined" ? CHAMPION_JUMP_FACTOR      : 1.25;
+  const auraJumpFact   = typeof AURA_JUMP_FACTOR          !== "undefined" ? AURA_JUMP_FACTOR          : 1.15;
+  const luckyDurBoost  = typeof LUCKY_BUFF_DURATION_BOOST !== "undefined" ? LUCKY_BUFF_DURATION_BOOST : 1.4;
+  const luckyScorePer  = typeof LUCKY_SCORE_BONUS_PER     !== "undefined" ? LUCKY_SCORE_BONUS_PER     : 0.10;
+
+  // upgrade factors (safe fallbacks)
+  const frogSpeedUp    = typeof FROG_SPEED_UPGRADE_FACTOR    !== "undefined" ? FROG_SPEED_UPGRADE_FACTOR    : 0.9;
+  const frogJumpUp     = typeof FROG_JUMP_UPGRADE_FACTOR     !== "undefined" ? FROG_JUMP_UPGRADE_FACTOR     : 1.25;
+  const buffDurUp      = typeof BUFF_DURATION_UPGRADE_FACTOR !== "undefined" ? BUFF_DURATION_UPGRADE_FACTOR : 1.15;
+  const orbIntervalUp  = typeof ORB_INTERVAL_FACTOR          !== "undefined" ? ORB_INTERVAL_FACTOR          : 0.85;
+
+  const epicDeathChance  = typeof EPIC_DEATHRATTLE_CHANCE    !== "undefined" ? EPIC_DEATHRATTLE_CHANCE      : 0.25;
+  const legDeathChance   = typeof LEGENDARY_DEATHRATTLE_CHANCE !== "undefined" ? LEGENDARY_DEATHRATTLE_CHANCE : 0.50;
+  const frenzyDur        = typeof LEGENDARY_FRENZY_DURATION  !== "undefined" ? LEGENDARY_FRENZY_DURATION    : 13;
+  const frenzySpeedFact  = typeof FRENZY_SPEED_FACTOR        !== "undefined" ? FRENZY_SPEED_FACTOR          : 1.25;
 
   const pages = [
     // Page 0 – orb buffs
-    () => `
+    `
 <b>🟢 Orb buffs</b><br><br>
-⚡ <b>Speed</b> – frogs act faster for 
-<span style="color:${neon};">${formatSeconds(SPEED_BUFF_DURATION)}</span> (longer with upgrades).<br>
-🦘 <b>Jump</b> – frogs jump higher for 
-<span style="color:${neon};">${formatSeconds(JUMP_BUFF_DURATION)}</span> (about 
-<span style="color:${neon};">${formatMult(JUMP_BUFF_FACTOR)}</span> height).<br>
-🐸➕ <b>Spawn</b> – spawn 
-<span style="color:${neon};">1–10</span> frogs (+ extra if Lucky).<br>
-🧊 <b>Snake slow</b> – snake speed cut to 
-<span style="color:${neon};">${formatPercentFromFactor(SNAKE_SLOW_FACTOR)}</span> for a few seconds.<br>
-🤪 <b>Confuse</b> – snake steers randomly for 
-<span style="color:${neon};">${formatSeconds(SNAKE_CONFUSE_DURATION)}</span> (before scaling).<br>
-📏 <b>Shrink</b> – snake smaller, eat radius shrinks for 
-<span style="color:${neon};">${formatSeconds(SNAKE_SHRINK_DURATION)}</span>.<br>
-🛡️ <b>Team shield</b> – all frogs ignore snake hits for 
-<span style="color:${neon};">${formatSeconds(FROG_SHIELD_DURATION)}</span>.<br>
-⏱️ <b>Time slow</b> – game + snake run at ~
-<span style="color:${neon};">${formatPercentFromFactor(TIME_SLOW_FACTOR)}</span> speed for 
-<span style="color:${neon};">${formatSeconds(TIME_SLOW_DURATION)}</span>.<br>
-🧲 <b>Orb magnet</b> – orbs drift toward frogs for 
-<span style="color:${neon};">${formatSeconds(ORB_MAGNET_DURATION)}</span>.<br>
-🐸🌊 <b>Mega spawn</b> – spawn 
-<span style="color:${neon};">15–25</span> frogs (+ bonus if Lucky).<br>
-💰 <b>Score x2</b> – score gain boosted by 
-<span style="color:${neon};">${formatMult(SCORE_MULTI_FACTOR)}</span> for 
-<span style="color:${neon};">${formatSeconds(SCORE_MULTI_DURATION)}</span>.<br>
-😱 <b>Panic hop</b> – frogs hop faster but randomly for 
-<span style="color:${neon};">${formatSeconds(PANIC_HOP_DURATION)}</span> (speed factor 
-<span style="color:${neon};">${formatMult(1 / PANIC_HOP_SPEED_FACTOR)}</span> vs normal cycle).<br>
-🩸 <b>Life steal</b> – each orb collected spawns 
-<span style="color:${neon};">+1</span> frog for 
-<span style="color:${neon};">${formatSeconds(LIFE_STEAL_DURATION)}</span>.<br>
+⚡ <b>Speed</b> – frogs act faster for <span style="color:${neon};">${secFromConst(speedDur, 15)}</span> (longer with upgrades).<br>
+🦘 <b>Jump</b> – frogs jump higher for <span style="color:${neon};">${secFromConst(jumpDur, 18)}</span> (about <span style="color:${neon};">${multFromFactor(jumpBuffFactor, 3.2)}</span> height).<br>
+🐸➕ <b>Spawn</b> – spawn <span style="color:${neon};">1–10</span> frogs (+ extra if Lucky).<br>
+🧊 <b>Snake slow</b> – snake speed cut to <span style="color:${neon};">${percentFromFactor(snakeSlowFact, 0.5)}</span> for <span style="color:${neon};">${secFromConst(slowDur, 8)}</span> (before resistance).<br>
+🤪 <b>Confuse</b> – snake steers randomly for <span style="color:${neon};">${secFromConst(confuseDur, 6)}</span>.<br>
+📏 <b>Shrink</b> – snake smaller, eat radius shrinks for <span style="color:${neon};">${secFromConst(shrinkDur, 8)}</span> (bite zone reduced).<br>
+🛡️ <b>Team shield</b> – all frogs ignore snake hits for <span style="color:${neon};">${secFromConst(shieldDur, 6)}</span>.<br>
+⏱️ <b>Time slow</b> – game + snake run at ~<span style="color:${neon};">${percentFromFactor(timeSlowFact, 0.4)}</span> speed for <span style="color:${neon};">${secFromConst(timeSlowDur, 6)}</span>.<br>
+🧲 <b>Orb magnet</b> – orbs drift toward frogs for <span style="color:${neon};">${secFromConst(orbMagDur, 10)}</span>, preferring magnets.<br>
+🐸🌊 <b>Mega spawn</b> – spawn <span style="color:${neon};">15–25</span> frogs (+ bonus if Lucky).<br>
+💰 <b>Score x2</b> – score gain boosted by <span style="color:${neon};">${multFromFactor(scoreMultiFact, 2.0)}</span> for <span style="color:${neon};">${secFromConst(scoreDur, 10)}</span>.<br>
+😱 <b>Panic hop</b> – frogs hop faster but in random directions for <span style="color:${neon};">${secFromConst(panicDur, 8)}</span>.<br>
+🩸 <b>Life steal</b> – each orb collected spawns <span style="color:${neon};">+1</span> frog for <span style="color:${neon};">${secFromConst(lifeStealDur, 12)}</span>.<br>
 ⭐ <b>PermaFrog</b> – gives that frog a random permanent role.
 `,
     // Page 1 – permanent frog roles
-    () => `
+    `
 <b>🐸 Permanent frog roles</b><br><br>
-🏅 <b>Champion</b> – that frog's hop cycle is ~
-<span style="color:${neon};">${formatPercentFromFactor(1 / CHAMPION_SPEED_FACTOR)}</span> faster and jumps 
-<span style="color:${neon};">${formatMult(CHAMPION_JUMP_FACTOR)}</span> higher.<br>
-🌈 <b>Aura</b> – nearby frogs get faster + higher jumps in a 
-<span style="color:${neon};">${Math.round(Math.sqrt(AURA_RADIUS2))}</span>px radius (speed factor 
-<span style="color:${neon};">${formatMult(1 / AURA_SPEED_FACTOR)}</span>, jump 
-<span style="color:${neon};">${formatMult(AURA_JUMP_FACTOR)}</span>).<br>
-🛡️ <b>Perma shield</b> – survives 
-<span style="color:${neon};">1</span> snake hit, then shield breaks.<br>
-🧲 <b>Magnet</b> – orbs within 
-<span style="color:${neon};">~220px</span> home in on this frog.<br>
-🍀 <b>Lucky</b> – buffs it collects last 
-<span style="color:${neon};">${formatMult(LUCKY_BUFF_DURATION_BOOST)}</span> longer, spawns more frogs, and each Lucky frog adds
-<span style="color:${neon};">${formatPercentFromBonus(LUCKY_SCORE_BONUS_PER)}</span> score rate.<br>
-🧟 <b>Zombie</b> – on death: spawn 
-<span style="color:${neon};">5</span> frogs and slow the snake.
+🏅 <b>Champion</b> – that frog's hop cycle is ~<span style="color:${neon};">${fasterPercentFromFactor(champSpeedFact, 0.85)}</span> faster and jumps <span style="color:${neon};">${multFromFactor(champJumpFact, 1.25)}</span> higher.<br>
+🌈 <b>Aura</b> – nearby frogs get faster + higher jumps in a <span style="color:${neon};">${auraRadiusPx}</span>px radius (jump <span style="color:${neon};">${multFromFactor(auraJumpFact, 1.15)}</span>).<br>
+🛡️ <b>Perma shield</b> – survives <span style="color:${neon};">1</span> snake hit, then shield breaks.<br>
+🧲 <b>Magnet</b> – orbs within ~<span style="color:${neon};">220px</span> home in on this frog.<br>
+🍀 <b>Lucky</b> – buffs last <span style="color:${neon};">${multFromFactor(luckyDurBoost, 1.4)}</span> longer, spawns more frogs, and each Lucky frog adds <span style="color:${neon};">${percentFromBonus(luckyScorePer, 0.10)}</span> score rate.<br>
+🧟 <b>Zombie</b> – on death: spawn <span style="color:${neon};">5</span> frogs and slow the snake.
 `,
     // Page 2 – global upgrades + epic/legendary
-    () => `
+    `
 <b>🏗️ Global upgrades</b><br><br>
-⏩ <b>Frogs hop faster forever</b> – each pick makes hops ~
-<span style="color:${neon};">${formatPercentFromBonus(1 - FROG_SPEED_UPGRADE_FACTOR)}</span> faster (stacks).<br>
-🦘⬆️ <b>Frogs jump higher forever</b> – each pick adds about
-<span style="color:${neon};">${formatPercentFromBonus(FROG_JUMP_UPGRADE_FACTOR - 1)}</span> jump height (stacks).<br>
+⏩ <b>Frogs hop faster forever</b> – each pick makes hops ~<span style="color:${neon};">${percentFromBonus(1 - frogSpeedUp, 0.1)}</span> faster (stacks).<br>
+🦘⬆️ <b>Frogs jump higher forever</b> – each pick adds ~<span style="color:${neon};">${percentFromBonus(frogJumpUp - 1, 0.25)}</span> jump height (stacks).<br>
 🐸💥 <b>Spawn 20/50/75 frogs</b> – instant extra frogs from normal / epic / legendary choices.<br>
-⏳ <b>Buffs last longer</b> – each pick multiplies durations by 
-<span style="color:${neon};">${formatMult(BUFF_DURATION_UPGRADE_FACTOR)}</span> (stacks).<br>
-🎯 <b>More orbs</b> – orbs spawn faster every time you pick this (interval factor 
-<span style="color:${neon};">${formatMult(ORB_INTERVAL_FACTOR)}</span> per pick).<br>
-💀 <b>Deathrattle</b> – epic: 
-<span style="color:${neon};">${formatPercentFromBonus(EPIC_DEATHRATTLE_CHANCE)}</span> respawn; legendary: 
-<span style="color:${neon};">${formatPercentFromBonus(LEGENDARY_DEATHRATTLE_CHANCE)}</span> respawn on frog death.<br>
-💥 <b>Legendary Frenzy</b> – at 
-<span style="color:${neon};">${formatSeconds(LEGENDARY_FRENZY_DURATION)}</span>, the snake turns red, gets 
-<span style="color:${neon};">${formatPercentFromBonus(FRENZY_SPEED_FACTOR - 1)}</span> speed, and frogs panic-hop.
+⏳ <b>Buffs last longer</b> – each pick multiplies durations by <span style="color:${neon};">${multFromFactor(buffDurUp, 1.15)}</span> (stacks).<br>
+🎯 <b>More orbs</b> – orbs spawn faster every time you pick this (interval factor <span style="color:${neon};">${multFromFactor(orbIntervalUp, 0.85)}</span> per pick).<br>
+💀 <b>Deathrattle</b> – epic: <span style="color:${neon};">${percentFromBonus(epicDeathChance, 0.25)}</span> respawn on death; legendary: <span style="color:${neon};">${percentFromBonus(legDeathChance, 0.50)}</span> respawn.<br>
+💥 <b>Legendary Frenzy</b> – at <span style="color:${neon};">10 min</span>, pick a legendary and the snake turns red, gets <span style="color:${neon};">${percentFromBonus(frenzySpeedFact - 1, 0.25)}</span> speed, and frogs panic-hop for <span style="color:${neon};">${secFromConst(frenzyDur, 13)}</span>.
 `
   ];
 
   const maxPage = pages.length - 1;
   buffGuidePage = Math.max(0, Math.min(maxPage, pageIndex));
 
-  buffGuideContentEl.innerHTML = pages[buffGuidePage]();
+  buffGuideContentEl.innerHTML = pages[buffGuidePage];
   buffGuidePageLabel.textContent = `Page ${buffGuidePage + 1} / ${pages.length}`;
 
   if (buffGuidePrevBtn) {
@@ -1931,7 +1943,7 @@ function setBuffGuidePage(pageIndex) {
   }
   if (buffGuideNextBtn) {
     buffGuideNextBtn.disabled = buffGuidePage === maxPage;
-    buffGuideNextBtn.style.opacity = buffGuidePage === maxPage ? "0.5" : "1";
+    buffGuideNextBtn.style.opacity = buffGuideNextBtn.disabled ? "0.5" : "1";
   }
 }
 
