@@ -1,4 +1,4 @@
-// snake-frog-game.js
+// frog-game.js
 // Frog Snake survival game for FreshFrogs.
 // - Uses the same frog layering + hop behavior as scatter-frogs
 // - Start with 50 frogs, no auto-respawn on death (only via buff)
@@ -13,9 +13,9 @@
   // -----------------------------
   const FROG_SIZE       = 64;
   const MAX_TOKEN_ID    = 4040;
-  const META_BASE       = "../frog/json/";
+  const META_BASE       = "/frog/json/";
   const META_EXT        = ".json";
-  const BUILD_BASE      = "../frog/build_files";
+  const BUILD_BASE      = "/frog/build_files";
   const STARTING_FROGS  = 50;
   const MAX_FROGS       = 150;
 
@@ -109,27 +109,27 @@
 
   function initAudio() {
     audioRibbits = [
-      new Audio("https://freshfrogs.github.io/snake/audio/ribbitOne.mp3"),
-      new Audio("https://freshfrogs.github.io/snake/audio/ribbitTwo.mp3"),
-      new Audio("https://freshfrogs.github.io/snake/audio/ribbitThree.mp3"),
-      new Audio("https://freshfrogs.github.io/snake/audio/ribbitBase.mp3"),
+      new Audio("/snake/audio/ribbitOne.mp3"),
+      new Audio("/snake/audio/ribbitTwo.mp3"),
+      new Audio("/snake/audio/ribbitThree.mp3"),
+      new Audio("/snake/audio/ribbitBase.mp3"),
     ];
     audioRibbits.forEach(a => a.volume = 0.8);
 
-    audioFrogDeath = new Audio("https://freshfrogs.github.io/snake/audio/frogDeath.mp3");
+    audioFrogDeath = new Audio("/frogDeath.mp3");
     audioFrogDeath.volume = 0.9;
 
-    audioSnakeEat = new Audio("https://freshfrogs.github.io/snake/audio/munch.mp3");
+    audioSnakeEat = new Audio("/snake/munch.mp3");
     audioSnakeEat.volume = 0.7;
 
-    audioOrbSpawn1 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawn.mp3");
-    audioOrbSpawn2 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawnTwo.mp3");
+    audioOrbSpawn1 = new Audio("/audio/orbSpawn.mp3");
+    audioOrbSpawn2 = new Audio("/audio/orbSpawnTwo.mp3");
     audioOrbSpawn1.volume = 0.8;
     audioOrbSpawn2.volume = 0.8;
 
-    audioSuperSpeed = new Audio("https://freshfrogs.github.io/snake/audio/superSpeed.mp3");
-    audioSuperJump  = new Audio("https://freshfrogs.github.io/snake/audio/superJump.mp3");
-    audioFrogSpawn  = new Audio("https://freshfrogs.github.io/snake/audio/frogSpawn.mp3");
+    audioSuperSpeed = new Audio("/audio/superSpeed.mp3");
+    audioSuperJump  = new Audio("/audio/superJump.mp3");
+    audioFrogSpawn  = new Audio("/audio/frogSpawn.mp3");
     audioSuperSpeed.volume = 0.9;
     audioSuperJump.volume  = 0.9;
     audioFrogSpawn.volume  = 0.9;
@@ -463,18 +463,20 @@
   // -----------------------------
   // BUFFS
   // -----------------------------
-  const SPEED_BUFF_DURATION = 8;  // seconds
-  const JUMP_BUFF_DURATION  = 8;
+  const SPEED_BUFF_DURATION = 15; // CHANGED: was 8
+  const JUMP_BUFF_DURATION  = 18; // CHANGED: was 8
 
   let speedBuffTime = 0;
   let jumpBuffTime  = 0;
 
   function getSpeedFactor() {
-    return speedBuffTime > 0 ? 0.55 : 1.0; // smaller duration / idle time → faster movement
+    // Smaller durations → faster hopping rhythm
+    return speedBuffTime > 0 ? 0.5 : 1.0; // CHANGED: a bit faster during buff
   }
 
   function getJumpFactor() {
-    return jumpBuffTime > 0 ? 1.8 : 1.0; // higher hops
+    // Make super jump very noticeable
+    return jumpBuffTime > 0 ? 3.2 : 1.0; // CHANGED: was 1.8
   }
 
   function applyBuff(type) {
@@ -574,7 +576,7 @@
           } else {
             hopHeight = randRange(frog.hopHeightMin, frog.hopHeightMax);
           }
-          frog.hopHeight = hopHeight * getJumpFactor();
+          frog.hopHeight = hopHeight * getJumpFactor(); // CHANGED: stronger multiplier during buff
 
           chooseHopDestination(frog, width, height);
           playRandomRibbit();
@@ -727,7 +729,7 @@
   const SNAKE_SEGMENT_SIZE  = 48;
   const SNAKE_BASE_SPEED    = 90;
   const SNAKE_TURN_RATE     = Math.PI * 1.5;
-  const SNAKE_SEGMENT_GAP   = 6;
+  const SNAKE_SEGMENT_GAP   = 12; // CHANGED: was 6 → more spacing between segments
   const SNAKE_INITIAL_SEGMENTS = 6;
   const SNAKE_EAT_RADIUS    = 40;
 
@@ -916,7 +918,7 @@
     head.el.style.transform =
       `translate3d(${head.x}px, ${head.y}px, 0) rotate(${head.angle}rad)`;
 
-    // Render segments
+    // Render segments with more spacing
     for (let i = 0; i < snake.segments.length; i++) {
       const seg = snake.segments[i];
       const idx = Math.min(
