@@ -272,7 +272,7 @@
 
         for (const td of [rankCell, nameCell, timeCell, scoreCell]) {
           td.style.padding = "2px 4px";
-          td.style.borderBottom = "1px solid "#222";
+          td.style.borderBottom = "1px solid #222";
         }
 
         // Highlight THIS run's name in bright yellow
