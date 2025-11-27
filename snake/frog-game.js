@@ -1248,6 +1248,18 @@ function updateSnake(dt, width, height) {
         continue;
       }
 
+      // 🔹 Clone Swarm: chance that the snake only bites a fake clone
+      if (cloneSwarmTime > 0) {
+        // 65% of hits are "fake" while the buff is active
+        const DECOY_CHANCE = 0.65;
+        if (Math.random() < DECOY_CHANCE) {
+          // Snake thinks it ate something – munch sound – but frog survives
+          playSnakeMunch();
+          // No frogDeath, no removal
+          continue;
+        }
+      }
+
       // remove clone, if any
       if (frog.cloneEl && frog.cloneEl.parentNode === container) {
         container.removeChild(frog.cloneEl);
@@ -1275,6 +1287,7 @@ function updateSnake(dt, width, height) {
     }
   }
 }
+
 
   // --------------------------------------------------
   // PERMANENT UPGRADE OVERLAY (GLOBAL PER-MINUTE)
