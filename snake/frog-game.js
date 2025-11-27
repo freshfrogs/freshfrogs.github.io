@@ -1338,17 +1338,17 @@ function updateSnake(dt, width, height) {
     return [
       {
         id: "epicSpawn50",
-        label: "EPIC: Spawn 50 frogs right now",
+        label: "Spawn 50 frogs right now",
         apply: () => { spawnExtraFrogs(50); }
       },
       {
         id: "epicDeathRattle",
-        label: "EPIC: Deathrattle – 25% chance a dead frog respawns",
+        label: "25% chance a frog respawns upon death",
         apply: () => { frogDeathRattleChance = 0.25; }
       },
       {
         id: "epicFrogSpeed",
-        label: "EPIC: All frogs move permanently faster",
+        label: "All frogs move permanently faster",
         apply: () => { frogPermanentSpeedFactor *= 0.9; /* small but permanent */ }
       }
     ];
