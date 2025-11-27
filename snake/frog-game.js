@@ -779,46 +779,42 @@
     el.style.borderRadius = "50%";
     el.style.pointerEvents = "none";
     el.style.zIndex = "20";
-    el.style.boxShadow = "0 0 10px rgba(0,0,0,0.4)";
 
-    // Small solid bright colors with shaded background
+    // use shared orb.gif for all buffs
+    el.style.backgroundImage = "url(/snake/orb.gif)";
+    el.style.backgroundSize = "contain";
+    el.style.backgroundRepeat = "no-repeat";
+    el.style.backgroundPosition = "center";
+
+    // different colored glow per buff type so you can still tell them apart
     if (type === "speed") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #32ff9b)";
+      el.style.boxShadow = "0 0 14px #32ff9b";
     } else if (type === "jump") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #b857ff)";
+      el.style.boxShadow = "0 0 14px #b857ff";
     } else if (type === "spawn") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #ffe66b)";
+      el.style.boxShadow = "0 0 14px #ffe66b";
     } else if (type === "snakeSlow") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #ff6b6b)";
+      el.style.boxShadow = "0 0 14px #ff6b6b";
     } else if (type === "snakeConfuse") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #ff9ff3)";
+      el.style.boxShadow = "0 0 14px #ff9ff3";
     } else if (type === "snakeShrink") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #74b9ff)";
+      el.style.boxShadow = "0 0 14px #74b9ff";
     } else if (type === "frogShield") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #55efc4)";
+      el.style.boxShadow = "0 0 14px #55efc4";
     } else if (type === "timeSlow") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #ffeaa7)";
+      el.style.boxShadow = "0 0 14px #ffeaa7";
     } else if (type === "orbMagnet") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #a29bfe)";
+      el.style.boxShadow = "0 0 14px #a29bfe";
     } else if (type === "megaSpawn") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #fd79a8)";
+      el.style.boxShadow = "0 0 14px #fd79a8";
     } else if (type === "scoreMulti") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #fdcb6e)";
+      el.style.boxShadow = "0 0 14px #fdcb6e";
     } else if (type === "panicHop") {
-      el.style.background =
-        "radial-gradient(circle at 30% 30%, #ffffff, #fab1a0)";
+      el.style.boxShadow = "0 0 14px #fab1a0";
+    } else {
+      el.style.boxShadow = "0 0 10px rgba(0,0,0,0.4)";
     }
+
 
     container.appendChild(el);
     orbs.push({
