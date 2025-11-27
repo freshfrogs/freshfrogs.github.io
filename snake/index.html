@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fresh Frogs – Snake Game</title>
+  <title>Fresh Frogs – Snake Scatter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <link rel="stylesheet" href="../style.css" />
+  <!-- Adjust path if your CSS is elsewhere -->
+  <link rel="stylesheet" href="/style.css" />
 
   <style>
     html, body {
@@ -14,8 +15,7 @@
       height: 100%;
       width: 100%;
       overflow: hidden;
-      background: #7cc1ff;
-      cursor: crosshair;
+      background: #7cc1ff; /* light blue */
     }
 
     #frog-bg {
@@ -23,61 +23,12 @@
       inset: 0;
       pointer-events: auto;
     }
-
-    .frog-sprite {
-      position: absolute;
-      width: 64px;
-      height: 64px;
-      image-rendering: pixelated;
-    }
-
-    .frog-sprite img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      image-rendering: pixelated;
-      object-fit: contain;
-      pointer-events: none;
-    }
-
-    .snake-head,
-    .snake-body {
-      position: absolute;
-      width: 48px;
-      height: 48px;
-      image-rendering: pixelated;
-      background-size: contain;
-      background-repeat: no-repeat;
-      pointer-events: none;
-      z-index: 30;
-    }
-
-    .frog-powerup {
-      pointer-events: none;
-    }
-
-    .snake-timer {
-      position: fixed;
-      top: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.6);
-      color: #fff;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      z-index: 100;
-      pointer-events: none;
-    }
   </style>
 </head>
 <body>
-  <div id="frog-bg"></div>
+  <!-- data-snake-game turns on snake logic in scatter-frogs.js -->
+  <div id="frog-bg" data-snake-game="1"></div>
 
-  <script src="./snake-game.js"></script>
+  <script src="/assets/scatter-frogs.js"></script>
 </body>
 </html>
