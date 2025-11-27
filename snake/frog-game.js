@@ -476,7 +476,7 @@
 
   function getJumpFactor() {
     // Make super jump very noticeable
-    return jumpBuffTime > 0 ? 3.2 : 1.0; // CHANGED: was 1.8
+    return jumpBuffTime > 0 ? 6.2 : 1.0; // CHANGED: was 1.8
   }
 
   function applyBuff(type) {
