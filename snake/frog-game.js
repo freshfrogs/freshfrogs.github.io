@@ -109,17 +109,17 @@
 
   function initAudio() {
     audioRibbits = [
-      new Audio("/snake/audio/ribbitOne.mp3"),
-      new Audio("/snake/audio/ribbitTwo.mp3"),
-      new Audio("/snake/audio/ribbitThree.mp3"),
-      new Audio("/snake/audio/ribbitBase.mp3"),
+      new Audio("/audio/ribbitOne.mp3"),
+      new Audio("/audio/ribbitTwo.mp3"),
+      new Audio("/audio/ribbitThree.mp3"),
+      new Audio("/audio/ribbitBase.mp3"),
     ];
     audioRibbits.forEach(a => a.volume = 0.8);
 
-    audioFrogDeath = new Audio("/frogDeath.mp3");
+    audioFrogDeath = new Audio("/audio/frogDeath.mp3");
     audioFrogDeath.volume = 0.9;
 
-    audioSnakeEat = new Audio("/snake/munch.mp3");
+    audioSnakeEat = new Audio("/audio/munch.mp3");
     audioSnakeEat.volume = 0.7;
 
     audioOrbSpawn1 = new Audio("/audio/orbSpawn.mp3");
