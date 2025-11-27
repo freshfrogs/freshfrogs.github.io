@@ -3,38 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <title>escape the snake 🐍</title>
-
-  <!-- Force a desktop-like layout width even on mobile -->
-  <meta
-    name="viewport"
-    content="width=1024, initial-scale=0.8, maximum-scale=0.8, user-scalable=no"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Adjust path if your CSS is elsewhere -->
   <link rel="stylesheet" href="/style.css" />
 
   <style>
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
-      background: #7cc1ff; /* light blue */
-      overflow-x: auto;    /* allow horizontal scroll if needed */
-      overflow-y: hidden;  /* keep vertical fixed */
-    }
-
-    /* Desktop-style wrapper so the game always behaves like 1024px wide */
-    #snake-desktop-wrapper {
-      width: 1024px;       /* pretend desktop width */
-      margin: 0 auto;      /* center on larger screens */
-      height: 100%;
       overflow: hidden;
-      position: relative;
+      background: #7cc1ff; /* light blue */
     }
 
-    /* Your existing frog background (if created by JS) */
     #frog-bg {
       position: fixed;
       inset: 0;
@@ -43,11 +26,8 @@
   </style>
 </head>
 <body>
-  <!-- Fixed-width desktop-style container -->
-  <div id="snake-desktop-wrapper">
-    <!-- data-snake-game turns on snake logic in scatter-frogs.js (if used there) -->
-    <div id="frog-game"></div>
-  </div>
+  <!-- data-snake-game turns on snake logic in scatter-frogs.js -->
+  <div id="frog-game"></div>
 
   <script src="frog-audio.js"></script>
   <script src="frog-leaderboard.js"></script>
