@@ -1349,8 +1349,12 @@
   let upgradeOverlay = null;
   let upgradeOverlayButtonsContainer = null;
   let upgradeOverlayTitleEl = null;
-  let currentUpgradeOverlayMode = "normal"; // "normal" | "epic" | "legendary"
+  let currentUpgradeOverlayMode = "normal"; // "normal" | "epic"
   let initialUpgradeDone = false;
+
+  // How-to-play overlay shown once before the very first buff choice
+  let howToOverlay = null;
+  let hasShownHowToOverlay = false;
 
   function getUpgradeChoices() {
     return [
@@ -1436,6 +1440,102 @@ function getLegendaryUpgradeChoices() {
     }
   ];
 }
+
+  function ensureHowToOverlay() {
+    if (howToOverlay) return;
+
+    howToOverlay = document.createElement("div");
+    howToOverlay.className = "frog-howto-overlay";
+
+    howToOverlay.style.position = "absolute";
+    howToOverlay.style.inset = "0";
+    howToOverlay.style.background = "rgba(0,0,0,0.7)";
+    howToOverlay.style.display = "none";
+    howToOverlay.style.zIndex = "160";
+    howToOverlay.style.alignItems = "center";
+    howToOverlay.style.justifyContent = "center";
+    howToOverlay.style.pointerEvents = "auto";
+
+    const panel = document.createElement("div");
+    panel.style.background = "#111";
+    panel.style.padding = "18px 22px";
+    panel.style.borderRadius = "10px";
+    panel.style.border = "1px solid #444";
+    panel.style.color = "#fff";
+    panel.style.fontFamily = "monospace";
+    panel.style.textAlign = "left";
+    panel.style.minWidth = "260px";
+    panel.style.maxWidth = "420px";
+    panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
+
+    const title = document.createElement("div");
+    title.textContent = "escape the snake 🐍";
+    title.style.fontSize = "18px";
+    title.style.fontWeight = "bold";
+    title.style.marginBottom = "4px";
+
+    const subtitle = document.createElement("div");
+    subtitle.textContent = "-- How to Play --";
+    subtitle.style.marginBottom = "10px";
+    subtitle.style.fontSize = "13px";
+    subtitle.style.opacity = "0.9";
+
+    const list = document.createElement("ul");
+    list.style.paddingLeft = "18px";
+    list.style.margin = "0 0 14px 0";
+    list.style.fontSize = "13px";
+    list.style.lineHeight = "1.4";
+
+    [
+      "Avoid the snake and stay alive as long as possible!",
+      "Collect orbs to gain buffs and upgrades.",
+      "Beat the high score to get on the leaderboard.",
+      "Control frogs with your mouse."
+    ].forEach(text => {
+      const li = document.createElement("li");
+      li.textContent = text;
+      list.appendChild(li);
+    });
+
+    const button = document.createElement("button");
+    button.textContent = "Start & Choose Buff";
+    button.style.fontFamily = "monospace";
+    button.style.fontSize = "13px";
+    button.style.padding = "6px 10px";
+    button.style.borderRadius = "6px";
+    button.style.border = "1px solid #555";
+    button.style.background = "#222";
+    button.style.color = "#fff";
+    button.style.cursor = "pointer";
+    button.style.display = "block";
+    button.style.margin = "0 auto";
+    button.onmouseenter = () => { button.style.background = "#333"; };
+    button.onmouseleave = () => { button.style.background = "#222"; };
+    button.onclick = () => {
+      hasShownHowToOverlay = true;
+      if (howToOverlay) {
+        howToOverlay.style.display = "none";
+      }
+      // When the player is ready, open the first buff menu.
+      openUpgradeOverlay("normal");
+    };
+
+    panel.appendChild(title);
+    panel.appendChild(subtitle);
+    panel.appendChild(list);
+    panel.appendChild(button);
+
+    howToOverlay.appendChild(panel);
+    container.appendChild(howToOverlay);
+  }
+
+  function openHowToOverlay() {
+    ensureHowToOverlay();
+    gamePaused = true;
+    if (howToOverlay) {
+      howToOverlay.style.display = "flex";
+    }
+  }
 
   function ensureUpgradeOverlay() {
     if (upgradeOverlay) return;
@@ -1802,9 +1902,14 @@ function getLegendaryUpgradeChoices() {
     initAudio();
     initLeaderboard(container);
     ensureUpgradeOverlay(); // just creates DOM, doesn't show it
+    ensureHowToOverlay();
 
     const topList = await fetchLeaderboard();
-    if (topList) updateMiniLeaderboard(topList);
+    if (topList) {
+      updateMiniLeaderboard(topList);
+      // Show the full leaderboard alongside the How to Play menu
+      openScoreboardOverlay(topList, lastRunScore, lastRunTime);
+    }
 
     const width  = window.innerWidth;
     const height = window.innerHeight;
@@ -1815,10 +1920,15 @@ function getLegendaryUpgradeChoices() {
     setNextOrbTime();
     updateHUD();
 
-    // Starting permanent upgrade before time starts
-    openUpgradeOverlay("normal");
+    // Show How to Play first; it will open the buff menu when the player clicks Start
+    if (!hasShownHowToOverlay) {
+      openHowToOverlay();
+    } else {
+      openUpgradeOverlay("normal");
+    }
 
     animId = requestAnimationFrame(drawFrame);
+
   }
 
   window.addEventListener("load", startGame);
