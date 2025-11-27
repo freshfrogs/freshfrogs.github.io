@@ -728,68 +728,85 @@ function getJumpFactor(frog) {
     }
   }
 
-  function applyBuff(type, frog) {
-    const durBoost = collector && collector.isLucky
-      ? LUCKY_BUFF_DURATION_BOOST   // 1.4
-      : 1.0;
+function applyBuff(type, frog) {
+  // Lucky frogs extend buff durations
+  const isLuckyCollector = frog && frog.isLucky;
+  const durBoost = isLuckyCollector
+    ? LUCKY_BUFF_DURATION_BOOST   // from config, e.g. 1.4
+    : 1.0;
 
-    buffDuration = baseDur * buffDurationFactor * durBoost;
+  switch (type) {
+    case "speed":
+      speedBuffTime = SPEED_BUFF_DURATION * buffDurationFactor * durBoost;
+      break;
 
+    case "jump":
+      jumpBuffTime = JUMP_BUFF_DURATION * buffDurationFactor * durBoost;
+      break;
 
-    switch (type) {
-      case "speed":
-        speedBuffTime = SPEED_BUFF_DURATION * buffDurationFactor * durBoost;
-        break;
-      case "jump":
-        jumpBuffTime = JUMP_BUFF_DURATION * buffDurationFactor * durBoost;
-        break;
-      case "spawn": {
-        const base = randInt(1, 10);
-        const bonus = isLuckyCollector ? randInt(1, 4) : 0;
-        spawnExtraFrogs(base + bonus);
-        break;
-      }
-      case "snakeSlow":
-        snakeSlowTime = SNAKE_SLOW_DURATION * buffDurationFactor * durBoost;
-        break;
-      case "snakeConfuse":
-        snakeConfuseTime = SNAKE_CONFUSE_DURATION * buffDurationFactor * durBoost;
-        break;
-      case "snakeShrink":
-        snakeShrinkTime = SNAKE_SHRINK_DURATION * buffDurationFactor * durBoost;
-        break;
-      case "frogShield":
-        frogShieldTime = FROG_SHIELD_DURATION * buffDurationFactor * durBoost;
-        break;
-      case "timeSlow":
-        timeSlowTime = TIME_SLOW_DURATION * buffDurationFactor * durBoost;
-        break;
-      case "orbMagnet":
-        orbMagnetTime = ORB_MAGNET_DURATION * buffDurationFactor * durBoost;
-        break;
-      case "megaSpawn": {
-        const base = randInt(15, 25);
-        const bonus = isLuckyCollector ? randInt(3, 8) : 0;
-        spawnExtraFrogs(base + bonus);
-        break;
-      }
-      case "scoreMulti":
-        scoreMultiTime = SCORE_MULTI_DURATION * buffDurationFactor * durBoost;
-        break;
-      case "panicHop":
-        panicHopTime = PANIC_HOP_DURATION * buffDurationFactor * durBoost;
-        break;
-      case "lifeSteal":
-        lifeStealTime = LIFE_STEAL_DURATION * buffDurationFactor * durBoost;
-        break;
-      default:
-        break;
+    case "spawn": {
+      const base  = randInt(1, 10);
+      const bonus = isLuckyCollector ? randInt(1, 4) : 0;
+      spawnExtraFrogs(base + bonus);
+      break;
     }
 
-    if (type !== "permaFrog") {
-      playBuffSound(type);
+    case "snakeSlow":
+      snakeSlowTime = SNAKE_SLOW_DURATION * buffDurationFactor * durBoost;
+      break;
+
+    case "snakeConfuse":
+      snakeConfuseTime = SNAKE_CONFUSE_DURATION * buffDurationFactor * durBoost;
+      break;
+
+    case "snakeShrink":
+      snakeShrinkTime = SNAKE_SHRINK_DURATION * buffDurationFactor * durBoost;
+      break;
+
+    case "frogShield":
+      frogShieldTime = FROG_SHIELD_DURATION * buffDurationFactor * durBoost;
+      break;
+
+    case "timeSlow":
+      timeSlowTime = TIME_SLOW_DURATION * buffDurationFactor * durBoost;
+      break;
+
+    case "orbMagnet":
+      orbMagnetTime = ORB_MAGNET_DURATION * buffDurationFactor * durBoost;
+      break;
+
+    case "megaSpawn": {
+      const base  = randInt(15, 25);
+      const bonus = isLuckyCollector ? randInt(3, 8) : 0;
+      spawnExtraFrogs(base + bonus);
+      break;
     }
+
+    case "scoreMulti":
+      scoreMultiTime = SCORE_MULTI_DURATION * buffDurationFactor * durBoost;
+      break;
+
+    case "panicHop":
+      panicHopTime = PANIC_HOP_DURATION * buffDurationFactor * durBoost;
+      break;
+
+    case "cloneSwarm":
+      cloneSwarmTime = CLONE_SWARM_DURATION * buffDurationFactor * durBoost;
+      break;
+
+    case "lifeSteal":
+      lifeStealTime = LIFE_STEAL_DURATION * buffDurationFactor * durBoost;
+      break;
+
+    default:
+      break;
   }
+
+  if (type !== "permaFrog") {
+    playBuffSound(type);
+  }
+}
+
 
   function applySnakeAppearance() {
     if (!snake) return;
