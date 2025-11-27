@@ -28,15 +28,12 @@
   function getEntryScore(entry) {
     if (!entry || typeof entry !== "object") return 0;
 
-    // Preferred key
     if ("score" in entry) return asNumber(entry.score, 0);
 
-    // Look for something with "score" in the key
     for (const k of Object.keys(entry)) {
       if (/score/i.test(k)) return asNumber(entry[k], 0);
     }
 
-    // Fallback: first numeric-ish field
     for (const k of Object.keys(entry)) {
       const n = asNumber(entry[k], NaN);
       if (Number.isFinite(n)) return n;
@@ -49,10 +46,8 @@
   function getEntryTime(entry) {
     if (!entry || typeof entry !== "object") return 0;
 
-    // Preferred key
     if ("time" in entry) return asNumber(entry.time, 0);
 
-    // Look for something with time/seconds/duration in the key
     for (const k of Object.keys(entry)) {
       if (/time|second|duration/i.test(k)) {
         return asNumber(entry[k], 0);
@@ -76,6 +71,20 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  function getDisplayName(entry, fallbackLabel) {
+    if (!entry || typeof entry !== "object") {
+      return fallbackLabel || "Player";
+    }
+    // Prefer tag, then userTag, then name
+    return (
+      entry.tag ||
+      entry.userTag ||
+      entry.name ||
+      fallbackLabel ||
+      "Player"
+    );
   }
 
   // --------------------------------------------------
@@ -189,7 +198,7 @@
     for (let i = 0; i < maxRows; i++) {
       const entry = topList[i] || {};
       const rank = i + 1;
-      const name = entry.userTag || entry.name || `Player ${rank}`;
+      const name = getDisplayName(entry, `Player ${rank}`);
       const score = getEntryScore(entry);
       const time = getEntryTime(entry);
       lines.push(
@@ -237,9 +246,7 @@
       }
     }
 
-    const myName = myEntry
-      ? myEntry.userTag || myEntry.name || "You"
-      : "You";
+    const myName = getDisplayName(myEntry, "You");
 
     // Run summary with name in bright yellow
     const summary = document.createElement("div");
@@ -305,7 +312,7 @@
         const scoreCell = document.createElement("td");
 
         const rank = i + 1;
-        const name = entry.userTag || entry.name || `Player ${rank}`;
+        const name = getDisplayName(entry, `Player ${rank}`);
         const score = getEntryScore(entry);
         const time = getEntryTime(entry);
 
