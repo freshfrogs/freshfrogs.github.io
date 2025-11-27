@@ -90,6 +90,8 @@
   let gamePaused    = false;
   let nextOrbTime   = 0;
   let score         = 0;
+  let frogsEatenCount = 0; // grow one segment every 2 frogs
+
 
   let lastRunScore  = 0;
   let lastRunTime   = 0;
@@ -1287,7 +1289,13 @@ function updateSnake(dt, width, height) {
 
       playSnakeMunch();
       playFrogDeath();
-      growSnake(1);
+
+      // Only grow one segment for every 2 frogs eaten
+      frogsEatenCount++;
+      if (frogsEatenCount % 2 === 0) {
+        growSnake(1);
+      }
+
 
     }
   }
