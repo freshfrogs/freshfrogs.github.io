@@ -521,8 +521,10 @@ function snakeShed(stage, speedMultiplier) {
   const PANIC_HOP_SPEED_FACTOR   = 0.6;  // panic hop speed factor
   const JUMP_BUFF_FACTOR         = 3.2;  // jump buff height multiplier
 
-  const SNAKE_SLOW_FACTOR        = 0.5;  // snake at 50% speed
-  const TIME_SLOW_FACTOR         = 0.4;  // global/time slow ~40% speed
+  // Snake speed + Lucky config
+  const SNAKE_SLOW_FACTOR      = 0.5;  // snake slow buff → 50% speed
+  const TIME_SLOW_FACTOR       = 0.4;  // time slow → 40% speed
+  const FRENZY_SPEED_FACTOR    = 1.25; // legendary Frenzy → +25% speed
 
   const SCORE_MULTI_FACTOR       = 2.0;  // score x2
 
