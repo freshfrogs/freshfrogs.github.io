@@ -15,6 +15,16 @@
   const STARTING_FROGS  = 50;
   const MAX_FROGS       = 150;
 
+  // Worker endpoint
+  const LEADERBOARD_URL = "https://lucky-king-0d37.danielssouthworth.workers.dev/leaderboard"; // change this
+
+  let lastRunScore = 0;
+  let lastRunTime  = 0;
+
+  // scoreboard overlay
+  let scoreboardOverlay = null;
+
+
   // Values that have animation variants for frogs (same as scatter-frogs.js)
   const SCATTER_ANIMATED_VALUES = new Set([
     "goldenDartFrog",
@@ -96,6 +106,179 @@
     }
     mouse.follow = true;
   });
+
+  function ensureScoreboardOverlay() {
+  if (scoreboardOverlay) return;
+
+  scoreboardOverlay = document.createElement("div");
+  scoreboardOverlay.style.position = "absolute";
+  scoreboardOverlay.style.inset = "0";
+  scoreboardOverlay.style.background = "rgba(0,0,0,0.78)";
+  scoreboardOverlay.style.display = "none";
+  scoreboardOverlay.style.zIndex = "200";
+  scoreboardOverlay.style.display = "flex";
+  scoreboardOverlay.style.alignItems = "center";
+  scoreboardOverlay.style.justifyContent = "center";
+  scoreboardOverlay.style.pointerEvents = "auto";
+
+  const panel = document.createElement("div");
+  panel.style.background = "#111";
+  panel.style.padding = "16px 20px";
+  panel.style.borderRadius = "10px";
+  panel.style.border = "1px solid #444";
+  panel.style.color = "#fff";
+  panel.style.fontFamily = "monospace";
+  panel.style.textAlign = "center";
+  panel.style.minWidth = "320px";
+  panel.style.maxWidth = "480px";
+
+  const title = document.createElement("div");
+  title.textContent = "Run Summary";
+  title.style.fontSize = "16px";
+  title.style.marginBottom = "8px";
+
+  const summary = document.createElement("div");
+  summary.style.fontSize = "13px";
+  summary.style.marginBottom = "10px";
+  summary.id = "frog-score-summary";
+
+  const leaderboardTitle = document.createElement("div");
+  leaderboardTitle.textContent = "Top Scores";
+  leaderboardTitle.style.fontSize = "14px";
+  leaderboardTitle.style.margin = "10px 0 4px";
+
+  const table = document.createElement("table");
+  table.style.width = "100%";
+  table.style.borderCollapse = "collapse";
+  table.style.fontSize = "12px";
+  table.id = "frog-score-table";
+
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+  ["#", "Tag", "Score", "Time"].forEach((h) => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    th.style.borderBottom = "1px solid #444";
+    th.style.padding = "2px 4px";
+    th.style.textAlign = h === "#" ? "right" : "left";
+    headRow.appendChild(th);
+  });
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  table.appendChild(tbody);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "Close";
+  closeBtn.style.marginTop = "10px";
+  closeBtn.style.fontFamily = "monospace";
+  closeBtn.style.fontSize = "13px";
+  closeBtn.style.padding = "6px 10px";
+  closeBtn.style.borderRadius = "6px";
+  closeBtn.style.border = "1px solid #555";
+  closeBtn.style.background = "#222";
+  closeBtn.style.color = "#fff";
+  closeBtn.style.cursor = "pointer";
+  closeBtn.onclick = () => {
+    scoreboardOverlay.style.display = "none";
+  };
+  closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
+  closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
+
+  panel.appendChild(title);
+  panel.appendChild(summary);
+  panel.appendChild(leaderboardTitle);
+  panel.appendChild(table);
+  panel.appendChild(closeBtn);
+
+  scoreboardOverlay.appendChild(panel);
+  container.appendChild(scoreboardOverlay);
+}
+
+async function submitScoreToServer(score, time) {
+  try {
+    const res = await fetch(LEADERBOARD_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ score, time }),
+    });
+    if (!res.ok) throw new Error("submit failed");
+    return await res.json(); // expect array top scores
+  } catch (e) {
+    console.error("submitScoreToServer error", e);
+    return null;
+  }
+}
+
+async function fetchLeaderboard() {
+  try {
+    const res = await fetch(LEADERBOARD_URL, {
+      method: "GET"
+    });
+    if (!res.ok) throw new Error("get failed");
+    return await res.json();
+  } catch (e) {
+    console.error("fetchLeaderboard error", e);
+    return null;
+  }
+}
+
+function openScoreboardOverlay(topList) {
+  ensureScoreboardOverlay();
+  const summary = document.getElementById("frog-score-summary");
+  const table   = document.getElementById("frog-score-table");
+  if (!summary || !table) return;
+
+  summary.textContent =
+    `Time: ${formatTime(lastRunTime)}  |  Score: ${Math.floor(lastRunScore)}`;
+
+  const tbody = table.querySelector("tbody");
+  tbody.innerHTML = "";
+
+  if (!Array.isArray(topList) || !topList.length) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 4;
+    td.textContent = "No scores yet.";
+    td.style.padding = "4px";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  } else {
+    topList.forEach((entry, idx) => {
+      const tr = document.createElement("tr");
+
+      const tdRank = document.createElement("td");
+      tdRank.textContent = String(idx + 1);
+      tdRank.style.textAlign = "right";
+      tdRank.style.padding = "2px 4px";
+
+      const tdTag = document.createElement("td");
+      tdTag.textContent = entry.tag || "Unknown";
+      tdTag.style.padding = "2px 4px";
+
+      const tdScore = document.createElement("td");
+      tdScore.textContent = entry.bestScore != null
+        ? String(Math.floor(entry.bestScore))
+        : "-";
+      tdScore.style.padding = "2px 4px";
+
+      const tdTime = document.createElement("td");
+      tdTime.textContent = entry.bestTime != null
+        ? formatTime(entry.bestTime)
+        : "-";
+      tdTime.style.padding = "2px 4px";
+
+      tr.appendChild(tdRank);
+      tr.appendChild(tdTag);
+      tr.appendChild(tdScore);
+      tr.appendChild(tdTime);
+      tbody.appendChild(tr);
+    });
+  }
+
+  scoreboardOverlay.style.display = "flex";
+}
 
   // -----------------------------
   // AUDIO
@@ -1251,10 +1434,24 @@
   // -----------------------------
   // GAME LOOP
   // -----------------------------
-  function endGame() {
-    gameOver = true;
-    showGameOver();
-  }
+function endGame() {
+  gameOver = true;
+
+  // capture last run
+  lastRunTime  = elapsedTime;
+  lastRunScore = score;
+
+  // submit score, then show scoreboard overlay
+  (async () => {
+    const topList = await submitScoreToServer(lastRunScore, lastRunTime)
+                  || await fetchLeaderboard()
+                  || [];
+    openScoreboardOverlay(topList);
+  })();
+
+  showGameOver();
+}
+
 
   function restartGame() {
     if (animId) {
@@ -1369,20 +1566,22 @@
   // -----------------------------
   // INIT
   // -----------------------------
-  async function startGame() {
-    initAudio();
-    ensureUpgradeOverlay();
+async function startGame() {
+  initAudio();
+  ensureUpgradeOverlay();
+  ensureScoreboardOverlay();  // <-- add this
 
-    const width  = window.innerWidth;
-    const height = window.innerHeight;
+  const width  = window.innerWidth;
+  const height = window.innerHeight;
 
-    await createInitialFrogs(width, height);
-    initSnake(width, height);
+  await createInitialFrogs(width, height);
+  initSnake(width, height);
 
-    nextOrbTime = randRange(ORB_SPAWN_INTERVAL_MIN, ORB_SPAWN_INTERVAL_MAX);
-    updateHUD();
-    animId = requestAnimationFrame(drawFrame);
-  }
+  nextOrbTime = randRange(ORB_SPAWN_INTERVAL_MIN, ORB_SPAWN_INTERVAL_MAX);
+  updateHUD();
+  animId = requestAnimationFrame(drawFrame);
+}
+
 
   window.addEventListener("load", startGame);
 })();
