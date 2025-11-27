@@ -514,7 +514,7 @@ function snakeShed(stage, speedMultiplier) {
   const SCORE_MULTI_DURATION   = 10;
   const PANIC_HOP_DURATION     = 5;
   const CLONE_SWARM_DURATION   = 7;
-  const LIFE_STEAL_DURATION    = 10;
+  const LIFE_STEAL_DURATION    = 23;
 
   // How strong each buff is
   const SPEED_BUFF_FACTOR        = 0.5;  // frogs act 2× faster (0.5 = half their cycle)
