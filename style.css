@@ -56,14 +56,17 @@ a {
   font-size: 0.9rem;
 }
 
-.nav a {
+/* Make hero links look just like nav links */
+.nav a,
+.hero-actions a {
   color: inherit;
   text-decoration: none;
   padding: 0.2rem 0;
   position: relative;
 }
 
-.nav a::after {
+.nav a::after,
+.hero-actions a::after {
   content: "";
   position: absolute;
   left: 0;
@@ -74,11 +77,13 @@ a {
   transition: width 160ms ease-out;
 }
 
-.nav a:hover {
+.nav a:hover,
+.hero-actions a:hover {
   color: darkcyan;
 }
 
-.nav a:hover::after {
+.nav a:hover::after,
+.hero-actions a:hover::after {
   width: 80%;
 }
 
@@ -185,7 +190,7 @@ a {
 }
 
 .btn.primary {  
-padding: 0.55rem 1.2rem;
+  padding: 0.55rem 1.2rem;
   border-radius: 0px;
   border: none;
   color: #022c22;
@@ -199,7 +204,7 @@ padding: 0.55rem 1.2rem;
 }
 
 .btn.secondary {
-padding: 0.55rem 1.2rem;
+  padding: 0.55rem 1.2rem;
   border-radius: 0px;
   border: none;
   color: #022c22;
@@ -335,7 +340,6 @@ padding: 0.55rem 1.2rem;
 }
 
 /* FROG CARD (used everywhere: owned, staked, sales, mints, pond, rarity) */
-
 
 .sale_card_title {
   float: left;
@@ -693,14 +697,12 @@ padding: 0.55rem 1.2rem;
   box-shadow: 2px 2px darkslateblue;
 }
 
-
 /* Reuse recent_sale_card style for owned / staked NFTs */
 .nft-grid .recent_sale_card {
   max-width: 240px;      /* 🔹 same cap for wallet grids */
   width: 240px;
   margin: 8px auto;
 }
-
 
 /* HEADER NAV: active state for view tabs */
 
@@ -715,6 +717,7 @@ padding: 0.55rem 1.2rem;
 .nav a.active::after {
   width: 80%;
 }
+
 .frog-owner-link {
   color: inherit;
   text-decoration: none;
@@ -723,6 +726,7 @@ padding: 0.55rem 1.2rem;
 .frog-owner-link:hover {
   text-decoration: underline;
 }
+
 /* Morph gallery */
 .morph-gallery {
   display: flex;
@@ -764,12 +768,14 @@ padding: 0.55rem 1.2rem;
   border-color: #52ff9b; /* neon-ish frog green */
   box-shadow: 0 0 0 2px rgba(82,255,155,0.5);
 }
+
 /* your existing button styles stay the same */
 .recent_sale_card .frog-actions{
   display: flex;
   gap: 0px;
   justify-content: center;
 }
+
 /* makes <a> behave exactly like your <button> */
 .frog-actions .frog_action_btn{
   background: cornflowerblue;
@@ -784,9 +790,9 @@ padding: 0.55rem 1.2rem;
 }
 
 .frog_action_btn:hover {
-    transform: translateY(-1px);
-    background: white;
-    color: #333;
+  transform: translateY(-1px);
+  background: white;
+  color: #333;
 }
 
 #frog-bg {
