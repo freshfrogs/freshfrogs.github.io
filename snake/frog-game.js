@@ -378,9 +378,6 @@
     const animatedValues = pickAnimatedValues(attrs);
     const layers = [];
 
-    const basePath = `${BUILD_BASE}/base`;
-    layers.push({ url: `${basePath}/${meta.imageBase || "base"}.png`, animated: false });
-
     for (const att of attrs) {
       const traitType = att.trait_type;
       const value = att.value;
