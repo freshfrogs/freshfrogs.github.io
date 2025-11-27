@@ -386,21 +386,8 @@
       const value = att.value;
       if (!value || value === "None") continue;
 
-      let folder = null;
-      switch (traitType) {
-        case "Background": folder = "background"; break;
-        case "Body":       folder = "body";       break;
-        case "Belly":      folder = "belly";      break;
-        case "Spots":      folder = "spots";      break;
-        case "Mouth":      folder = "mouth";      break;
-        case "Eye Accessory": folder = "eye";     break;
-        case "Special":    folder = "special";    break;
-        case "Hat / Head Accessory": folder = "hat"; break;
-        default: continue;
-      }
-
       const valueSafe = String(value).replace(/\s+/g, "");
-      const url = `${BUILD_BASE}/${folder}/${valueSafe}.png`;
+      const url = `${BUILD_BASE}/${traitType}/${valueSafe}.png`;
       const animated = animatedValues.has(valueSafe);
       layers.push({ url, animated });
     }
