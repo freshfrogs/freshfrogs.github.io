@@ -536,21 +536,27 @@ function snakeShed(stage, speedMultiplier) {
   const AURA_SPEED_FACTOR        = 0.9;
   const LUCKY_SCORE_BONUS_PER    = 0.10; // +10% per Lucky frog
 
-  // --------------------------------------------------
-  // UPGRADE CONFIG (permanent choices)
-  // --------------------------------------------------
+// --------------------------------------------------
+// UPGRADE CONFIG (permanent choices)
+// --------------------------------------------------
 
   // Normal upgrade multipliers
-  const FROG_SPEED_UPGRADE_FACTOR     = 0.90; // each pick ~15% faster hops
-  const FROG_JUMP_UPGRADE_FACTOR      = 1.70;  // each pick +70% jump height
-  const BUFF_DURATION_UPGRADE_FACTOR  = 1.10; // each pick +20% buff duration
-  const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // each pick ~15% faster orb spawns
+  const FROG_SPEED_UPGRADE_FACTOR     = 0.85; // ~15% faster hops each pick
+  const FROG_JUMP_UPGRADE_FACTOR      = 1.70; // ~70% higher jumps each pick
+  const BUFF_DURATION_UPGRADE_FACTOR  = 1.20; // +20% buff duration each pick
+  const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
 
-  // Spawn amounts (so you can tweak easily later)
-  const NORMAL_SPAWN_AMOUNT           = 20;   // "spawn 20"
-  const EPIC_SPAWN_AMOUNT             = 50;   // epic spawn
-  const LEGENDARY_SPAWN_AMOUNT        = 75;   // legendary spawn
+  // Spawn amounts
+  const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
+  const EPIC_SPAWN_AMOUNT             = 50;   // epic menu
+  const LEGENDARY_SPAWN_AMOUNT        = 75;   // legendary menu
 
+  // Deathrattle chances
+  const EPIC_DEATHRATTLE_CHANCE       = 0.25; // 25%
+  const LEGENDARY_DEATHRATTLE_CHANCE  = 0.50; // 50%
+
+  // Legendary buff duration spike
+  const LEGENDARY_BUFF_DURATION_FACTOR = 2.0; // x2 all buff durations
 
   let speedBuffTime   = 0;
   let jumpBuffTime    = 0;
