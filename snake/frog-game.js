@@ -2052,7 +2052,7 @@ function setBuffGuidePage(pageIndex) {
 <b>🏗️ Global upgrades</b><br><br>
 ⏩ <b>Frogs hop faster forever</b> – each pick makes hops ~<span style="color:${neon};">${percentFromBonus(1 - frogSpeedUp, 0.1)}</span> faster (stacks).<br>
 🦘⬆️ <b>Frogs jump higher forever</b> – each pick adds ~<span style="color:${neon};">${percentFromBonus(frogJumpUp - 1, 0.25)}</span> jump height (stacks).<br>
-🐸💥 <b>Spawn 20/50/75 frogs</b> – instant extra frogs from normal / epic / legendary choices.<br>
+🐸💥 <b>Spawn ${NORMAL_SPAWN_AMOUNT}/${EPIC_SPAWN_AMOUNT}/${LEGENDARY_SPAWN_AMOUNT_SPAWN_AMOUNT} frogs</b> – instant extra frogs from normal / epic / legendary choices.<br>
 ⏳ <b>Buffs last longer</b> – each pick multiplies durations by <span style="color:${neon};">${multFromFactor(buffDurUp, 1.15)}</span> (stacks).<br>
 🎯 <b>More orbs</b> – orbs spawn faster every time you pick this (interval factor <span style="color:${neon};">${multFromFactor(orbIntervalUp, 0.85)}</span> per pick).<br>
 💀 <b>Deathrattle</b> – epic: <span style="color:${neon};">${percentFromBonus(epicDeathChance, 0.25)}</span> respawn on death; legendary: <span style="color:${neon};">${percentFromBonus(legDeathChance, 0.50)}</span> respawn.<br>
@@ -2190,9 +2190,9 @@ function populateUpgradeOverlayChoices(mode) {
             id: "spawn20",
             label: `
               🐸➕ Spawn frogs<br>
-              <span style="color:${neon};">20</span> frogs right now
+              <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
             `,
-            apply: () => { spawnExtraFrogs(20); }
+            apply: () => { spawnExtraFrogs(NORMAL_SPAWN_AMOUNT); }
           };
         }
 
