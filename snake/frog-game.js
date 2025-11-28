@@ -2643,7 +2643,7 @@ function populateUpgradeOverlayChoices(mode) {
     // Reset upgrade timing / sheds
     initialUpgradeDone       = false;
     nextPermanentChoiceTime  = 60;
-    nextEpicChoiceTime       = 10;
+    nextEpicChoiceTime       = 180;
     legendaryEventTriggered = false;
     firstShedTriggered      = false;
     secondShedTriggered     = false;
