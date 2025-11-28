@@ -255,10 +255,12 @@
   };
 
   window.addEventListener("mousemove", (e) => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
+    // Convert from screen pixels into game-space pixels
+    mouse.x = e.clientX / gameScale;
+    mouse.y = e.clientY / gameScale;
     mouse.active = true;
   });
+
 
   window.addEventListener("click", () => {
     if (gameOver) {
@@ -393,8 +395,8 @@
 
 
     // Spawn the new snake roughly where the old head was.
-    const width  = window.innerWidth;
-    const height = window.innerHeight;
+    const width  = getGameWidth();
+    const height = getGameHeight();
 
     const startX = (oldSnake.head && typeof oldSnake.head.x === "number")
       ? oldSnake.head.x
@@ -731,8 +733,9 @@
   }
 
     function spawnZombieHorde(count) {
-    const width  = window.innerWidth;
-    const height = window.innerHeight;
+      const width  = getGameWidth();
+      const height = getGameHeight();
+  
     const margin = 16;
 
     const toSpawn = Math.min(count, MAX_FROGS - frogs.length);
@@ -751,8 +754,8 @@
 
   function spawnExtraFrogs(n) {
     if (frogs.length >= MAX_FROGS) return;
-    const width  = window.innerWidth;
-    const height = window.innerHeight;
+    const width  = getGameWidth();
+    const height = getGameHeight();
     const margin = 16;
 
     const toSpawn = Math.min(n, MAX_FROGS - frogs.length);
@@ -1988,8 +1991,8 @@ function getEpicUpgradeChoices() {
         Drop <span style="color:${neon};">${orbStormCount}</span> random orbs right now
       `,
       apply: () => {
-        const width  = window.innerWidth;
-        const height = window.innerHeight;
+        const width  = getGameWidth();
+        const height = getGameHeight();
         for (let i = 0; i < orbStormCount; i++) {
           spawnOrbRandom(width, height);
         }
@@ -3029,6 +3032,43 @@ function populateUpgradeOverlayChoices(mode) {
   const containerEl = upgradeOverlayButtonsContainer;
   if (!containerEl) return;
 
+    // --------------------------------------------------
+  // SCALING FOR SMALLER SCREENS
+  // --------------------------------------------------
+  let gameScale = 1;
+
+  function computeGameScale() {
+    // "Design" resolution the game was built around
+    const BASE_WIDTH  = 1200;
+    const BASE_HEIGHT = 800;
+
+    const scaleX = window.innerWidth  / BASE_WIDTH;
+    const scaleY = window.innerHeight / BASE_HEIGHT;
+
+    // Fit inside both dimensions
+    let s = Math.min(scaleX, scaleY);
+
+    // Clamp so it never gets *bigger* than original, or too tiny
+    s = Math.max(0.6, Math.min(1, s)); // 60%–100%
+
+    return s;
+  }
+
+  function applyGameScale() {
+    gameScale = computeGameScale();
+    container.style.transformOrigin = "top left";
+    container.style.transform = `scale(${gameScale})`;
+  }
+
+  function getGameWidth() {
+    return window.innerWidth / gameScale;
+  }
+
+  function getGameHeight() {
+    return window.innerHeight / gameScale;
+  }
+
+
   currentUpgradeOverlayMode = mode || "normal";
   const isEpic      = currentUpgradeOverlayMode === "epic";
   const isLegendary = currentUpgradeOverlayMode === "legendary";
@@ -3355,9 +3395,8 @@ function populateUpgradeOverlayChoices(mode) {
     if (upgradeOverlay) upgradeOverlay.style.display = "none";
     hideScoreboardOverlay();
 
-    // Recreate frogs + snake
-    const width  = window.innerWidth;
-    const height = window.innerHeight;
+    const width  = getGameWidth();
+    const height = getGameHeight();
 
     createInitialFrogs(width, height).then(() => {});
     initSnake(width, height);
@@ -3381,8 +3420,8 @@ function populateUpgradeOverlayChoices(mode) {
   // GAME LOOP
   // --------------------------------------------------
   function drawFrame(time) {
-    const width  = window.innerWidth;
-    const height = window.innerHeight;
+    const width  = getGameWidth();
+    const height = getGameHeight();
 
     if (!lastTime) lastTime = time;
     const dt = (time - lastTime) / 1000;
@@ -3459,6 +3498,7 @@ function populateUpgradeOverlayChoices(mode) {
     initLeaderboard(container);
     ensureUpgradeOverlay();
     ensureInfoOverlay();  // unified info / readme panel
+    applyGameScale();
   
     // Fetch leaderboard and show the usual match-summary overlay on load
     const topList = await fetchLeaderboard();
@@ -3473,11 +3513,11 @@ function populateUpgradeOverlayChoices(mode) {
       infoLeaderboardData = [];
     }
   
-    const width  = window.innerWidth;
-    const height = window.innerHeight;
+    const width  = getGameWidth();
+    const height = getGameHeight();
   
     await createInitialFrogs(width, height);
-    initSnake(width, height);
+    initSnake(width, height);  
   
     setNextOrbTime();
     updateHUD();
@@ -3499,6 +3539,9 @@ function populateUpgradeOverlayChoices(mode) {
     animId = requestAnimationFrame(drawFrame);
   }
   
+  window.addEventListener("resize", () => {
+    applyGameScale();
+  });
 
   window.addEventListener("load", startGame);
 })();
