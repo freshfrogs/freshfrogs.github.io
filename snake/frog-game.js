@@ -2569,7 +2569,7 @@ if (infoPage === 0) {
   } else {
     html += `
       <div style="margin-top:8px; font-size:11px; opacity:0.8;">
-        Current tag: <span style="color:${neon};">not set</span>
+        Current tag: <span style="color:${neon};">not-set</span>
       </div>
     `;
   }
