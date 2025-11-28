@@ -835,7 +835,6 @@ function getJumpFactor(frog) {
       switch (r) {
         case "champion": return !frog.isChampion;
         case "aura":     return !frog.isAura;
-        case "shield":   return !frog.hasPermaShield;
         case "magnet":   return !frog.isMagnet;
         case "lucky":    return !frog.isLucky;
         case "zombie":   return !frog.isZombie;
@@ -846,7 +845,6 @@ function getJumpFactor(frog) {
     switch (role) {
       case "champion": grantChampionFrog(frog); break;
       case "aura":     grantAuraFrog(frog);     break;
-      case "shield":   grantShieldFrog(frog);   break;
       case "magnet":   grantMagnetFrog(frog);   break;
       case "lucky":    grantLuckyFrog(frog);    break;
       case "zombie":   grantZombieFrog(frog);   break;
