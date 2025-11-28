@@ -94,7 +94,9 @@
   const FROG_JUMP_UPGRADE_FACTOR      = 1.50; // ~70% higher jumps each pick
   const BUFF_DURATION_UPGRADE_FACTOR  = 1.10; // +20% buff duration each pick
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
-  
+
+  const MAX_SNAKE_SEGMENTS = 200;
+
 
   // Spawn amounts
   const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
@@ -1649,6 +1651,15 @@ function applyBuff(type, frog) {
   function growSnake(extraSegments) {
     if (!snake) return;
     extraSegments = extraSegments || 1;
+
+    // 🔒 Do not grow beyond MAX_SNAKE_SEGMENTS
+    const currentLen = snake.segments.length;
+    const allowedExtra = Math.max(0, MAX_SNAKE_SEGMENTS - currentLen);
+    if (allowedExtra <= 0) {
+      return; // already at or above cap
+    }
+
+    extraSegments = Math.min(extraSegments, allowedExtra);
 
     for (let i = 0; i < extraSegments; i++) {
       const tailIndex = snake.segments.length - 1;
