@@ -40,7 +40,7 @@
   // SNAKE CONSTANTS
   // --------------------------------------------------
   const SNAKE_SEGMENT_SIZE  = 64;
-  const SNAKE_BASE_SPEED    = 90;
+  const SNAKE_BASE_SPEED    = 100;
   const SNAKE_TURN_RATE     = Math.PI * 0.75;
   const SNAKE_SEGMENT_GAP   = 32;
   const SNAKE_INITIAL_SEGMENTS = 6;
@@ -52,27 +52,27 @@
   const SPEED_BUFF_DURATION = 7;
   const JUMP_BUFF_DURATION  = 7;
 
-  const SNAKE_SLOW_DURATION    = 10;
-  const SNAKE_CONFUSE_DURATION = 10;
-  const SNAKE_SHRINK_DURATION  = 10;
-  const FROG_SHIELD_DURATION   = 10;
+  const SNAKE_SLOW_DURATION    = 7;
+  const SNAKE_CONFUSE_DURATION = 7;
+  const SNAKE_SHRINK_DURATION  = 7;
+  const FROG_SHIELD_DURATION   = 7;
   const TIME_SLOW_DURATION     = 7;
-  const ORB_MAGNET_DURATION    = 10;
-  const SCORE_MULTI_DURATION   = 10;
+  const ORB_MAGNET_DURATION    = 7;
+  const SCORE_MULTI_DURATION   = 7;
   const PANIC_HOP_DURATION     = 5;
   const CLONE_SWARM_DURATION   = 7;
-  const LIFE_STEAL_DURATION    = 23;
+  const LIFE_STEAL_DURATION    = 20;
   // Permanent lifesteal upgrade: how many orbs it affects
   const PERMA_LIFESTEAL_ORB_COUNT = 30;
 
   // How strong each buff is
-  const SPEED_BUFF_FACTOR        = 0.8;  // frogs act 2× faster (0.5 = half their cycle)
-  const PANIC_HOP_SPEED_FACTOR   = 0.6;  // panic hop speed factor
-  const JUMP_BUFF_FACTOR         = 3.2;  // jump buff height multiplier
+  const SPEED_BUFF_FACTOR        = 0.85;  // frogs act 2× faster (0.5 = half their cycle)
+  const PANIC_HOP_SPEED_FACTOR   = 0.60;  // panic hop speed factor
+  const JUMP_BUFF_FACTOR         = 3.25;  // jump buff height multiplier
 
   // Snake speed + Lucky config
   const SNAKE_SLOW_FACTOR      = 0.5;  // snake slow buff → 50% speed
-  const TIME_SLOW_FACTOR       = 0.4;  // time slow → 40% speed
+  const TIME_SLOW_FACTOR       = 0.5;  // time slow → 40% speed
   const FRENZY_SPEED_FACTOR    = 1.25; // legendary Frenzy → +25% speed
 
   const SCORE_MULTI_FACTOR       = 2.0;  // score x2
@@ -98,7 +98,7 @@
   // Spawn amounts
   const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
   const EPIC_SPAWN_AMOUNT             = 50;   // epic menu
-  const LEGENDARY_SPAWN_AMOUNT        = 75;   // legendary menu
+  const LEGENDARY_SPAWN_AMOUNT        = 70;   // legendary menu
 
   // Deathrattle chances
   const EPIC_DEATHRATTLE_CHANCE       = 0.25; // 25%
