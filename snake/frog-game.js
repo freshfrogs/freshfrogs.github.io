@@ -1557,7 +1557,7 @@ function getUpgradeChoices() {
         id: "spawn20",
         label: `
           🐸➕ Spawn frogs<br>
-          <span style="color:${neon};">20</span> frogs right now
+          <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
         `,
         apply: () => { spawnExtraFrogs(NORMAL_SPAWN_AMOUNT); }
       },
