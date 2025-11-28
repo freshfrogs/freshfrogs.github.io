@@ -2137,7 +2137,7 @@ function setBuffGuidePage(pageIndex) {
     panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
 
     const title = document.createElement("div");
-    title.textContent = "Choose a permanent upgrade";
+    title.textContent = "Choose an upgrade";
     title.style.marginBottom = "12px";
     title.style.fontSize = "14px";
     upgradeOverlayTitleEl = title;
@@ -2169,13 +2169,7 @@ function populateUpgradeOverlayChoices(mode) {
     const neon = "#4defff";
 
     if (upgradeOverlayTitleEl) {
-      if (isLegendary) {
-        upgradeOverlayTitleEl.textContent = "Choose a LEGENDARY upgrade";
-      } else if (isEpic) {
-        upgradeOverlayTitleEl.textContent = "Choose an EPIC upgrade";
-      } else {
-        upgradeOverlayTitleEl.textContent = "Choose a permanent upgrade";
-      }
+      upgradeOverlayTitleEl.textContent = "Choose an upgrade";
     }
 
     let choices = [];
