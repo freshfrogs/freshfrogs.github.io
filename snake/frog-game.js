@@ -210,6 +210,7 @@
   let permaLifeStealOrbsRemaining = 0;
   let cannibalFrogCount = 0;       // how many cannibal frogs are currently alive
   let lastStandActive = false;
+  let orbCollectorActive   = false;
 
   // Legendary Frenzy timer (snake + frogs go wild)
   let snakeFrenzyTime = 0;
@@ -2947,6 +2948,8 @@ function populateUpgradeOverlayChoices(mode) {
     nextShedTime             = SHED_INTERVAL;
     dyingSnakes              = [];
     snakeEggPending          = false;
+    orbCollectorActive = false;
+    lastStandActive = false;
 
     // Reset all temporary buff timers
     speedBuffTime   = 0;
