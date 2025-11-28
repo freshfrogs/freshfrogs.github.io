@@ -94,6 +94,7 @@
   const FROG_JUMP_UPGRADE_FACTOR      = 1.50; // ~70% higher jumps each pick
   const BUFF_DURATION_UPGRADE_FACTOR  = 1.10; // +20% buff duration each pick
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
+  const COMMON_DEATHRATTLE_BUFF = 0.10;
 
   // Spawn amounts
   const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
@@ -1638,6 +1639,16 @@ function getUpgradeChoices() {
       `,
       apply: () => {
         permaLifeStealOrbsRemaining += PERMA_LIFESTEAL_ORB_COUNT;
+      }
+    },
+        {
+      id: "commonDeathRattle",
+      label: `
+        💀 Deathrattle<br>
+        <span style="color:${neon};">${COMMON_DEATHRATTLE_BUFF}%</span> increased chance a dead frog respawns
+      `,
+      apply: () => {
+        frogDeathRattleChance += COMMON_DEATHRATTLE_BUFF;
       }
     }
   ];
