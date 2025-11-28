@@ -94,7 +94,7 @@
   const FROG_JUMP_UPGRADE_FACTOR      = 1.50; // ~70% higher jumps each pick
   const BUFF_DURATION_UPGRADE_FACTOR  = 1.10; // +20% buff duration each pick
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
-  const COMMON_DEATHRATTLE_BUFF = 0.10;
+  
 
   // Spawn amounts
   const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
@@ -102,8 +102,9 @@
   const LEGENDARY_SPAWN_AMOUNT        = 55;   // legendary menu
 
   // Deathrattle chances
-  const EPIC_DEATHRATTLE_CHANCE       = 0.25; // 25%
-  const LEGENDARY_DEATHRATTLE_CHANCE  = 0.50; // 50%
+  const COMMON_DEATHRATTLE_BUFF = 0.05;
+  const EPIC_DEATHRATTLE_CHANCE       = 0.15; // 25%
+  const LEGENDARY_DEATHRATTLE_CHANCE  = 0.25; // 50%
 
   // Legendary buff duration spike
   const LEGENDARY_BUFF_DURATION_FACTOR = 2.0; // x2 all buff durations
@@ -1494,6 +1495,7 @@ function applyBuff(type, frog) {
           );
         }
 
+        if (frogDeathRattleChance > 0.50) { frogDeathRattleChance = 0.50; }
         // EPIC buff: global deathrattle – chance to spawn a replacement frog
         if (frogDeathRattleChance > 0 && Math.random() < frogDeathRattleChance) {
           spawnExtraFrogs(1);
@@ -1557,7 +1559,7 @@ function getEpicUpgradeChoices() {
         <span style="color:${neon};">${deathPct}%</span> chance a dead frog respawns
       `,
       apply: () => {
-        frogDeathRattleChance = Math.max(frogDeathRattleChance, EPIC_DEATHRATTLE_CHANCE);
+        frogDeathRattleChance += EPIC_DEATHRATTLE_CHANCE;
       }
     },
     {
@@ -1687,7 +1689,7 @@ function getLegendaryUpgradeChoices() {
         <span style="color:${neon};">${deathPct}%</span> chance a dead frog respawns
       `,
       apply: () => {
-        frogDeathRattleChance = Math.max(frogDeathRattleChance, LEGENDARY_DEATHRATTLE_CHANCE);
+        frogDeathRattleChance += LEGENDARY_DEATHRATTLE_CHANCE;
       }
     }
   ];
