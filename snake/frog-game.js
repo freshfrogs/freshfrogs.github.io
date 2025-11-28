@@ -1540,12 +1540,13 @@ function getEpicUpgradeChoices() {
   const neon = "#4defff";
   const speedPct = Math.round((1 - FROG_SPEED_UPGRADE_FACTOR) * 100);
   const deathPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
+  const buffBonusPct  = 25;//Math.round((BUFF_DURATION_UPGRADE_FACTOR - 1) * 100);        // longer duration
 
   return [
     {
       id: "epicSpawn50",
       label: `
-        🐸🌊 EPIC frog wave<br>
+        🐸 Spawn Frogs<br>
         Spawn <span style="color:${neon};">${EPIC_SPAWN_AMOUNT}</span> frogs now
       `,
       apply: () => {
@@ -1563,13 +1564,23 @@ function getEpicUpgradeChoices() {
       }
     },
     {
-      id: "epicFrogSpeed",
+      id: "epicBuffDuration",
       label: `
-        ⏩⏩ EPIC frog speed<br>
+        ⏩ EPIC frog speed<br>
         Another <span style="color:${neon};">~${speedPct}%</span> faster forever
       `,
       apply: () => {
         frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
+      }
+    },
+    {
+      id: "buffDuration",
+      label: `
+        ⏳ Buffs last longer<br>
+        +<span style="color:${neon};">${buffBonusPct}%</span> buff duration
+      `,
+      apply: () => {
+        buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR+0.25;
       }
     }
   ];
