@@ -2174,6 +2174,21 @@ function getUpgradeChoices() {
     });
   }
 
+  // 🔹 Orb Collector – only if not already taken
+  if (!orbCollectorActive) {
+    upgrades.push({
+      id: "orbCollector",
+      label: `
+        🌌 Orb Collector<br>
+        Every orb has a <span style="color:${neon};">20%</span> chance to spawn
+        <span style="color:${neon};">+1</span> extra frog
+      `,
+      apply: () => {
+        orbCollectorActive = true;
+      }
+    });
+  }
+
   return upgrades;
 }
 
