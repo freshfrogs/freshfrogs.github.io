@@ -91,7 +91,7 @@
 
   // Normal upgrade multipliers
   const FROG_SPEED_UPGRADE_FACTOR     = 0.90; // ~15% faster hops each pick
-  const FROG_JUMP_UPGRADE_FACTOR      = 1.00; // ~70% higher jumps each pick
+  const FROG_JUMP_UPGRADE_FACTOR      = 5.00; // ~70% higher jumps each pick
   const BUFF_DURATION_UPGRADE_FACTOR  = 1.10; // +20% buff duration each pick
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
 
