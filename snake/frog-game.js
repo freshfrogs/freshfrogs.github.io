@@ -2456,26 +2456,28 @@ function setInfoPage(pageIndex) {
   let html = "";
 
 if (infoPage === 0) {
-  // PAGE 0 – Leaderboard
+  // PAGE 0 – Leaderboard (same data as the old popup, no "undefined")
   html += "<b>🏆 Leaderboard</b><br><br>";
-  const list = infoLeaderboardData || [];
+
+  const list = Array.isArray(infoLeaderboardData) ? infoLeaderboardData : [];
 
   if (!list.length) {
     html += "<div>No scores yet — be the first to escape the snake.</div>";
   } else {
-    // Try to detect the current player's tag (same idea as mini-board / end summary)
+    // Try to detect the current player's tag (same logic as your old overlay)
     let currentTag = null;
     try {
-      currentTag =
-        (window.localStorage &&
-          (localStorage.getItem("ff_user_tag") ||
-           localStorage.getItem("ffUserTag"))) ||
-        null;
+      if (window.localStorage) {
+        currentTag =
+          localStorage.getItem("ff_user_tag") ||
+          localStorage.getItem("ffUserTag") ||
+          null;
+      }
     } catch (e) {
       currentTag = null;
     }
 
-    // simple inline escape so tags don't break HTML
+    // Simple HTML escaping so tags can't break the table
     const esc = (str) => String(str)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
@@ -2484,23 +2486,47 @@ if (infoPage === 0) {
       .replace(/'/g, "&#39;");
 
     html += "<table style='width:100%; border-collapse:collapse; font-size:12px;'>";
-    html += "<tr><th style='text-align:left;'>#</th><th style='text-align:left;'>Tag</th><th style='text-align:right;'>Score</th><th style='text-align:right;'>Time</th></tr>";
+    html += "<tr>" +
+              "<th style='text-align:left;'>#</th>" +
+              "<th style='text-align:left;'>Tag</th>" +
+              "<th style='text-align:right;'>Score</th>" +
+              "<th style='text-align:right;'>Time</th>" +
+            "</tr>";
 
     list.slice(0, 10).forEach((entry, i) => {
       const rank = i + 1;
-      const rawTag = entry.tag || entry.name || `Player ${rank}`;
+
+      // Tag / name
+      const rawTag =
+        entry.tag ||
+        entry.name ||
+        entry.userTag ||
+        `Player ${rank}`;
       const safeTag = esc(rawTag);
 
-      const score = typeof entry.score === "number"
-        ? Math.floor(entry.score)
-        : entry.score;
+      // Score: use whatever numeric field exists, fall back to 0 — never "undefined"
+      let numericScore = 0;
+      if (typeof entry.score === "number") {
+        numericScore = entry.score;
+      } else if (typeof entry.bestScore === "number") {
+        numericScore = entry.bestScore;
+      }
+      const scoreStr = Math.floor(Math.max(0, numericScore));
 
-      const secs  = entry.time || entry.bestTime || 0;
-      const m = Math.floor(secs / 60);
-      const s = Math.floor(secs % 60);
-      const tStr = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+      // Time: same idea, fall back to 0 seconds
+      let timeSecs = 0;
+      if (typeof entry.time === "number") {
+        timeSecs = entry.time;
+      } else if (typeof entry.bestTime === "number") {
+        timeSecs = entry.bestTime;
+      }
+      timeSecs = Math.max(0, timeSecs | 0); // force integer
 
-      // Same "this is you" logic as end summary / mini-board:
+      const m = Math.floor(timeSecs / 60);
+      const s = timeSecs % 60;
+      const tStr = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+
+      // Highlight the current user’s row (like the old popup)
       const isSelf =
         entry.isSelf ||
         entry.isYou ||
@@ -2519,18 +2545,21 @@ if (infoPage === 0) {
         <tr>
           <td>${rank}</td>
           <td>${tagHtml}</td>
-          <td style="text-align:right;">${score}</td>
+          <td style="text-align:right;">${scoreStr}</td>
           <td style="text-align:right;">${tStr}</td>
         </tr>
       `;
     });
 
     html += "</table>";
-    html += `<div style="margin-top:6px; font-size:11px; opacity:0.8;">
-      Beat your own best score to update your entry.
-    </div>`;
+    html += `
+      <div style="margin-top:6px; font-size:11px; opacity:0.8;">
+        Beat your own best score to update your entry.
+      </div>
+    `;
   }
-} else if (infoPage === 1) {
+}
+ else if (infoPage === 1) {
     // PAGE 1 – How to Play
     html = `
 <b>🐍 How to Play</b><br><br>
