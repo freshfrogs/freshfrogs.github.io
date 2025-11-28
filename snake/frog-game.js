@@ -94,6 +94,7 @@
   const FROG_JUMP_UPGRADE_FACTOR      = 1.50; // ~70% higher jumps each pick
   const BUFF_DURATION_UPGRADE_FACTOR  = 1.10; // +20% buff duration each pick
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
+  const ORB_COLLECTOR_CHANCE = 0.10;
 
   const MAX_SNAKE_SEGMENTS = 200;
   const CANNIBAL_ROLE_CHANCE = 0.05; // 5% chance eaten frog gains random role
@@ -1592,7 +1593,7 @@ function applyBuff(type, frog) {
         }
 
         // 🔹 Orb Collector: flat 20% chance any collected orb spawns +1 frog
-        if (orbCollectorActive && Math.random() < 0.20) {
+        if (orbCollectorActive && Math.random() < ORB_COLLECTOR_CHANCE) {
           spawnExtraFrogs(1);
         }
 
