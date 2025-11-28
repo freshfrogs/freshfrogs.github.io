@@ -1713,142 +1713,241 @@ function applyBuff(type, frog) {
       snake.path.push({ x: last.x, y: last.y });
     }
   }
+function tryKillFrogAtIndex(index, source) {
+  // source: "snake", "cannibal", etc.
+  const frog = frogs[index];
+  if (!frog || !frog.el) return false;
 
-  function updateSnake(dt, width, height) {
-    if (!snake) return;
+  const wasLastFrog = (frogs.length === 1);
 
-    const marginX = 8;
-    const marginY = 24;
-
-    const head = snake.head;
-    if (!head) return;
-
-    // -----------------------------
-    // Targeting logic
-    // -----------------------------
-    let targetFrog = null;
-    let bestDist2 = Infinity;
-
-    for (const frog of frogs) {
-      if (!frog || !frog.el) continue;
-      const fx = frog.x + FROG_SIZE / 2;
-      const fy = frog.baseY + FROG_SIZE / 2;
-      const dx = fx - head.x;
-      const dy = fy - head.y;
-      const d2 = dx * dx + dy * dy;
-      if (d2 < bestDist2) {
-        bestDist2 = d2;
-        targetFrog = frog;
-      }
+  // -----------------------------
+  // Snake-specific protections
+  // -----------------------------
+  if (source === "snake") {
+    // Team-wide temporary shield buff
+    if (frogShieldTime > 0) {
+      return false;
     }
 
-    let desiredAngle = head.angle;
-
-    if (snakeConfuseTime > 0) {
-      // confused: random-ish turning
-      desiredAngle = head.angle + (Math.random() - 0.5) * Math.PI;
-      targetFrog = null;
-    } else if (targetFrog) {
-      const fx = targetFrog.x + FROG_SIZE / 2;
-      const fy = targetFrog.baseY + FROG_SIZE / 2;
-      desiredAngle = Math.atan2(fy - head.y, fx - head.x);
-    } else {
-      // no frogs? just wander
-      desiredAngle += (Math.random() - 0.5) * dt;
+    // Per-frog shield role (if you still use it; safe even if you don't spawn them)
+    if (frog.hasPermaShield) {
+      frog.hasPermaShield = false;
+      refreshFrogPermaGlow(frog);
+      playPerFrogUpgradeSound("shield");
+      return false;
     }
 
-    let angleDiff =
-      ((desiredAngle - head.angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
-    const maxTurn = SNAKE_TURN_RATE * dt;
-    if (angleDiff > maxTurn) angleDiff = maxTurn;
-    if (angleDiff < -maxTurn) angleDiff = -maxTurn;
-    head.angle += angleDiff;
-
-    const speedFactor = getSnakeSpeedFactor();
-    const speed = SNAKE_BASE_SPEED * speedFactor * (0.8 + Math.random() * 0.4);
-    head.x += Math.cos(head.angle) * speed * dt;
-    head.y += Math.sin(head.angle) * speed * dt;
-
-    // Keep inside bounds
-    if (head.x < marginX) {
-      head.x = marginX;
-      head.angle = Math.PI - head.angle;
-    } else if (head.x > width - marginX - SNAKE_SEGMENT_SIZE) {
-      head.x = width - marginX - SNAKE_SEGMENT_SIZE;
-      head.angle = Math.PI - head.angle;
-    }
-    if (head.y < marginY) {
-      head.y = marginY;
-      head.angle = -head.angle;
-    } else if (head.y > height - marginY - SNAKE_SEGMENT_SIZE) {
-      head.y = height - marginY - SNAKE_SEGMENT_SIZE;
-      head.angle = -head.angle;
-    }
-
-    // -----------------------------
-    // Path + segments follow
-    // -----------------------------
-    snake.path.unshift({ x: head.x, y: head.y });
-    const maxPathLength = (snake.segments.length + 2) * SNAKE_SEGMENT_GAP + 2;
-    while (snake.path.length > maxPathLength) {
-      snake.path.pop();
-    }
-
-    const shrinkScale = snakeShrinkTime > 0 ? 0.8 : 1.0;
-
-    head.el.style.transform =
-      `translate3d(${head.x}px, ${head.y}px, 0) rotate(${head.angle}rad) scale(${shrinkScale})`;
-
-    for (let i = 0; i < snake.segments.length; i++) {
-      const seg = snake.segments[i];
-      const idx = Math.min(
-        snake.path.length - 1,
-        (i + 1) * SNAKE_SEGMENT_GAP
-      );
-      const p = snake.path[idx] || snake.path[snake.path.length - 1];
-
-      const nextIdx = Math.max(0, idx - 2);
-      const q = snake.path[nextIdx] || p;
-      const angle = Math.atan2(p.y - q.y, p.x - q.x);
-
-      seg.x = p.x;
-      seg.y = p.y;
-
-      seg.el.style.transform =
-        `translate3d(${seg.x}px, ${seg.y}px, 0) rotate(${angle}rad) scale(${shrinkScale})`;
-    }
-
-    // -----------------------------
-    // Collisions with frogs
-    // -----------------------------
-    const eatRadius = getSnakeEatRadius();
-    const eatR2 = eatRadius * eatRadius;
-
-    for (let i = frogs.length - 1; i >= 0; i--) {
-      const frog = frogs[i];
-      if (!frog || !frog.el) continue;
-
-      const fx = frog.x + FROG_SIZE / 2;
-      const fy = frog.baseY + FROG_SIZE / 2;
-      const dx = fx - head.x;
-      const dy = fy - head.y;
-      const d2 = dx * dx + dy * dy;
-
-      if (d2 <= eatR2) {
-        // Shared kill logic (shields, zombies, deathrattle, sounds, cannibal tracking)
-        const killed = tryKillFrogAtIndex(i, "snake");
-
-        if (killed) {
-          // Only grow one segment for every 2 frogs eaten
-          frogsEatenCount++;
-          if (frogsEatenCount % 2 === 0) {
-            growSnake(1);
-          }
-        }
+    // Clone Swarm: chance it's a fake hit
+    if (cloneSwarmTime > 0) {
+      const DECOY_CHANCE = 0.65;
+      if (Math.random() < DECOY_CHANCE) {
+        playSnakeMunch(); // snake "bites" the fake
+        return false;
       }
     }
   }
 
+  // -----------------------------
+  // Remove clone visual if any
+  // -----------------------------
+  if (frog.cloneEl && frog.cloneEl.parentNode === container) {
+    container.removeChild(frog.cloneEl);
+    frog.cloneEl = null;
+  }
+
+  // -----------------------------
+  // Remove frog DOM + from array
+  // -----------------------------
+  if (frog.el.parentNode === container) {
+    container.removeChild(frog.el);
+  }
+  frogs.splice(index, 1);
+
+  // -----------------------------
+  // On-death effects: zombie, deathrattle, Last Stand
+  // -----------------------------
+
+  // Zombie on-death effect (for any zombie frog)
+  if (frog.isZombie) {
+    // Your existing behavior: spawn 5 frogs + slow the snake
+    spawnExtraFrogs(5);
+    snakeSlowTime = Math.max(
+      snakeSlowTime,
+      3 * buffDurationFactor
+    );
+  }
+
+  // Global + per-frog + Last Stand deathrattle
+  let drChance = frogDeathRattleChance;
+
+  // Per-frog deathrattle (e.g. Zombie Horde frogs with 50% DR)
+  if (frog.specialDeathRattleChance != null) {
+    drChance = Math.max(drChance, frog.specialDeathRattleChance);
+  }
+
+  // Last Stand: if this was the last frog, guarantee at least 50% DR
+  if (lastStandActive && wasLastFrog) {
+    drChance = Math.max(drChance, 0.5);
+  }
+
+  // Clamp to 50%
+  if (drChance > 0.5) drChance = 0.5;
+
+  if (drChance > 0 && Math.random() < drChance) {
+    // Spawn a replacement frog.
+    // NOTE: this new frog is a normal spawn (no specialDeathRattleChance by default).
+    // That matches: Zombie Horde respawns lose their 50% DR bonus.
+    spawnExtraFrogs(1);
+  }
+
+  // -----------------------------
+  // Sounds based on source
+  // -----------------------------
+  if (source === "snake") {
+    playSnakeMunch();
+    playFrogDeath();
+  } else if (source === "cannibal") {
+    // Cannibal eats frog: just play death sound (no snake munch)
+    playFrogDeath();
+  }
+
+  return true; // a frog actually died
+}
+
+function updateSnake(dt, width, height) {
+  if (!snake) return;
+
+  const marginX = 8;
+  const marginY = 24;
+
+  const head = snake.head;
+  if (!head) return;
+
+  // -----------------------------
+  // Targeting logic
+  // -----------------------------
+  let targetFrog = null;
+  let bestDist2 = Infinity;
+
+  for (const frog of frogs) {
+    if (!frog || !frog.el) continue;
+    const fx = frog.x + FROG_SIZE / 2;
+    const fy = frog.baseY + FROG_SIZE / 2;
+    const dx = fx - head.x;
+    const dy = fy - head.y;
+    const d2 = dx * dx + dy * dy;
+    if (d2 < bestDist2) {
+      bestDist2 = d2;
+      targetFrog = frog;
+    }
+  }
+
+  let desiredAngle = head.angle;
+
+  if (snakeConfuseTime > 0) {
+    // confused: random-ish turning
+    desiredAngle = head.angle + (Math.random() - 0.5) * Math.PI;
+    targetFrog = null;
+  } else if (targetFrog) {
+    const fx = targetFrog.x + FROG_SIZE / 2;
+    const fy = targetFrog.baseY + FROG_SIZE / 2;
+    desiredAngle = Math.atan2(fy - head.y, fx - head.x);
+  } else {
+    // no frogs? just wander
+    desiredAngle += (Math.random() - 0.5) * dt;
+  }
+
+  let angleDiff =
+    ((desiredAngle - head.angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+  const maxTurn = SNAKE_TURN_RATE * dt;
+  if (angleDiff > maxTurn) angleDiff = maxTurn;
+  if (angleDiff < -maxTurn) angleDiff = -maxTurn;
+  head.angle += angleDiff;
+
+  const speedFactor = getSnakeSpeedFactor();
+  const speed = SNAKE_BASE_SPEED * speedFactor * (0.8 + Math.random() * 0.4);
+  head.x += Math.cos(head.angle) * speed * dt;
+  head.y += Math.sin(head.angle) * speed * dt;
+
+  // Keep inside bounds
+  if (head.x < marginX) {
+    head.x = marginX;
+    head.angle = Math.PI - head.angle;
+  } else if (head.x > width - marginX - SNAKE_SEGMENT_SIZE) {
+    head.x = width - marginX - SNAKE_SEGMENT_SIZE;
+    head.angle = Math.PI - head.angle;
+  }
+  if (head.y < marginY) {
+    head.y = marginY;
+    head.angle = -head.angle;
+  } else if (head.y > height - marginY - SNAKE_SEGMENT_SIZE) {
+    head.y = height - marginY - SNAKE_SEGMENT_SIZE;
+    head.angle = -head.angle;
+  }
+
+  // -----------------------------
+  // Path + segments follow
+  // -----------------------------
+  snake.path.unshift({ x: head.x, y: head.y });
+  const maxPathLength = (snake.segments.length + 2) * SNAKE_SEGMENT_GAP + 2;
+  while (snake.path.length > maxPathLength) {
+    snake.path.pop();
+  }
+
+  const shrinkScale = snakeShrinkTime > 0 ? 0.8 : 1.0;
+
+  head.el.style.transform =
+    `translate3d(${head.x}px, ${head.y}px, 0) rotate(${head.angle}rad) scale(${shrinkScale})`;
+
+  for (let i = 0; i < snake.segments.length; i++) {
+    const seg = snake.segments[i];
+    const idx = Math.min(
+      snake.path.length - 1,
+      (i + 1) * SNAKE_SEGMENT_GAP
+    );
+    const p = snake.path[idx] || snake.path[snake.path.length - 1];
+
+    const nextIdx = Math.max(0, idx - 2);
+    const q = snake.path[nextIdx] || p;
+    const angle = Math.atan2(p.y - q.y, p.x - q.x);
+
+    seg.x = p.x;
+    seg.y = p.y;
+
+    seg.el.style.transform =
+      `translate3d(${seg.x}px, ${seg.y}px, 0) rotate(${angle}rad) scale(${shrinkScale})`;
+  }
+
+  // -----------------------------
+  // Collisions with frogs
+  // -----------------------------
+  const eatRadius = getSnakeEatRadius();
+  const eatR2 = eatRadius * eatRadius;
+
+  for (let i = frogs.length - 1; i >= 0; i--) {
+    const frog = frogs[i];
+    if (!frog || !frog.el) continue;
+
+    const fx = frog.x + FROG_SIZE / 2;
+    const fy = frog.baseY + FROG_SIZE / 2;
+    const dx = fx - head.x;
+    const dy = fy - head.y;
+    const d2 = dx * dx + dy * dy;
+
+    if (d2 <= eatR2) {
+      // Shared kill logic (shields, zombies, deathrattle, sounds, cannibal tracking)
+      const killed = tryKillFrogAtIndex(i, "snake");
+
+      if (killed) {
+        // Only grow one segment for every 2 frogs eaten
+        frogsEatenCount++;
+        if (frogsEatenCount % 2 === 0) {
+          growSnake(1);
+        }
+      }
+    }
+  }
+}
 
   // --------------------------------------------------
   // PERMANENT, EPIC & LEGENDARY UPGRADE OVERLAY
