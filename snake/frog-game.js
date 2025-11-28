@@ -2588,8 +2588,13 @@ function closeInfoOverlay() {
     infoOverlay.style.display = "none";
   }
   gamePaused = false;
-}
 
+  // 🔹 If this is the very start of the match,
+  // immediately show the common upgrade menu.
+  if (!initialUpgradeDone && elapsedTime === 0 && !gameOver) {
+    openUpgradeOverlay("normal");
+  }
+}
 
 function ensureBuffGuideOverlay() {
   if (buffGuideOverlay) return;
