@@ -1585,6 +1585,7 @@ function getUpgradeChoices() {
   const jumpBonusPct  = Math.round((FROG_JUMP_UPGRADE_FACTOR - 1) * 100);       // more jump height
   const buffBonusPct  = Math.round((BUFF_DURATION_UPGRADE_FACTOR - 1) * 100);        // longer duration
   const orbFasterPct  = Math.round((1 - ORB_INTERVAL_UPGRADE_FACTOR) * 100);    // faster orb spawns
+  const deathPct = Math.round(COMMON_DEATHRATTLE_CHANCE * 100);
 
   return [
     {
@@ -1647,7 +1648,7 @@ function getUpgradeChoices() {
       id: "commonDeathRattle",
       label: `
         💀 Deathrattle<br>
-        <span style="color:${neon};">${COMMON_DEATHRATTLE_BUFF}%</span> increased chance a dead frog respawns
+        <span style="color:${neon};">${deathPct}%</span> increased chance a dead frog respawns
       `,
       apply: () => {
         frogDeathRattleChance += COMMON_DEATHRATTLE_BUFF;
