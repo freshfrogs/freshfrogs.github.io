@@ -122,6 +122,43 @@
   const container = document.getElementById("frog-game");
   if (!container) return;
 
+    // --------------------------------------------------
+  // SCALING FOR SMALLER SCREENS
+  // --------------------------------------------------
+  let gameScale = 1;
+
+  function computeGameScale() {
+    // "Design" resolution the game was built around
+    const BASE_WIDTH  = 1200;
+    const BASE_HEIGHT = 800;
+
+    const scaleX = window.innerWidth  / BASE_WIDTH;
+    const scaleY = window.innerHeight / BASE_HEIGHT;
+
+    // Fit inside both dimensions
+    let s = Math.min(scaleX, scaleY);
+
+    // Clamp so it never gets *bigger* than original, or too tiny
+    s = Math.max(0.6, Math.min(1, s)); // 60%–100%
+
+    return s;
+  }
+
+  function applyGameScale() {
+    gameScale = computeGameScale();
+    container.style.transformOrigin = "top left";
+    container.style.transform = `scale(${gameScale})`;
+  }
+
+  function getGameWidth() {
+    return window.innerWidth / gameScale;
+  }
+
+  function getGameHeight() {
+    return window.innerHeight / gameScale;
+  }
+
+
   // Keep these arrays consistent with your scatter-frogs setup
   const SCATTER_ANIMATED_VALUES = new Set([
     "goldenDartFrog",
@@ -3031,43 +3068,6 @@ function populateUpgradeOverlayChoices(mode) {
   ensureUpgradeOverlay();
   const containerEl = upgradeOverlayButtonsContainer;
   if (!containerEl) return;
-
-    // --------------------------------------------------
-  // SCALING FOR SMALLER SCREENS
-  // --------------------------------------------------
-  let gameScale = 1;
-
-  function computeGameScale() {
-    // "Design" resolution the game was built around
-    const BASE_WIDTH  = 1200;
-    const BASE_HEIGHT = 800;
-
-    const scaleX = window.innerWidth  / BASE_WIDTH;
-    const scaleY = window.innerHeight / BASE_HEIGHT;
-
-    // Fit inside both dimensions
-    let s = Math.min(scaleX, scaleY);
-
-    // Clamp so it never gets *bigger* than original, or too tiny
-    s = Math.max(0.6, Math.min(1, s)); // 60%–100%
-
-    return s;
-  }
-
-  function applyGameScale() {
-    gameScale = computeGameScale();
-    container.style.transformOrigin = "top left";
-    container.style.transform = `scale(${gameScale})`;
-  }
-
-  function getGameWidth() {
-    return window.innerWidth / gameScale;
-  }
-
-  function getGameHeight() {
-    return window.innerHeight / gameScale;
-  }
-
 
   currentUpgradeOverlayMode = mode || "normal";
   const isEpic      = currentUpgradeOverlayMode === "epic";
