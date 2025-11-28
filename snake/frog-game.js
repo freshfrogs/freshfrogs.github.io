@@ -821,11 +821,17 @@ function getJumpFactor(frog) {
       chance += frog.extraDeathRattleChance;
     }
 
-    // Hard cap at 50%
-    if (chance > 0.5) chance = 0.5;
+    // 🔴 Lifeline: while active, all frogs that die respawn
+    if (lifeStealTime > 0) {
+      chance = 1.0;
+    }
+
+    // Hard cap at 100% and floor at 0%
+    if (chance > 1.0) chance = 1.0;
     if (chance < 0)   chance = 0;
     return chance;
   }
+
 
   // Attempt to kill a frog at index i, with a specific killer (`"snake"` or `"cannibal"`)
   function tryKillFrogAtIndex(i, killer) {
@@ -1428,15 +1434,11 @@ function applyBuff(type, frog) {
         } else {
           applyBuff(orb.type, collectedBy);
 
-          // Life steal handling (temporary + permanent upgrade)
+          // Lifeline no longer spawns frogs from orbs.
+          // Only the permanent lifesteal upgrade still does.
           let extraFrogsFromLifeSteal = 0;
 
-          // Time-based lifesteal buff
-          if (lifeStealTime > 0) {
-            extraFrogsFromLifeSteal += 1;
-          }
-
-          // Permanent lifesteal upgrade: next N orbs
+          // Permanent lifesteal upgrade: next N orbs → still spawn frogs
           if (permaLifeStealOrbsRemaining > 0) {
             permaLifeStealOrbsRemaining -= 1;
             extraFrogsFromLifeSteal += 1;
@@ -2280,7 +2282,7 @@ function setBuffGuidePage(pageIndex) {
 🐸🌊 <b>Mega spawn</b> – spawn <span style="color:${neon};">15–25</span> frogs (+ bonus if Lucky).<br>
 💰 <b>Score x2</b> – score gain boosted by <span style="color:${neon};">${multFromFactor(scoreMultiFact, 2.0)}</span> for <span style="color:${neon};">${secFromConst(scoreDur, 10)}</span>.<br>
 😱 <b>Panic hop</b> – frogs hop faster but in random directions for <span style="color:${neon};">${secFromConst(panicDur, 8)}</span>.<br>
-🩸 <b>Life steal</b> – each orb collected spawns <span style="color:${neon};">+1</span> frog for <span style="color:${neon};">${secFromConst(lifeStealDur, 12)}</span>.<br>
+🩸 <b>Lifeline</b> – for <span style="color:${neon};">${secFromConst(lifeStealDur, 12)}</span>, any frog that dies automatically respawns.
 ⭐ <b>PermaFrog</b> – gives that frog a random permanent role.
 `,
     // Page 1 – permanent frog roles
