@@ -1,206 +1,233 @@
 // frog-audio.js
-// Handles all sound loading & playback for the frog snake game.
+// Handles all sound loading & playback for the frog snake game,
+// using small audio pools + simple throttling so late-game doesn’t lag or glitch.
 
 (function () {
   "use strict";
 
-  // Core game sounds
-  let audioRibbits = [];
-  let audioFrogDeath = null;
-  let audioSnakeEat  = null;
-  let audioOrbSpawn1 = null;
-  let audioOrbSpawn2 = null;
-  let audioSuperSpeed = null;
-  let audioSuperJump  = null;
-  let audioFrogSpawn  = null;
+  const AUDIO_BASE = "https://freshfrogs.github.io/snake/audio/";
 
-  // Temp buff sounds
-  let audioSnakeSlow    = null;
-  let audioSnakeConfuse = null;
-  let audioSnakeShrink  = null;
-  let audioFrogShield   = null;
-  let audioTimeSlow     = null;
-  let audioOrbMagnet    = null;
-  let audioMegaSpawn    = null;
-  let audioScoreMulti   = null;
-  let audioPanicHop     = null;
-  let audioCloneSwarm   = null;
-  let audioLifeSteal    = null;
+  // ------------------------------------------------------------
+  // SIMPLE AUDIO POOLING
+  // ------------------------------------------------------------
+  const pools = {};
+  let audioInitialized = false;
 
-  // Per-run permanent upgrade (minute overlay)
-  let audioPermanentChoice = null;
+  /**
+   * Create a small pool of Audio elements for a given key.
+   * @param {string} key
+   * @param {string} filename  e.g. "munch.mp3"
+   * @param {object} options   { poolSize, volume, minIntervalMs }
+   */
+  function createPool(key, filename, options) {
+    const poolSize = (options && options.poolSize) || 3;
+    const volume = (options && options.volume) != null ? options.volume : 0.9;
+    const minIntervalMs = (options && options.minIntervalMs) || 0;
 
-  // Per-frog permanent upgrade sounds
-  let audioChampionFrog    = null;
-  let audioAuraFrog        = null;
-  let audioShieldFrogPerma = null;
-  let audioMagnetFrogPerma = null;
-  let audioLuckyFrogPerma  = null;
-  let audioZombieFrogPerma = null;
-
-  function initAudio() {
-    try {
-      audioRibbits = [
-        new Audio("https://freshfrogs.github.io/snake/audio/ribbitOne.mp3"),
-        new Audio("https://freshfrogs.github.io/snake/audio/ribbitTwo.mp3"),
-        new Audio("https://freshfrogs.github.io/snake/audio/ribbitThree.mp3"),
-        new Audio("https://freshfrogs.github.io/snake/audio/ribbitBase.mp3"),
-      ];
-      audioRibbits.forEach(a => a.volume = 0.8);
-    } catch (e) {}
-
-    try {
-      audioFrogDeath = new Audio("https://freshfrogs.github.io/snake/audio/frogDeath.mp3");
-      audioFrogDeath.volume = 0.9;
-    } catch (e) {}
-
-    try {
-      audioSnakeEat = new Audio("https://freshfrogs.github.io/snake/audio/munch.mp3");
-      audioSnakeEat.volume = 0.7;
-    } catch (e) {}
-
-    try {
-      audioOrbSpawn1 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawn.mp3");
-      audioOrbSpawn2 = new Audio("https://freshfrogs.github.io/snake/audio/orbSpawnTwo.mp3");
-      audioOrbSpawn1.volume = 0.8;
-      audioOrbSpawn2.volume = 0.8;
-    } catch (e) {}
-
-    try {
-      audioSuperSpeed = new Audio("https://freshfrogs.github.io/snake/audio/superSpeed.mp3");
-      audioSuperJump  = new Audio("https://freshfrogs.github.io/snake/audio/superJump.mp3");
-      audioFrogSpawn  = new Audio("https://freshfrogs.github.io/snake/audio/frogSpawn.mp3");
-      audioSuperSpeed.volume = 0.9;
-      audioSuperJump.volume  = 0.9;
-      audioFrogSpawn.volume  = 0.9;
-    } catch (e) {}
-
-    // temp buff placeholders
-    try {
-      audioSnakeSlow    = new Audio("https://freshfrogs.github.io/snake/audio/snakeSlow.mp3");
-      audioSnakeConfuse = new Audio("https://freshfrogs.github.io/snake/audio/snakeConfuse.mp3");
-      audioSnakeShrink  = new Audio("https://freshfrogs.github.io/snake/audio/snakeShrink.mp3");
-      audioFrogShield   = new Audio("https://freshfrogs.github.io/snake/audio/frogShield.mp3");
-      audioTimeSlow     = new Audio("https://freshfrogs.github.io/snake/audio/timeSlow.mp3");
-      audioOrbMagnet    = new Audio("https://freshfrogs.github.io/snake/audio/orbMagnet.mp3");
-      audioMegaSpawn    = new Audio("https://freshfrogs.github.io/snake/audio/megaSpawn.mp3");
-      audioScoreMulti   = new Audio("https://freshfrogs.github.io/snake/audio/scoreMulti.mp3");
-      audioPanicHop     = new Audio("https://freshfrogs.github.io/snake/audio/panicHop.mp3");
-      audioCloneSwarm   = new Audio("https://freshfrogs.github.io/snake/audio/cloneSwarm.mp3");
-      audioLifeSteal    = new Audio("https://freshfrogs.github.io/snake/audio/lifeSteal.mp3");
-
-      [
-        audioSnakeSlow,
-        audioSnakeConfuse,
-        audioSnakeShrink,
-        audioFrogShield,
-        audioTimeSlow,
-        audioOrbMagnet,
-        audioMegaSpawn,
-        audioScoreMulti,
-        audioPanicHop,
-        audioCloneSwarm,
-        audioLifeSteal
-      ].forEach(a => { if (a) a.volume = 0.9; });
-    } catch (e) {}
-
-    // per-run permanent choice
-    try {
-      audioPermanentChoice = new Audio("https://freshfrogs.github.io/snake/audio/permanentBuffChoice.mp3");
-      audioPermanentChoice.volume = 0.9;
-    } catch (e) {}
-
-    // per-frog permanent upgrades
-    try {
-      audioChampionFrog    = new Audio("https://freshfrogs.github.io/snake/audio/championFrog.mp3");
-      audioAuraFrog        = new Audio("https://freshfrogs.github.io/snake/audio/auraFrog.mp3");
-      audioShieldFrogPerma = new Audio("https://freshfrogs.github.io/snake/audio/shieldFrog.mp3");
-      audioMagnetFrogPerma = new Audio("https://freshfrogs.github.io/snake/audio/magnetFrog.mp3");
-      audioLuckyFrogPerma  = new Audio("https://freshfrogs.github.io/snake/audio/luckyFrog.mp3");
-      audioZombieFrogPerma = new Audio("https://freshfrogs.github.io/snake/audio/zombieFrog.mp3");
-
-      [
-        audioChampionFrog,
-        audioAuraFrog,
-        audioShieldFrogPerma,
-        audioMagnetFrogPerma,
-        audioLuckyFrogPerma,
-        audioZombieFrogPerma
-      ].forEach(a => { if (a) a.volume = 0.9; });
-    } catch (e) {}
-  }
-
-  function playClone(base) {
-    if (!base) return;
-    try {
-      const clone = base.cloneNode();
-      clone.volume = base.volume;
-      const p = clone.play();
-      if (p && typeof p.catch === "function") {
-        p.catch(() => {}); // ignore autoplay / codec errors
+    const players = [];
+    for (let i = 0; i < poolSize; i++) {
+      try {
+        const a = new Audio(AUDIO_BASE + filename);
+        a.preload = "auto";
+        a.volume = volume;
+        a.crossOrigin = "anonymous";
+        players.push(a);
+      } catch (e) {
+        // If something goes wrong creating audio, just stop building pool.
+        break;
       }
-    } catch (e) {}
+    }
+
+    pools[key] = {
+      players,
+      index: 0,
+      lastPlay: 0,
+      minIntervalMs
+    };
   }
+
+  /**
+   * Play from a pool with basic rate-limiting.
+   * Will reuse paused/ended instances; if all are in use, it “steals” the next one.
+   */
+  function playFromPool(key) {
+    if (!audioInitialized) return;
+    const pool = pools[key];
+    if (!pool || !pool.players.length) return;
+
+    const now = (typeof performance !== "undefined" && performance.now)
+      ? performance.now()
+      : Date.now();
+
+    if (pool.minIntervalMs > 0 && now - pool.lastPlay < pool.minIntervalMs) {
+      // Throttled: too soon since last play
+      return;
+    }
+
+    pool.lastPlay = now;
+
+    const { players } = pool;
+    const len = players.length;
+
+    // Try to find a free instance
+    for (let i = 0; i < len; i++) {
+      const idx = (pool.index + i) % len;
+      const audio = players[idx];
+      if (audio.paused || audio.ended) {
+        try {
+          audio.currentTime = 0;
+        } catch (e) {}
+        const p = audio.play();
+        if (p && typeof p.catch === "function") {
+          p.catch(() => {}); // ignore autoplay / codec errors
+        }
+        pool.index = (idx + 1) % len;
+        return;
+      }
+    }
+
+    // Fallback: steal one
+    const audio = players[pool.index];
+    try {
+      audio.currentTime = 0;
+    } catch (e) {}
+    const p = audio.play();
+    if (p && typeof p.catch === "function") {
+      p.catch(() => {});
+    }
+    pool.index = (pool.index + 1) % len;
+  }
+
+  // ------------------------------------------------------------
+  // INIT – BUILD ALL POOLS
+  // ------------------------------------------------------------
+  function initAudio() {
+    if (audioInitialized) return;
+
+    try {
+      // Core ribbits (slightly throttled, bigger pool)
+      createPool("ribbit1",    "ribbitOne.mp3",   { poolSize: 4, volume: 0.8, minIntervalMs: 90 });
+      createPool("ribbit2",    "ribbitTwo.mp3",   { poolSize: 4, volume: 0.8, minIntervalMs: 90 });
+      createPool("ribbit3",    "ribbitThree.mp3", { poolSize: 4, volume: 0.8, minIntervalMs: 90 });
+      createPool("ribbitBase", "ribbitBase.mp3",  { poolSize: 4, volume: 0.8, minIntervalMs: 90 });
+
+      // Death / snake / orb
+      createPool("frogDeath", "frogDeath.mp3", { poolSize: 3, volume: 0.9, minIntervalMs: 120 });
+      createPool("snakeMunch", "munch.mp3",    { poolSize: 4, volume: 0.9, minIntervalMs: 50 });
+
+      createPool("orbSpawn1", "orbSpawn.mp3",    { poolSize: 2, volume: 0.9, minIntervalMs: 120 });
+      createPool("orbSpawn2", "orbSpawnTwo.mp3", { poolSize: 2, volume: 0.9, minIntervalMs: 120 });
+
+      // Temp buff sounds (minute / orb buffs)
+      createPool("buff_speed",        "superSpeed.mp3",   { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_jump",         "superJump.mp3",    { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_spawn",        "frogSpawn.mp3",    { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_snakeSlow",    "snakeSlow.mp3",    { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_snakeConfuse", "snakeConfuse.mp3", { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_snakeShrink",  "snakeShrink.mp3",  { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_frogShield",   "frogShield.mp3",   { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_timeSlow",     "timeSlow.mp3",     { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_orbMagnet",    "orbMagnet.mp3",    { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_megaSpawn",    "megaSpawn.mp3",    { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_scoreMulti",   "scoreMulti.mp3",   { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_panicHop",     "panicHop.mp3",     { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_cloneSwarm",   "cloneSwarm.mp3",   { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+      createPool("buff_lifeSteal",    "lifeSteal.mp3",    { poolSize: 2, volume: 0.9, minIntervalMs: 150 });
+
+      // Per-run permanent upgrade (minute overlay)
+      createPool("permanentChoice", "permanentBuffChoice.mp3", { poolSize: 1, volume: 1.0, minIntervalMs: 400 });
+
+      // Per-frog permanent upgrade sounds
+      createPool("perfrog_champion", "championFrog.mp3",  { poolSize: 1, volume: 1.0, minIntervalMs: 250 });
+      createPool("perfrog_aura",     "auraFrog.mp3",      { poolSize: 1, volume: 1.0, minIntervalMs: 250 });
+      createPool("perfrog_shield",   "shieldFrog.mp3",    { poolSize: 1, volume: 1.0, minIntervalMs: 250 });
+      createPool("perfrog_magnet",   "magnetFrog.mp3",    { poolSize: 1, volume: 1.0, minIntervalMs: 250 });
+      createPool("perfrog_lucky",    "luckyFrog.mp3",     { poolSize: 1, volume: 1.0, minIntervalMs: 250 });
+      createPool("perfrog_zombie",   "zombieFrog.mp3",    { poolSize: 1, volume: 1.0, minIntervalMs: 250 });
+
+      audioInitialized = true;
+    } catch (e) {
+      // If audio init fails for some reason, fail silently.
+      audioInitialized = false;
+    }
+  }
+
+  // ------------------------------------------------------------
+  // PUBLIC PLAY HELPERS (SAME API AS BEFORE)
+  // ------------------------------------------------------------
 
   function playRandomRibbit() {
-    if (!audioRibbits.length) return;
-    const base = audioRibbits[Math.floor(Math.random() * audioRibbits.length)];
-    playClone(base);
+    // Choose randomly among the four ribbit variants
+    const ribbits = ["ribbit1", "ribbit2", "ribbit3", "ribbitBase"];
+    const key = ribbits[Math.floor(Math.random() * ribbits.length)];
+    playFromPool(key);
   }
 
   function playFrogDeath() {
-    playClone(audioFrogDeath);
+    playFromPool("frogDeath");
   }
 
   function playSnakeMunch() {
-    playClone(audioSnakeEat);
+    playFromPool("snakeMunch");
   }
 
   function playRandomOrbSpawnSound() {
-    const choices = [audioOrbSpawn1, audioOrbSpawn2].filter(Boolean);
-    if (!choices.length) return;
-    const base = choices[Math.floor(Math.random() * choices.length)];
-    playClone(base);
+    const keys = ["orbSpawn1", "orbSpawn2"];
+    const key = keys[Math.floor(Math.random() * keys.length)];
+    playFromPool(key);
   }
 
+  /**
+   * Temp buff audio – `type` matches your existing game logic:
+   * "speed", "jump", "spawn", "snakeSlow", "snakeConfuse", "snakeShrink",
+   * "frogShield", "timeSlow", "orbMagnet", "megaSpawn",
+   * "scoreMulti", "panicHop", "cloneSwarm", "lifeSteal"
+   */
   function playBuffSound(type) {
-    let base = null;
+    let key = null;
     switch (type) {
-      case "speed":        base = audioSuperSpeed;    break;
-      case "jump":         base = audioSuperJump;     break;
-      case "spawn":        base = audioFrogSpawn;     break;
-      case "snakeSlow":    base = audioSnakeSlow;     break;
-      case "snakeConfuse": base = audioSnakeConfuse;  break;
-      case "snakeShrink":  base = audioSnakeShrink;   break;
-      case "frogShield":   base = audioFrogShield;    break;
-      case "timeSlow":     base = audioTimeSlow;      break;
-      case "orbMagnet":    base = audioOrbMagnet;     break;
-      case "megaSpawn":    base = audioMegaSpawn;     break;
-      case "scoreMulti":   base = audioScoreMulti;    break;
-      case "panicHop":     base = audioPanicHop;      break;
-      case "cloneSwarm":   base = audioCloneSwarm;    break;
-      case "lifeSteal":    base = audioLifeSteal;     break;
+      case "speed":        key = "buff_speed";        break;
+      case "jump":         key = "buff_jump";         break;
+      case "spawn":        key = "buff_spawn";        break;
+      case "snakeSlow":    key = "buff_snakeSlow";    break;
+      case "snakeConfuse": key = "buff_snakeConfuse"; break;
+      case "snakeShrink":  key = "buff_snakeShrink";  break;
+      case "frogShield":   key = "buff_frogShield";   break;
+      case "timeSlow":     key = "buff_timeSlow";     break;
+      case "orbMagnet":    key = "buff_orbMagnet";    break;
+      case "megaSpawn":    key = "buff_megaSpawn";    break;
+      case "scoreMulti":   key = "buff_scoreMulti";   break;
+      case "panicHop":     key = "buff_panicHop";     break;
+      case "cloneSwarm":   key = "buff_cloneSwarm";   break;
+      case "lifeSteal":    key = "buff_lifeSteal";    break;
     }
-    if (base) playClone(base);
+    if (key) playFromPool(key);
   }
 
   function playPermanentChoiceSound() {
-    playClone(audioPermanentChoice);
+    playFromPool("permanentChoice");
   }
 
+  /**
+   * Per-frog permanent upgrade sounds – `role` matches your existing code:
+   * "champion", "aura", "shield", "magnet", "lucky", "zombie"
+   */
   function playPerFrogUpgradeSound(role) {
-    let base = null;
+    let key = null;
     switch (role) {
-      case "champion": base = audioChampionFrog;    break;
-      case "aura":     base = audioAuraFrog;        break;
-      case "shield":   base = audioShieldFrogPerma; break;
-      case "magnet":   base = audioMagnetFrogPerma; break;
-      case "lucky":    base = audioLuckyFrogPerma;  break;
-      case "zombie":   base = audioZombieFrogPerma; break;
+      case "champion": key = "perfrog_champion"; break;
+      case "aura":     key = "perfrog_aura";     break;
+      case "shield":   key = "perfrog_shield";   break;
+      case "magnet":   key = "perfrog_magnet";   break;
+      case "lucky":    key = "perfrog_lucky";    break;
+      case "zombie":   key = "perfrog_zombie";   break;
     }
-    if (base) playClone(base);
+    if (key) playFromPool(key);
   }
 
+  // ------------------------------------------------------------
+  // EXPORT API
+  // ------------------------------------------------------------
   window.FrogGameAudio = {
     initAudio,
     playRandomRibbit,
