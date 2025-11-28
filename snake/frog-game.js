@@ -1683,69 +1683,20 @@ function applyBuff(type, frog) {
       const d2 = dx * dx + dy * dy;
 
       if (d2 <= eatR2) {
-        // temporary global frog shield
-        if (frogShieldTime > 0) {
-          continue;
-        }
+        // Shared kill logic (shields, zombies, deathrattle, sounds, cannibal tracking)
+        const killed = tryKillFrogAtIndex(i, "snake");
 
-        // per-frog permanent shield
-        if (frog.hasPermaShield) {
-          frog.hasPermaShield = false;
-          refreshFrogPermaGlow(frog);
-          playPerFrogUpgradeSound("shield");
-          continue;
-        }
-
-        // 🔹 Clone Swarm: chance that the snake only bites a fake clone
-        if (cloneSwarmTime > 0) {
-          // 65% of hits are "fake" while the buff is active
-          const DECOY_CHANCE = 0.65;
-          if (Math.random() < DECOY_CHANCE) {
-            // Snake thinks it ate something – munch sound – but frog survives
-            playSnakeMunch();
-            // No frogDeath, no removal
-            continue;
+        if (killed) {
+          // Only grow one segment for every 2 frogs eaten
+          frogsEatenCount++;
+          if (frogsEatenCount % 2 === 0) {
+            growSnake(1);
           }
-        }
-
-        // remove clone, if any
-        if (frog.cloneEl && frog.cloneEl.parentNode === container) {
-          container.removeChild(frog.cloneEl);
-          frog.cloneEl = null;
-        }
-
-        // remove frog dom + from array
-        if (frog.el.parentNode === container) {
-          container.removeChild(frog.el);
-        }
-        frogs.splice(i, 1);
-
-        // zombie on-death effect
-        if (frog.isZombie) {
-          spawnExtraFrogs(5);
-          snakeSlowTime = Math.max(
-            snakeSlowTime,
-            3 * buffDurationFactor
-          );
-        }
-
-        if (frogDeathRattleChance > 0.50) { frogDeathRattleChance = 0.50; }
-        // EPIC buff: global deathrattle – chance to spawn a replacement frog
-        if (frogDeathRattleChance > 0 && Math.random() < frogDeathRattleChance) {
-          spawnExtraFrogs(1);
-        }
-
-        playSnakeMunch();
-        playFrogDeath();
-
-        // Only grow one segment for every 2 frogs eaten
-        frogsEatenCount++;
-        if (frogsEatenCount % 2 === 0) {
-          growSnake(1);
         }
       }
     }
   }
+
 
   // --------------------------------------------------
   // PERMANENT, EPIC & LEGENDARY UPGRADE OVERLAY
