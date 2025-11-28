@@ -2231,7 +2231,8 @@ function ensureHowToOverlay() {
   howToOverlay = document.createElement("div");
   howToOverlay.className = "frog-howto-overlay";
 
-  howToOverlay.style.position = "absolute";
+  // 🔥 key bits: position: fixed + append to body
+  howToOverlay.style.position = "fixed";
   howToOverlay.style.inset = "0";
   howToOverlay.style.background = "rgba(0,0,0,0.7)";
   howToOverlay.style.display = "none";
@@ -2281,7 +2282,6 @@ function ensureHowToOverlay() {
     list.appendChild(li);
   });
 
-  // Buttons row: Start & Learn more
   const btnRow = document.createElement("div");
   btnRow.style.display = "flex";
   btnRow.style.justifyContent = "space-between";
@@ -2336,8 +2336,11 @@ function ensureHowToOverlay() {
   panel.appendChild(btnRow);
 
   howToOverlay.appendChild(panel);
-  container.appendChild(howToOverlay);
+
+  // ⬇️ append to BODY instead of container so scaling doesn’t affect it
+  (document.body || container).appendChild(howToOverlay);
 }
+
 
 function openHowToOverlay() {
   ensureHowToOverlay();
