@@ -185,6 +185,15 @@
 
   let legendaryEventTriggered = false;
 
+  let infoOverlay = null;
+  let infoPage = 0;
+  let infoContentEl = null;
+  let infoPageLabel = null;
+  let infoPrevBtn = null;
+  let infoNextBtn = null;
+  let infoLeaderboardData = [];
+
+
   // Shed state
   let snakeShedStage   = 0;          // 0 = base, 1 = yellow, 2 = orange, 3+ = red
   let snakeShedCount   = 0;          // how many times we've shed this run
@@ -2371,6 +2380,272 @@ function openHowToOverlay() {
     }
   }
 
+function ensureInfoOverlay() {
+  if (infoOverlay) return;
+
+  infoOverlay = document.createElement("div");
+  infoOverlay.className = "frog-info-overlay";
+  infoOverlay.style.position = "absolute";
+  infoOverlay.style.inset = "0";
+  infoOverlay.style.background = "rgba(0,0,0,0.75)";
+  infoOverlay.style.display = "none";
+  infoOverlay.style.zIndex = "180";
+  infoOverlay.style.alignItems = "center";
+  infoOverlay.style.justifyContent = "center";
+  infoOverlay.style.pointerEvents = "auto";
+
+  const panel = document.createElement("div");
+  panel.style.background = "#111";
+  panel.style.padding = "16px 20px 12px 20px";
+  panel.style.borderRadius = "10px";
+  panel.style.border = "1px solid #444";
+  panel.style.color = "#fff";
+  panel.style.fontFamily = "monospace";
+  panel.style.textAlign = "left";
+  panel.style.minWidth = "260px";
+  panel.style.maxWidth = "480px";
+  panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
+
+  // Header row
+  const headerRow = document.createElement("div");
+  headerRow.style.display = "flex";
+  headerRow.style.justifyContent = "space-between";
+  headerRow.style.alignItems = "center";
+  headerRow.style.marginBottom = "6px";
+
+  const title = document.createElement("div");
+  title.textContent = "escape the snake 🐍 – info";
+  title.style.fontSize = "14px";
+  title.style.fontWeight = "bold";
+
+  const pageLabel = document.createElement("div");
+  pageLabel.style.fontSize = "11px";
+  pageLabel.style.opacity = "0.8";
+  infoPageLabel = pageLabel;
+
+  headerRow.appendChild(title);
+  headerRow.appendChild(pageLabel);
+
+  const content = document.createElement("div");
+  content.style.fontSize = "13px";
+  content.style.marginTop = "4px";
+  content.style.lineHeight = "1.4";
+  infoContentEl = content;
+
+  // Footer nav row
+  const navRow = document.createElement("div");
+  navRow.style.display = "flex";
+  navRow.style.justifyContent = "space-between";
+  navRow.style.alignItems = "center";
+  navRow.style.marginTop = "10px";
+
+  const leftBtns = document.createElement("div");
+  leftBtns.style.display = "flex";
+  leftBtns.style.gap = "6px";
+
+  const prevBtn = document.createElement("button");
+  prevBtn.textContent = "◀ Prev";
+  prevBtn.style.fontFamily = "monospace";
+  prevBtn.style.fontSize = "12px";
+  prevBtn.style.padding = "4px 8px";
+  prevBtn.style.borderRadius = "6px";
+  prevBtn.style.border = "1px solid #555";
+  prevBtn.style.background = "#222";
+  prevBtn.style.color = "#fff";
+  prevBtn.style.cursor = "pointer";
+  prevBtn.onmouseenter = () => { prevBtn.style.background = "#333"; };
+  prevBtn.onmouseleave = () => { prevBtn.style.background = "#222"; };
+  prevBtn.onclick = () => setInfoPage(infoPage - 1);
+  infoPrevBtn = prevBtn;
+
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = "Next ▶";
+  nextBtn.style.fontFamily = "monospace";
+  nextBtn.style.fontSize = "12px";
+  nextBtn.style.padding = "4px 8px";
+  nextBtn.style.borderRadius = "6px";
+  nextBtn.style.border = "1px solid #555";
+  nextBtn.style.background = "#222";
+  nextBtn.style.color = "#fff";
+  nextBtn.style.cursor = "pointer";
+  nextBtn.onmouseenter = () => { nextBtn.style.background = "#333"; };
+  nextBtn.onmouseleave = () => { nextBtn.style.background = "#222"; };
+  nextBtn.onclick = () => setInfoPage(infoPage + 1);
+  infoNextBtn = nextBtn;
+
+  leftBtns.appendChild(prevBtn);
+  leftBtns.appendChild(nextBtn);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "Close ×";
+  closeBtn.style.fontFamily = "monospace";
+  closeBtn.style.fontSize = "12px";
+  closeBtn.style.padding = "4px 8px";
+  closeBtn.style.borderRadius = "6px";
+  closeBtn.style.border = "1px solid #555";
+  closeBtn.style.background = "#222";
+  closeBtn.style.color = "#fff";
+  closeBtn.style.cursor = "pointer";
+  closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
+  closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
+  closeBtn.onclick = () => closeInfoOverlay();
+
+  navRow.appendChild(leftBtns);
+  navRow.appendChild(closeBtn);
+
+  panel.appendChild(headerRow);
+  panel.appendChild(content);
+  panel.appendChild(navRow);
+
+  infoOverlay.appendChild(panel);
+  container.appendChild(infoOverlay);
+
+  // clicking dark background closes the panel
+  infoOverlay.addEventListener("click", (e) => {
+    if (e.target === infoOverlay) {
+      closeInfoOverlay();
+    }
+  });
+
+  // start on page 0 (leaderboard)
+  setInfoPage(0);
+}
+
+function setInfoPage(pageIndex) {
+  if (!infoContentEl || !infoPageLabel) return;
+  const neon = "#4defff";
+
+  const maxPage = 4; // 0..4: 5 total pages
+  infoPage = Math.max(0, Math.min(maxPage, pageIndex));
+
+  let html = "";
+
+  if (infoPage === 0) {
+    // PAGE 0 – Leaderboard
+    html += "<b>🏆 Leaderboard</b><br><br>";
+    const list = infoLeaderboardData || [];
+    if (!list.length) {
+      html += "<div>No scores yet — be the first to escape the snake.</div>";
+    } else {
+      html += "<table style='width:100%; border-collapse:collapse; font-size:12px;'>";
+      html += "<tr><th style='text-align:left;'>#</th><th style='text-align:left;'>Tag</th><th style='text-align:right;'>Score</th><th style='text-align:right;'>Time</th></tr>";
+      list.slice(0, 10).forEach((entry, i) => {
+        const rank = i + 1;
+        const tag  = entry.tag || entry.name || `Player ${rank}`;
+        const score = typeof entry.score === "number" ? Math.floor(entry.score) : entry.score;
+        const secs  = entry.time || entry.bestTime || 0;
+        const m = Math.floor(secs / 60);
+        const s = Math.floor(secs % 60);
+        const tStr = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        html += `
+          <tr>
+            <td>${rank}</td>
+            <td>${tag}</td>
+            <td style="text-align:right;">${score}</td>
+            <td style="text-align:right;">${tStr}</td>
+          </tr>
+        `;
+      });
+      html += "</table>";
+      html += `<div style="margin-top:6px; font-size:11px; opacity:0.8;">
+        Beat your own best score to update your entry.
+      </div>`;
+    }
+  } else if (infoPage === 1) {
+    // PAGE 1 – How to Play
+    html = `
+<b>🐍 How to Play</b><br><br>
+• Avoid the snake and keep the frogs alive as long as possible.<br>
+• Frogs hop around the screen. Move your mouse to guide the swarm.<br>
+• Collect glowing orbs to trigger buffs and upgrades.<br>
+• Every minute you choose a <span style="color:${neon};">common</span> upgrade.<br>
+• Every 3 minutes you get a <span style="color:${neon};">common + epic</span> upgrade chain.<br>
+• Every 5 minutes the snake sheds, gets stronger, and changes color.<br>
+• Your run ends when <span style="color:${neon};">all frogs are gone</span>.
+`;
+  } else if (infoPage === 2) {
+    // PAGE 2 – Orb buffs
+    html = `
+<b>🟢 Orb Buffs</b><br><br>
+⚡ <b>Speed</b> – frogs act faster for a short time (stacks with upgrades).<br>
+🦘 <b>Jump</b> – frogs jump much higher for a short time.<br>
+🐸➕ <b>Spawn</b> – instantly spawns extra frogs (more if the collector is Lucky).<br>
+🧊 <b>Snake Slow</b> – snake moves slower for a few seconds (less effective as it grows).<br>
+🤪 <b>Confuse</b> – snake turns randomly instead of targeting frogs.<br>
+📏 <b>Shrink</b> – snake body and bite radius shrink temporarily.<br>
+🛡️ <b>Team Shield</b> – all frogs ignore snake hits for a short duration.<br>
+⏱️ <b>Time Slow</b> – slows the whole game (and the snake) briefly.<br>
+🧲 <b>Orb Magnet</b> – orbs drift toward frogs, preferring magnet frogs.<br>
+🐸🌊 <b>Mega Spawn</b> – large wave of frogs appears at once.<br>
+💰 <b>Score ×2</b> – score gain is multiplied for a short window.<br>
+😱 <b>Panic Hop</b> – frogs hop faster but in random directions.<br>
+🩺 <b>Lifeline</b> – frogs that die during the buff have a chance to instantly respawn.<br>
+⭐ <b>PermaFrog</b> – upgrades one frog with a permanent role (Champion, Aura, Magnet, Lucky, Zombie, etc.).
+`;
+  } else if (infoPage === 3) {
+    // PAGE 3 – Permanent frog roles (no shield frog)
+    html = `
+<b>🐸 Permanent Frog Roles</b><br><br>
+🏅 <b>Champion</b> – that frog's hop cycle is faster and jumps are higher.<br>
+🌈 <b>Aura</b> – nearby frogs get bonus speed and jump height in a radius around this frog.<br>
+🧲 <b>Magnet</b> – orbs in a radius are strongly pulled toward this frog.<br>
+🍀 <b>Lucky</b> – buffs last longer, more frogs spawn from some effects, and score gain is boosted slightly per Lucky frog.<br>
+🧟 <b>Zombie</b> – when this frog dies, it causes extra chaos (like extra frogs and snake debuffs).<br><br>
+Perma roles stack with global upgrades and orb buffs, making some frogs into mini “heroes” of the swarm.
+`;
+  } else if (infoPage === 4) {
+    // PAGE 4 – Global upgrades (common + epic; no shield frog, no legendary)
+    html = `
+<b>🏗️ Global Upgrades</b><br><br>
+⏩ <b>Frogs hop faster forever</b> – reduces the hop cycle, making the whole swarm act more often.<br>
+🦘⬆️ <b>Frogs jump higher forever</b> – increases base jump height for all frogs.<br>
+🐸💥 <b>Spawn frogs</b> – instant injections of ${NORMAL_SPAWN_AMOUNT}/${EPIC_SPAWN_AMOUNT} frogs from common / epic menus.<br>
+⏳ <b>Buffs last longer</b> – multiplies the duration of all temporary buffs (orb effects).<br>
+🎯 <b>More orbs</b> – orbs spawn more frequently over time.<br>
+💀 <b>Deathrattle</b> – dead frogs have a chance to respawn immediately (common and epic versions stack).<br>
+🏹 <b>Last Stand</b> – your final remaining frog always has a 50% deathrattle chance (one-time pick).<br>
+🌌 <b>Orb Collector</b> – every collected orb has a flat chance to spawn an extra frog (one-time pick).<br>
+🧟‍♂️ <b>Zombie Horde (epic)</b> – summons special zombie frogs with boosted deathrattle while they last.<br>
+🍖 <b>Cannibal Frog (epic)</b> – spawns a cannibal frog that eats nearby frogs and buffs global deathrattle while alive.<br>
+💫 <b>Orb Storm / Snake Egg (epic)</b> – high-impact utilities that affect orb spawns or the next snake after a shed.<br><br>
+Synergize permanent upgrades, frog roles, and epic choices to keep the swarm alive deep into later sheds.
+`;
+  }
+
+  infoContentEl.innerHTML = html;
+  infoPageLabel.textContent = `Page ${infoPage + 1} / 5`;
+
+  if (infoPrevBtn) {
+    infoPrevBtn.disabled = (infoPage === 0);
+    infoPrevBtn.style.opacity = infoPage === 0 ? "0.5" : "1";
+  }
+  if (infoNextBtn) {
+    infoNextBtn.disabled = (infoPage === maxPage);
+    infoNextBtn.style.opacity = infoNextBtn.disabled ? "0.5" : "1";
+  }
+}
+
+function openInfoOverlay(startPage) {
+  ensureInfoOverlay();
+  gamePaused = true;
+  if (typeof startPage === "number") {
+    setInfoPage(startPage);
+  } else {
+    setInfoPage(infoPage);
+  }
+  if (infoOverlay) {
+    infoOverlay.style.display = "flex";
+  }
+}
+
+function closeInfoOverlay() {
+  if (infoOverlay) {
+    infoOverlay.style.display = "none";
+  }
+  gamePaused = false;
+}
+
+
 function ensureBuffGuideOverlay() {
   if (buffGuideOverlay) return;
 
@@ -3106,38 +3381,39 @@ function populateUpgradeOverlayChoices(mode) {
   // --------------------------------------------------
   // INIT
   // --------------------------------------------------
-  async function startGame() {
-    initAudio();
-    initLeaderboard(container);
-    ensureUpgradeOverlay(); // just creates DOM, doesn't show it
-    ensureHowToOverlay();
+async function startGame() {
+  initAudio();
+  initLeaderboard(container);
+  ensureUpgradeOverlay();
+  ensureInfoOverlay();  // unified info panel
 
-    const topList = await fetchLeaderboard();
-    if (topList) {
-      updateMiniLeaderboard(topList);
-      // Show the full leaderboard alongside the How to Play menu
-      openScoreboardOverlay(topList, lastRunScore, lastRunTime);
-    }
-
-    const width  = window.innerWidth;
-    const height = window.innerHeight;
-
-    await createInitialFrogs(width, height);
-    initSnake(width, height);
-
-    setNextOrbTime();
-    updateHUD();
-
-    // Show How to Play first; it will open the buff menu when the player clicks Start
-    if (!hasShownHowToOverlay) {
-      openHowToOverlay();
-    } else {
-      openUpgradeOverlay("normal");
-    }
-
-    animId = requestAnimationFrame(drawFrame);
-
+  const topList = await fetchLeaderboard();
+  if (topList) {
+    updateMiniLeaderboard(topList);
+    infoLeaderboardData = topList;
+  } else {
+    infoLeaderboardData = [];
   }
+
+  const width  = window.innerWidth;
+  const height = window.innerHeight;
+
+  await createInitialFrogs(width, height);
+  initSnake(width, height);
+
+  setNextOrbTime();
+  updateHUD();
+
+  // Show unified info panel once at the start of a fresh run
+  if (!hasShownHowToOverlay) {
+    hasShownHowToOverlay = true;
+    openInfoOverlay(0); // start on leaderboard page
+  } else {
+    openUpgradeOverlay("normal");
+  }
+
+  animId = requestAnimationFrame(drawFrame);
+}
 
   window.addEventListener("load", startGame);
 })();
