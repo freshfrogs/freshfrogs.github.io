@@ -1612,7 +1612,13 @@ function getUpgradeChoices() {
     },
     {
       id: "spawn20",
-      // (unchanged)
+      label: `
+        Spawn frogs<br>
+        <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
+      `,
+      apply: () => {
+        spawnExtraFrogs(NORMAL_SPAWN_AMOUNT);
+      }
     },
     {
       id: "buffDuration",
@@ -1644,7 +1650,7 @@ function getUpgradeChoices() {
         permaLifeStealOrbsRemaining += PERMA_LIFESTEAL_ORB_COUNT;
       }
     },
-        {
+    {
       id: "commonDeathRattle",
       label: `
         💀 Deathrattle<br>
