@@ -2598,8 +2598,6 @@ if (infoPage === 0) {
 • Avoid the snake and keep the frogs alive as long as possible.<br>
 • Frogs hop around the screen. Move your mouse to guide the swarm.<br>
 • Collect glowing orbs to trigger buffs and upgrades.<br>
-• Every minute you choose a <span style="color:${neon};">common</span> upgrade.<br>
-• Every 3 minutes you get a <span style="color:${neon};">common + epic</span> upgrade chain.<br>
 • Every 5 minutes the snake sheds, gets stronger, and changes color.<br>
 • Your run ends when <span style="color:${neon};">all frogs are gone</span>.
 `;
