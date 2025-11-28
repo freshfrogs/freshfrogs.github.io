@@ -2742,9 +2742,11 @@ function populateUpgradeOverlayChoices(mode) {
           // One-time 10-minute legendary menu
           legendaryEventTriggered = true;
           openUpgradeOverlay("legendary");
+          openUpgradeOverlay("normal");
         }
         else if (elapsedTime >= nextEpicChoiceTime) {
           openUpgradeOverlay("epic");
+          openUpgradeOverlay("normal");
         }
         else if (elapsedTime >= nextPermanentChoiceTime) {
           openUpgradeOverlay("normal");
