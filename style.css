@@ -824,3 +824,33 @@ a {
   pointer-events: none;
   border-radius: 100%;
 }
+/* ============================
+   ESCAPE THE SNAKE – FULLSCREEN GAME
+   Make #frog-game fill the viewport so all overlays
+   (leaderboard, readme, upgrade selects, HUD) center correctly.
+============================ */
+
+html,
+body {
+  height: 100%;
+}
+
+/* Only affects the /snake page where #frog-game exists */
+#frog-game {
+  position: fixed;
+  inset: 0;              /* top:0; right:0; bottom:0; left:0 */
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 10;           /* above any background, below modals if needed */
+}
+
+/* Optional: make sure game UI layers sit above other layout if any */
+#frog-game .frog-upgrade-overlay,
+#frog-game .frog-info-overlay,
+#frog-game .frog-buff-guide-overlay,
+#frog-game #frog-mini-leaderboard,
+#frog-game .frog-howto-overlay,
+#frog-game .frog-summary-overlay {
+  z-index: 100;
+}
