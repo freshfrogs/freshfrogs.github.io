@@ -49,16 +49,16 @@
   // --------------------------------------------------
   // BUFFS
   // --------------------------------------------------
-  const SPEED_BUFF_DURATION = 7;
-  const JUMP_BUFF_DURATION  = 7;
+  const SPEED_BUFF_DURATION = 10;
+  const JUMP_BUFF_DURATION  = 10;
 
-  const SNAKE_SLOW_DURATION    = 7;
-  const SNAKE_CONFUSE_DURATION = 7;
-  const SNAKE_SHRINK_DURATION  = 7;
+  const SNAKE_SLOW_DURATION    = 5;
+  const SNAKE_CONFUSE_DURATION = 5;
+  const SNAKE_SHRINK_DURATION  = 5;
   const FROG_SHIELD_DURATION   = 7;
-  const TIME_SLOW_DURATION     = 7;
+  const TIME_SLOW_DURATION     = 5;
   const ORB_MAGNET_DURATION    = 7;
-  const SCORE_MULTI_DURATION   = 7;
+  const SCORE_MULTI_DURATION   = 20;
   const PANIC_HOP_DURATION     = 5;
   const CLONE_SWARM_DURATION   = 1;
   const LIFE_STEAL_DURATION    = 20;
