@@ -2089,6 +2089,7 @@ function getUpgradeChoices() {
   const buffBonusPct  = Math.round((BUFF_DURATION_UPGRADE_FACTOR - 1) * 100);        // longer duration
   const orbFasterPct  = Math.round((1 - ORB_INTERVAL_UPGRADE_FACTOR) * 100);    // faster orb spawns
   const deathPct = Math.round(COMMON_DEATHRATTLE_CHANCE * 100);
+  const orbSpawnFrog = Math.round(ORB_COLLECTOR_CHANCE * 100);
 
   const upgrades = [
     {
@@ -2186,7 +2187,7 @@ function getUpgradeChoices() {
       id: "orbCollector",
       label: `
         🌌 Orb Collector<br>
-        Every orb has a <span style="color:${neon};">20%</span> chance to spawn
+        Every orb has a <span style="color:${neon};">${orbSpawnFrog}%</span> chance to spawn
         <span style="color:${neon};">+1</span> extra frog
       `,
       apply: () => {
