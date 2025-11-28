@@ -1994,8 +1994,8 @@ function getEpicUpgradeChoices() {
     {
       id: "epicDeathRattle",
       label: `
-        💀 EPIC deathrattle<br>
-        <span style="color:${neon};">${deathPct}%</span> chance a dead frog respawns
+        💀 Deathrattle<br>
+        +<span style="color:${neon};">${deathPct}%</span> deathrattle chance
       `,
       apply: () => {
         frogDeathRattleChance += EPIC_DEATHRATTLE_CHANCE;
@@ -2004,7 +2004,7 @@ function getEpicUpgradeChoices() {
     {
       id: "epicBuffDuration",
       label: `
-        ⏳ Buffs last even longer<br>
+        ⏳ Buffs extended<br>
         +<span style="color:${neon};">${buffBonusPct}%</span> buff duration
       `,
       apply: () => {
