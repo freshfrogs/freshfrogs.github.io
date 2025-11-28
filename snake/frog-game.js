@@ -1576,45 +1576,12 @@ function getEpicUpgradeChoices() {
 function getUpgradeChoices() {
   const neon = "#4defff";
 
-  // --- resolve upgrade factors with safe fallbacks ---
-  const frogSpeedUp =
-    typeof FROG_SPEED_UPGRADE_FACTOR !== "undefined"
-      ? FROG_SPEED_UPGRADE_FACTOR
-      : 0.9;   // 10% faster by default
-
-  const frogJumpUp =
-    typeof FROG_JUMP_UPGRADE_FACTOR !== "undefined"
-      ? FROG_JUMP_UPGRADE_FACTOR
-      : 1.25;  // +25% jump by default
-
-  const buffDurUp =
-    typeof BUFF_DURATION_UPGRADE_FACTOR !== "undefined"
-      ? BUFF_DURATION_UPGRADE_FACTOR
-      : 1.15;  // +15% duration by default
-
-  // You used ORB_INTERVAL_UPGRADE_FACTOR here; fall back to ORB_INTERVAL_FACTOR or 0.85
-  const orbIntervalUp =
-    typeof ORB_INTERVAL_UPGRADE_FACTOR !== "undefined"
-      ? ORB_INTERVAL_UPGRADE_FACTOR
-      : (typeof ORB_INTERVAL_FACTOR !== "undefined"
-          ? ORB_INTERVAL_FACTOR
-          : 0.85); // 15% faster spawns by default
-
   // --- derived percentages for labels ---
   // e.g. factor 0.9 => 10% faster, factor 1.25 => +25%, etc.
-  const speedBonusPct = Math.round((1 - frogSpeedUp) * 100);      // faster hops
-  const jumpBonusPct  = Math.round((frogJumpUp - 1) * 100);       // more jump height
-  const buffBonusPct  = Math.round((buffDurUp - 1) * 100);        // longer duration
-  const orbFasterPct  = Math.round((1 - orbIntervalUp) * 100);    // faster orb spawns
-
-  // amounts that are already absolute values
-  const spawnAmount =
-    typeof NORMAL_SPAWN_AMOUNT !== "undefined" ? NORMAL_SPAWN_AMOUNT : 20;
-
-  const permaLsCount =
-    typeof PERMA_LIFESTEAL_ORB_COUNT !== "undefined"
-      ? PERMA_LIFESTEAL_ORB_COUNT
-      : 30;
+  const speedBonusPct = Math.round((1 - FROG_SPEED_UPGRADE_FACTOR) * 100);      // faster hops
+  const jumpBonusPct  = Math.round((FROG_JUMP_UPGRADE_FACTOR - 1) * 100);       // more jump height
+  const buffBonusPct  = Math.round((BUFF_DURATION_UPGRADE_FACTOR - 1) * 100);        // longer duration
+  const orbFasterPct  = Math.round((1 - ORB_INTERVAL_UPGRADE_FACTOR) * 100);    // faster orb spawns
 
   return [
     {
@@ -1641,10 +1608,10 @@ function getUpgradeChoices() {
       id: "spawn20",
       label: `
         🐸➕ Spawn frogs<br>
-        <span style="color:${neon};">${spawnAmount}</span> frogs right now
+        <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
       `,
       apply: () => {
-        spawnExtraFrogs(spawnAmount);
+        spawnExtraFrogs(NORMAL_SPAWN_AMOUNT);
       }
     },
     {
@@ -1671,10 +1638,10 @@ function getUpgradeChoices() {
       id: "permaLifeSteal",
       label: `
         🩸 Lifesteal (upgrade)<br>
-        Next <span style="color:${neon};">${permaLsCount}</span> orbs also spawn frogs
+        Next <span style="color:${neon};">${PERMA_LIFESTEAL_ORB_COUNT}</span> orbs also spawn frogs
       `,
       apply: () => {
-        permaLifeStealOrbsRemaining += permaLsCount;
+        permaLifeStealOrbsRemaining += PERMA_LIFESTEAL_ORB_COUNT;
       }
     }
   ];
