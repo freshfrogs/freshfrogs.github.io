@@ -96,9 +96,9 @@
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
 
   // Spawn amounts
-  const NORMAL_SPAWN_AMOUNT           = 15;   // normal menu
+  const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
   const EPIC_SPAWN_AMOUNT             = 30;   // epic menu
-  const LEGENDARY_SPAWN_AMOUNT        = 60;   // legendary menu
+  const LEGENDARY_SPAWN_AMOUNT        = 40;   // legendary menu
 
   // Deathrattle chances
   const EPIC_DEATHRATTLE_CHANCE       = 0.25; // 25%
