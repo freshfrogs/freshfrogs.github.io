@@ -1604,7 +1604,6 @@ function getUpgradeChoices() {
       apply: () => {
         // use the config constant directly
         frogPermanentJumpFactor *= FROG_JUMP_UPGRADE_FACTOR;
-        console.log("Perma jump picked, new frogPermanentJumpFactor =", frogPermanentJumpFactor);
       }
     },
     {
@@ -1633,7 +1632,13 @@ function getUpgradeChoices() {
     },
     {
       id: "permaLifeSteal",
-      // ...
+      label: `
+        🩸 Lifesteal (upgrade)<br>
+        Next <span style="color:${neon};">${PERMA_LIFESTEAL_ORB_COUNT}</span> orbs also spawn frogs
+      `,
+      apply: () => {
+        permaLifeStealOrbsRemaining += PERMA_LIFESTEAL_ORB_COUNT;
+      }
     }
   ];
 }
