@@ -1613,7 +1613,7 @@ function getUpgradeChoices() {
     {
       id: "spawn20",
       label: `
-        Spawn frogs<br>
+        🐸 Spawn frogs<br>
         <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
       `,
       apply: () => {
