@@ -1749,16 +1749,6 @@ function getEpicUpgradeChoices() {
       }
     },
     {
-      id: "epicFrogSpeed",
-      label: `
-        ⏩ EPIC frog speed<br>
-        Another <span style="color:${neon};">~${speedPct}%</span> faster forever
-      `,
-      apply: () => {
-        frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
-      }
-    },
-    {
       id: "epicBuffDuration",
       label: `
         ⏳ Buffs last even longer<br>
