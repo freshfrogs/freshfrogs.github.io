@@ -2438,7 +2438,6 @@ function setBuffGuidePage(pageIndex) {
 <b>🐸 Permanent frog roles</b><br><br>
 🏅 <b>Champion</b> – that frog's hop cycle is ~<span style="color:${neon};">${fasterPercentFromFactor(champSpeedFact, 0.85)}</span> faster and jumps <span style="color:${neon};">${multFromFactor(champJumpFact, 1.25)}</span> higher.<br>
 🌈 <b>Aura</b> – nearby frogs get faster + higher jumps in a <span style="color:${neon};">${auraRadiusPx}</span>px radius (jump <span style="color:${neon};">${multFromFactor(auraJumpFact, 1.15)}</span>).<br>
-🛡️ <b>Perma shield</b> – snake can't eat this frog while the shield is fresh. After about <span style="color:${neon};">40s</span> or if it's the <i>last</i> frog left, the shield breaks and it can die normally.<br>
 🧲 <b>Magnet</b> – orbs within ~<span style="color:${neon};">220px</span> home in on this frog.<br>
 🍀 <b>Lucky</b> – buffs last <span style="color:${neon};">${multFromFactor(luckyDurBoost, 1.4)}</span> longer, spawns more frogs, and each Lucky frog adds <span style="color:${neon};">${percentFromBonus(luckyScorePer, 0.10)}</span> score rate.<br>
 🧟 <b>Zombie</b> – on death: spawn a small frog burst and slow the snake. Zombies keep their role if they respawn (but special epic bonuses may fall off).<br>
