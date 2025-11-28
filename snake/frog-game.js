@@ -96,7 +96,7 @@
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
 
   const MAX_SNAKE_SEGMENTS = 200;
-
+  const CANNIBAL_ROLE_CHANCE = 0.05; // 5% chance eaten frog gains random role
 
   // Spawn amounts
   const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
@@ -661,6 +661,8 @@
       isLucky: false,
       isZombie: false,
       shieldGrantedAt: null,
+      // per-frog deathrattle (for special cases like Zombie Horde)
+      specialDeathRattleChance: null,
 
       // NEW – special roles
       isCannibal: false,
@@ -691,6 +693,25 @@
       const pos = positions[i];
       const tokenId = tokenIds[i];
       createFrogAt(pos.x, pos.y, tokenId);
+    }
+  }
+
+    function spawnZombieHorde(count) {
+    const width  = window.innerWidth;
+    const height = window.innerHeight;
+    const margin = 16;
+
+    const toSpawn = Math.min(count, MAX_FROGS - frogs.length);
+    for (let i = 0; i < toSpawn; i++) {
+      const x = margin + Math.random() * (width - margin * 2 - FROG_SIZE);
+      const y = margin + Math.random() * (height - margin * 2 - FROG_SIZE);
+      const tokenId = randInt(1, MAX_TOKEN_ID);
+      const frog = createFrogAt(x, y, tokenId);
+
+      // Mark these as special “Zombie Horde” zombies:
+      frog.isZombie = true;
+      frog.specialDeathRattleChance = 0.5; // 50% DR just for these guys
+      refreshFrogPermaGlow(frog);          // keep your purple glow
     }
   }
 
@@ -1938,14 +1959,14 @@ function getEpicUpgradeChoices() {
 
     // NEW EPIC: Zombie Horde
     {
-      id: "epicZombieHorde",
+      id: "zombieHorde",
       label: `
-        🧟 Zombie Horde<br>
-        Summon <span style="color:${neon};">3</span> zombie frogs with<br>
-        <span style="color:${neon};">50%</span> deathrattle
+        🧟🧟🧟 Zombie Horde<br>
+        Summon <span style="color:${neon};">3</span> zombie frogs
+        with <span style="color:${neon};">50%</span> deathrattle
       `,
       apply: () => {
-        spawnZombieHorde();
+        spawnZombieHorde(3);
       }
     }
   ];
