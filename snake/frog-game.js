@@ -107,6 +107,10 @@
   // Legendary buff duration spike
   const LEGENDARY_BUFF_DURATION_FACTOR = 2.0; // x2 all buff durations
 
+  
+  const AURA_RADIUS  = 200;
+  const AURA_RADIUS2 = AURA_RADIUS * AURA_RADIUS;
+
   const container = document.getElementById("frog-game");
   if (!container) return;
 
@@ -563,34 +567,6 @@ function snakeShed(stage, speedMultiplier) {
       createFrogAt(x, y, tokenId);
     }
   }
-
-  let speedBuffTime   = 0;
-  let jumpBuffTime    = 0;
-  let snakeSlowTime   = 0;
-  let snakeConfuseTime= 0;
-  let snakeShrinkTime = 0;
-  let frogShieldTime  = 0;
-  let timeSlowTime    = 0;
-  let orbMagnetTime   = 0;
-  let scoreMultiTime  = 0;
-  let panicHopTime    = 0;
-  let cloneSwarmTime  = 0;
-  let lifeStealTime   = 0;
-  let frogDeathRattleChance = 0.0;  // 0.25 when epic is picked
-  let permaLifeStealOrbsRemaining = 0;
-
-  // Legendary Frenzy timer (snake + frogs go wild)
-  let snakeFrenzyTime = 0;
-
-  // global permanent buffs
-  let frogPermanentSpeedFactor = 1.0; // <1 = faster hops
-  let frogPermanentJumpFactor  = 1.0; // >1 = higher hops
-  let snakePermanentSpeedFactor= 1.0;
-  let buffDurationFactor       = 1.0; // >1 = longer temp buffs
-  let orbSpawnIntervalFactor   = 1.0; // <1 = more orbs
-
-  const AURA_RADIUS  = 200;
-  const AURA_RADIUS2 = AURA_RADIUS * AURA_RADIUS;
 
   function getSpeedFactor(frog) {
     let factor = frogPermanentSpeedFactor * (frog.speedMult || 1);
