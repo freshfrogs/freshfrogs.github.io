@@ -1804,7 +1804,7 @@ function tryKillFrogAtIndex(index, source) {
 
   // Last Stand: if this was the last frog, guarantee at least 50% DR
   if (lastStandActive && wasLastFrog) {
-    drChance = Math.max(drChance, 0.5);
+    drChance = Math.max(drChance, 0.33);
   }
 
   // Clamp to 50%
@@ -2183,7 +2183,7 @@ function getUpgradeChoices() {
       label: `
         🏹 Last Stand<br>
         Your <span style="color:${neon};">last frog</span> always has
-        <span style="color:${neon};">50%</span> deathrattle chance
+        <span style="color:${neon};">33%</span> deathrattle chance
       `,
       apply: () => {
         lastStandActive = true;
