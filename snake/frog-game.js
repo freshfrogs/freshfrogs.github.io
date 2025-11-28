@@ -202,6 +202,8 @@
   let lifeStealTime   = 0;
   let frogDeathRattleChance = 0.0;  // 0.25 when epic is picked
   let permaLifeStealOrbsRemaining = 0;
+  let cannibalFrogCount = 0;       // how many cannibal frogs are currently alive
+
 
   // Legendary Frenzy timer (snake + frogs go wild)
   let snakeFrenzyTime = 0;
@@ -486,6 +488,7 @@ function snakeShed(stage, speedMultiplier) {
     if (frog.isMagnet)        glows.push("0 0 10px rgba(173,255,47,0.9)");
     if (frog.isLucky)         glows.push("0 0 10px rgba(255,105,180,0.9)");
     if (frog.isZombie)        glows.push("0 0 10px rgba(148,0,211,0.9)");
+    if (frog.isCannibal)      glows.push("0 0 12px rgba(255,69,0,0.95)"); // NEW
     frog.el.style.boxShadow = glows.join(", ");
   }
 
@@ -551,6 +554,11 @@ function snakeShed(stage, speedMultiplier) {
       isMagnet: false,
       isLucky: false,
       isZombie: false,
+
+      // NEW – special roles
+      isCannibal: false,
+      extraDeathRattleChance: 0,  // per-frog extra chance (e.g. Zombie Horde)
+      cannibalIcon: null,         // overlay icon for cannibal
 
       cloneEl: null,
       layers: []
@@ -736,6 +744,197 @@ function getJumpFactor(frog) {
       case "zombie":   grantZombieFrog(frog);   break;
     }
   }
+
+  // --------------------------------------------------
+  // SPECIAL ROLES: CANNIBAL & HELPERS
+  // --------------------------------------------------
+
+  function markCannibalFrog(frog) {
+    if (!frog || frog.isCannibal) return;
+
+    frog.isCannibal = true;
+
+    // +5% "overall stats": slightly faster cycle + higher jumps
+    frog.speedMult *= 0.95;          // 5% faster hops
+    frog.jumpMult  *= 1.05;          // 5% higher jumps
+
+    // +5% personal deathrattle
+    frog.extraDeathRattleChance = (frog.extraDeathRattleChance || 0) + 0.05;
+
+    // Visual bones icon overlay (placeholder asset)
+    const icon = document.createElement("img");
+    icon.src = "/snake/bones.png";   // placeholder sprite
+    icon.alt = "";
+    icon.style.position = "absolute";
+    icon.style.width = "24px";
+    icon.style.height = "24px";
+    icon.style.right = "-4px";
+    icon.style.top = "-8px";
+    icon.style.imageRendering = "pixelated";
+    icon.style.pointerEvents = "none";
+    frog.el.appendChild(icon);
+    frog.cannibalIcon = icon;
+
+    cannibalFrogCount++;
+    refreshFrogPermaGlow(frog);
+  }
+
+  function unmarkCannibalFrog(frog) {
+    if (!frog || !frog.isCannibal) return;
+
+    frog.isCannibal = false;
+
+    if (frog.cannibalIcon && frog.cannibalIcon.parentNode === frog.el) {
+      frog.el.removeChild(frog.cannibalIcon);
+    }
+    frog.cannibalIcon = null;
+
+    cannibalFrogCount = Math.max(0, cannibalFrogCount - 1);
+    refreshFrogPermaGlow(frog);
+  }
+
+  // Spawn a single "random" frog at a random position and return it
+  function createRandomFrog() {
+    if (frogs.length >= MAX_FROGS) return null;
+
+    const width  = window.innerWidth;
+    const height = window.innerHeight;
+    const margin = 16;
+
+    const x = margin + Math.random() * (width - margin * 2 - FROG_SIZE);
+    const y = margin + Math.random() * (height - margin * 2 - FROG_SIZE);
+    const tokenId = randInt(1, MAX_TOKEN_ID);
+    return createFrogAt(x, y, tokenId);
+  }
+
+  // Global + per-frog deathrattle calculation
+  function computeDeathRattleChanceForFrog(frog) {
+    let chance = frogDeathRattleChance || 0;
+
+    // Cannibal aura: +5% per cannibal frog alive (while they exist)
+    if (cannibalFrogCount > 0) {
+      chance += cannibalFrogCount * 0.05;
+    }
+
+    // Per-frog bonus (Zombie Horde, Cannibal stats, etc.)
+    if (frog && frog.extraDeathRattleChance) {
+      chance += frog.extraDeathRattleChance;
+    }
+
+    // Hard cap at 50%
+    if (chance > 0.5) chance = 0.5;
+    if (chance < 0)   chance = 0;
+    return chance;
+  }
+
+  // Attempt to kill a frog at index i, with a specific killer (`"snake"` or `"cannibal"`)
+  function tryKillFrogAtIndex(i, killer) {
+    const frog = frogs[i];
+    if (!frog) return false;
+
+    // Global temporary shield → ignore hit
+    if (frogShieldTime > 0) {
+      return false;
+    }
+
+    // Perma shield → consume shield instead of dying
+    if (frog.hasPermaShield) {
+      frog.hasPermaShield = false;
+      refreshFrogPermaGlow(frog);
+      playPerFrogUpgradeSound("shield");
+      return false;
+    }
+
+    // Snake-only: Clone Swarm decoy (fake bites)
+    if (killer === "snake" && cloneSwarmTime > 0) {
+      const DECOY_CHANCE = 0.65;
+      if (Math.random() < DECOY_CHANCE) {
+        // Snake thinks it ate something – munch sound – but frog survives
+        playSnakeMunch();
+        return false;
+      }
+    }
+
+    // Remove visual clone if it exists
+    if (frog.cloneEl && frog.cloneEl.parentNode === container) {
+      container.removeChild(frog.cloneEl);
+      frog.cloneEl = null;
+    }
+
+    // Cannibal bookkeeping
+    if (frog.isCannibal) {
+      unmarkCannibalFrog(frog);
+    }
+
+    // Remove DOM
+    if (frog.el && frog.el.parentNode === container) {
+      container.removeChild(frog.el);
+    }
+
+    // Remove from frogs array
+    frogs.splice(i, 1);
+
+    // Zombie on-death effect (always spawns frogs; slow only if snake kills)
+    if (frog.isZombie) {
+      spawnExtraFrogs(5);
+      if (killer === "snake") {
+        snakeSlowTime = Math.max(snakeSlowTime, 3 * buffDurationFactor);
+      }
+    }
+
+    // Deathrattle: base + cannibal aura + per-frog bonus
+    const deathChance = computeDeathRattleChanceForFrog(frog);
+    if (deathChance > 0 && Math.random() < deathChance) {
+      const newFrog = createRandomFrog();
+      if (newFrog) {
+        // Zombies keep their role, but NOT their extra 50% deathrattle
+        if (frog.isZombie) {
+          grantZombieFrog(newFrog);
+        }
+
+        // Cannibal frogs respawn as cannibals
+        if (frog.isCannibal) {
+          markCannibalFrog(newFrog);
+        }
+
+        // NOTE: we do NOT copy frog.extraDeathRattleChance:
+        // Zombie Horde's 50% goes away after the first death.
+      }
+    }
+
+    // Sounds
+    if (killer === "snake") {
+      playSnakeMunch();
+    }
+    playFrogDeath();
+
+    return true;
+  }
+
+  // EPIC: spawn a Cannibal Frog
+  function spawnCannibalFrog() {
+    const frog = createRandomFrog();
+    if (!frog) return;
+    markCannibalFrog(frog);
+  }
+
+  // EPIC: give all frogs random permanent roles
+  function giveAllFrogsRandomRoles() {
+    for (const frog of frogs) {
+      grantRandomPermaFrogUpgrade(frog);
+    }
+  }
+
+  // EPIC: spawn 3 special zombie frogs with 50% personal deathrattle
+  function spawnZombieHorde() {
+    for (let i = 0; i < 3; i++) {
+      const frog = createRandomFrog();
+      if (!frog) continue;
+      grantZombieFrog(frog);
+      frog.extraDeathRattleChance = 0.5; // 50% personal deathrattle on this life only
+    }
+  }
+
 
 function applyBuff(type, frog) {
   // Lucky frogs extend buff durations
@@ -1027,6 +1226,41 @@ function applyBuff(type, frog) {
           container.removeChild(frog.cloneEl);
         }
         frog.cloneEl = null;
+      }
+    }
+        // --- Cannibal Frogs: eat nearby frogs that get in their way --- // NEW
+    const cannibals = frogs.filter(f => f.isCannibal);
+    if (cannibals.length > 0) {
+      const eatRadius = FROG_SIZE * 0.6;
+      const eatR2 = eatRadius * eatRadius;
+
+      for (const cannibal of cannibals) {
+        let victim = null;
+        let bestD2 = Infinity;
+
+        const cx = cannibal.x + FROG_SIZE / 2;
+        const cy = cannibal.baseY + FROG_SIZE / 2;
+
+        for (const candidate of frogs) {
+          if (candidate === cannibal) continue;
+          const fx = candidate.x + FROG_SIZE / 2;
+          const fy = candidate.baseY + FROG_SIZE / 2;
+          const dx = fx - cx;
+          const dy = fy - cy;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < eatR2 && d2 < bestD2) {
+            bestD2 = d2;
+            victim = candidate;
+          }
+        }
+
+        if (victim) {
+          const idx = frogs.indexOf(victim);
+          if (idx !== -1) {
+            // Cannibal kill; uses the same deathrattle logic but no snake growth
+            tryKillFrogAtIndex(idx, "cannibal");
+          }
+        }
       }
     }
   }
@@ -1540,7 +1774,7 @@ function getEpicUpgradeChoices() {
   const neon = "#4defff";
   const speedPct = Math.round((1 - FROG_SPEED_UPGRADE_FACTOR) * 100);
   const deathPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
-  const buffBonusPct  = 25;//Math.round((BUFF_DURATION_UPGRADE_FACTOR - 1) * 100);        // longer duration
+  const buffBonusPct  = 25; // ~25% extra here for epic
 
   return [
     {
@@ -1564,7 +1798,7 @@ function getEpicUpgradeChoices() {
       }
     },
     {
-      id: "epicBuffDuration",
+      id: "epicFrogSpeed",
       label: `
         ⏩ EPIC frog speed<br>
         Another <span style="color:${neon};">~${speedPct}%</span> faster forever
@@ -1574,19 +1808,59 @@ function getEpicUpgradeChoices() {
       }
     },
     {
-      id: "buffDuration",
+      id: "epicBuffDuration",
       label: `
-        ⏳ Buffs last longer<br>
+        ⏳ Buffs last even longer<br>
         +<span style="color:${neon};">${buffBonusPct}%</span> buff duration
       `,
       apply: () => {
-        buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR+0.25;
+        buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR + 0.25;
+      }
+    },
+
+    // NEW EPIC: Cannibal Frog
+    {
+      id: "epicCannibalFrog",
+      label: `
+        🦴 Cannibal Frog<br>
+        Spawn a <span style="color:${neon};">Cannibal</span> frog that:<br>
+        • Gives <span style="color:${neon};">+5%</span> global deathrattle while alive<br>
+        • Has <span style="color:${neon};">+5%</span> speed, jump & deathrattle<br>
+        • Eats nearby frogs that get in its way
+      `,
+      apply: () => {
+        spawnCannibalFrog();
+      }
+    },
+
+    // NEW EPIC: Random frog roles
+    {
+      id: "epicRandomRoles",
+      label: `
+        🎲 Random frog roles<br>
+        Give <span style="color:${neon};">every frog</span> a random permanent role
+      `,
+      apply: () => {
+        giveAllFrogsRandomRoles();
+      }
+    },
+
+    // NEW EPIC: Zombie Horde
+    {
+      id: "epicZombieHorde",
+      label: `
+        🧟 Zombie Horde<br>
+        Summon <span style="color:${neon};">3</span> zombie frogs with<br>
+        <span style="color:${neon};">50%</span> personal deathrattle (first life only)
+      `,
+      apply: () => {
+        spawnZombieHorde();
       }
     }
   ];
 }
 
-  // EPIC choices every 3 minutes
+
 function getUpgradeChoices() {
   const neon = "#4defff";
 
@@ -2452,6 +2726,7 @@ function populateUpgradeOverlayChoices(mode) {
 
     // Reset EPIC deathrattle
     frogDeathRattleChance = 0.0;
+    cannibalFrogCount = 0;
 
     // Reset global permanent buffs
     frogPermanentSpeedFactor = 1.0;
