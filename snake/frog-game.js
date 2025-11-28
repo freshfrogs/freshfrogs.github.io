@@ -187,6 +187,8 @@
   let snakeShedCount   = 0;          // how many times we've shed this run
   let nextShedTime     = SHED_INTERVAL;
 
+  let snakeEggPending = false; // EPIC: next shed uses reduced speed bonus
+
   // Old snakes that are despawning chunk-by-chunk
   let dyingSnakes = [];
 
@@ -351,8 +353,14 @@
       });
     }
 
-    // Permanent +20% speed each shed.
-    snakePermanentSpeedFactor *= 1.20;
+    // Permanent speed bonus each shed.
+    // Normally +20%, but if Snake Egg is pending, only +11% (20% - 9%).
+    let speedMult = 1.20;
+    if (snakeEggPending) {
+      speedMult = 1.11;   // +11% instead of +20%
+      snakeEggPending = false; // consume the egg buff
+    }
+    snakePermanentSpeedFactor *= speedMult;
 
     // Decide new color stage (1 = yellow, 2 = orange, 3+ = red).
     snakeShedStage = stage;
@@ -1888,17 +1896,34 @@ function getEpicUpgradeChoices() {
       }
     },
 
-    /* NEW EPIC: Random frog roles
+    // 🌩️ ORB STORM – drop a bunch of orbs right now
     {
-      id: "epicRandomRoles",
+      id: "epicOrbStorm",
       label: `
-        🎲 Random frog roles<br>
-        Give <span style="color:${neon};">every frog</span> a random permanent role
+        🌩️ Orb Storm<br>
+        Drop <span style="color:${neon};">${orbStormCount}</span> random orbs right now
       `,
       apply: () => {
-        giveAllFrogsRandomRoles();
+        const width  = window.innerWidth;
+        const height = window.innerHeight;
+        for (let i = 0; i < orbStormCount; i++) {
+          spawnOrbRandom(width, height);
+        }
       }
-    }, */
+    },
+
+    // 🥚 SNAKE EGG – next shed snake only gets +11% speed instead of +20%
+    {
+      id: "snakeEgg",
+      label: `
+        🥚 Snake Egg<br>
+        The <span style="color:${neon};">next shed</span> only gives the new snake
+        <span style="color:${neon};">+${snakeEggBuffPct}%</span> speed instead of +20%
+      `,
+      apply: () => {
+        snakeEggPending = true;
+      }
+    },
 
     // NEW EPIC: Zombie Horde
     {
@@ -2772,7 +2797,7 @@ function populateUpgradeOverlayChoices(mode) {
     snakeShedCount           = 0;
     nextShedTime             = SHED_INTERVAL;
     dyingSnakes              = [];
-
+    snakeEggPending          = false;
 
     // Reset all temporary buff timers
     speedBuffTime   = 0;
