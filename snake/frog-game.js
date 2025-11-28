@@ -554,6 +554,7 @@ function snakeShed(stage, speedMultiplier) {
       isMagnet: false,
       isLucky: false,
       isZombie: false,
+      shieldGrantedAt: null,
 
       // NEW – special roles
       isCannibal: false,
@@ -694,10 +695,13 @@ function getJumpFactor(frog) {
   }
 
   function grantShieldFrog(frog) {
+    if (!frog) return;
     frog.hasPermaShield = true;
+    frog.shieldGrantedAt = elapsedTime;  // start 40s timer from now
     refreshFrogPermaGlow(frog);
     playPerFrogUpgradeSound("shield");
   }
+
 
   function grantMagnetFrog(frog) {
     if (frog.isMagnet) return;
@@ -838,27 +842,32 @@ function getJumpFactor(frog) {
     const frog = frogs[i];
     if (!frog) return false;
 
-    // Global temporary shield → ignore hit
-    if (frogShieldTime > 0) {
+    // Global temporary shield from orb: protects vs snake/cannibal, but NOT vs timed death
+    if (frogShieldTime > 0 && killer !== "time") {
       return false;
     }
 
-    // Perma shield → consume shield instead of dying
-    if (frog.hasPermaShield) {
-      frog.hasPermaShield = false;
-      refreshFrogPermaGlow(frog);
-      playPerFrogUpgradeSound("shield");
-      return false;
-    }
+    // Permanent shield role:
+    // - While active (< 40s) and not last frog, snake cannot eat this frog.
+    // - If it's the last frog OR shield lifetime has expired, snake can kill it.
+    if (killer === "snake" && frog.hasPermaShield) {
+      const SHIELD_LIFETIME = 40; // seconds
+      const isLastFrog = (frogs.length === 1);
+      const lifetimeExpired =
+        frog.shieldGrantedAt != null &&
+        (elapsedTime - frog.shieldGrantedAt) >= SHIELD_LIFETIME;
 
-    // Snake-only: Clone Swarm decoy (fake bites)
-    if (killer === "snake" && cloneSwarmTime > 0) {
-      const DECOY_CHANCE = 0.65;
-      if (Math.random() < DECOY_CHANCE) {
-        // Snake thinks it ate something – munch sound – but frog survives
-        playSnakeMunch();
+      if (!isLastFrog && !lifetimeExpired) {
+        // Snake hit blocked – frog survives, shield remains
+        playPerFrogUpgradeSound("shield");
         return false;
       }
+
+      // If we are here, either it's the last frog or shield lifetime is over:
+      // clear shield visuals and allow normal death logic below
+      frog.hasPermaShield = false;
+      frog.shieldGrantedAt = null;
+      refreshFrogPermaGlow(frog);
     }
 
     // Remove visual clone if it exists
