@@ -209,7 +209,7 @@
   let frogDeathRattleChance = 0.0;  // 0.25 when epic is picked
   let permaLifeStealOrbsRemaining = 0;
   let cannibalFrogCount = 0;       // how many cannibal frogs are currently alive
-
+  let lastStandActive = false;
 
   // Legendary Frenzy timer (snake + frogs go wild)
   let snakeFrenzyTime = 0;
@@ -1984,7 +1984,7 @@ function getUpgradeChoices() {
   const orbFasterPct  = Math.round((1 - ORB_INTERVAL_UPGRADE_FACTOR) * 100);    // faster orb spawns
   const deathPct = Math.round(COMMON_DEATHRATTLE_CHANCE * 100);
 
-  return [
+  const upgrades = [
     {
       id: "frogSpeed",
       label: `
@@ -2058,6 +2058,23 @@ function getUpgradeChoices() {
       }
     }
   ];
+
+   // 🔹 Only include Last Stand if it hasn't been picked yet
+  if (!lastStandActive) {
+    upgrades.push({
+      id: "lastStand",
+      label: `
+        🏹 Last Stand<br>
+        Your <span style="color:${neon};">last frog</span> always has
+        <span style="color:${neon};">50%</span> deathrattle chance
+      `,
+      apply: () => {
+        lastStandActive = true;
+      }
+    });
+  }
+
+  return upgrades;
 }
 
   // LEGENDARY choices at 10 minutes (placeholders, TODO)
