@@ -2250,7 +2250,7 @@ function setBuffGuidePage(pageIndex) {
   const orbMagDur      = typeof ORB_MAGNET_DURATION       !== "undefined" ? ORB_MAGNET_DURATION       : 10;
   const scoreDur       = typeof SCORE_MULTI_DURATION      !== "undefined" ? SCORE_MULTI_DURATION      : 10;
   const panicDur       = typeof PANIC_HOP_DURATION        !== "undefined" ? PANIC_HOP_DURATION        : 8;
-  const lifeStealDur   = typeof LIFE_STEAL_DURATION       !== "undefined" ? LIFE_STEAL_DURATION       : 12;
+  const lifeStealDur   = typeof LIFE_STEAL_DURATION       !== "undefined" ? LIFE_STEAL_DURATION       : 20;
 
   const jumpBuffFactor = typeof JUMP_BUFF_FACTOR          !== "undefined" ? JUMP_BUFF_FACTOR          : 3.2;
   const snakeSlowFact  = typeof SNAKE_SLOW_FACTOR         !== "undefined" ? SNAKE_SLOW_FACTOR         : 0.5;
@@ -2268,12 +2268,12 @@ function setBuffGuidePage(pageIndex) {
   const frogSpeedUp    = typeof FROG_SPEED_UPGRADE_FACTOR    !== "undefined" ? FROG_SPEED_UPGRADE_FACTOR    : 0.9;
   const frogJumpUp     = typeof FROG_JUMP_UPGRADE_FACTOR     !== "undefined" ? FROG_JUMP_UPGRADE_FACTOR     : 1.25;
   const buffDurUp      = typeof BUFF_DURATION_UPGRADE_FACTOR !== "undefined" ? BUFF_DURATION_UPGRADE_FACTOR : 1.15;
-  const orbIntervalUp  = typeof ORB_INTERVAL_FACTOR          !== "undefined" ? ORB_INTERVAL_FACTOR          : 0.85;
+  const orbIntervalUp  = typeof ORB_INTERVAL_UPGRADE_FACTOR  !== "undefined" ? ORB_INTERVAL_UPGRADE_FACTOR  : 0.85;
 
-  const epicDeathChance  = typeof EPIC_DEATHRATTLE_CHANCE    !== "undefined" ? EPIC_DEATHRATTLE_CHANCE      : 0.25;
-  const legDeathChance   = typeof LEGENDARY_DEATHRATTLE_CHANCE !== "undefined" ? LEGENDARY_DEATHRATTLE_CHANCE : 0.50;
-  const frenzyDur        = typeof LEGENDARY_FRENZY_DURATION  !== "undefined" ? LEGENDARY_FRENZY_DURATION    : 13;
-  const frenzySpeedFact  = typeof FRENZY_SPEED_FACTOR        !== "undefined" ? FRENZY_SPEED_FACTOR          : 1.25;
+  const epicDeathChance  = typeof EPIC_DEATHRATTLE_CHANCE       !== "undefined" ? EPIC_DEATHRATTLE_CHANCE       : 0.25;
+  const legDeathChance   = typeof LEGENDARY_DEATHRATTLE_CHANCE  !== "undefined" ? LEGENDARY_DEATHRATTLE_CHANCE  : 0.50;
+  const frenzyDur        = typeof LEGENDARY_FRENZY_DURATION     !== "undefined" ? LEGENDARY_FRENZY_DURATION      : 13;
+  const frenzySpeedFact  = typeof FRENZY_SPEED_FACTOR           !== "undefined" ? FRENZY_SPEED_FACTOR            : 1.25;
 
   const pages = [
     // Page 0 – orb buffs
@@ -2291,7 +2291,7 @@ function setBuffGuidePage(pageIndex) {
 🐸🌊 <b>Mega spawn</b> – spawn <span style="color:${neon};">15–25</span> frogs (+ bonus if Lucky).<br>
 💰 <b>Score x2</b> – score gain boosted by <span style="color:${neon};">${multFromFactor(scoreMultiFact, 2.0)}</span> for <span style="color:${neon};">${secFromConst(scoreDur, 10)}</span>.<br>
 😱 <b>Panic hop</b> – frogs hop faster but in random directions for <span style="color:${neon};">${secFromConst(panicDur, 8)}</span>.<br>
-🩸 <b>Lifeline</b> – for <span style="color:${neon};">${secFromConst(lifeStealDur, 12)}</span>, any frog that dies automatically respawns.<br>
+🩸 <b>Lifeline</b> – for <span style="color:${neon};">${secFromConst(lifeStealDur, 20)}</span>, any frog that dies automatically respawns (stacks with other deathrattle bonuses).<br>
 ⭐ <b>PermaFrog</b> – gives that frog a random permanent role.
 `,
     // Page 1 – permanent frog roles
@@ -2299,21 +2299,29 @@ function setBuffGuidePage(pageIndex) {
 <b>🐸 Permanent frog roles</b><br><br>
 🏅 <b>Champion</b> – that frog's hop cycle is ~<span style="color:${neon};">${fasterPercentFromFactor(champSpeedFact, 0.85)}</span> faster and jumps <span style="color:${neon};">${multFromFactor(champJumpFact, 1.25)}</span> higher.<br>
 🌈 <b>Aura</b> – nearby frogs get faster + higher jumps in a <span style="color:${neon};">${auraRadiusPx}</span>px radius (jump <span style="color:${neon};">${multFromFactor(auraJumpFact, 1.15)}</span>).<br>
-🛡️ <b>Perma shield</b> – survives <span style="color:${neon};">1</span> snake hit, then shield breaks.<br>
+🛡️ <b>Perma shield</b> – snake can't eat this frog while the shield is fresh. After about <span style="color:${neon};">40s</span> or if it's the <i>last</i> frog left, the shield breaks and it can die normally.<br>
 🧲 <b>Magnet</b> – orbs within ~<span style="color:${neon};">220px</span> home in on this frog.<br>
 🍀 <b>Lucky</b> – buffs last <span style="color:${neon};">${multFromFactor(luckyDurBoost, 1.4)}</span> longer, spawns more frogs, and each Lucky frog adds <span style="color:${neon};">${percentFromBonus(luckyScorePer, 0.10)}</span> score rate.<br>
-🧟 <b>Zombie</b> – on death: spawn <span style="color:${neon};">5</span> frogs and slow the snake.
+🧟 <b>Zombie</b> – on death: spawn a small frog burst and slow the snake. Zombies keep their role if they respawn (but special epic bonuses may fall off).<br>
+☠️🍖 <b>Cannibal</b> – a brutal frog that can eat other frogs in its way. While a cannibal is alive, each one adds <span style="color:${neon};">+5%</span> global deathrattle chance, and if it respawns it stays a cannibal.
 `,
     // Page 2 – global upgrades + epic/legendary
     `
-<b>🏗️ Global upgrades</b><br><br>
+<b>🏗️ Global upgrades & events</b><br><br>
 ⏩ <b>Frogs hop faster forever</b> – each pick makes hops ~<span style="color:${neon};">${percentFromBonus(1 - frogSpeedUp, 0.1)}</span> faster (stacks).<br>
 🦘⬆️ <b>Frogs jump higher forever</b> – each pick adds ~<span style="color:${neon};">${percentFromBonus(frogJumpUp - 1, 0.25)}</span> jump height (stacks).<br>
 🐸💥 <b>Spawn ${NORMAL_SPAWN_AMOUNT}/${EPIC_SPAWN_AMOUNT}/${LEGENDARY_SPAWN_AMOUNT} frogs</b> – instant extra frogs from normal / epic / legendary choices.<br>
 ⏳ <b>Buffs last longer</b> – each pick multiplies durations by <span style="color:${neon};">${multFromFactor(buffDurUp, 1.15)}</span> (stacks).<br>
-🎯 <b>More orbs</b> – orbs spawn faster every time you pick this (interval factor <span style="color:${neon};">${multFromFactor(orbIntervalUp, 0.85)}</span> per pick).<br>
-💀 <b>Deathrattle</b> – epic: <span style="color:${neon};">${percentFromBonus(epicDeathChance, 0.25)}</span> respawn on death; legendary: <span style="color:${neon};">${percentFromBonus(legDeathChance, 0.50)}</span> respawn.<br>
-💥 <b>Legendary Frenzy</b> – at <span style="color:${neon};">10 min</span>, pick a legendary and the snake turns red, gets <span style="color:${neon};">${percentFromBonus(frenzySpeedFact - 1, 0.25)}</span> speed, and frogs panic-hop for <span style="color:${neon};">${secFromConst(frenzyDur, 13)}</span>.
+🎯 <b>More orbs</b> – orbs spawn faster every time you pick this (interval factor ~<span style="color:${neon};">${multFromFactor(orbIntervalUp, 0.85)}</span> per pick).<br>
+💀 <b>Deathrattle</b> – normal/epic picks raise base respawn chance (epic ~<span style="color:${neon};">${percentFromBonus(epicDeathChance, 0.25)}</span>, legendary ~<span style="color:${neon};">${percentFromBonus(legDeathChance, 0.50)}</span>). Cannibals add another <span style="color:${neon};">+5%</span> each, and Lifeline temporarily pushes it to 100%.<br><br>
+
+<b>✨ Epic upgrades (every few minutes)</b><br>
+At 3-minute marks you first choose a normal upgrade, then an <b>EPIC</b> one:<br>
+🩸 <b>Cannibal Frog</b> – spawns a special cannibal frog (bones sprite) that boosts global deathrattle while it lives and keeps its role on respawn.<br>
+🧟‍♂️ <b>Zombie Horde</b> – summons three zombie frogs with a huge one-time deathrattle bonus; when they respawn they stay zombies but lose the extra 50% bonus.<br>
+🎲 <b>Random roles</b> – gives all frogs random permanent roles (Champion/Aura/Shield/Magnet/Lucky/Zombie/Cannibal).<br><br>
+
+💥 <b>Legendary Frenzy (10 min)</b> – at <span style="color:${neon};">10 min</span>, pick a legendary and the snake turns red, gets ~<span style="color:${neon};">${percentFromBonus(frenzySpeedFact - 1, 0.25)}</span> speed, and frogs panic-hop for about <span style="color:${neon};">${secFromConst(frenzyDur, 13)}</span>.
 `
   ];
 
@@ -2332,6 +2340,7 @@ function setBuffGuidePage(pageIndex) {
     buffGuideNextBtn.style.opacity = buffGuideNextBtn.disabled ? "0.5" : "1";
   }
 }
+
 
   function openBuffGuideOverlay() {
     ensureBuffGuideOverlay();
