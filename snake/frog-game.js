@@ -368,8 +368,19 @@
       ? oldSnake.head.y
       : height * 0.5;
 
-    // Decide how many segments the new snake should start with.
-    const newSegCount = Math.max(SNAKE_INITIAL_SEGMENTS, oldSegmentEls.length || SNAKE_INITIAL_SEGMENTS);
+    // Decide how many segments the new snake should start with:
+    // - 1/4 of the old snake's length
+    // - minimum SNAKE_INITIAL_SEGMENTS
+    // - maximum 50 segments
+    const oldCountRaw = oldSegmentEls.length || SNAKE_INITIAL_SEGMENTS;
+    let newSegCount = Math.round(oldCountRaw / 4);
+
+    if (newSegCount < SNAKE_INITIAL_SEGMENTS) {
+      newSegCount = SNAKE_INITIAL_SEGMENTS;
+    }
+    if (newSegCount > 50) {
+      newSegCount = 50;
+    }
 
     // Create new head
     const headEl = document.createElement("div");
