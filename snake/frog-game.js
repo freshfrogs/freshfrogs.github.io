@@ -177,16 +177,18 @@
   // 10-minute legendary choice
   const LEGENDARY_EVENT_TIME = 600; // 10 minutes
 
-  // Snake sheds
-  const FIRST_SHED_TIME  = 300; // 5 minutes
-  const SECOND_SHED_TIME = 600; // 10 minutes
+  // Snake shedding every 5 minutes
+  const SHED_INTERVAL = 300; // 5 minutes
 
   let legendaryEventTriggered = false;
-  let firstShedTriggered      = false;
-  let secondShedTriggered     = false;
 
-  // 0 = base, 1 = first shed, 2 = second shed
-  let snakeShedStage          = 0;
+  // Shed state
+  let snakeShedStage   = 0;          // 0 = base, 1 = yellow, 2 = orange, 3+ = red
+  let snakeShedCount   = 0;          // how many times we've shed this run
+  let nextShedTime     = SHED_INTERVAL;
+
+  // Old snakes that are despawning chunk-by-chunk
+  let dyingSnakes = [];
 
     let speedBuffTime   = 0;
   let jumpBuffTime    = 0;
@@ -331,41 +333,124 @@
   // HELPERS
   // --------------------------------------------------
 
-function snakeShed(stage, speedMultiplier) {
-  if (!snake) return;
+  function snakeShed(stage) {
+    if (!snake) return;
 
-  snakeShedStage = stage;
+    // Capture the old snake so we can despawn it over time.
+    const oldSnake = snake;
+    const oldHeadEl = oldSnake.head && oldSnake.head.el ? oldSnake.head.el : null;
+    const oldSegmentEls = Array.isArray(oldSnake.segments)
+      ? oldSnake.segments.map(seg => seg.el).filter(Boolean)
+      : [];
 
-  // 1) Cut body length in half (keep at least 3 segments)
-  const segs = snake.segments;
-  const desiredCount = Math.max(3, Math.ceil(segs.length / 2));
-
-  while (segs.length > desiredCount) {
-    const seg = segs.pop();
-    if (seg && seg.el && seg.el.parentNode === container) {
-      container.removeChild(seg.el);
+    if (oldHeadEl || oldSegmentEls.length) {
+      dyingSnakes.push({
+        headEl: oldHeadEl,
+        segmentEls: oldSegmentEls,
+        nextDespawnTime: 0.08   // seconds between chunks disappearing
+      });
     }
-  }
 
-  // Ensure last segment is tail sprite, others are body
-  if (segs.length > 0) {
-    for (let i = 0; i < segs.length; i++) {
-      const segEl = segs[i].el;
-      if (!segEl) continue;
-      const isTail = (i === segs.length - 1);
+    // Permanent +20% speed each shed.
+    snakePermanentSpeedFactor *= 1.20;
+
+    // Decide new color stage (1 = yellow, 2 = orange, 3+ = red).
+    snakeShedStage = stage;
+
+    // Spawn the new snake roughly where the old head was.
+    const width  = window.innerWidth;
+    const height = window.innerHeight;
+
+    const startX = (oldSnake.head && typeof oldSnake.head.x === "number")
+      ? oldSnake.head.x
+      : width * 0.15;
+    const startY = (oldSnake.head && typeof oldSnake.head.y === "number")
+      ? oldSnake.head.y
+      : height * 0.5;
+
+    // Decide how many segments the new snake should start with.
+    const newSegCount = Math.max(SNAKE_INITIAL_SEGMENTS, oldSegmentEls.length || SNAKE_INITIAL_SEGMENTS);
+
+    // Create new head
+    const headEl = document.createElement("div");
+    headEl.className = "snake-head";
+    headEl.style.position = "absolute";
+    headEl.style.width = SNAKE_SEGMENT_SIZE + "px";
+    headEl.style.height = SNAKE_SEGMENT_SIZE + "px";
+    headEl.style.imageRendering = "pixelated";
+    headEl.style.backgroundSize = "contain";
+    headEl.style.backgroundRepeat = "no-repeat";
+    headEl.style.pointerEvents = "none";
+    headEl.style.zIndex = "30";
+    headEl.style.backgroundImage = "url(/snake/head.png)";
+    container.appendChild(headEl);
+
+    // Create new segments
+    const segments = [];
+    for (let i = 0; i < newSegCount; i++) {
+      const segEl = document.createElement("div");
+      const isTail = i === newSegCount - 1;
+      segEl.className = isTail ? "snake-tail" : "snake-body";
+      segEl.style.position = "absolute";
+      segEl.style.width = SNAKE_SEGMENT_SIZE + "px";
+      segEl.style.height = SNAKE_SEGMENT_SIZE + "px";
+      segEl.style.imageRendering = "pixelated";
+      segEl.style.backgroundSize = "contain";
+      segEl.style.backgroundRepeat = "no-repeat";
+      segEl.style.pointerEvents = "none";
+      segEl.style.zIndex = "29";
       segEl.style.backgroundImage = isTail
         ? "url(/snake/tail.png)"
         : "url(/snake/body.png)";
+      container.appendChild(segEl);
+
+      segments.push({ el: segEl, x: startX, y: startY });
     }
+
+    // New path for the new snake
+    const path = [];
+    const maxPath = (segments.length + 2) * SNAKE_SEGMENT_GAP + 2;
+    for (let i = 0; i < maxPath; i++) {
+      path.push({ x: startX, y: startY });
+    }
+
+    // Replace global snake reference with the new snake
+    snake = {
+      head: { el: headEl, x: startX, y: startY, angle: 0 },
+      segments,
+      path,
+      isFrenzyVisual: false
+    };
+
+    // Apply the appropriate color tint for this shed stage
+    applySnakeAppearance();
   }
 
-  // 2) Permanently increase snake speed
-  snakePermanentSpeedFactor *= speedMultiplier;
+    function updateDyingSnakes(dt) {
+    for (let i = dyingSnakes.length - 1; i >= 0; i--) {
+      const ds = dyingSnakes[i];
+      ds.nextDespawnTime -= dt;
 
-  // 3) Update color based on new stage
-  applySnakeAppearance();
-}
+      if (ds.nextDespawnTime <= 0) {
+        ds.nextDespawnTime = 0.08;
 
+        if (ds.segmentEls.length > 0) {
+          const segEl = ds.segmentEls.pop();
+          if (segEl && segEl.parentNode === container) {
+            container.removeChild(segEl);
+          }
+        } else if (ds.headEl) {
+          if (ds.headEl.parentNode === container) {
+            container.removeChild(ds.headEl);
+          }
+          ds.headEl = null;
+        } else {
+          // fully gone
+          dyingSnakes.splice(i, 1);
+        }
+      }
+    }
+  }
 
   function randInt(min, maxInclusive) {
     return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
@@ -1044,14 +1129,20 @@ function applyBuff(type, frog) {
 
     let filter = "";
 
-    // Base color per shed stage
-    // (tweak these filters or swap to new PNGs later if you want)
+    // Base color per shed stage:
+    // 0: default
+    // 1: yellow
+    // 2: orange
+    // 3+: red
     if (snakeShedStage === 1) {
-      // 1st shed: aqua/teal-ish
-      filter = "hue-rotate(80deg) saturate(1.4)";
+      // yellow-ish
+      filter = "hue-rotate(-40deg) saturate(1.6) brightness(1.1)";
     } else if (snakeShedStage === 2) {
-      // 2nd shed: purple-ish
-      filter = "hue-rotate(150deg) saturate(1.6)";
+      // orange-ish
+      filter = "hue-rotate(-20deg) saturate(1.7) brightness(1.05)";
+    } else if (snakeShedStage >= 3) {
+      // red-ish
+      filter = "hue-rotate(-60deg) saturate(1.8)";
     }
 
     // Legendary Frenzy overlay (red tint)
@@ -1063,6 +1154,7 @@ function applyBuff(type, frog) {
       el.style.filter = filter;
     }
   }
+
 
   function setSnakeFrenzyVisual(active) {
     if (!snake) return;
@@ -2665,14 +2757,17 @@ function populateUpgradeOverlayChoices(mode) {
 
     // Reset upgrade timing
     // Reset upgrade timing / sheds
+    // Reset upgrade timing / sheds
     initialUpgradeDone       = false;
     nextPermanentChoiceTime  = 60;
     nextEpicChoiceTime       = 180;
-    legendaryEventTriggered = false;
-    firstShedTriggered      = false;
-    secondShedTriggered     = false;
-    snakeShedStage          = 0;
-    firstTimedNormalChoiceDone  = false;
+    legendaryEventTriggered  = false;
+
+    snakeShedStage           = 0;
+    snakeShedCount           = 0;
+    nextShedTime             = SHED_INTERVAL;
+    dyingSnakes              = [];
+
 
     // Reset all temporary buff timers
     speedBuffTime   = 0;
@@ -2743,23 +2838,17 @@ function populateUpgradeOverlayChoices(mode) {
     if (!gameOver) {
       if (!gamePaused) {
         elapsedTime += dt;
-
-        // inside: if (!gameOver && !gamePaused) { elapsedTime += dt; ... }
-
         //
-        // 1) Snake sheds are purely time-based
+        // 1) Snake sheds every 5 minutes
         //
-        if (!firstShedTriggered && elapsedTime >= FIRST_SHED_TIME) {
-          firstShedTriggered = true;
-          // 🐍 First shed at 5 minutes: half body, new color, +17% speed
-          snakeShed(1, 1.17);
+        if (elapsedTime >= nextShedTime) {
+          snakeShedCount += 1;
+          // Stage 1 = yellow, 2 = orange, 3+ = red
+          const stage = Math.min(snakeShedCount, 3);
+          snakeShed(stage);
+          nextShedTime += SHED_INTERVAL;
         }
 
-        if (!secondShedTriggered && elapsedTime >= SECOND_SHED_TIME) {
-          secondShedTriggered = true;
-          // 🐍 Second shed at 10 minutes: half body again, new color, +20% speed
-          snakeShed(2, 1.20);
-        }
 
         //
         // 2) Upgrade menus (legendary / epic / normal)
@@ -2784,6 +2873,7 @@ function populateUpgradeOverlayChoices(mode) {
           updateFrogs(dt, width, height);
           updateSnake(dt * slowFactor, width, height);
           updateOrbs(dt * slowFactor);
+          updateDyingSnakes(dt);
 
           let scoreFactor = scoreMultiTime > 0 ? 2 : 1;
           scoreFactor *= getLuckyScoreBonusFactor();
