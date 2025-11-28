@@ -2359,137 +2359,137 @@ function openHowToOverlay() {
     }
   }
 
-function ensureInfoOverlay() {
-  if (infoOverlay) return;
-
-  infoOverlay = document.createElement("div");
-  infoOverlay.className = "frog-info-overlay";
-  infoOverlay.style.position = "absolute";
-  infoOverlay.style.inset = "0";
-  infoOverlay.style.background = "rgba(0,0,0,0.75)";
-  infoOverlay.style.display = "none";
-  infoOverlay.style.zIndex = "180";
-  infoOverlay.style.alignItems = "center";
-  infoOverlay.style.justifyContent = "center";
-  infoOverlay.style.pointerEvents = "auto";
-
-  const panel = document.createElement("div");
-  panel.style.background = "#111";
-  panel.style.padding = "16px 20px 12px 20px";
-  panel.style.borderRadius = "10px";
-  panel.style.border = "1px solid #444";
-  panel.style.color = "#fff";
-  panel.style.fontFamily = "monospace";
-  panel.style.textAlign = "left";
-  panel.style.minWidth = "260px";
-  panel.style.maxWidth = "480px";
-  panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
-
-  // Header row
-  const headerRow = document.createElement("div");
-  headerRow.style.display = "flex";
-  headerRow.style.justifyContent = "space-between";
-  headerRow.style.alignItems = "center";
-  headerRow.style.marginBottom = "6px";
-
-  const title = document.createElement("div");
-  title.textContent = "escape the snake 🐍 – info";
-  title.style.fontSize = "14px";
-  title.style.fontWeight = "bold";
-
-  const pageLabel = document.createElement("div");
-  pageLabel.style.fontSize = "11px";
-  pageLabel.style.opacity = "0.8";
-  infoPageLabel = pageLabel;
-
-  headerRow.appendChild(title);
-  headerRow.appendChild(pageLabel);
-
-  const content = document.createElement("div");
-  content.style.fontSize = "13px";
-  content.style.marginTop = "4px";
-  content.style.lineHeight = "1.4";
-  infoContentEl = content;
-
-  // Footer nav row
-  const navRow = document.createElement("div");
-  navRow.style.display = "flex";
-  navRow.style.justifyContent = "space-between";
-  navRow.style.alignItems = "center";
-  navRow.style.marginTop = "10px";
-
-  const leftBtns = document.createElement("div");
-  leftBtns.style.display = "flex";
-  leftBtns.style.gap = "6px";
-
-  const prevBtn = document.createElement("button");
-  prevBtn.textContent = "◀ Prev";
-  prevBtn.style.fontFamily = "monospace";
-  prevBtn.style.fontSize = "12px";
-  prevBtn.style.padding = "4px 8px";
-  prevBtn.style.borderRadius = "6px";
-  prevBtn.style.border = "1px solid #555";
-  prevBtn.style.background = "#222";
-  prevBtn.style.color = "#fff";
-  prevBtn.style.cursor = "pointer";
-  prevBtn.onmouseenter = () => { prevBtn.style.background = "#333"; };
-  prevBtn.onmouseleave = () => { prevBtn.style.background = "#222"; };
-  prevBtn.onclick = () => setInfoPage(infoPage - 1);
-  infoPrevBtn = prevBtn;
-
-  const nextBtn = document.createElement("button");
-  nextBtn.textContent = "Next ▶";
-  nextBtn.style.fontFamily = "monospace";
-  nextBtn.style.fontSize = "12px";
-  nextBtn.style.padding = "4px 8px";
-  nextBtn.style.borderRadius = "6px";
-  nextBtn.style.border = "1px solid #555";
-  nextBtn.style.background = "#222";
-  nextBtn.style.color = "#fff";
-  nextBtn.style.cursor = "pointer";
-  nextBtn.onmouseenter = () => { nextBtn.style.background = "#333"; };
-  nextBtn.onmouseleave = () => { nextBtn.style.background = "#222"; };
-  nextBtn.onclick = () => setInfoPage(infoPage + 1);
-  infoNextBtn = nextBtn;
-
-  leftBtns.appendChild(prevBtn);
-  leftBtns.appendChild(nextBtn);
-
-  const closeBtn = document.createElement("button");
-  closeBtn.textContent = "Close ×";
-  closeBtn.style.fontFamily = "monospace";
-  closeBtn.style.fontSize = "12px";
-  closeBtn.style.padding = "4px 8px";
-  closeBtn.style.borderRadius = "6px";
-  closeBtn.style.border = "1px solid #555";
-  closeBtn.style.background = "#222";
-  closeBtn.style.color = "#fff";
-  closeBtn.style.cursor = "pointer";
-  closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
-  closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
-  closeBtn.onclick = () => closeInfoOverlay();
-
-  navRow.appendChild(leftBtns);
-  navRow.appendChild(closeBtn);
-
-  panel.appendChild(headerRow);
-  panel.appendChild(content);
-  panel.appendChild(navRow);
-
-  infoOverlay.appendChild(panel);
-  container.appendChild(infoOverlay);
-
-  // clicking dark background closes the panel
-  infoOverlay.addEventListener("click", (e) => {
-    if (e.target === infoOverlay) {
-      closeInfoOverlay();
-    }
-  });
-
-  // start on page 0 (leaderboard)
-  setInfoPage(0);
-}
-
+  function ensureInfoOverlay() {
+    if (infoOverlay) return;
+  
+    infoOverlay = document.createElement("div");
+    infoOverlay.className = "frog-info-overlay";
+  
+    infoOverlay.style.position = "fixed";   // 🔥 fixed on viewport
+    infoOverlay.style.inset = "0";
+    infoOverlay.style.background = "rgba(0,0,0,0.75)";
+    infoOverlay.style.display = "none";
+    infoOverlay.style.zIndex = "180";
+    infoOverlay.style.alignItems = "center";
+    infoOverlay.style.justifyContent = "center";
+    infoOverlay.style.pointerEvents = "auto";
+  
+    const panel = document.createElement("div");
+    panel.style.background = "#111";
+    panel.style.padding = "16px 20px 12px 20px";
+    panel.style.borderRadius = "10px";
+    panel.style.border = "1px solid #444";
+    panel.style.color = "#fff";
+    panel.style.fontFamily = "monospace";
+    panel.style.textAlign = "left";
+    panel.style.minWidth = "260px";
+    panel.style.maxWidth = "480px";
+    panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
+  
+    const headerRow = document.createElement("div");
+    headerRow.style.display = "flex";
+    headerRow.style.justifyContent = "space-between";
+    headerRow.style.alignItems = "center";
+    headerRow.style.marginBottom = "6px";
+  
+    const title = document.createElement("div");
+    title.textContent = "escape the snake 🐍 – info";
+    title.style.fontSize = "14px";
+    title.style.fontWeight = "bold";
+  
+    const pageLabel = document.createElement("div");
+    pageLabel.style.fontSize = "11px";
+    pageLabel.style.opacity = "0.8";
+    infoPageLabel = pageLabel;
+  
+    headerRow.appendChild(title);
+    headerRow.appendChild(pageLabel);
+  
+    const content = document.createElement("div");
+    content.style.fontSize = "13px";
+    content.style.marginTop = "4px";
+    content.style.lineHeight = "1.4";
+    infoContentEl = content;
+  
+    const navRow = document.createElement("div");
+    navRow.style.display = "flex";
+    navRow.style.justifyContent = "space-between";
+    navRow.style.alignItems = "center";
+    navRow.style.marginTop = "10px";
+  
+    const leftBtns = document.createElement("div");
+    leftBtns.style.display = "flex";
+    leftBtns.style.gap = "6px";
+  
+    const prevBtn = document.createElement("button");
+    prevBtn.textContent = "◀ Prev";
+    prevBtn.style.fontFamily = "monospace";
+    prevBtn.style.fontSize = "12px";
+    prevBtn.style.padding = "4px 8px";
+    prevBtn.style.borderRadius = "6px";
+    prevBtn.style.border = "1px solid #555";
+    prevBtn.style.background = "#222";
+    prevBtn.style.color = "#fff";
+    prevBtn.style.cursor = "pointer";
+    prevBtn.onmouseenter = () => { prevBtn.style.background = "#333"; };
+    prevBtn.onmouseleave = () => { prevBtn.style.background = "#222"; };
+    prevBtn.onclick = () => setInfoPage(infoPage - 1);
+    infoPrevBtn = prevBtn;
+  
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "Next ▶";
+    nextBtn.style.fontFamily = "monospace";
+    nextBtn.style.fontSize = "12px";
+    nextBtn.style.padding = "4px 8px";
+    nextBtn.style.borderRadius = "6px";
+    nextBtn.style.border = "1px solid #555";
+    nextBtn.style.background = "#222";
+    nextBtn.style.color = "#fff";
+    nextBtn.style.cursor = "pointer";
+    nextBtn.onmouseenter = () => { nextBtn.style.background = "#333"; };
+    nextBtn.onmouseleave = () => { nextBtn.style.background = "#222"; };
+    nextBtn.onclick = () => setInfoPage(infoPage + 1);
+    infoNextBtn = nextBtn;
+  
+    leftBtns.appendChild(prevBtn);
+    leftBtns.appendChild(nextBtn);
+  
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = "Close ×";
+    closeBtn.style.fontFamily = "monospace";
+    closeBtn.style.fontSize = "12px";
+    closeBtn.style.padding = "4px 8px";
+    closeBtn.style.borderRadius = "6px";
+    closeBtn.style.border = "1px solid #555";
+    closeBtn.style.background = "#222";
+    closeBtn.style.color = "#fff";
+    closeBtn.style.cursor = "pointer";
+    closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
+    closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
+    closeBtn.onclick = () => closeInfoOverlay();
+  
+    navRow.appendChild(leftBtns);
+    navRow.appendChild(closeBtn);
+  
+    panel.appendChild(headerRow);
+    panel.appendChild(content);
+    panel.appendChild(navRow);
+  
+    infoOverlay.appendChild(panel);
+  
+    // clicking dark background closes
+    infoOverlay.addEventListener("click", (e) => {
+      if (e.target === infoOverlay) {
+        closeInfoOverlay();
+      }
+    });
+  
+    // ⬇️ append to BODY, not #frog-game
+    (document.body || container).appendChild(infoOverlay);
+  
+    setInfoPage(0);
+  }
+  
 function setInfoPage(pageIndex) {
   if (!infoContentEl || !infoPageLabel) return;
   const neon = "#4defff";
@@ -2746,7 +2746,7 @@ function ensureBuffGuideOverlay() {
 
   buffGuideOverlay = document.createElement("div");
   buffGuideOverlay.className = "frog-buff-guide-overlay";
-  buffGuideOverlay.style.position = "absolute";
+  buffGuideOverlay.style.position = "fixed";   // 🔥
   buffGuideOverlay.style.inset = "0";
   buffGuideOverlay.style.background = "rgba(0,0,0,0.75)";
   buffGuideOverlay.style.display = "none";
@@ -2857,18 +2857,19 @@ function ensureBuffGuideOverlay() {
   panel.appendChild(navRow);
 
   buffGuideOverlay.appendChild(panel);
-  container.appendChild(buffGuideOverlay);
 
-  // clicking the dim background also closes it
   buffGuideOverlay.addEventListener("click", (e) => {
     if (e.target === buffGuideOverlay) {
       closeBuffGuideOverlay();
     }
   });
 
-  // start on page 0
+  // ⬇️ attach to BODY
+  (document.body || container).appendChild(buffGuideOverlay);
+
   setBuffGuidePage(0);
 }
+
 function setBuffGuidePage(pageIndex) {
   if (!buffGuideContentEl || !buffGuidePageLabel) return;
 
@@ -3022,19 +3023,19 @@ function setBuffGuidePage(pageIndex) {
 
   function ensureUpgradeOverlay() {
     if (upgradeOverlay) return;
-
+  
     upgradeOverlay = document.createElement("div");
     upgradeOverlay.className = "frog-upgrade-overlay";
-
-    upgradeOverlay.style.position = "absolute";
+  
+    upgradeOverlay.style.position = "fixed";   // 🔥 fixed on viewport
     upgradeOverlay.style.inset = "0";
     upgradeOverlay.style.background = "rgba(0,0,0,0.7)";
-    upgradeOverlay.style.display = "none"; // hidden by default
+    upgradeOverlay.style.display = "none";
     upgradeOverlay.style.zIndex = "150";
     upgradeOverlay.style.alignItems = "center";
     upgradeOverlay.style.justifyContent = "center";
     upgradeOverlay.style.pointerEvents = "auto";
-
+  
     const panel = document.createElement("div");
     panel.style.background = "#111";
     panel.style.padding = "16px 20px";
@@ -3046,26 +3047,28 @@ function setBuffGuidePage(pageIndex) {
     panel.style.minWidth = "260px";
     panel.style.maxWidth = "360px";
     panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
-
+  
     const title = document.createElement("div");
     title.textContent = "Choose an upgrade";
     title.style.marginBottom = "12px";
     title.style.fontSize = "14px";
     upgradeOverlayTitleEl = title;
-
+  
     const buttonsContainer = document.createElement("div");
     buttonsContainer.style.display = "flex";
     buttonsContainer.style.flexDirection = "column";
     buttonsContainer.style.gap = "8px";
     buttonsContainer.style.alignItems = "stretch";
-
     upgradeOverlayButtonsContainer = buttonsContainer;
-
+  
     panel.appendChild(title);
     panel.appendChild(buttonsContainer);
     upgradeOverlay.appendChild(panel);
-    container.appendChild(upgradeOverlay);
+  
+    // ⬇️ attach to BODY, not container
+    (document.body || container).appendChild(upgradeOverlay);
   }
+  
 
 function populateUpgradeOverlayChoices(mode) {
   ensureUpgradeOverlay();
