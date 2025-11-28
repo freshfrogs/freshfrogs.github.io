@@ -63,7 +63,7 @@
   const CLONE_SWARM_DURATION   = 1;
   const LIFE_STEAL_DURATION    = 20;
   // Permanent lifesteal upgrade: how many orbs it affects
-  const PERMA_LIFESTEAL_ORB_COUNT = 25;
+  const PERMA_LIFESTEAL_ORB_COUNT = 20;
 
   // How strong each buff is
   const SPEED_BUFF_FACTOR        = 0.85;  // frogs act 2× faster (0.5 = half their cycle)
