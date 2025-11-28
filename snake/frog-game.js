@@ -57,13 +57,13 @@
   const SNAKE_SHRINK_DURATION  = 7;
   const FROG_SHIELD_DURATION   = 7;
   const TIME_SLOW_DURATION     = 5;
-  const ORB_MAGNET_DURATION    = 7;
+  const ORB_MAGNET_DURATION    = 10;
   const SCORE_MULTI_DURATION   = 20;
   const PANIC_HOP_DURATION     = 5;
   const CLONE_SWARM_DURATION   = 1;
   const LIFE_STEAL_DURATION    = 20;
   // Permanent lifesteal upgrade: how many orbs it affects
-  const PERMA_LIFESTEAL_ORB_COUNT = 30;
+  const PERMA_LIFESTEAL_ORB_COUNT = 25;
 
   // How strong each buff is
   const SPEED_BUFF_FACTOR        = 0.85;  // frogs act 2× faster (0.5 = half their cycle)
