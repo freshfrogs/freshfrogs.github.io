@@ -1591,6 +1591,11 @@ function applyBuff(type, frog) {
           }
         }
 
+        // 🔹 Orb Collector: flat 20% chance any collected orb spawns +1 frog
+        if (orbCollectorActive && Math.random() < 0.20) {
+          spawnExtraFrogs(1);
+        }
+
         if (orb.el && orb.el.parentNode === container) {
           container.removeChild(orb.el);
         }
