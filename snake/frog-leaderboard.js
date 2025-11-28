@@ -85,7 +85,7 @@
 
     scoreboardOverlay = document.createElement("div");
     scoreboardOverlay.id = "frog-scoreboard-overlay";
-    scoreboardOverlay.style.position = "fixed";
+    scoreboardOverlay.style.position = "relative";
     scoreboardOverlay.style.inset = "0";
     scoreboardOverlay.style.background = "rgba(0,0,0,0.65)";
     scoreboardOverlay.style.display = "none";
