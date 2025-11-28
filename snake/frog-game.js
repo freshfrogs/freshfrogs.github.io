@@ -199,7 +199,8 @@
   let infoPrevBtn = null;
   let infoNextBtn = null;
   let infoLeaderboardData = [];
-
+  // After showing the info/readme at the start, open the first common upgrade
+  let pendingInitialUpgradeAfterInfo = false;
 
   // Shed state
   let snakeShedStage   = 0;          // 0 = base, 1 = yellow, 2 = orange, 3+ = red
@@ -2667,12 +2668,14 @@ Synergize permanent upgrades, frog roles, and epic choices to keep the swarm ali
 
 function openInfoOverlay(startPage) {
   ensureInfoOverlay();
-  gamePaused = true;
+  gamePaused = true; // pause game while info is open
+
   if (typeof startPage === "number") {
     setInfoPage(startPage);
   } else {
     setInfoPage(infoPage);
   }
+
   if (infoOverlay) {
     infoOverlay.style.display = "flex";
   }
@@ -2683,18 +2686,19 @@ function closeInfoOverlay() {
     infoOverlay.style.display = "none";
   }
 
-  // If this was the initial readme shown at the start of the run,
+  // If this was the initial readme shown at the very start of the run,
   // immediately open the first common upgrade instead of unpausing.
   if (pendingInitialUpgradeAfterInfo && !initialUpgradeDone) {
     pendingInitialUpgradeAfterInfo = false;
-    // Keep gamePaused = true here; openUpgradeOverlay will keep the game paused
-    // until the player picks their first buff.
+
+    // Keep the game effectively paused; the upgrade overlay also pauses.
     openUpgradeOverlay("normal");
   } else {
     // Normal case: just resume the game
     gamePaused = false;
   }
 }
+
 
 function ensureBuffGuideOverlay() {
   if (buffGuideOverlay) return;
@@ -3452,42 +3456,51 @@ function populateUpgradeOverlayChoices(mode) {
   // --------------------------------------------------
   // INIT
   // --------------------------------------------------
-async function startGame() {
-  initAudio();
-  initLeaderboard(container);
-  ensureUpgradeOverlay();
-  ensureInfoOverlay();  // unified info / readme panel
-
-  const topList = await fetchLeaderboard();
-  if (topList) {
-    updateMiniLeaderboard(topList);
-    infoLeaderboardData = topList;
-  } else {
-    infoLeaderboardData = [];
+  async function startGame() {
+    initAudio();
+    initLeaderboard(container);
+    ensureUpgradeOverlay();
+    ensureInfoOverlay();  // unified info / readme panel
+  
+    // Fetch leaderboard and show the usual match-summary overlay on load
+    const topList = await fetchLeaderboard();
+    if (topList) {
+      updateMiniLeaderboard(topList);
+      infoLeaderboardData = topList;
+  
+      // Same summary overlay used at end of match:
+      // (lastRunScore / lastRunTime will be 0 on very first visit)
+      openScoreboardOverlay(topList, lastRunScore, lastRunTime);
+    } else {
+      infoLeaderboardData = [];
+    }
+  
+    const width  = window.innerWidth;
+    const height = window.innerHeight;
+  
+    await createInitialFrogs(width, height);
+    initSnake(width, height);
+  
+    setNextOrbTime();
+    updateHUD();
+  
+    // After the player closes the summary overlay, we want:
+    //   Readme / How to Play  -> first common upgrade -> game start
+    if (!hasShownHowToOverlay) {
+      hasShownHowToOverlay = true;
+      pendingInitialUpgradeAfterInfo = true;
+  
+      // Open the info panel on the “How to Play” page (page 1),
+      // since they just saw the scoreboard-style summary.
+      openInfoOverlay(1);
+    } else {
+      // On later runs, skip straight to first common upgrade.
+      openUpgradeOverlay("normal");
+    }
+  
+    animId = requestAnimationFrame(drawFrame);
   }
-
-  const width  = window.innerWidth;
-  const height = window.innerHeight;
-
-  await createInitialFrogs(width, height);
-  initSnake(width, height);
-
-  setNextOrbTime();
-  updateHUD();
-
-  // On the very first run: show readme/info FIRST,
-  // then when the player closes it, we immediately open the first common upgrade.
-  if (!hasShownHowToOverlay) {
-    hasShownHowToOverlay = true;
-    pendingInitialUpgradeAfterInfo = true;
-    openInfoOverlay(0);   // Leaderboard / How to play pages
-  } else {
-    // On later runs, skip straight to the starting common upgrade
-    openUpgradeOverlay("normal");
-  }
-
-  animId = requestAnimationFrame(drawFrame);
-}
+  
 
   window.addEventListener("load", startGame);
 })();
