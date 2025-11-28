@@ -1543,7 +1543,7 @@ function getUpgradeChoices() {
           ⏩ Frogs hop faster forever<br>
           ~<span style="color:${neon};">10%</span> faster hop cycle
         `,
-        apply: () => { frogPermanentSpeedFactor *= 0.9; }
+        apply: () => { frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR; }
       },
       {
         id: "frogJump",
@@ -1551,7 +1551,7 @@ function getUpgradeChoices() {
           🦘⬆️ Frogs jump higher forever<br>
           ~<span style="color:${neon};">+25%</span> jump height
         `,
-        apply: () => { frogPermanentJumpFactor *= 1.25; }
+        apply: () => { frogPermanentJumpFactor *= FROG_JUMP_UPGRADE_FACTOR; }
       },
       {
         id: "spawn20",
@@ -1559,7 +1559,7 @@ function getUpgradeChoices() {
           🐸➕ Spawn frogs<br>
           <span style="color:${neon};">20</span> frogs right now
         `,
-        apply: () => { spawnExtraFrogs(20); }
+        apply: () => { spawnExtraFrogs(NORMAL_SPAWN_AMOUNT); }
       },
       {
         id: "buffDuration",
@@ -1567,7 +1567,7 @@ function getUpgradeChoices() {
           ⏳ Buffs last longer<br>
           +<span style="color:${neon};">15%</span> buff duration
         `,
-        apply: () => { buffDurationFactor *= 1.15; }
+        apply: () => { buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR; }
       },
       {
         id: "moreOrbs",
@@ -1575,7 +1575,7 @@ function getUpgradeChoices() {
           🎯 More orbs over time<br>
           ~<span style="color:${neon};">15%</span> faster orb spawns
         `,
-        apply: () => { orbSpawnIntervalFactor *= 0.85; }
+        apply: () => { orbSpawnIntervalFactor *= ORB_INTERVAL_UPGRADE_FACTOR; }
       },
       {
         id: "permaLifeSteal",
