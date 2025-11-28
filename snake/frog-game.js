@@ -39,12 +39,19 @@
     // --------------------------------------------------
   // SNAKE CONSTANTS
   // --------------------------------------------------
-  const SNAKE_SEGMENT_SIZE  = 64;
-  const SNAKE_BASE_SPEED    = 90;
-  const SNAKE_TURN_RATE     = Math.PI * 0.80;
-  const SNAKE_SEGMENT_GAP   = 32;
+  const SNAKE_SEGMENT_SIZE   = 64;
+  const SNAKE_BASE_SPEED     = 90;
+
+  // Base turn rate and cap
+  const SNAKE_TURN_RATE_BASE = Math.PI * 0.80;
+  const SNAKE_TURN_RATE_CAP  = Math.PI * 1.11;
+
+  // This is the value actually used in movement and scaled on each shed
+  let   snakeTurnRate        = SNAKE_TURN_RATE_BASE;
+
+  const SNAKE_SEGMENT_GAP    = 32;
   const SNAKE_INITIAL_SEGMENTS = 6;
-  const SNAKE_EAT_RADIUS_BASE = 40;
+
 
   // --------------------------------------------------
   // BUFFS
@@ -376,8 +383,13 @@
     }
     snakePermanentSpeedFactor *= speedMult;
 
+    // Turn radius: slightly tighter turns each shed (20% per shed, capped)
+    // NOTE: higher snakeTurnRate = sharper turns (tighter radius).
+    snakeTurnRate = Math.min(SNAKE_TURN_RATE_CAP, snakeTurnRate * 1.2);
+
     // Decide new color stage (1 = yellow, 2 = orange, 3+ = red).
     snakeShedStage = stage;
+
 
     // Spawn the new snake roughly where the old head was.
     const width  = window.innerWidth;
@@ -1876,7 +1888,7 @@ function updateSnake(dt, width, height) {
 
   let angleDiff =
     ((desiredAngle - head.angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
-  const maxTurn = SNAKE_TURN_RATE * dt;
+  const maxTurn = snakeTurnRate * dt;
   if (angleDiff > maxTurn) angleDiff = maxTurn;
   if (angleDiff < -maxTurn) angleDiff = -maxTurn;
   head.angle += angleDiff;
@@ -3227,6 +3239,21 @@ function populateUpgradeOverlayChoices(mode) {
       }
     }
     snake = null;
+    // Remove any old shed skins still fading out
+    for (const ds of dyingSnakes) {
+      if (ds.headEl && ds.headEl.parentNode === container) {
+        container.removeChild(ds.headEl);
+      }
+      if (Array.isArray(ds.segmentEls)) {
+        for (const el of ds.segmentEls) {
+          if (el && el.parentNode === container) {
+            container.removeChild(el);
+          }
+        }
+      }
+    }
+    dyingSnakes = [];
+
 
     // Reset game state
     elapsedTime     = 0;
@@ -3253,6 +3280,7 @@ function populateUpgradeOverlayChoices(mode) {
     snakeEggPending          = false;
     orbCollectorActive = false;
     lastStandActive = false;
+    snakeTurnRate            = SNAKE_TURN_RATE_BASE;
 
     // Reset all temporary buff timers
     speedBuffTime   = 0;
