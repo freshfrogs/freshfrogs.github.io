@@ -191,6 +191,7 @@
   let nextShedTime     = SHED_INTERVAL;
 
   let snakeEggPending = false; // EPIC: next shed uses reduced speed bonus
+  let epicChainPending = false;
 
   // Old snakes that are despawning chunk-by-chunk
   let dyingSnakes = [];
@@ -2859,23 +2860,28 @@ function populateUpgradeOverlayChoices(mode) {
     }
     gamePaused = false;
 
+    // --- schedule next timers based on what we just picked ---
     if (!initialUpgradeDone && currentUpgradeOverlayMode === "normal") {
-      // This was the "starting" upgrade
+      // First-ever normal upgrade at game start
       initialUpgradeDone = true;
-      nextPermanentChoiceTime = elapsedTime + 60; // first timed choice 60s after game actually starts
+      nextPermanentChoiceTime = elapsedTime + 60;
     } else {
       if (currentUpgradeOverlayMode === "normal") {
-        // normal per-minute upgrades
+        // Any regular normal upgrade (including the one that happens at epic marks)
         nextPermanentChoiceTime = elapsedTime + 60;
       } else if (currentUpgradeOverlayMode === "epic") {
-        // epic every 3 minutes; also schedule next normal in 60s
+        // Epic picked: next epic in 3 minutes
         nextEpicChoiceTime = elapsedTime + 180;
-        nextPermanentChoiceTime = elapsedTime + 60;
-      } else if (currentUpgradeOverlayMode === "legendary") {
-        nextPermanentChoiceTime = elapsedTime + 60;
-        // still do Frenzy, but NO shedding here anymore
-        triggerLegendaryFrenzy();
+        // NOTE: we do NOT touch nextPermanentChoiceTime here; it was already
+        // set when the normal half of the chain closed.
       }
+    }
+
+    // --- epic chain: if we hit an epic mark, go normal -> epic back-to-back ---
+    if (epicChainPending && currentUpgradeOverlayMode === "normal") {
+      epicChainPending = false;
+      // Immediately show the EPIC choices now that the player picked a normal one
+      openUpgradeOverlay("epic");
     }
   }
 
@@ -3053,31 +3059,28 @@ function populateUpgradeOverlayChoices(mode) {
           nextShedTime += SHED_INTERVAL;
         }
 
-
         //
-        // 2) Upgrade menus (legendary / epic / normal)
+        // 2) Upgrade menus (epic + normal)
         //
-        if (!legendaryEventTriggered && elapsedTime >= LEGENDARY_EVENT_TIME) {
-          // One-time 10-minute legendary menu
-          legendaryEventTriggered = true;
-          openUpgradeOverlay("legendary");
-        }
-        else if (elapsedTime >= nextEpicChoiceTime) {
-          openUpgradeOverlay("epic");
+        if (elapsedTime >= nextEpicChoiceTime) {
+          // At epic milestones: player picks a NORMAL upgrade first,
+          // then immediately an EPIC upgrade.
+          epicChainPending = true;
+          openUpgradeOverlay("normal");
         }
         else if (elapsedTime >= nextPermanentChoiceTime) {
+          // Regular 1-minute normal upgrades
           openUpgradeOverlay("normal");
         }
         else {
           // ... your normal update logic: buffs, frogs, snake, orbs, score, etc.
-                  updateBuffTimers(dt);
+          updateBuffTimers(dt);
 
           const slowFactor = timeSlowTime > 0 ? 0.4 : 1.0;
 
           updateFrogs(dt, width, height);
           updateSnake(dt * slowFactor, width, height);
           updateOrbs(dt * slowFactor);
-          updateDyingSnakes(dt);
 
           let scoreFactor = scoreMultiTime > 0 ? 2 : 1;
           scoreFactor *= getLuckyScoreBonusFactor();
