@@ -523,7 +523,7 @@ function snakeShed(stage, speedMultiplier) {
   const PERMA_LIFESTEAL_ORB_COUNT = 30;
 
   // How strong each buff is
-  const SPEED_BUFF_FACTOR        = 0.5;  // frogs act 2× faster (0.5 = half their cycle)
+  const SPEED_BUFF_FACTOR        = 0.8;  // frogs act 2× faster (0.5 = half their cycle)
   const PANIC_HOP_SPEED_FACTOR   = 0.6;  // panic hop speed factor
   const JUMP_BUFF_FACTOR         = 3.2;  // jump buff height multiplier
 
