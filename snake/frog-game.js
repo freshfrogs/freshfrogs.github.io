@@ -1533,62 +1533,44 @@ function applyBuff(type, frog) {
   let buffGuideNextBtn = null;
   let buffGuidePage = 0;
 
-function getUpgradeChoices() {
-    const neon = "#4defff";
+function getEpicUpgradeChoices() {
+  const neon = "#4defff";
+  const speedPct = Math.round((1 - FROG_SPEED_UPGRADE_FACTOR) * 100);
+  const deathPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
 
-    return [
-      {
-        id: "frogSpeed",
-        label: `
-          ⏩ Frogs hop faster forever<br>
-          ~<span style="color:${neon};">10%</span> faster hop cycle
-        `,
-        apply: () => { frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR; }
-      },
-      {
-        id: "frogJump",
-        label: `
-          🦘⬆️ Frogs jump higher forever<br>
-          ~<span style="color:${neon};">+25%</span> jump height
-        `,
-        apply: () => { frogPermanentJumpFactor *= FROG_JUMP_UPGRADE_FACTOR; }
-      },
-      {
-        id: "spawn20",
-        label: `
-          🐸➕ Spawn frogs<br>
-          <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
-        `,
-        apply: () => { spawnExtraFrogs(NORMAL_SPAWN_AMOUNT); }
-      },
-      {
-        id: "buffDuration",
-        label: `
-          ⏳ Buffs last longer<br>
-          +<span style="color:${neon};">15%</span> buff duration
-        `,
-        apply: () => { buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR; }
-      },
-      {
-        id: "moreOrbs",
-        label: `
-          🎯 More orbs over time<br>
-          ~<span style="color:${neon};">15%</span> faster orb spawns
-        `,
-        apply: () => { orbSpawnIntervalFactor *= ORB_INTERVAL_UPGRADE_FACTOR; }
-      },
-      {
-        id: "permaLifeSteal",
-        label: `
-          🩸 Lifesteal (upgrade)<br>
-          Next <span style="color:${neon};">${PERMA_LIFESTEAL_ORB_COUNT}</span> orbs also spawn frogs
-        `,
-        apply: () => {
-          permaLifeStealOrbsRemaining += PERMA_LIFESTEAL_ORB_COUNT;
-        }
+  return [
+    {
+      id: "epicSpawn50",
+      label: `
+        🐸🌊 EPIC frog wave<br>
+        Spawn <span style="color:${neon};">${EPIC_SPAWN_AMOUNT}</span> frogs now
+      `,
+      apply: () => {
+        spawnExtraFrogs(EPIC_SPAWN_AMOUNT);
       }
-    ];
-  }
+    },
+    {
+      id: "epicDeathRattle",
+      label: `
+        💀 EPIC deathrattle<br>
+        <span style="color:${neon};">${deathPct}%</span> chance a dead frog respawns
+      `,
+      apply: () => {
+        frogDeathRattleChance = Math.max(frogDeathRattleChance, EPIC_DEATHRATTLE_CHANCE);
+      }
+    },
+    {
+      id: "epicFrogSpeed",
+      label: `
+        ⏩⏩ EPIC frog speed<br>
+        Another <span style="color:${neon};">~${speedPct}%</span> faster forever
+      `,
+      apply: () => {
+        frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
+      }
+    }
+  ];
+}
 
   // EPIC choices every 3 minutes
 function getUpgradeChoices() {
