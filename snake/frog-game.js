@@ -2282,7 +2282,7 @@ function setBuffGuidePage(pageIndex) {
 🐸🌊 <b>Mega spawn</b> – spawn <span style="color:${neon};">15–25</span> frogs (+ bonus if Lucky).<br>
 💰 <b>Score x2</b> – score gain boosted by <span style="color:${neon};">${multFromFactor(scoreMultiFact, 2.0)}</span> for <span style="color:${neon};">${secFromConst(scoreDur, 10)}</span>.<br>
 😱 <b>Panic hop</b> – frogs hop faster but in random directions for <span style="color:${neon};">${secFromConst(panicDur, 8)}</span>.<br>
-🩸 <b>Lifeline</b> – for <span style="color:${neon};">${secFromConst(lifeStealDur, 12)}</span>, any frog that dies automatically respawns.
+🩸 <b>Lifeline</b> – for <span style="color:${neon};">${secFromConst(lifeStealDur, 12)}</span>, any frog that dies automatically respawns.<br>
 ⭐ <b>PermaFrog</b> – gives that frog a random permanent role.
 `,
     // Page 1 – permanent frog roles
