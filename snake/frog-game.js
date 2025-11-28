@@ -2450,148 +2450,13 @@ function setInfoPage(pageIndex) {
   if (!infoContentEl || !infoPageLabel) return;
   const neon = "#4defff";
 
-  const maxPage = 4; // 0..4: 5 total pages
+  const maxPage = 3; // 0..3 = 4 pages total
   infoPage = Math.max(0, Math.min(maxPage, pageIndex));
 
   let html = "";
-if (infoPage === 0) {
-  const neon = "#4defff";
-  html += "<b>🏆 Leaderboard</b><br><br>";
 
-  // --- Get current user tag from the same place as the match summary ---
-  let currentTag = null;
-  try {
-    const leaderMod = window.FrogGameLeaderboard || {};
-
-    // Prefer a helper from the leaderboard module, if it exists
-    if (typeof leaderMod.getCurrentUserTag === "function") {
-      currentTag = leaderMod.getCurrentUserTag() || null;
-    }
-
-    // Fallbacks: look in localStorage for whatever key the worker used
-    if (!currentTag && window.localStorage) {
-      currentTag =
-        localStorage.getItem("ff_user_tag") ||
-        localStorage.getItem("ffUserTag") ||
-        localStorage.getItem("ff_leaderboard_tag") ||
-        localStorage.getItem("ff_leaderboard_name") ||
-        null;
-    }
-  } catch (e) {
-    currentTag = null;
-  }
-
-  const list = Array.isArray(infoLeaderboardData) ? infoLeaderboardData : [];
-
-  // Small helper to HTML-escape tag strings
-  const esc = (str) => String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-
-  if (!list.length) {
-    html += "<div>No scores yet — be the first to escape the snake.</div>";
-  } else {
-    html += "<table style='width:100%; border-collapse:collapse; font-size:12px;'>";
-    html += "<tr>" +
-              "<th style='text-align:left;'>#</th>" +
-              "<th style='text-align:left;'>Tag</th>" +
-              "<th style='text-align:right;'>Score</th>" +
-              "<th style='text-align:right;'>Time</th>" +
-            "</tr>";
-
-    list.slice(0, 10).forEach((entry, i) => {
-      const rank = i + 1;
-
-      // Tag from server row
-      const rawTag =
-        entry.tag ||
-        entry.name ||
-        entry.userTag ||
-        `Player ${rank}`;
-      const safeTag = esc(rawTag);
-
-      // Score: prefer entry.score, fall back to bestScore
-      let numericScore = 0;
-      if (typeof entry.score === "number") {
-        numericScore = entry.score;
-      } else if (typeof entry.bestScore === "number") {
-        numericScore = entry.bestScore;
-      }
-      const scoreStr = Math.floor(Math.max(0, numericScore));
-
-      // Time: prefer entry.time, fall back to bestTime
-      let timeSecs = 0;
-      if (typeof entry.time === "number") {
-        timeSecs = entry.time;
-      } else if (typeof entry.bestTime === "number") {
-        timeSecs = entry.bestTime;
-      }
-      timeSecs = Math.max(0, timeSecs | 0);
-      const m = Math.floor(timeSecs / 60);
-      const s = timeSecs % 60;
-      const tStr = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-
-      // Highlight this row if it belongs to the current user
-      const isSelf =
-        entry.isSelf ||
-        entry.isYou ||
-        entry.isCurrentUser ||
-        (currentTag && rawTag === currentTag);
-
-      const tagHtml = isSelf
-        ? `<span style="
-              color:#ffe66b;
-              font-weight:bold;
-              text-shadow:0 0 6px rgba(255,255,0,0.9);
-           ">${safeTag}</span>`
-        : `<span style="color:${neon};">${safeTag}</span>`;
-
-      html += `
-        <tr>
-          <td>${rank}</td>
-          <td>${tagHtml}</td>
-          <td style="text-align:right;">${scoreStr}</td>
-          <td style="text-align:right;">${tStr}</td>
-        </tr>
-      `;
-    });
-
-    html += "</table>";
-  }
-
-  // --- Always show the user's current tag under the leaderboard ---
-  if (currentTag) {
-    html += `
-      <div style="margin-top:8px; font-size:11px;">
-        Current tag:
-        <span style="
-          color:#ffe66b;
-          font-weight:bold;
-          text-shadow:0 0 6px rgba(255,255,0,0.9);
-        ">
-          ${esc(currentTag)}
-        </span>
-      </div>
-    `;
-  } else {
-    html += `
-      <div style="margin-top:8px; font-size:11px; opacity:0.8;">
-        Current tag: <span style="color:${neon};">not set</span>
-      </div>
-    `;
-  }
-
-  html += `
-    <div style="margin-top:4px; font-size:11px; opacity:0.75;">
-      Beat your own best score to update your entry.
-    </div>
-  `;
-}
- else if (infoPage === 1) {
-    // PAGE 1 – How to Play
+  if (infoPage === 0) {
+    // PAGE 0 – How to Play
     html = `
 <b>🐍 How to Play</b><br><br>
 • Avoid the snake and keep the frogs alive as long as possible.<br>
@@ -2602,8 +2467,8 @@ if (infoPage === 0) {
 • Every 5 minutes the snake sheds, gets stronger, and changes color.<br>
 • Your run ends when <span style="color:${neon};">all frogs are gone</span>.
 `;
-  } else if (infoPage === 2) {
-    // PAGE 2 – Orb buffs
+  } else if (infoPage === 1) {
+    // PAGE 1 – Orb buffs
     html = `
 <b>🟢 Orb Buffs</b><br><br>
 ⚡ <b>Speed</b> – frogs act faster for a short time (stacks with upgrades).<br>
@@ -2621,21 +2486,22 @@ if (infoPage === 0) {
 🩺 <b>Lifeline</b> – frogs that die during the buff have a chance to instantly respawn.<br>
 ⭐ <b>PermaFrog</b> – upgrades one frog with a permanent role (Champion, Aura, Magnet, Lucky, Zombie, etc.).
 `;
-  } else if (infoPage === 3) {
-    // PAGE 3 – Permanent frog roles (no shield frog)
+  } else if (infoPage === 2) {
+    // PAGE 2 – Permanent frog roles
     html = `
 <b>🐸 Permanent Frog Roles</b><br><br>
 🏅 <b>Champion</b> – that frog's hop cycle is faster and jumps are higher.<br>
 🌈 <b>Aura</b> – nearby frogs get bonus speed and jump height in a radius around this frog.<br>
 🧲 <b>Magnet</b> – orbs in a radius are strongly pulled toward this frog.<br>
 🍀 <b>Lucky</b> – buffs last longer, more frogs spawn from some effects, and score gain is boosted slightly per Lucky frog.<br>
-🧟 <b>Zombie</b> – when this frog dies, it causes extra chaos (like extra frogs and snake debuffs).<br><br>
+🧟 <b>Zombie</b> – when this frog dies, it causes extra chaos (like extra frogs and snake debuffs).<br>
+💀 <b>Cannibal</b> – hunts nearby frogs; sometimes “spares” a victim and grants it a random permanent role instead of killing it.<br><br>
 Perma roles stack with global upgrades and orb buffs, making some frogs into mini “heroes” of the swarm.
 `;
-  } else if (infoPage === 4) {
-    // PAGE 4 – Global upgrades (common + epic; no shield frog, no legendary)
+  } else if (infoPage === 3) {
+    // PAGE 3 – Global upgrades & sheds
     html = `
-<b>🏗️ Global Upgrades</b><br><br>
+<b>🏗️ Global Upgrades & Sheds</b><br><br>
 ⏩ <b>Frogs hop faster forever</b> – reduces the hop cycle, making the whole swarm act more often.<br>
 🦘⬆️ <b>Frogs jump higher forever</b> – increases base jump height for all frogs.<br>
 🐸💥 <b>Spawn frogs</b> – instant injections of ${NORMAL_SPAWN_AMOUNT}/${EPIC_SPAWN_AMOUNT} frogs from common / epic menus.<br>
@@ -2646,13 +2512,13 @@ Perma roles stack with global upgrades and orb buffs, making some frogs into min
 🌌 <b>Orb Collector</b> – every collected orb has a flat chance to spawn an extra frog (one-time pick).<br>
 🧟‍♂️ <b>Zombie Horde (epic)</b> – summons special zombie frogs with boosted deathrattle while they last.<br>
 🍖 <b>Cannibal Frog (epic)</b> – spawns a cannibal frog that eats nearby frogs and buffs global deathrattle while alive.<br>
-💫 <b>Orb Storm / Snake Egg (epic)</b> – high-impact utilities that affect orb spawns or the next snake after a shed.<br><br>
-Synergize permanent upgrades, frog roles, and epic choices to keep the swarm alive deep into later sheds.
+🌩️ <b>Orb Storm / Snake Egg (epic)</b> – high-impact utilities that affect orb spawns or the next snake after a shed.<br>
+🔥 <b>Snake sheds</b> – every 5 minutes the snake sheds, gains permanent speed, and respawns shorter and deadlier.
 `;
   }
 
   infoContentEl.innerHTML = html;
-  infoPageLabel.textContent = `Page ${infoPage + 1} / 5`;
+  infoPageLabel.textContent = `Page ${infoPage + 1} / ${maxPage + 1}`;
 
   if (infoPrevBtn) {
     infoPrevBtn.disabled = (infoPage === 0);
@@ -2663,7 +2529,6 @@ Synergize permanent upgrades, frog roles, and epic choices to keep the swarm ali
     infoNextBtn.style.opacity = infoNextBtn.disabled ? "0.5" : "1";
   }
 }
-
 
 function openInfoOverlay(startPage) {
   ensureInfoOverlay();
@@ -3453,6 +3318,7 @@ async function startGame() {
   ensureUpgradeOverlay();
   ensureInfoOverlay();  // unified info panel
 
+  // Get leaderboard for the mini HUD + summary overlay
   const topList = await fetchLeaderboard();
   if (topList) {
     updateMiniLeaderboard(topList);
@@ -3470,11 +3336,26 @@ async function startGame() {
   setNextOrbTime();
   updateHUD();
 
-  // Show unified info panel once at the start of a fresh run
+  // On first visit: show the match-summary style overlay,
+  // AND open the common-upgrade panel for the start of the run.
   if (!hasShownHowToOverlay) {
     hasShownHowToOverlay = true;
-    openInfoOverlay(0); // start on leaderboard page
+
+    // Match summary / scoreboard overlay (same as endGame uses)
+    try {
+      if (topList) {
+        openScoreboardOverlay(topList, null, null);
+      } else {
+        openScoreboardOverlay([], null, null);
+      }
+    } catch (e) {
+      console.warn("openScoreboardOverlay on start failed:", e);
+    }
+
+    // Start-of-match common upgrade (behind the scoreboard)
+    openUpgradeOverlay("normal");
   } else {
+    // Subsequent visits: just start with the common upgrade chooser
     openUpgradeOverlay("normal");
   }
 
