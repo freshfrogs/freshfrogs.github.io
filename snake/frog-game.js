@@ -1877,7 +1877,7 @@ function getEpicUpgradeChoices() {
       }
     },
 
-    // NEW EPIC: Random frog roles
+    /* NEW EPIC: Random frog roles
     {
       id: "epicRandomRoles",
       label: `
@@ -1887,7 +1887,7 @@ function getEpicUpgradeChoices() {
       apply: () => {
         giveAllFrogsRandomRoles();
       }
-    },
+    }, */
 
     // NEW EPIC: Zombie Horde
     {
