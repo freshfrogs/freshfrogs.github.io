@@ -1848,6 +1848,8 @@ function getEpicUpgradeChoices() {
   const speedPct = Math.round((1 - FROG_SPEED_UPGRADE_FACTOR) * 100);
   const deathPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
   const buffBonusPct  = 25; // ~25% extra here for epic
+  const orbStormCount = 10;
+  const snakeEggBuffPct = 11; // +11% instead of +20%
 
   return [
     {
