@@ -107,7 +107,6 @@
   // Legendary buff duration spike
   const LEGENDARY_BUFF_DURATION_FACTOR = 2.0; // x2 all buff durations
 
-  
   const AURA_RADIUS  = 200;
   const AURA_RADIUS2 = AURA_RADIUS * AURA_RADIUS;
 
