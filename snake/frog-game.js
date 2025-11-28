@@ -994,94 +994,108 @@ function getJumpFactor(frog) {
     return chance;
   }
 
+    // Attempt to kill a frog at index `index`, with a specific source ("snake", "cannibal", etc.)
+  function tryKillFrogAtIndex(index, source) {
+    const frog = frogs[index];
+    if (!frog || !frog.el) return false;
 
-  // Attempt to kill a frog at index i, with a specific killer (`"snake"` or `"cannibal"`)
-  function tryKillFrogAtIndex(i, killer) {
-    const frog = frogs[i];
-    if (!frog) return false;
+    const wasLastFrog = (frogs.length === 1);
 
-    // Global temporary shield from orb: protects vs snake/cannibal, but NOT vs timed death
-    if (frogShieldTime > 0 && killer !== "time") {
-      return false;
-    }
-
-    // Permanent shield role:
-    // - While active (< 40s) and not last frog, snake cannot eat this frog.
-    // - If it's the last frog OR shield lifetime has expired, snake can kill it.
-    if (killer === "snake" && frog.hasPermaShield) {
-      const SHIELD_LIFETIME = 40; // seconds
-      const isLastFrog = (frogs.length === 1);
-      const lifetimeExpired =
-        frog.shieldGrantedAt != null &&
-        (elapsedTime - frog.shieldGrantedAt) >= SHIELD_LIFETIME;
-
-      if (!isLastFrog && !lifetimeExpired) {
-        // Snake hit blocked – frog survives, shield remains
-        playPerFrogUpgradeSound("shield");
+    // -----------------------------
+    // Snake-specific protections
+    // -----------------------------
+    if (source === "snake") {
+      // Global temporary shield from orb: protects vs snake hits
+      if (frogShieldTime > 0) {
         return false;
       }
 
-      // If we are here, either it's the last frog or shield lifetime is over:
-      // clear shield visuals and allow normal death logic below
-      frog.hasPermaShield = false;
-      frog.shieldGrantedAt = null;
-      refreshFrogPermaGlow(frog);
+      // Clone Swarm: chance that the snake bites a fake decoy instead
+      if (cloneSwarmTime > 0) {
+        const DECOY_CHANCE = 0.65;
+        if (Math.random() < DECOY_CHANCE) {
+          playSnakeMunch(); // snake thinks it ate something
+          return false;
+        }
+      }
     }
 
-    // Remove visual clone if it exists
+    // -----------------------------
+    // Remove clone visual if any
+    // -----------------------------
     if (frog.cloneEl && frog.cloneEl.parentNode === container) {
       container.removeChild(frog.cloneEl);
       frog.cloneEl = null;
     }
 
-    // Cannibal bookkeeping
+    // If this frog *is* a cannibal, unmark it so global counters stay correct
     if (frog.isCannibal) {
       unmarkCannibalFrog(frog);
     }
 
-    // Remove DOM
-    if (frog.el && frog.el.parentNode === container) {
+    // -----------------------------
+    // Remove frog DOM + from array
+    // -----------------------------
+    if (frog.el.parentNode === container) {
       container.removeChild(frog.el);
     }
+    frogs.splice(index, 1);
 
-    // Remove from frogs array
-    frogs.splice(i, 1);
+    // -----------------------------
+    // On-death effects: zombie, global + per-frog deathrattle, Lifeline, Last Stand
+    // -----------------------------
 
-    // Zombie on-death effect (always spawns frogs; slow only if snake kills)
+    // Zombie on-death effect (any zombie frog)
     if (frog.isZombie) {
       spawnExtraFrogs(5);
-      if (killer === "snake") {
+      if (source === "snake") {
         snakeSlowTime = Math.max(snakeSlowTime, 3 * buffDurationFactor);
       }
     }
 
-    // Deathrattle: base + cannibal aura + per-frog bonus
-    const deathChance = computeDeathRattleChanceForFrog(frog);
-    if (deathChance > 0 && Math.random() < deathChance) {
+    // Base deathrattle from global + cannibal aura + per-frog bonus + Lifeline
+    let drChance = computeDeathRattleChanceForFrog(frog);
+
+    // Last Stand: if active and this was the last frog, guarantee at least 50%
+    if (lastStandActive && wasLastFrog) {
+      drChance = Math.max(drChance, 0.5);
+    }
+
+    // Clamp to [0, 1]
+    if (drChance > 1.0) drChance = 1.0;
+    if (drChance < 0)   drChance = 0;
+
+    if (drChance > 0 && Math.random() < drChance) {
+      // Spawn a replacement frog
       const newFrog = createRandomFrog();
       if (newFrog) {
-        // Zombies keep their role, but NOT their extra 50% deathrattle
+        // Zombies keep being zombies, but we do NOT keep their extra 50% DR forever
         if (frog.isZombie) {
           grantZombieFrog(newFrog);
         }
 
-        // Cannibal frogs respawn as cannibals
+        // Cannibal respawns stay cannibals
         if (frog.isCannibal) {
           markCannibalFrog(newFrog);
         }
 
         // NOTE: we do NOT copy frog.extraDeathRattleChance:
-        // Zombie Horde's 50% goes away after the first death.
+        // special 50% bonuses (Zombie Horde) only apply to that one life.
       }
     }
 
-    // Sounds
-    if (killer === "snake") {
+    // -----------------------------
+    // Sounds based on source
+    // -----------------------------
+    if (source === "snake") {
       playSnakeMunch();
+      playFrogDeath();
+    } else if (source === "cannibal") {
+      // Cannibal eats frog: just play death sound (no snake munch)
+      playFrogDeath();
     }
-    playFrogDeath();
 
-    return true;
+    return true; // a frog actually died
   }
 
   // EPIC: spawn a Cannibal Frog
@@ -1751,106 +1765,6 @@ function applyBuff(type, frog) {
       snake.path.push({ x: last.x, y: last.y });
     }
   }
-function tryKillFrogAtIndex(index, source) {
-  // source: "snake", "cannibal", etc.
-  const frog = frogs[index];
-  if (!frog || !frog.el) return false;
-
-  const wasLastFrog = (frogs.length === 1);
-
-  // -----------------------------
-  // Snake-specific protections
-  // -----------------------------
-  if (source === "snake") {
-    // Team-wide temporary shield buff
-    if (frogShieldTime > 0) {
-      return false;
-    }
-
-    // Per-frog shield role (if you still use it; safe even if you don't spawn them)
-    if (frog.hasPermaShield) {
-      frog.hasPermaShield = false;
-      refreshFrogPermaGlow(frog);
-      playPerFrogUpgradeSound("shield");
-      return false;
-    }
-
-    // Clone Swarm: chance it's a fake hit
-    if (cloneSwarmTime > 0) {
-      const DECOY_CHANCE = 0.65;
-      if (Math.random() < DECOY_CHANCE) {
-        playSnakeMunch(); // snake "bites" the fake
-        return false;
-      }
-    }
-  }
-
-  // -----------------------------
-  // Remove clone visual if any
-  // -----------------------------
-  if (frog.cloneEl && frog.cloneEl.parentNode === container) {
-    container.removeChild(frog.cloneEl);
-    frog.cloneEl = null;
-  }
-
-  // -----------------------------
-  // Remove frog DOM + from array
-  // -----------------------------
-  if (frog.el.parentNode === container) {
-    container.removeChild(frog.el);
-  }
-  frogs.splice(index, 1);
-
-  // -----------------------------
-  // On-death effects: zombie, deathrattle, Last Stand
-  // -----------------------------
-
-  // Zombie on-death effect (for any zombie frog)
-  if (frog.isZombie) {
-    // Your existing behavior: spawn 5 frogs + slow the snake
-    spawnExtraFrogs(5);
-    snakeSlowTime = Math.max(
-      snakeSlowTime,
-      3 * buffDurationFactor
-    );
-  }
-
-  // Global + per-frog + Last Stand deathrattle
-  let drChance = frogDeathRattleChance;
-
-  // Per-frog deathrattle (e.g. Zombie Horde frogs with 50% DR)
-  if (frog.specialDeathRattleChance != null) {
-    drChance = Math.max(drChance, frog.specialDeathRattleChance);
-  }
-
-  // Last Stand: if this was the last frog, guarantee at least 50% DR
-  if (lastStandActive && wasLastFrog) {
-    drChance = Math.max(drChance, 0.33);
-  }
-
-  // Clamp to 50%
-  if (drChance > 0.5) drChance = 0.5;
-
-  if (drChance > 0 && Math.random() < drChance) {
-    // Spawn a replacement frog.
-    // NOTE: this new frog is a normal spawn (no specialDeathRattleChance by default).
-    // That matches: Zombie Horde respawns lose their 50% DR bonus.
-    spawnExtraFrogs(1);
-  }
-
-  // -----------------------------
-  // Sounds based on source
-  // -----------------------------
-  if (source === "snake") {
-    playSnakeMunch();
-    playFrogDeath();
-  } else if (source === "cannibal") {
-    // Cannibal eats frog: just play death sound (no snake munch)
-    playFrogDeath();
-  }
-
-  return true; // a frog actually died
-}
 
 function updateSnake(dt, width, height) {
   if (!snake) return;
