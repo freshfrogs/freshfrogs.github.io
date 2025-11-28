@@ -107,9 +107,6 @@
   // Legendary buff duration spike
   const LEGENDARY_BUFF_DURATION_FACTOR = 2.0; // x2 all buff durations
 
-  const AURA_RADIUS  = 200;
-  const AURA_RADIUS2 = AURA_RADIUS * AURA_RADIUS;
-
   const container = document.getElementById("frog-game");
   if (!container) return;
 
@@ -566,6 +563,34 @@ function snakeShed(stage, speedMultiplier) {
       createFrogAt(x, y, tokenId);
     }
   }
+
+  let speedBuffTime   = 0;
+  let jumpBuffTime    = 0;
+  let snakeSlowTime   = 0;
+  let snakeConfuseTime= 0;
+  let snakeShrinkTime = 0;
+  let frogShieldTime  = 0;
+  let timeSlowTime    = 0;
+  let orbMagnetTime   = 0;
+  let scoreMultiTime  = 0;
+  let panicHopTime    = 0;
+  let cloneSwarmTime  = 0;
+  let lifeStealTime   = 0;
+  let frogDeathRattleChance = 0.0;  // 0.25 when epic is picked
+  let permaLifeStealOrbsRemaining = 0;
+
+  // Legendary Frenzy timer (snake + frogs go wild)
+  let snakeFrenzyTime = 0;
+
+  // global permanent buffs
+  let frogPermanentSpeedFactor = 1.0; // <1 = faster hops
+  let frogPermanentJumpFactor  = 1.0; // >1 = higher hops
+  let snakePermanentSpeedFactor= 1.0;
+  let buffDurationFactor       = 1.0; // >1 = longer temp buffs
+  let orbSpawnIntervalFactor   = 1.0; // <1 = more orbs
+
+  const AURA_RADIUS  = 200;
+  const AURA_RADIUS2 = AURA_RADIUS * AURA_RADIUS;
 
   function getSpeedFactor(frog) {
     let factor = frogPermanentSpeedFactor * (frog.speedMult || 1);
@@ -2533,56 +2558,6 @@ function populateUpgradeOverlayChoices(mode) {
       // Show the full leaderboard alongside the How to Play menu
       openScoreboardOverlay(topList, lastRunScore, lastRunTime);
     }
-
-    snake = null;
-
-    // Reset game state
-    elapsedTime     = 0;
-    lastTime        = 0;
-    gameOver        = false;
-    gamePaused      = false;
-    score           = 0;
-    frogsEatenCount = 0;
-    nextOrbTime     = 0;
-    mouse.follow    = false;
-
-    // Reset upgrade timing
-    // Reset upgrade timing / sheds
-    initialUpgradeDone       = false;
-    nextPermanentChoiceTime  = 60;
-    nextEpicChoiceTime       = 180;
-    legendaryEventTriggered = false;
-    firstShedTriggered      = false;
-    secondShedTriggered     = false;
-    snakeShedStage          = 0;
-    firstTimedNormalChoiceDone  = false;
-
-    // Reset all temporary buff timers
-    speedBuffTime   = 0;
-    jumpBuffTime    = 0;
-    snakeSlowTime   = 0;
-    snakeConfuseTime= 0;
-    snakeShrinkTime = 0;
-    frogShieldTime  = 0;
-    timeSlowTime    = 0;
-    orbMagnetTime   = 0;
-    scoreMultiTime  = 0;
-    panicHopTime    = 0;
-    cloneSwarmTime  = 0;
-    lifeStealTime   = 0;
-    permaLifeStealOrbsRemaining = 0;
-    snakeFrenzyTime = 0;
-    setSnakeFrenzyVisual(false);
-
-    // Reset EPIC deathrattle
-    frogDeathRattleChance = 0.0;
-
-    // Reset global permanent buffs
-    frogPermanentSpeedFactor = 1.0;
-    frogPermanentJumpFactor  = 1.0;
-    buffDurationFactor       = 1.0;
-    orbSpawnIntervalFactor   = 1.0;
-    snakePermanentSpeedFactor= 1.0;
 
     const width  = window.innerWidth;
     const height = window.innerHeight;
