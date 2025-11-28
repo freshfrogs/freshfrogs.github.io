@@ -388,8 +388,8 @@
     if (newSegCount < SNAKE_INITIAL_SEGMENTS) {
       newSegCount = SNAKE_INITIAL_SEGMENTS;
     }
-    if (newSegCount > 50) {
-      newSegCount = 50;
+    if (newSegCount > 20) {
+      newSegCount = 20;
     }
 
     // Create new head
