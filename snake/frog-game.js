@@ -2458,13 +2458,23 @@ if (infoPage === 0) {
   const neon = "#4defff";
   html += "<b>🏆 Leaderboard</b><br><br>";
 
-  // --- Get current user tag from localStorage (same tag that end-summary uses) ---
+  // --- Get current user tag from the same place as the match summary ---
   let currentTag = null;
   try {
-    if (window.localStorage) {
+    const leaderMod = window.FrogGameLeaderboard || {};
+
+    // Prefer a helper from the leaderboard module, if it exists
+    if (typeof leaderMod.getCurrentUserTag === "function") {
+      currentTag = leaderMod.getCurrentUserTag() || null;
+    }
+
+    // Fallbacks: look in localStorage for whatever key the worker used
+    if (!currentTag && window.localStorage) {
       currentTag =
         localStorage.getItem("ff_user_tag") ||
         localStorage.getItem("ffUserTag") ||
+        localStorage.getItem("ff_leaderboard_tag") ||
+        localStorage.getItem("ff_leaderboard_name") ||
         null;
     }
   } catch (e) {
@@ -2503,7 +2513,7 @@ if (infoPage === 0) {
         `Player ${rank}`;
       const safeTag = esc(rawTag);
 
-      // Score: prefer entry.score, fall back to bestScore, never "undefined"
+      // Score: prefer entry.score, fall back to bestScore
       let numericScore = 0;
       if (typeof entry.score === "number") {
         numericScore = entry.score;
@@ -2512,7 +2522,7 @@ if (infoPage === 0) {
       }
       const scoreStr = Math.floor(Math.max(0, numericScore));
 
-      // Time: prefer entry.time, fall back to bestTime, never "undefined"
+      // Time: prefer entry.time, fall back to bestTime
       let timeSecs = 0;
       if (typeof entry.time === "number") {
         timeSecs = entry.time;
@@ -2522,7 +2532,7 @@ if (infoPage === 0) {
       timeSecs = Math.max(0, timeSecs | 0);
       const m = Math.floor(timeSecs / 60);
       const s = timeSecs % 60;
-      const tStr = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+      const tStr = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
 
       // Highlight this row if it belongs to the current user
       const isSelf =
@@ -2569,7 +2579,7 @@ if (infoPage === 0) {
   } else {
     html += `
       <div style="margin-top:8px; font-size:11px; opacity:0.8;">
-        Current tag: <span style="color:${neon};">not-set</span>
+        Current tag: <span style="color:${neon};">not set</span>
       </div>
     `;
   }
@@ -2580,7 +2590,6 @@ if (infoPage === 0) {
     </div>
   `;
 }
-
  else if (infoPage === 1) {
     // PAGE 1 – How to Play
     html = `
