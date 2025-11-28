@@ -1867,9 +1867,9 @@ function getEpicUpgradeChoices() {
       id: "epicCannibalFrog",
       label: `
         🦴 Cannibal Frog<br>
-        Spawn a <span style="color:${neon};">Cannibal</span> frog that:<br>
-        • Gives <span style="color:${neon};">+5%</span> global deathrattle while alive<br>
-        • Has <span style="color:${neon};">+5%</span> speed, jump & deathrattle<br>
+        Spawn a <span style="color:${neon};">Cannibal</span> frog with<br>
+        +<span style="color:${neon};">5%</span> deathrattle chance<br>
+        +<span style="color:${neon};">5%</span> overall stats<br>
         • Eats nearby frogs that get in its way
       `,
       apply: () => {
@@ -1895,7 +1895,7 @@ function getEpicUpgradeChoices() {
       label: `
         🧟 Zombie Horde<br>
         Summon <span style="color:${neon};">3</span> zombie frogs with<br>
-        <span style="color:${neon};">50%</span> personal deathrattle (first life only)
+        <span style="color:${neon};">50%</span> deathrattle
       `,
       apply: () => {
         spawnZombieHorde();
@@ -2406,12 +2406,6 @@ function setBuffGuidePage(pageIndex) {
 ⏳ <b>Buffs last longer</b> – each pick multiplies durations by <span style="color:${neon};">${multFromFactor(buffDurUp, 1.15)}</span> (stacks).<br>
 🎯 <b>More orbs</b> – orbs spawn faster every time you pick this (interval factor ~<span style="color:${neon};">${multFromFactor(orbIntervalUp, 0.85)}</span> per pick).<br>
 💀 <b>Deathrattle</b> – normal/epic picks raise base respawn chance (epic ~<span style="color:${neon};">${percentFromBonus(epicDeathChance, 0.25)}</span>, legendary ~<span style="color:${neon};">${percentFromBonus(legDeathChance, 0.50)}</span>). Cannibals add another <span style="color:${neon};">+5%</span> each, and Lifeline temporarily pushes it to 100%.<br><br>
-
-<b>✨ Epic upgrades (every few minutes)</b><br>
-At 3-minute marks you first choose a normal upgrade, then an <b>EPIC</b> one:<br>
-🩸 <b>Cannibal Frog</b> – spawns a special cannibal frog (bones sprite) that boosts global deathrattle while it lives and keeps its role on respawn.<br>
-🧟‍♂️ <b>Zombie Horde</b> – summons three zombie frogs with a huge one-time deathrattle bonus; when they respawn they stay zombies but lose the extra 50% bonus.<br>
-🎲 <b>Random roles</b> – gives all frogs random permanent roles (Champion/Aura/Shield/Magnet/Lucky/Zombie/Cannibal).<br><br>
 
 💥 <b>Legendary Frenzy (10 min)</b> – at <span style="color:${neon};">10 min</span>, pick a legendary and the snake turns red, gets ~<span style="color:${neon};">${percentFromBonus(frenzySpeedFact - 1, 0.25)}</span> speed, and frogs panic-hop for about <span style="color:${neon};">${secFromConst(frenzyDur, 13)}</span>.
 `
