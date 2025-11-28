@@ -1591,45 +1591,112 @@ function getUpgradeChoices() {
   }
 
   // EPIC choices every 3 minutes
-function getEpicUpgradeChoices() {
+function getUpgradeChoices() {
   const neon = "#4defff";
-  const speedPct = Math.round((1 - FROG_SPEED_UPGRADE_FACTOR) * 100);
-  const deathPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
+
+  // --- resolve upgrade factors with safe fallbacks ---
+  const frogSpeedUp =
+    typeof FROG_SPEED_UPGRADE_FACTOR !== "undefined"
+      ? FROG_SPEED_UPGRADE_FACTOR
+      : 0.9;   // 10% faster by default
+
+  const frogJumpUp =
+    typeof FROG_JUMP_UPGRADE_FACTOR !== "undefined"
+      ? FROG_JUMP_UPGRADE_FACTOR
+      : 1.25;  // +25% jump by default
+
+  const buffDurUp =
+    typeof BUFF_DURATION_UPGRADE_FACTOR !== "undefined"
+      ? BUFF_DURATION_UPGRADE_FACTOR
+      : 1.15;  // +15% duration by default
+
+  // You used ORB_INTERVAL_UPGRADE_FACTOR here; fall back to ORB_INTERVAL_FACTOR or 0.85
+  const orbIntervalUp =
+    typeof ORB_INTERVAL_UPGRADE_FACTOR !== "undefined"
+      ? ORB_INTERVAL_UPGRADE_FACTOR
+      : (typeof ORB_INTERVAL_FACTOR !== "undefined"
+          ? ORB_INTERVAL_FACTOR
+          : 0.85); // 15% faster spawns by default
+
+  // --- derived percentages for labels ---
+  // e.g. factor 0.9 => 10% faster, factor 1.25 => +25%, etc.
+  const speedBonusPct = Math.round((1 - frogSpeedUp) * 100);      // faster hops
+  const jumpBonusPct  = Math.round((frogJumpUp - 1) * 100);       // more jump height
+  const buffBonusPct  = Math.round((buffDurUp - 1) * 100);        // longer duration
+  const orbFasterPct  = Math.round((1 - orbIntervalUp) * 100);    // faster orb spawns
+
+  // amounts that are already absolute values
+  const spawnAmount =
+    typeof NORMAL_SPAWN_AMOUNT !== "undefined" ? NORMAL_SPAWN_AMOUNT : 20;
+
+  const permaLsCount =
+    typeof PERMA_LIFESTEAL_ORB_COUNT !== "undefined"
+      ? PERMA_LIFESTEAL_ORB_COUNT
+      : 30;
 
   return [
     {
-      id: "epicSpawn50",
+      id: "frogSpeed",
       label: `
-        🐸🌊 EPIC frog wave<br>
-        Spawn <span style="color:${neon};">${EPIC_SPAWN_AMOUNT}</span> frogs now
+        ⏩ Frogs hop faster forever<br>
+        ~<span style="color:${neon};">${speedBonusPct}%</span> faster hop cycle
       `,
       apply: () => {
-        spawnExtraFrogs(EPIC_SPAWN_AMOUNT);
+        frogPermanentSpeedFactor *= frogSpeedUp;
       }
     },
     {
-      id: "epicDeathRattle",
+      id: "frogJump",
       label: `
-        💀 EPIC deathrattle<br>
-        <span style="color:${neon};">${deathPct}%</span> chance a dead frog respawns
+        🦘⬆️ Frogs jump higher forever<br>
+        ~<span style="color:${neon};">+${jumpBonusPct}%</span> jump height
       `,
       apply: () => {
-        frogDeathRattleChance = Math.max(frogDeathRattleChance, EPIC_DEATHRATTLE_CHANCE);
+        frogPermanentJumpFactor *= frogJumpUp;
       }
     },
     {
-      id: "epicFrogSpeed",
+      id: "spawn20",
       label: `
-        ⏩⏩ EPIC frog speed<br>
-        Another <span style="color:${neon};">~${speedPct}%</span> faster forever
+        🐸➕ Spawn frogs<br>
+        <span style="color:${neon};">${spawnAmount}</span> frogs right now
       `,
       apply: () => {
-        frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
+        spawnExtraFrogs(spawnAmount);
+      }
+    },
+    {
+      id: "buffDuration",
+      label: `
+        ⏳ Buffs last longer<br>
+        +<span style="color:${neon};">${buffBonusPct}%</span> buff duration
+      `,
+      apply: () => {
+        buffDurationFactor *= buffDurUp;
+      }
+    },
+    {
+      id: "moreOrbs",
+      label: `
+        🎯 More orbs over time<br>
+        ~<span style="color:${neon};">${orbFasterPct}%</span> faster orb spawns
+      `,
+      apply: () => {
+        orbSpawnIntervalFactor *= orbIntervalUp;
+      }
+    },
+    {
+      id: "permaLifeSteal",
+      label: `
+        🩸 Lifesteal (upgrade)<br>
+        Next <span style="color:${neon};">${permaLsCount}</span> orbs also spawn frogs
+      `,
+      apply: () => {
+        permaLifeStealOrbsRemaining += permaLsCount;
       }
     }
   ];
 }
-
 
   // LEGENDARY choices at 10 minutes (placeholders, TODO)
 function getLegendaryUpgradeChoices() {
