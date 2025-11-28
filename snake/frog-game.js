@@ -471,31 +471,40 @@
     applySnakeAppearance();
   }
 
-    function updateDyingSnakes(dt) {
+  function updateDyingSnakes(dt) {
+    // Walk backwards so we can safely splice as things fully disappear
     for (let i = dyingSnakes.length - 1; i >= 0; i--) {
       const ds = dyingSnakes[i];
+
+      // Countdown to the next piece disappearing
       ds.nextDespawnTime -= dt;
 
       if (ds.nextDespawnTime <= 0) {
-        ds.nextDespawnTime = 0.08;
+        // Reset timer between chunks
+        ds.nextDespawnTime = 0.08; // ~12–13 segments per second
 
-        if (ds.segmentEls.length > 0) {
+        // 1) Remove one body segment at a time
+        if (ds.segmentEls && ds.segmentEls.length > 0) {
           const segEl = ds.segmentEls.pop();
           if (segEl && segEl.parentNode === container) {
             container.removeChild(segEl);
           }
-        } else if (ds.headEl) {
+        }
+        // 2) Once all segments are gone, remove the head
+        else if (ds.headEl) {
           if (ds.headEl.parentNode === container) {
             container.removeChild(ds.headEl);
           }
           ds.headEl = null;
-        } else {
-          // fully gone
+        }
+        // 3) When nothing is left, drop this dying snake entry
+        else {
           dyingSnakes.splice(i, 1);
         }
       }
     }
   }
+
 
   function randInt(min, maxInclusive) {
     return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
@@ -3351,6 +3360,7 @@ function populateUpgradeOverlayChoices(mode) {
     if (!gameOver) {
       if (!gamePaused) {
         elapsedTime += dt;
+
         //
         // 1) Snake sheds every 5 minutes
         //
@@ -3376,13 +3386,17 @@ function populateUpgradeOverlayChoices(mode) {
           openUpgradeOverlay("normal");
         }
         else {
-          // ... your normal update logic: buffs, frogs, snake, orbs, score, etc.
+          // ... normal update logic: buffs, frogs, snake, orbs, score, etc.
           updateBuffTimers(dt);
 
           const slowFactor = timeSlowTime > 0 ? 0.4 : 1.0;
 
           updateFrogs(dt, width, height);
           updateSnake(dt * slowFactor, width, height);
+
+          // 🔹 Despawn old shed snakes segment-by-segment
+          updateDyingSnakes(dt);
+
           updateOrbs(dt * slowFactor);
 
           let scoreFactor = scoreMultiTime > 0 ? 2 : 1;
