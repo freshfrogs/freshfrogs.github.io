@@ -856,3 +856,9 @@ body {
 #frog-game #frog-mini-leaderboard {
   z-index: 100;
 }
+@media (max-width: 900px) {
+  #frog-game {
+    transform: scale(0.9);
+    transform-origin: center top;
+  }
+}
