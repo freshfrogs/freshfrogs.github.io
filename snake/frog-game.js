@@ -2095,7 +2095,7 @@ function getUpgradeChoices() {
     {
       id: "frogSpeed",
       label: `
-        ⏩ Frogs hop faster forever<br>
+        ⏩ Frogs hop faster<br>
         ~<span style="color:${neon};">${speedBonusPct}%</span> faster hop cycle
       `,
       apply: () => {
@@ -2106,7 +2106,7 @@ function getUpgradeChoices() {
     {
       id: "frogJump",
       label: `
-        🦘⬆️ Frogs jump higher forever<br>
+        🦘⬆️ Frogs jump higher<br>
         ~<span style="color:${neon};">+${jumpBonusPct}%</span> jump height
       `,
       apply: () => {
@@ -2606,8 +2606,8 @@ function setBuffGuidePage(pageIndex) {
     // Page 2 – global upgrades / epic / special rules
     `
 <b>🏗️ Global upgrades & special rules</b><br><br>
-⏩ <b>Frogs hop faster forever</b> – each pick makes hops ~<span style="color:${neon};">${percentFromBonus(1 - frogSpeedUp, 0.1)}</span> faster (stacks).<br>
-🦘⬆️ <b>Frogs jump higher forever</b> – each pick adds ~<span style="color:${neon};">${percentFromBonus(frogJumpUp - 1, 0.25)}</span> jump height (stacks).<br>
+⏩ <b>Frogs hop faster</b> – each pick makes hops ~<span style="color:${neon};">${percentFromBonus(1 - frogSpeedUp, 0.1)}</span> faster (stacks).<br>
+🦘⬆️ <b>Frogs jump higher</b> – each pick adds ~<span style="color:${neon};">${percentFromBonus(frogJumpUp - 1, 0.25)}</span> jump height (stacks).<br>
 🐸💥 <b>Spawn ${NORMAL_SPAWN_AMOUNT}/${EPIC_SPAWN_AMOUNT}</b> – instant extra frogs from normal / epic choices.<br>
 ⏳ <b>Buffs last longer</b> – each pick multiplies durations by <span style="color:${neon};">${multFromFactor(buffDurUp, 1.15)}</span> (stacks).<br>
 🎯 <b>More orbs</b> – orbs spawn faster every time you pick this (interval factor <span style="color:${neon};">${multFromFactor(orbIntervalUp, 0.85)}</span> per pick).<br>
