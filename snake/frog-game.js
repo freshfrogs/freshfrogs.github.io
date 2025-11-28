@@ -2454,37 +2454,36 @@ function setInfoPage(pageIndex) {
   infoPage = Math.max(0, Math.min(maxPage, pageIndex));
 
   let html = "";
-
 if (infoPage === 0) {
-  // PAGE 0 – Leaderboard (same data as the old popup, no "undefined")
+  const neon = "#4defff";
   html += "<b>🏆 Leaderboard</b><br><br>";
 
+  // --- Get current user tag from localStorage (same tag that end-summary uses) ---
+  let currentTag = null;
+  try {
+    if (window.localStorage) {
+      currentTag =
+        localStorage.getItem("ff_user_tag") ||
+        localStorage.getItem("ffUserTag") ||
+        null;
+    }
+  } catch (e) {
+    currentTag = null;
+  }
+
   const list = Array.isArray(infoLeaderboardData) ? infoLeaderboardData : [];
+
+  // Small helper to HTML-escape tag strings
+  const esc = (str) => String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 
   if (!list.length) {
     html += "<div>No scores yet — be the first to escape the snake.</div>";
   } else {
-    // Try to detect the current player's tag (same logic as your old overlay)
-    let currentTag = null;
-    try {
-      if (window.localStorage) {
-        currentTag =
-          localStorage.getItem("ff_user_tag") ||
-          localStorage.getItem("ffUserTag") ||
-          null;
-      }
-    } catch (e) {
-      currentTag = null;
-    }
-
-    // Simple HTML escaping so tags can't break the table
-    const esc = (str) => String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-
     html += "<table style='width:100%; border-collapse:collapse; font-size:12px;'>";
     html += "<tr>" +
               "<th style='text-align:left;'>#</th>" +
@@ -2496,7 +2495,7 @@ if (infoPage === 0) {
     list.slice(0, 10).forEach((entry, i) => {
       const rank = i + 1;
 
-      // Tag / name
+      // Tag from server row
       const rawTag =
         entry.tag ||
         entry.name ||
@@ -2504,7 +2503,7 @@ if (infoPage === 0) {
         `Player ${rank}`;
       const safeTag = esc(rawTag);
 
-      // Score: use whatever numeric field exists, fall back to 0 — never "undefined"
+      // Score: prefer entry.score, fall back to bestScore, never "undefined"
       let numericScore = 0;
       if (typeof entry.score === "number") {
         numericScore = entry.score;
@@ -2513,20 +2512,19 @@ if (infoPage === 0) {
       }
       const scoreStr = Math.floor(Math.max(0, numericScore));
 
-      // Time: same idea, fall back to 0 seconds
+      // Time: prefer entry.time, fall back to bestTime, never "undefined"
       let timeSecs = 0;
       if (typeof entry.time === "number") {
         timeSecs = entry.time;
       } else if (typeof entry.bestTime === "number") {
         timeSecs = entry.bestTime;
       }
-      timeSecs = Math.max(0, timeSecs | 0); // force integer
-
+      timeSecs = Math.max(0, timeSecs | 0);
       const m = Math.floor(timeSecs / 60);
       const s = timeSecs % 60;
       const tStr = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 
-      // Highlight the current user’s row (like the old popup)
+      // Highlight this row if it belongs to the current user
       const isSelf =
         entry.isSelf ||
         entry.isYou ||
@@ -2539,7 +2537,7 @@ if (infoPage === 0) {
               font-weight:bold;
               text-shadow:0 0 6px rgba(255,255,0,0.9);
            ">${safeTag}</span>`
-        : `<span style="color:#4defff;">${safeTag}</span>`;
+        : `<span style="color:${neon};">${safeTag}</span>`;
 
       html += `
         <tr>
@@ -2552,13 +2550,37 @@ if (infoPage === 0) {
     });
 
     html += "</table>";
+  }
+
+  // --- Always show the user's current tag under the leaderboard ---
+  if (currentTag) {
     html += `
-      <div style="margin-top:6px; font-size:11px; opacity:0.8;">
-        Beat your own best score to update your entry.
+      <div style="margin-top:8px; font-size:11px;">
+        Current tag:
+        <span style="
+          color:#ffe66b;
+          font-weight:bold;
+          text-shadow:0 0 6px rgba(255,255,0,0.9);
+        ">
+          ${esc(currentTag)}
+        </span>
+      </div>
+    `;
+  } else {
+    html += `
+      <div style="margin-top:8px; font-size:11px; opacity:0.8;">
+        Current tag: <span style="color:${neon};">not set</span>
       </div>
     `;
   }
+
+  html += `
+    <div style="margin-top:4px; font-size:11px; opacity:0.75;">
+      Beat your own best score to update your entry.
+    </div>
+  `;
 }
+
  else if (infoPage === 1) {
     // PAGE 1 – How to Play
     html = `
