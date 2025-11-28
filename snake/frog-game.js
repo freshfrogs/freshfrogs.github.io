@@ -102,7 +102,7 @@
   const LEGENDARY_SPAWN_AMOUNT        = 55;   // legendary menu
 
   // Deathrattle chances
-  const COMMON_DEATHRATTLE_BUFF = 0.05;
+  const COMMON_DEATHRATTLE_CHANCE = 0.05;
   const EPIC_DEATHRATTLE_CHANCE       = 0.15; // 25%
   const LEGENDARY_DEATHRATTLE_CHANCE  = 0.25; // 50%
 
@@ -1657,7 +1657,7 @@ function getUpgradeChoices() {
         <span style="color:${neon};">${deathPct}%</span> increased chance a dead frog respawns
       `,
       apply: () => {
-        frogDeathRattleChance += COMMON_DEATHRATTLE_BUFF;
+        frogDeathRattleChance += COMMON_DEATHRATTLE_CHANCE;
       }
     }
   ];
