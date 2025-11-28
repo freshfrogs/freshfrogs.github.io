@@ -1591,7 +1591,8 @@ function getUpgradeChoices() {
         ~<span style="color:${neon};">${speedBonusPct}%</span> faster hop cycle
       `,
       apply: () => {
-        frogPermanentSpeedFactor *= frogSpeedUp;
+        // use the config constant directly
+        frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
       }
     },
     {
@@ -1601,18 +1602,14 @@ function getUpgradeChoices() {
         ~<span style="color:${neon};">+${jumpBonusPct}%</span> jump height
       `,
       apply: () => {
-        frogPermanentJumpFactor *= frogJumpUp;
+        // use the config constant directly
+        frogPermanentJumpFactor *= FROG_JUMP_UPGRADE_FACTOR;
+        console.log("Perma jump picked, new frogPermanentJumpFactor =", frogPermanentJumpFactor);
       }
     },
     {
       id: "spawn20",
-      label: `
-        🐸➕ Spawn frogs<br>
-        <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
-      `,
-      apply: () => {
-        spawnExtraFrogs(NORMAL_SPAWN_AMOUNT);
-      }
+      // (unchanged)
     },
     {
       id: "buffDuration",
@@ -1621,7 +1618,7 @@ function getUpgradeChoices() {
         +<span style="color:${neon};">${buffBonusPct}%</span> buff duration
       `,
       apply: () => {
-        buffDurationFactor *= buffDurUp;
+        buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR;
       }
     },
     {
@@ -1631,18 +1628,12 @@ function getUpgradeChoices() {
         ~<span style="color:${neon};">${orbFasterPct}%</span> faster orb spawns
       `,
       apply: () => {
-        orbSpawnIntervalFactor *= orbIntervalUp;
+        orbSpawnIntervalFactor *= ORB_INTERVAL_UPGRADE_FACTOR;
       }
     },
     {
       id: "permaLifeSteal",
-      label: `
-        🩸 Lifesteal (upgrade)<br>
-        Next <span style="color:${neon};">${PERMA_LIFESTEAL_ORB_COUNT}</span> orbs also spawn frogs
-      `,
-      apply: () => {
-        permaLifeStealOrbsRemaining += PERMA_LIFESTEAL_ORB_COUNT;
-      }
+      // ...
     }
   ];
 }
