@@ -1956,6 +1956,7 @@ function getEpicUpgradeChoices() {
   const neon = "#4defff";
 
   const deathPerPickPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
+  const eggPct = Math.round((SNAKE_EGG_BUFF_PCT - 1) * 100);
   const buffPerPickPct  = Math.round((BUFF_DURATION_UPGRADE_FACTOR + 0.25 - 1) * 100);
 
   const epicBuffFactor  = BUFF_DURATION_UPGRADE_FACTOR + 0.25;
@@ -2045,7 +2046,7 @@ function getEpicUpgradeChoices() {
     label: `
         🥚 Snake Egg<br>
         The <span style="color:${neon};">next shed</span> only gives the new snake
-        <span style="color:${neon};">+${SNAKE_EGG_BUFF_PCT}%</span> speed instead of +27%
+        <span style="color:${neon};">+${eggPct}%</span> speed instead of +27%
       `,
     apply: () => {
       snakeEggPending = true;
