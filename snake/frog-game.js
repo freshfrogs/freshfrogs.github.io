@@ -196,7 +196,7 @@
   let nextPermanentChoiceTime = 60;
 
   // every 180 seconds we pause for an EPIC upgrade
-  let nextEpicChoiceTime = 180;
+  let nextEpicChoiceTime = 10;
 
   // 10-minute legendary choice
   const LEGENDARY_EVENT_TIME = 600; // 10 minutes
