@@ -2457,7 +2457,7 @@ function setInfoPage(pageIndex) {
 
   if (infoPage === 0) {
     // PAGE 0 – Leaderboard
-    html += "<b>🏆 Leaderboard --</b><br><br>";
+    html += "<b>🏆 Leaderboard</b><br><br>";
 
     // infoLeaderboardData can be either:
     // - { entries: [...], myEntry: {...} }
@@ -2523,6 +2523,7 @@ function setInfoPage(pageIndex) {
       </div>`;
     }
   } else if (infoPage === 1) {
+
     // PAGE 1 – How to Play
     html = `
 <b>🐍 How to Play</b><br><br>
