@@ -292,7 +292,7 @@
   }
 
   // --------------------------------------------------
-  // MINI LEADERBOARD (top-right HUD)
+  // MINI LEADERBOARD (top-right HUD / pre-game view)
   // --------------------------------------------------
   function updateMiniLeaderboard(topList) {
     const mini = document.getElementById("frog-mini-leaderboard");
@@ -304,7 +304,11 @@
       return;
     }
 
-    const lines = [];
+    // Find this user's entry (if any) in the list
+    const { index: myIndex } = findMyIndexInList(safe, 0, 0);
+
+    // Build simple HTML rows so we can highlight "my" row
+    mini.innerHTML = "";
     const maxRows = Math.min(5, safe.length);
 
     for (let i = 0; i < maxRows; i++) {
@@ -314,12 +318,24 @@
       const score = getEntryScore(entry);
       const time = getEntryTime(entry);
 
-      lines.push(
-        `${rank}. ${name} — ${formatTime(time)}, ${Math.floor(score)}`
-      );
-    }
+      const row = document.createElement("div");
+      row.style.fontFamily = "monospace";
+      row.style.fontSize = "11px";
 
-    mini.textContent = lines.join("\n");
+      const label = `${rank}. ${name} — ${formatTime(time)}, ${Math.floor(
+        score
+      )}`;
+
+      row.textContent = label;
+
+      // Highlight this user's row (gold) if present on the board
+      if (i === myIndex) {
+        row.style.color = "#ffd700";
+        row.style.fontWeight = "bold";
+      }
+
+      mini.appendChild(row);
+    }
   }
 
   // --------------------------------------------------
@@ -417,7 +433,7 @@
 
         for (const td of [rankCell, nameCell, timeCell, scoreCell]) {
           td.style.padding = "2px 4px";
-          td.style.borderBottom = "1px solid #222";
+          td.style.borderBottom = "1px solid " + "#222";
         }
 
         // Highlight the row that actually belongs to the current user
