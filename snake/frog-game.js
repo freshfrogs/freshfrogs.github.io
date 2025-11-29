@@ -121,98 +121,250 @@
   // --------------------------------------------------
   // SIMPLE RUN SUMMARY OVERLAY (NO READ-MORE PAGES)
   // --------------------------------------------------
-  function ensureInfoOverlay() {
-    if (infoOverlay) return;
+function ensureInfoOverlay() {
+  if (infoOverlay) return;
 
-    infoOverlay = document.createElement("div");
-    infoOverlay.className = "frog-info-overlay";
+  infoOverlay = document.createElement("div");
+  infoOverlay.className = "frog-info-overlay";
 
-    infoOverlay.style.position = "fixed";
-    infoOverlay.style.inset = "0";
-    infoOverlay.style.background = "rgba(0,0,0,0.75)";
-    infoOverlay.style.display = "none";
-    infoOverlay.style.zIndex = "180";
-    infoOverlay.style.alignItems = "center";
-    infoOverlay.style.justifyContent = "center";
-    infoOverlay.style.pointerEvents = "auto";
+  infoOverlay.style.position = "fixed";
+  infoOverlay.style.inset = "0";
+  infoOverlay.style.background = "rgba(0,0,0,0.75)";
+  infoOverlay.style.display = "none";
+  infoOverlay.style.zIndex = "180";
+  infoOverlay.style.alignItems = "center";
+  infoOverlay.style.justifyContent = "center";
+  infoOverlay.style.pointerEvents = "auto";
 
-    const panel = document.createElement("div");
-    panel.style.background = "#111";
-    panel.style.padding = "16px 20px 12px 20px";
-    panel.style.borderRadius = "10px";
-    panel.style.border = "1px solid #444";
-    panel.style.color = "#fff";
-    panel.style.fontFamily = "monospace";
-    panel.style.textAlign = "left";
-    panel.style.minWidth = "260px";
-    panel.style.maxWidth = "480px";
-    panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
+  const panel = document.createElement("div");
+  panel.style.background = "#111";
+  panel.style.padding = "16px 20px 12px 20px";
+  panel.style.borderRadius = "10px";
+  panel.style.border = "1px solid #444";
+  panel.style.color = "#fff";
+  panel.style.fontFamily = "monospace";
+  panel.style.textAlign = "left";
+  panel.style.minWidth = "260px";
+  panel.style.maxWidth = "420px";
+  panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
 
-    const headerRow = document.createElement("div");
-    headerRow.style.display = "flex";
-    headerRow.style.justifyContent = "space-between";
-    headerRow.style.alignItems = "center";
-    headerRow.style.marginBottom = "6px";
+  const headerRow = document.createElement("div");
+  headerRow.style.display = "flex";
+  headerRow.style.justifyContent = "space-between";
+  headerRow.style.alignItems = "center";
+  headerRow.style.marginBottom = "6px";
 
-    const title = document.createElement("div");
-    title.textContent = "escape the snake 🐍 – summary";
-    title.style.fontSize = "14px";
-    title.style.fontWeight = "bold";
+  const title = document.createElement("div");
+  title.textContent = "escape the snake 🐍 – summary";
+  title.style.fontSize = "14px";
+  title.style.fontWeight = "bold";
 
-    const pageLabel = document.createElement("div");
-    pageLabel.style.fontSize = "11px";
-    pageLabel.style.opacity = "0.8";
-    infoPageLabel = pageLabel;
+  const pageLabel = document.createElement("div");
+  pageLabel.style.fontSize = "11px";
+  pageLabel.style.opacity = "0.8";
+  infoPageLabel = pageLabel;
 
-    headerRow.appendChild(title);
-    headerRow.appendChild(pageLabel);
+  headerRow.appendChild(title);
+  headerRow.appendChild(pageLabel);
 
-    const content = document.createElement("div");
-    content.style.fontSize = "13px";
-    content.style.marginTop = "4px";
-    content.style.lineHeight = "1.4";
-    infoContentEl = content;
+  const content = document.createElement("div");
+  content.style.fontSize = "13px";
+  content.style.marginTop = "4px";
+  content.style.lineHeight = "1.4";
+  infoContentEl = content;
 
-    const navRow = document.createElement("div");
-    navRow.style.display = "flex";
-    navRow.style.justifyContent = "flex-end";
-    navRow.style.alignItems = "center";
-    navRow.style.marginTop = "10px";
+  const navRow = document.createElement("div");
+  navRow.style.display = "flex";
+  navRow.style.justifyContent = "flex-end";
+  navRow.style.alignItems = "center";
+  navRow.style.marginTop = "10px";
 
-    const closeBtn = document.createElement("button");
-    closeBtn.textContent = "Close ×";
-    closeBtn.style.fontFamily = "monospace";
-    closeBtn.style.fontSize = "12px";
-    closeBtn.style.padding = "4px 8px";
-    closeBtn.style.borderRadius = "6px";
-    closeBtn.style.border = "1px solid #555";
-    closeBtn.style.background = "#222";
-    closeBtn.style.color = "#fff";
-    closeBtn.style.cursor = "pointer";
-    closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
-    closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
-    closeBtn.onclick = () => closeInfoOverlay();
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "Close ×";
+  closeBtn.style.fontFamily = "monospace";
+  closeBtn.style.fontSize = "12px";
+  closeBtn.style.padding = "4px 8px";
+  closeBtn.style.borderRadius = "6px";
+  closeBtn.style.border = "1px solid #555";
+  closeBtn.style.background = "#222";
+  closeBtn.style.color = "#fff";
+  closeBtn.style.cursor = "pointer";
+  closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
+  closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
+  closeBtn.onclick = () => closeInfoOverlay();
 
-    navRow.appendChild(closeBtn);
+  navRow.appendChild(closeBtn);
 
-    panel.appendChild(headerRow);
-    panel.appendChild(content);
-    panel.appendChild(navRow);
+  panel.appendChild(headerRow);
+  panel.appendChild(content);
+  panel.appendChild(navRow);
 
-    infoOverlay.appendChild(panel);
+  infoOverlay.appendChild(panel);
 
-    // clicking dark background closes
-    infoOverlay.addEventListener("click", (e) => {
-      if (e.target === infoOverlay) {
-        closeInfoOverlay();
+  // clicking dark background closes
+  infoOverlay.addEventListener("click", (e) => {
+    if (e.target === infoOverlay) {
+      closeInfoOverlay();
+    }
+  });
+
+  // append to BODY (not scaled container)
+  (document.body || container).appendChild(infoOverlay);
+
+  setInfoPage(0);
+}
+
+function setInfoPage(pageIndex) {
+  if (!infoContentEl || !infoPageLabel) return;
+  const neon = "#4defff";
+
+  // Single page now: run summary only
+  infoPage = 0;
+
+  let html = "";
+
+  // Match summary pulled from stored leaderboard + this session
+  const list = Array.isArray(infoLeaderboardData) ? infoLeaderboardData : [];
+  const userLabel = (typeof getCurrentUserLabel === "function")
+    ? getCurrentUserLabel()
+    : null;
+
+  // Find this user's row in the leaderboard, if any
+  let meRow = null;
+  if (userLabel && list.length > 0) {
+    const meLower = userLabel.trim().toLowerCase();
+    for (let i = 0; i < list.length; i++) {
+      const row = list[i];
+      if (!row) continue;
+
+      let tag =
+        (typeof row === "object")
+          ? (row.tag || row.username || row.user || row.name || row.label || null)
+          : String(row);
+
+      if (!tag) continue;
+      if (String(tag).trim().toLowerCase() === meLower) {
+        meRow = row;
+        break;
       }
-    });
-
-    // append to BODY, not #frog-game
-    (document.body || container).appendChild(infoOverlay);
-
-    setInfoPage(0);
+    }
   }
+
+  // See if we have a last run from this session
+  const hasSessionRun =
+    (typeof lastRunScore === "number" && lastRunScore > 0) ||
+    (typeof lastRunTime === "number" && lastRunTime > 0);
+
+  if (!hasSessionRun && !meRow) {
+    // No data yet
+    html += `
+      <div style="font-size:13px; line-height:1.5;">
+        <b>No runs recorded yet</b><br>
+        No previous runs yet for this tag.<br>
+        Start a game and try to keep your frogs alive as long as possible!
+      </div>
+    `;
+  } else {
+    // Decide what numbers to show:
+    // 1) Prefer this-session last run if available
+    // 2) Otherwise fall back to best known run from leaderboard
+    let displayScore = 0;
+    let displaySecs  = 0;
+
+    if (hasSessionRun) {
+      displayScore = lastRunScore || 0;
+      displaySecs  = Math.max(0, lastRunTime || 0);
+    } else if (meRow && typeof meRow === "object") {
+      // Best guess for fields coming from the worker
+      let s = null;
+      let t = null;
+
+      if (meRow.score != null)          s = meRow.score;
+      else if (meRow.bestScore != null) s = meRow.bestScore;
+      else if (meRow.maxScore != null)  s = meRow.maxScore;
+      else if (meRow.points != null)    s = meRow.points;
+
+      if (meRow.seconds != null)        t = meRow.seconds;
+      else if (meRow.time != null)      t = meRow.time;
+      else if (meRow.bestTime != null)  t = meRow.bestTime;
+
+      if (typeof s === "string") {
+        const parsed = parseFloat(s);
+        if (!Number.isNaN(parsed)) s = parsed;
+      }
+      if (typeof t === "string") {
+        const parsed = parseFloat(t);
+        if (!Number.isNaN(parsed)) t = parsed;
+      }
+
+      if (typeof s === "number" && s > 0) displayScore = s;
+      if (typeof t === "number" && t > 0) displaySecs  = t;
+    }
+
+    // Fallback if everything is zero
+    displayScore = displayScore || 0;
+    displaySecs  = Math.max(0, displaySecs || 0);
+
+    const scoreStr = Math.floor(displayScore).toLocaleString("en-US");
+    const secs = Math.floor(displaySecs);
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    const tStr = `${m}:${s.toString().padStart(2, "0")}`;
+
+    let tagLine = "";
+    if (userLabel && typeof userLabel === "string") {
+      const esc = userLabel.replace(/[&<>]/g, c => (
+        c === "&" ? "&amp;" :
+        c === "<" ? "&lt;"  :
+        c === ">" ? "&gt;"  : c
+      ));
+      tagLine = `
+        • Your tag: <span style="color:${neon}; font-weight:bold;">${esc}</span><br>
+      `;
+    }
+
+    html += `
+      <div style="font-size:13px; line-height:1.5;">
+        <b>Last / Best run</b><br>
+        • Time survived: <span style="color:${neon};">${tStr}</span><br>
+        • Score: <span style="color:${neon};">${scoreStr}</span><br>
+        ${tagLine}
+      </div>
+    `;
+  }
+
+  infoContentEl.innerHTML = html;
+  infoPageLabel.textContent = "Run summary";
+}
+
+function openInfoOverlay(startPage) {
+  ensureInfoOverlay();
+  gamePaused = true; // pause game while info is open
+
+  setInfoPage(0);
+
+  if (infoOverlay) {
+    infoOverlay.style.display = "flex";
+  }
+}
+
+function closeInfoOverlay() {
+  if (infoOverlay) {
+    infoOverlay.style.display = "none";
+  }
+
+  // If this was the initial panel shown at the very start of the run,
+  // immediately open the first common upgrade instead of unpausing.
+  if (pendingInitialUpgradeAfterInfo && !initialUpgradeDone) {
+    pendingInitialUpgradeAfterInfo = false;
+
+    // Keep the game effectively paused; the upgrade overlay also pauses.
+    openUpgradeOverlay("normal");
+  } else {
+    // Normal case: just resume the game
+    gamePaused = false;
+  }
+}
 
   function setInfoPage(pageIndex) {
     if (!infoContentEl || !infoPageLabel) return;
