@@ -12,7 +12,7 @@
   let scoreboardOverlay = null;
   let scoreboardOverlayInner = null;
 
-  // Last 'myEntry' returned by the worker (for correct tag highlighting + tag lookup)
+  // Last 'myEntry' returned by the worker (for correct tag highlighting)
   let lastMyEntry = null;
 
   // --------------------------------------------------
@@ -24,7 +24,8 @@
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function pad2(n) {
@@ -43,15 +44,7 @@
     if (!entry || typeof entry !== "object") return 0;
     if (typeof entry.bestScore === "number") return entry.bestScore;
     if (typeof entry.score === "number") return entry.score;
-
-    // fallback: first numeric-ish score field
-    const keys = ["maxScore", "points", "value"];
-    for (const k of keys) {
-      const v = entry[k];
-      if (typeof v === "number" && isFinite(v)) return v;
-    }
-
-    // last resort: look for any numeric "score" field
+    // fallback: first numeric field containing "score"
     for (const [k, v] of Object.entries(entry)) {
       if (typeof v === "number" && /score/i.test(k)) {
         return v;
@@ -64,8 +57,7 @@
     if (!entry || typeof entry !== "object") return 0;
     if (typeof entry.bestTime === "number") return entry.bestTime;
     if (typeof entry.time === "number") return entry.time;
-
-    // fallback: first numeric field containing "time/second/duration"
+    // fallback: first numeric field containing "time" / "second" / "duration"
     for (const [k, v] of Object.entries(entry)) {
       if (
         typeof v === "number" &&
@@ -89,8 +81,6 @@
 
   function ensureScoreboardOverlay(container) {
     if (scoreboardOverlay) return;
-
-    // Use the frog-game container if provided, otherwise fall back to body
     containerEl = container || document.body;
 
     scoreboardOverlay = document.createElement("div");
@@ -119,7 +109,6 @@
     scoreboardOverlay.appendChild(scoreboardOverlayInner);
     containerEl.appendChild(scoreboardOverlay);
 
-    // Click outside the panel to close
     scoreboardOverlay.addEventListener("click", (e) => {
       if (e.target === scoreboardOverlay) {
         hideScoreboardOverlay();
@@ -127,41 +116,9 @@
     });
   }
 
-  // --------------------------------------------------
-  // CURRENT USER TAG (EXPORTED)
-  // --------------------------------------------------
-  function getCurrentUserLabelFromLeaderboard() {
-    try {
-      // Prefer the tag / name on myEntry from the worker
-      if (lastMyEntry) {
-        if (typeof lastMyEntry.tag === "string" && lastMyEntry.tag.trim() !== "") {
-          return lastMyEntry.tag;
-        }
-        if (typeof lastMyEntry.name === "string" && lastMyEntry.name.trim() !== "") {
-          return lastMyEntry.name;
-        }
-      }
-
-      // Fallback for older versions: whatever was stored client-side
-      if (typeof localStorage !== "undefined") {
-        const stored =
-          localStorage.getItem("frogSnake_username") ||
-          localStorage.getItem("frogSnake_tag") ||
-          localStorage.getItem("frogSnakeUserTag") ||
-          null;
-        if (stored && String(stored).trim() !== "") {
-          return stored;
-        }
-      }
-    } catch (err) {
-      // ignore and fall through
-    }
-    return null;
-  }
-
-  // --------------------------------------------------
-  // FIND "MY" ENTRY / ROW
-  // --------------------------------------------------
+  // Find the current user's row in the leaderboard list.
+  // Prefer the exact myEntry.userId from the worker; fall back to
+  // the old "closest score+time" heuristic only if needed.
   function findMyIndexInList(list, lastRunScore, lastRunTime) {
     if (!Array.isArray(list) || list.length === 0) {
       return { index: -1, entry: null };
@@ -202,20 +159,17 @@
       }
     }
 
-    // 3) Old behaviour: pick the row whose score+time is closest
+    // 3) Old behaviour: pick the row whose score+time is closest to this run
     let bestDist = Infinity;
     let bestIndex = -1;
     let bestEntry = null;
-    const targetScore =
-      (typeof lastRunScore === "number" ? lastRunScore : getEntryScore(lastMyEntry || {})) || 0;
-    const targetTime =
-      (typeof lastRunTime === "number" ? lastRunTime : getEntryTime(lastMyEntry || {})) || 0;
 
     for (let i = 0; i < list.length; i++) {
-      const e = list[i];
-      if (!e) continue;
-      const ds = getEntryScore(e) - targetScore;
-      const dt = getEntryTime(e) - targetTime;
+      const e = list[i] || {};
+      const es = getEntryScore(e);
+      const et = getEntryTime(e);
+      const ds = es - lastRunScore;
+      const dt = et - lastRunTime;
       const dist = ds * ds + dt * dt;
       if (dist < bestDist) {
         bestDist = dist;
@@ -224,14 +178,11 @@
       }
     }
 
-    if (bestIndex === -1) {
-      return { index: -1, entry: null };
-    }
     return { index: bestIndex, entry: bestEntry };
   }
 
   // --------------------------------------------------
-  // NETWORK: FETCH & SUBMIT
+  // API CALLS
   // --------------------------------------------------
   async function fetchLeaderboard() {
     try {
@@ -266,8 +217,8 @@
   async function submitScoreToServer(score, time) {
     try {
       const payload = {
-        score: Math.floor(score || 0),
-        time: time || 0,
+        score: Math.floor(score),
+        time: time,
       };
 
       const res = await fetch(LEADERBOARD_URL, {
@@ -307,17 +258,16 @@
     const mini = document.getElementById("frog-mini-leaderboard");
     if (!mini) return;
 
-    const safe = Array.isArray(topList) ? topList : [];
-    if (safe.length === 0) {
-      mini.textContent = "No runs yet.";
+    if (!Array.isArray(topList) || topList.length === 0) {
+      mini.textContent = "No scores yet.";
       return;
     }
 
     const lines = [];
-    const maxRows = Math.min(5, safe.length);
+    const maxRows = Math.min(5, topList.length);
 
     for (let i = 0; i < maxRows; i++) {
-      const entry = safe[i] || {};
+      const entry = topList[i] || {};
       const rank = i + 1;
       const name = getDisplayName(entry, `Player ${rank}`);
       const score = getEntryScore(entry);
@@ -328,16 +278,17 @@
       );
     }
 
-    mini.textContent = lines.join("\n");
+    mini.innerHTML = lines.map(escapeHtml).join("<br/>");
   }
 
   // --------------------------------------------------
-  // FULL SCOREBOARD OVERLAY
+  // BIG OVERLAY (run summary + full leaderboard)
   // --------------------------------------------------
   function openScoreboardOverlay(topList, lastRunScore, lastRunTime) {
     if (!scoreboardOverlay || !scoreboardOverlayInner) return;
 
     const safeList = Array.isArray(topList) ? topList : [];
+
     scoreboardOverlayInner.innerHTML = "";
 
     const title = document.createElement("div");
@@ -355,23 +306,12 @@
     const summary = document.createElement("div");
     summary.style.marginBottom = "12px";
     summary.style.fontSize = "13px";
-
-    const useScore =
-      typeof lastRunScore === "number" && lastRunScore > 0
-        ? lastRunScore
-        : getEntryScore(myEntry || {});
-
-    const useTime =
-      typeof lastRunTime === "number" && lastRunTime > 0
-        ? lastRunTime
-        : getEntryTime(myEntry || {});
-
     summary.innerHTML =
       "Run summary:<br>" +
       `<span style="color:#ffd700;font-weight:bold;">${escapeHtml(
         myName
       )}</span>` +
-      ` — Time ${formatTime(useTime)}, Score ${Math.floor(useScore)}`;
+      ` — Time ${formatTime(lastRunTime)}, Score ${Math.floor(lastRunScore)}`;
     scoreboardOverlayInner.appendChild(summary);
 
     const hr = document.createElement("div");
@@ -394,7 +334,7 @@
     const thScore = document.createElement("th");
 
     thRank.textContent = "#";
-    thName.textContent = "Tag";
+    thName.textContent = "Name";
     thTime.textContent = "Time";
     thScore.textContent = "Score";
 
@@ -439,11 +379,10 @@
           td.style.borderBottom = "1px solid #222";
         }
 
+        // Highlight the row that actually belongs to the current user
         if (i === myIndex) {
-          // Highlight the row that belongs to the current user
           nameCell.style.color = "#ffd700";
           nameCell.style.fontWeight = "bold";
-          tr.style.background = "rgba(255, 215, 0, 0.08)";
         }
 
         tr.appendChild(rankCell);
@@ -470,16 +409,17 @@
     hint.textContent = "Click outside this panel to close.";
     hint.style.marginTop = "8px";
     hint.style.fontSize = "11px";
-    hint.style.opacity = "0.8";
     hint.style.textAlign = "center";
+    hint.style.color = "#aaa";
     scoreboardOverlayInner.appendChild(hint);
 
     scoreboardOverlay.style.display = "flex";
   }
 
   function hideScoreboardOverlay() {
-    if (!scoreboardOverlay) return;
-    scoreboardOverlay.style.display = "none";
+    if (scoreboardOverlay) {
+      scoreboardOverlay.style.display = "none";
+    }
   }
 
   // --------------------------------------------------
@@ -499,6 +439,5 @@
     updateMiniLeaderboard,
     openScoreboardOverlay,
     hideScoreboardOverlay,
-    getCurrentUserLabel: getCurrentUserLabelFromLeaderboard,
   };
 })();
