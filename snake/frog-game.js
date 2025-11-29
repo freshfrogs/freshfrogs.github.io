@@ -118,7 +118,7 @@
   const LEGENDARY_BUFF_DURATION_FACTOR = 2.0; // x2 all buff durations
 
   const container = document.getElementById("frog-game");
-  if (!container) return;
+  //if (!container) return;
 
   // Keep these arrays consistent with your scatter-frogs setup
   const SCATTER_ANIMATED_VALUES = new Set([
