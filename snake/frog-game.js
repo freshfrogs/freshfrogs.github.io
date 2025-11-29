@@ -2158,7 +2158,7 @@ function getUpgradeChoices() {
       id: "commonDeathRattle",
       label: `
         💀 Deathrattle<br>
-        +<span style="color:${neon};">${deathPerPickPct}%</span> increased chance a dead frog respawns
+        +<span style="color:${neon};">${deathPerPickPct}%</span> increased deathrattle chance
         (<span style="color:${totalColor};">${drTotalPct}%</span>)
       `,
       apply: () => {
