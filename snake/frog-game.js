@@ -337,6 +337,8 @@
   // --------------------------------------------------
   // HUD
   // --------------------------------------------------
+  // HUD
+  // --------------------------------------------------
   const hud = document.createElement("div");
   hud.style.position = "absolute";
   hud.style.top = "10px";
@@ -351,9 +353,23 @@
   hud.style.zIndex = "100";
   hud.style.pointerEvents = "none";
 
+  const tagLabel = document.createElement("span");
   const timerLabel = document.createElement("span");
   const frogsLabel = document.createElement("span");
   const scoreLabel = document.createElement("span");
+
+  tagLabel.style.marginRight = "12px";
+  tagLabel.style.color = "#4defff";
+
+  timerLabel.style.marginRight = "12px";
+  frogsLabel.style.marginRight = "12px";
+
+  hud.appendChild(tagLabel);
+  hud.appendChild(timerLabel);
+  hud.appendChild(frogsLabel);
+  hud.appendChild(scoreLabel);
+  container.appendChild(hud);
+
   frogsLabel.style.marginLeft = "12px";
   scoreLabel.style.marginLeft = "12px";
 
@@ -406,6 +422,19 @@
   }
 
   function updateHUD() {
+    const label =
+      typeof getCurrentUserLabel === "function"
+        ? getCurrentUserLabel()
+        : null;
+
+    if (label) {
+      tagLabel.textContent = `Tag: ${label}`;
+      tagLabel.style.display = "";
+    } else {
+      tagLabel.textContent = "";
+      tagLabel.style.display = "none";
+    }
+
     timerLabel.textContent = `Time: ${formatTime(elapsedTime)}`;
     frogsLabel.textContent = `Frogs left: ${frogs.length}`;
     scoreLabel.textContent = `Score: ${Math.floor(score)}`;
@@ -2648,36 +2677,30 @@ function openHowToOverlay() {
   • Your run ends when <span style="color:${neon};">all frogs are gone</span>.
   `;
     } else if (infoPage === 2) {
-      // PAGE 2 – Orb buffs
+      // PAGE 2 – Orb buffs (live stats from config)
+      const speedBuffPct = Math.round((1 / SPEED_BUFF_FACTOR - 1) * 100);
+      const panicBuffPct = Math.round((1 / PANIC_HOP_SPEED_FACTOR - 1) * 100);
+      const jumpBuffPct  = Math.round((JUMP_BUFF_FACTOR - 1) * 100);
+
       html = `
   <b>🟢 Orb Buffs</b><br><br>
-  ⚡ <b>Speed</b> – frogs act faster for a short time (stacks with upgrades).<br>
-  🦘 <b>Jump</b> – frogs jump much higher for a short time.<br>
-  🐸➕ <b>Spawn</b> – instantly spawns extra frogs (more if the collector is Lucky).<br>
-  🧊 <b>Snake Slow</b> – snake moves slower for a few seconds (less effective as it grows).<br>
-  🤪 <b>Confuse</b> – snake turns randomly instead of targeting frogs.<br>
-  📏 <b>Shrink</b> – snake body and bite radius shrink temporarily.<br>
-  🛡️ <b>Team Shield</b> – all frogs ignore snake hits for a short duration.<br>
-  ⏱️ <b>Time Slow</b> – slows the whole game (and the snake) briefly.<br>
-  🧲 <b>Orb Magnet</b> – orbs drift toward frogs, preferring magnet frogs.<br>
-  🐸🌊 <b>Mega Spawn</b> – large wave of frogs appears at once.<br>
-  💰 <b>Score ×2</b> – score gain is multiplied for a short window.<br>
-  😱 <b>Panic Hop</b> – frogs hop faster but in random directions.<br>
-  🩺 <b>Lifeline</b> – frogs that die during the buff have a chance to instantly respawn.<br>
-  ⭐ <b>PermaFrog</b> – upgrades one frog with a permanent role (Champion, Aura, Magnet, Lucky, Zombie, etc.).
+  ⚡ <b>Speed</b> – hop cycle ×${SPEED_BUFF_FACTOR.toFixed(2)} (~+${speedBuffPct}% faster) for about ${SPEED_BUFF_DURATION}s.<br>
+  🦘 <b>Jump</b> – jump height ×${JUMP_BUFF_FACTOR.toFixed(2)} (~+${jumpBuffPct}% higher) for about ${JUMP_BUFF_DURATION}s.<br>
+  🐸➕ <b>Spawn</b> – instantly spawns 1–10 extra frogs (Lucky frogs can roll a few extra).<br>
+  🧊 <b>Snake Slow</b> – snake speed ×${SNAKE_SLOW_FACTOR.toFixed(2)} for ~${SNAKE_SLOW_DURATION}s.<br>
+  🤪 <b>Confuse</b> – snake turns randomly instead of targeting frogs for ~${SNAKE_CONFUSE_DURATION}s.<br>
+  ✂️ <b>Shrink</b> – trims the snake back toward its starting size for ~${SNAKE_SHRINK_DURATION}s.<br>
+  🛡️ <b>Team Shield</b> – all frogs ignore snake hits for ~${FROG_SHIELD_DURATION}s.<br>
+  ⏱️ <b>Time Slow</b> – slows the whole game (and the snake) for ~${TIME_SLOW_DURATION}s.<br>
+  🧲 <b>Orb Magnet</b> – orbs drift toward frogs for ~${ORB_MAGNET_DURATION}s (magnet frogs get extra pull).<br>
+  🐸🌊 <b>Mega Spawn</b> – spawns a big wave of frogs at once (base 15–25 plus Lucky bonus).<br>
+  💰 <b>Score ×2</b> – score gain is ×${SCORE_MULTI_FACTOR.toFixed(1)} for ~${SCORE_MULTI_DURATION}s (stacks with Lucky bonus).<br>
+  😱 <b>Panic Hop</b> – frogs hop with cycle ×${PANIC_HOP_SPEED_FACTOR.toFixed(2)} (~+${panicBuffPct}% faster) in random directions for ~${PANIC_HOP_DURATION}s.<br>
+  🐸🌀 <b>Clone Swarm</b> – rapidly clones nearby frogs for ~${CLONE_SWARM_DURATION}s.<br>
+  🩺 <b>Lifesteal</b> – frogs that collect orbs can bring dead frogs back for ~${LIFE_STEAL_DURATION}s.<br>
+  ⭐ <b>Perma lifesteal</b> – a special upgrade makes the next ${PERMA_LIFESTEAL_ORB_COUNT} orbs also spawn frogs.<br>
   `;
-    } else if (infoPage === 3) {
-      // PAGE 3 – Permanent frog roles (no shield frog)
-      html = `
-  <b>🐸 Permanent Frog Roles</b><br><br>
-  🏅 <b>Champion</b> – that frog's hop cycle is faster and jumps are higher.<br>
-  🌈 <b>Aura</b> – nearby frogs get bonus speed and jump height in a radius around this frog.<br>
-  🧲 <b>Magnet</b> – orbs in a radius are strongly pulled toward this frog.<br>
-  🍀 <b>Lucky</b> – buffs last longer, more frogs spawn from some effects, and score gain is boosted slightly per Lucky frog.<br>
-  🧟 <b>Zombie</b> – when this frog dies, it causes extra chaos (like extra frogs and snake debuffs).<br>
-  💀 <b>Cannibal</b> – hunts nearby frogs; sometimes “spares” a victim and grants it a random permanent role instead of killing it.<br><br>
-  Perma roles stack with global upgrades and orb buffs, making some frogs into mini “heroes” of the swarm.
-  `;
+
     } else if (infoPage === 4) {
       // PAGE 4 – Global upgrades (common + epic; no shield frog, no legendary)
       html = `
