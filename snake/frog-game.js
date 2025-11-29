@@ -232,6 +232,7 @@
   let cannibalFrogCount = 0;       // how many cannibal frogs are currently alive
   let lastStandActive = false;
   let orbCollectorActive   = false;
+  let orbCollectorChance   = 0;    // current chance (0–1) that an orb spawns a frog
 
   // Legendary Frenzy timer (snake + frogs go wild)
   let snakeFrenzyTime = 0;
