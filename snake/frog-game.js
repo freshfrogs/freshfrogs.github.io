@@ -107,8 +107,8 @@
   const CANNIBAL_ROLE_CHANCE = 0.05; // 5% chance eaten frog gains random role
 
   // Spawn amounts
-  const NORMAL_SPAWN_AMOUNT           = 15;   // normal menu
-  const EPIC_SPAWN_AMOUNT             = 25;   // epic menu
+  const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
+  const EPIC_SPAWN_AMOUNT             = 20;   // epic menu
   const LEGENDARY_SPAWN_AMOUNT        = 30;   // legendary menu
 
   // Deathrattle chances
