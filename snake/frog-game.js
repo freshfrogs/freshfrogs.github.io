@@ -109,24 +109,14 @@
   // --- HARD CAPS for permanent upgrades / buffs ---
   // Frogs can't be faster than 50% of the original hop cycle
   const MIN_FROG_SPEED_FACTOR         = 0.50;
-
-  // Frogs can't have more than 300% base jump height from global upgrades
   const MAX_FROG_JUMP_FACTOR          = 3.0;
-
-  // Buffs can't last more than 300% of base duration from global upgrades
-  const MAX_BUFF_DURATION_FACTOR      = 3.0;
-
-  // Orb interval can't go below 35% of base (≈ 65% faster spawns)
+  const MAX_BUFF_DURATION_FACTOR      = 4.0;
   const MIN_ORB_SPAWN_INTERVAL_FACTOR = 0.35;
-
-  // Global deathrattle chance hard cap (100%)
-  const MAX_DEATHRATTLE_CHANCE        = 1.0;
-
-  // Orb Collector total frog-spawn chance cap (100%). Lower if you want.
+  const MAX_DEATHRATTLE_CHANCE        = 0.5;
   const MAX_ORB_COLLECTOR_TOTAL       = 1.0;
 
   const MAX_SNAKE_SEGMENTS = 200;
-  const CANNIBAL_ROLE_CHANCE = 0.05; // 5% chance eaten frog gains random role
+  const CANNIBAL_ROLE_CHANCE = 0.05;
 
   // Spawn amounts
   const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
