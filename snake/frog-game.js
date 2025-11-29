@@ -119,6 +119,7 @@
   const MAX_SNAKE_SEGMENTS = 200;
   const CANNIBAL_ROLE_CHANCE = 0.05;
 
+  const orbStormCount = 12;
   // Spawn amounts
   const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
   const EPIC_SPAWN_AMOUNT             = 30;   // epic menu
