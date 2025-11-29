@@ -18,6 +18,15 @@
         background: #7cc1ff; /* light blue */
       }
 
+      /* Main game container expected by frog-game.js */
+      #frog-game {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      /* You already had this, keeping it in case you later use #frog-bg */
       #frog-bg {
         position: fixed;
         inset: 0;
@@ -26,6 +35,9 @@
     </style>
   </head>
   <body>
+    <!-- This is the container frog-game.js is trying to use -->
+    <div id="frog-game"></div>
+
     <script src="frog-audio.js"></script>
     <script src="frog-leaderboard.js"></script>
     <script src="frog-game.js"></script>
