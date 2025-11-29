@@ -81,18 +81,23 @@
 
   function ensureScoreboardOverlay(container) {
     if (scoreboardOverlay) return;
+  
+    // Use the frog-game container if provided, otherwise fall back to body
     containerEl = container || document.body;
-
+  
     scoreboardOverlay = document.createElement("div");
     scoreboardOverlay.id = "frog-scoreboard-overlay";
-    scoreboardOverlay.style.position = "relative";
-    scoreboardOverlay.style.inset = "0";
-    scoreboardOverlay.style.background = "rgba(0,0,0,0.65)";
-    scoreboardOverlay.style.display = "none";
+  
+    // Fullscreen overlay inside the game container
+    scoreboardOverlay.style.position = "absolute";
+    scoreboardOverlay.style.inset = "0"; // top/right/bottom/left = 0
+    scoreboardOverlay.style.display = "none"; // shown via showScoreboardOverlay
     scoreboardOverlay.style.alignItems = "center";
     scoreboardOverlay.style.justifyContent = "center";
-    scoreboardOverlay.style.zIndex = "9999";
-
+    scoreboardOverlay.style.background = "rgba(0,0,0,0.65)";
+    scoreboardOverlay.style.zIndex = "200"; // above HUD but below dev tools
+    scoreboardOverlay.style.pointerEvents = "auto";
+  
     scoreboardOverlayInner = document.createElement("div");
     scoreboardOverlayInner.style.background = "#111";
     scoreboardOverlayInner.style.borderRadius = "10px";
@@ -105,16 +110,18 @@
     scoreboardOverlayInner.style.fontSize = "12px";
     scoreboardOverlayInner.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
     scoreboardOverlayInner.style.textAlign = "left";
-
+  
     scoreboardOverlay.appendChild(scoreboardOverlayInner);
     containerEl.appendChild(scoreboardOverlay);
-
+  
+    // Click outside the panel to close
     scoreboardOverlay.addEventListener("click", (e) => {
       if (e.target === scoreboardOverlay) {
         hideScoreboardOverlay();
       }
     });
   }
+  
 
   // Find the current user's row in the leaderboard list.
   // Prefer the exact myEntry.userId from the worker; fall back to
