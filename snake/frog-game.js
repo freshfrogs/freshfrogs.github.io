@@ -106,6 +106,25 @@
   const ORB_COLLECTOR_CHANCE = 0.10;
   const TOTAL_HIGHLIGHT_COLOR = "#ffb347"; // for showing new total values
 
+  // --- HARD CAPS for permanent upgrades / buffs ---
+  // Frogs can't be faster than 50% of the original hop cycle
+  const MIN_FROG_SPEED_FACTOR         = 0.50;
+
+  // Frogs can't have more than 300% base jump height from global upgrades
+  const MAX_FROG_JUMP_FACTOR          = 3.0;
+
+  // Buffs can't last more than 300% of base duration from global upgrades
+  const MAX_BUFF_DURATION_FACTOR      = 3.0;
+
+  // Orb interval can't go below 35% of base (≈ 65% faster spawns)
+  const MIN_ORB_SPAWN_INTERVAL_FACTOR = 0.35;
+
+  // Global deathrattle chance hard cap (100%)
+  const MAX_DEATHRATTLE_CHANCE        = 1.0;
+
+  // Orb Collector total frog-spawn chance cap (100%). Lower if you want.
+  const MAX_ORB_COLLECTOR_TOTAL       = 1.0;
+
   const MAX_SNAKE_SEGMENTS = 200;
   const CANNIBAL_ROLE_CHANCE = 0.05; // 5% chance eaten frog gains random role
 
@@ -1936,108 +1955,125 @@ function getEpicUpgradeChoices() {
 
   const deathPerPickPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
   const currentDRChance = frogDeathRattleChance;
-  const nextDRChance    = Math.min(1, currentDRChance + EPIC_DEATHRATTLE_CHANCE);
+  const nextDRChance    = Math.min(MAX_DEATHRATTLE_CHANCE, currentDRChance + EPIC_DEATHRATTLE_CHANCE);
   const drTotalPct      = Math.round(nextDRChance * 100);
 
   const epicBuffFactor  = BUFF_DURATION_UPGRADE_FACTOR + 0.25;
   const buffPerPickPct  = Math.round((epicBuffFactor - 1) * 100);
-  const nextBuffFactor  = buffDurationFactor * epicBuffFactor;
+  const nextBuffFactor  = Math.min(MAX_BUFF_DURATION_FACTOR, buffDurationFactor * epicBuffFactor);
   const buffTotalPct    = Math.round((nextBuffFactor - 1) * 100);
 
   const orbStormCount   = 10;
   const snakeEggBuffPct = 11; // +11% instead of +20%
 
-  return [
-    {
-      id: "epicSpawn50",
-      label: `
+  const choices = [];
+
+  // Spawn frogs – always allowed
+  choices.push({
+    id: "epicSpawn50",
+    label: `
         🐸 Spawn Frogs<br>
         Spawn <span style="color:${neon};">${EPIC_SPAWN_AMOUNT}</span> frogs now
       `,
-      apply: () => {
-        spawnExtraFrogs(EPIC_SPAWN_AMOUNT);
-      }
-    },
-    {
+    apply: () => {
+      spawnExtraFrogs(EPIC_SPAWN_AMOUNT);
+    }
+  });
+
+  // Epic deathrattle – only if we’re below cap
+  if (frogDeathRattleChance < MAX_DEATHRATTLE_CHANCE - 1e-4) {
+    choices.push({
       id: "epicDeathRattle",
       label: `
-        💀 Deathrattle<br>
+        💀 Deathrattle (epic)<br>
         +<span style="color:${neon};">${deathPerPickPct}%</span> deathrattle chance
         (<span style="color:${totalColor};">${drTotalPct}%</span>)
       `,
       apply: () => {
-        frogDeathRattleChance += EPIC_DEATHRATTLE_CHANCE;
+        frogDeathRattleChance = Math.min(
+          MAX_DEATHRATTLE_CHANCE,
+          frogDeathRattleChance + EPIC_DEATHRATTLE_CHANCE
+        );
       }
-    },
-    {
+    });
+  }
+
+  // Epic buff duration – only if we’re below cap
+  if (buffDurationFactor < MAX_BUFF_DURATION_FACTOR - 1e-4) {
+    choices.push({
       id: "epicBuffDuration",
       label: `
-        ⏳ Buffs extended<br>
+        ⏳ Buffs extended (epic)<br>
         +<span style="color:${neon};">${buffPerPickPct}%</span> buff duration
-        (<span style="color:${totalColor};">${buffTotalPct}%</span>)
+        (<span style="color:${totalColor};">+${buffTotalPct}%</span>)
       `,
       apply: () => {
-        buffDurationFactor *= epicBuffFactor;
+        buffDurationFactor = Math.min(
+          MAX_BUFF_DURATION_FACTOR,
+          buffDurationFactor * epicBuffFactor
+        );
       }
-    },
+    });
+  }
 
-    // Cannibal Frog
-    {
-      id: "epicCannibalFrog",
-      label: `
+  // Cannibal Frog – permanent role, no cap
+  choices.push({
+    id: "epicCannibalFrog",
+    label: `
         🦴 Cannibal Frog<br>
         Spawn a <span style="color:${neon};">Cannibal</span> frog with<br>
         +<span style="color:${neon};">5%</span> deathrattle chance<br>
         +<span style="color:${neon};">5%</span> overall stats<br>
         • Eats nearby frogs that get in its way
       `,
-      apply: () => {
-        spawnCannibalFrog();
-      }
-    },
+    apply: () => {
+      spawnCannibalFrog();
+    }
+  });
 
-    // ORB STORM
-    {
-      id: "epicOrbStorm",
-      label: `
+  // ORB STORM – always allowed
+  choices.push({
+    id: "epicOrbStorm",
+    label: `
         🌩️ Orb Storm<br>
         Drop <span style="color:${neon};">${orbStormCount}</span> random orbs right now
       `,
-      apply: () => {
-        const width  = window.innerWidth;
-        const height = window.innerHeight;
-        for (let i = 0; i < orbStormCount; i++) {
-          spawnOrbRandom(width, height);
-        }
+    apply: () => {
+      const width  = window.innerWidth;
+      const height = window.innerHeight;
+      for (let i = 0; i < orbStormCount; i++) {
+        spawnOrbRandom(width, height);
       }
-    },
+    }
+  });
 
-    // SNAKE EGG
-    {
-      id: "snakeEgg",
-      label: `
+  // SNAKE EGG – always allowed
+  choices.push({
+    id: "snakeEgg",
+    label: `
         🥚 Snake Egg<br>
         The <span style="color:${neon};">next shed</span> only gives the new snake
         <span style="color:${neon};">+${snakeEggBuffPct}%</span> speed instead of +20%
       `,
-      apply: () => {
-        snakeEggPending = true;
-      }
-    },
+    apply: () => {
+      snakeEggPending = true;
+    }
+  });
 
-    // Zombie Horde
-    {
-      id: "zombieHorde",
-      label: `
+  // Zombie Horde – always allowed
+  choices.push({
+    id: "zombieHorde",
+    label: `
         🧟🧟🧟 Zombie Horde<br>
         Summon <span style="color:${neon};">3</span> zombie frogs
         with <span style="color:${neon};">50%</span> deathrattle
       `,
-      apply: () => {
-        spawnZombieHorde(3);
-      }
+    apply: () => {
+      spawnZombieHorde(3);
     }
-  ];
+  });
+
+  return choices;
 }
 
 function getUpgradeChoices() {
@@ -2052,42 +2088,52 @@ function getUpgradeChoices() {
   const deathPerPickPct     = Math.round(COMMON_DEATHRATTLE_CHANCE * 100);
   const orbPerPickPct       = Math.round(ORB_COLLECTOR_CHANCE * 100);
 
-  // --- totals after taking this upgrade once more ---
+  // --- totals after taking this upgrade once more (with caps) ---
 
   // Frogs hop faster (factor < 1 = faster)
-  const nextSpeedFactor = frogPermanentSpeedFactor * FROG_SPEED_UPGRADE_FACTOR;
-  const speedTotalPct   = Math.round((1 - nextSpeedFactor) * 100); // faster vs base
+  const unclampedNextSpeedFactor = frogPermanentSpeedFactor * FROG_SPEED_UPGRADE_FACTOR;
+  const nextSpeedFactor          = Math.max(MIN_FROG_SPEED_FACTOR, unclampedNextSpeedFactor);
+  const speedTotalPct            = Math.round((1 - nextSpeedFactor) * 100); // faster vs base
 
   // Frogs jump higher (factor > 1 = higher)
-  const nextJumpFactor = frogPermanentJumpFactor * FROG_JUMP_UPGRADE_FACTOR;
-  const jumpTotalPct   = Math.round((nextJumpFactor - 1) * 100);   // taller vs base
+  const unclampedNextJumpFactor = frogPermanentJumpFactor * FROG_JUMP_UPGRADE_FACTOR;
+  const nextJumpFactor          = Math.min(MAX_FROG_JUMP_FACTOR, unclampedNextJumpFactor);
+  const jumpTotalPct            = Math.round((nextJumpFactor - 1) * 100);   // taller vs base
 
   // Buff duration multiplier
-  const nextBuffFactor = buffDurationFactor * BUFF_DURATION_UPGRADE_FACTOR;
-  const buffTotalPct   = Math.round((nextBuffFactor - 1) * 100);
+  const unclampedNextBuffFactor = buffDurationFactor * BUFF_DURATION_UPGRADE_FACTOR;
+  const nextBuffFactor          = Math.min(MAX_BUFF_DURATION_FACTOR, unclampedNextBuffFactor);
+  const buffTotalPct            = Math.round((nextBuffFactor - 1) * 100);
 
   // Orb spawn interval factor (<1 = faster)
-  const nextOrbIntervalFactor = orbSpawnIntervalFactor * ORB_INTERVAL_UPGRADE_FACTOR;
-  const orbFasterTotalPct     = Math.round((1 - nextOrbIntervalFactor) * 100);
+  const unclampedNextOrbIntervalFactor = orbSpawnIntervalFactor * ORB_INTERVAL_UPGRADE_FACTOR;
+  const nextOrbIntervalFactor          = Math.max(
+    MIN_ORB_SPAWN_INTERVAL_FACTOR,
+    unclampedNextOrbIntervalFactor
+  );
+  const orbFasterTotalPct = Math.round((1 - nextOrbIntervalFactor) * 100);
 
   // Global deathrattle chance
   const currentDRChance = frogDeathRattleChance;
-  const nextDRChance    = Math.min(1, currentDRChance + COMMON_DEATHRATTLE_CHANCE);
+  const nextDRChance    = Math.min(MAX_DEATHRATTLE_CHANCE, currentDRChance + COMMON_DEATHRATTLE_CHANCE);
   const drTotalPct      = Math.round(nextDRChance * 100);
 
   // Orb Collector total chance
   const currentOrbChance  = orbCollectorChance;
-  const nextOrbChance     = Math.min(1, currentOrbChance + ORB_COLLECTOR_CHANCE);
+  const nextOrbChance     = Math.min(MAX_ORB_COLLECTOR_TOTAL, currentOrbChance + ORB_COLLECTOR_CHANCE);
   const orbChanceTotalPct = Math.round(nextOrbChance * 100);
 
-  // Lifesteal queued orbs
+  // Lifesteal queued orbs (if you ever re-enable that upgrade)
   const currentLifeOrbs = permaLifeStealOrbsRemaining;
   const nextLifeOrbs    = currentLifeOrbs + PERMA_LIFESTEAL_ORB_COUNT;
 
   const lastStandPct = Math.round(LAST_STAND_MIN_CHANCE * 100);
 
-  const upgrades = [
-    {
+  const upgrades = [];
+
+  // --- Speed upgrade (capped at MIN_FROG_SPEED_FACTOR) ---
+  if (frogPermanentSpeedFactor > MIN_FROG_SPEED_FACTOR + 1e-4) {
+    upgrades.push({
       id: "frogSpeed",
       label: `
         ⏩ Frogs hop faster<br>
@@ -2096,9 +2142,16 @@ function getUpgradeChoices() {
       `,
       apply: () => {
         frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
+        if (frogPermanentSpeedFactor < MIN_FROG_SPEED_FACTOR) {
+          frogPermanentSpeedFactor = MIN_FROG_SPEED_FACTOR;
+        }
       }
-    },
-    {
+    });
+  }
+
+  // --- Jump upgrade (capped at MAX_FROG_JUMP_FACTOR) ---
+  if (frogPermanentJumpFactor < MAX_FROG_JUMP_FACTOR - 1e-4) {
+    upgrades.push({
       id: "frogJump",
       label: `
         🦘⬆️ Frogs jump higher<br>
@@ -2107,19 +2160,28 @@ function getUpgradeChoices() {
       `,
       apply: () => {
         frogPermanentJumpFactor *= FROG_JUMP_UPGRADE_FACTOR;
+        if (frogPermanentJumpFactor > MAX_FROG_JUMP_FACTOR) {
+          frogPermanentJumpFactor = MAX_FROG_JUMP_FACTOR;
+        }
       }
-    },
-    {
-      id: "spawn20",
-      label: `
+    });
+  }
+
+  // --- Spawn frogs (no cap, just a utility button) ---
+  upgrades.push({
+    id: "spawn20",
+    label: `
         🐸 Spawn frogs<br>
         <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
       `,
-      apply: () => {
-        spawnExtraFrogs(NORMAL_SPAWN_AMOUNT);
-      }
-    },
-    {
+    apply: () => {
+      spawnExtraFrogs(NORMAL_SPAWN_AMOUNT);
+    }
+  });
+
+  // --- Buff duration upgrade (capped at MAX_BUFF_DURATION_FACTOR) ---
+  if (buffDurationFactor < MAX_BUFF_DURATION_FACTOR - 1e-4) {
+    upgrades.push({
       id: "buffDuration",
       label: `
         ⏳ Buffs last longer<br>
@@ -2128,9 +2190,16 @@ function getUpgradeChoices() {
       `,
       apply: () => {
         buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR;
+        if (buffDurationFactor > MAX_BUFF_DURATION_FACTOR) {
+          buffDurationFactor = MAX_BUFF_DURATION_FACTOR;
+        }
       }
-    },
-    {
+    });
+  }
+
+  // --- Orb spawn rate (capped at MIN_ORB_SPAWN_INTERVAL_FACTOR) ---
+  if (orbSpawnIntervalFactor > MIN_ORB_SPAWN_INTERVAL_FACTOR + 1e-4) {
+    upgrades.push({
       id: "moreOrbs",
       label: `
         🎯 More orbs over time<br>
@@ -2139,10 +2208,17 @@ function getUpgradeChoices() {
       `,
       apply: () => {
         orbSpawnIntervalFactor *= ORB_INTERVAL_UPGRADE_FACTOR;
+        if (orbSpawnIntervalFactor < MIN_ORB_SPAWN_INTERVAL_FACTOR) {
+          orbSpawnIntervalFactor = MIN_ORB_SPAWN_INTERVAL_FACTOR;
+        }
       }
-    },
-    /*
-    {
+    });
+  }
+
+  /*
+  // If you ever re-enable permanent lifesteal, you can also cap it, etc.
+  if ( some condition  false) {
+    upgrades.push({
       id: "permaLifeSteal",
       label: `
         🩸 Lifesteal (upgrade)<br>
@@ -2152,9 +2228,13 @@ function getUpgradeChoices() {
       apply: () => {
         permaLifeStealOrbsRemaining += PERMA_LIFESTEAL_ORB_COUNT;
       }
-    },
-    */
-    {
+    });
+  }
+  */
+
+  // --- Global deathrattle (capped at MAX_DEATHRATTLE_CHANCE) ---
+  if (frogDeathRattleChance < MAX_DEATHRATTLE_CHANCE - 1e-4) {
+    upgrades.push({
       id: "commonDeathRattle",
       label: `
         💀 Deathrattle<br>
@@ -2162,10 +2242,17 @@ function getUpgradeChoices() {
         (<span style="color:${totalColor};">${drTotalPct}%</span>)
       `,
       apply: () => {
-        frogDeathRattleChance += COMMON_DEATHRATTLE_CHANCE;
+        frogDeathRattleChance = Math.min(
+          MAX_DEATHRATTLE_CHANCE,
+          frogDeathRattleChance + COMMON_DEATHRATTLE_CHANCE
+        );
       }
-    },
-    {
+    });
+  }
+
+  // --- Orb Collector (capped at MAX_ORB_COLLECTOR_TOTAL) ---
+  if (orbCollectorChance < MAX_ORB_COLLECTOR_TOTAL - 1e-4) {
+    upgrades.push({
       id: "orbCollector",
       label: `
         🌌 Orb Collector<br>
@@ -2174,10 +2261,13 @@ function getUpgradeChoices() {
       `,
       apply: () => {
         orbCollectorActive = true;
-        orbCollectorChance = Math.min(1, orbCollectorChance + ORB_COLLECTOR_CHANCE);
+        orbCollectorChance = Math.min(
+          MAX_ORB_COLLECTOR_TOTAL,
+          orbCollectorChance + ORB_COLLECTOR_CHANCE
+        );
       }
-    }
-  ];
+    });
+  }
 
   // 🔹 Only include Last Stand if it hasn't been picked yet
   if (!lastStandActive) {
@@ -2196,6 +2286,7 @@ function getUpgradeChoices() {
 
   return upgrades;
 }
+
 
   // LEGENDARY choices at 10 minutes (placeholders, TODO)
 function getLegendaryUpgradeChoices() {
