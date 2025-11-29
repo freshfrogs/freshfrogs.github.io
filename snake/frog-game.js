@@ -2171,9 +2171,6 @@ function getUpgradeChoices() {
         🌌 Orb Collector<br>
         Every orb gains +<span style="color:${neon};">${orbPerPickPct}%</span>
         (<span style="color:${totalColor};">${orbChanceTotalPct}%</span>) chance to spawn a frog<br>
-        <span style="font-size:11px;opacity:0.8;">
-          (On top of the orb's normal buff)
-        </span>
       `,
       apply: () => {
         orbCollectorActive = true;
