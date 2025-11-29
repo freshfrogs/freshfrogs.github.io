@@ -108,7 +108,7 @@
 
   // Spawn amounts
   const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
-  const EPIC_SPAWN_AMOUNT             = 20;   // epic menu
+  const EPIC_SPAWN_AMOUNT             = 30;   // epic menu
   const LEGENDARY_SPAWN_AMOUNT        = 30;   // legendary menu
 
   // Deathrattle chances
