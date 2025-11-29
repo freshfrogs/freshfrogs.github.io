@@ -2139,6 +2139,7 @@ function getUpgradeChoices() {
         orbSpawnIntervalFactor *= ORB_INTERVAL_UPGRADE_FACTOR;
       }
     },
+    /*
     {
       id: "permaLifeSteal",
       label: `
@@ -2150,6 +2151,7 @@ function getUpgradeChoices() {
         permaLifeStealOrbsRemaining += PERMA_LIFESTEAL_ORB_COUNT;
       }
     },
+    */
     {
       id: "commonDeathRattle",
       label: `
