@@ -40,7 +40,7 @@
   // SNAKE CONSTANTS
   // --------------------------------------------------
   const SNAKE_SEGMENT_SIZE  = 64;
-  const SNAKE_BASE_SPEED    = 85;
+  const SNAKE_BASE_SPEED    = 90;
   const SNAKE_TURN_RATE     = Math.PI * 0.75;
   const SNAKE_SEGMENT_GAP   = 32;
   const SNAKE_INITIAL_SEGMENTS = 6;
@@ -114,6 +114,7 @@
   const MIN_ORB_SPAWN_INTERVAL_FACTOR = 0.35;
   const MAX_DEATHRATTLE_CHANCE        = 0.5;
   const MAX_ORB_COLLECTOR_TOTAL       = 1.0;
+  const SNAKE_SHED_SPEEDUP = 1.25;
 
   const MAX_SNAKE_SEGMENTS = 200;
   const CANNIBAL_ROLE_CHANCE = 0.05;
@@ -390,7 +391,7 @@
 
     // Permanent speed bonus each shed.
     // Normally +20%, but if Snake Egg is pending, only +11% (20% - 9%).
-    let speedMult = 1.20;
+    let speedMult = SNAKE_SHED_SPEEDUP;
     if (snakeEggPending) {
       speedMult = 1.11;   // +11% instead of +20%
       snakeEggPending = false; // consume the egg buff
