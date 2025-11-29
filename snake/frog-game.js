@@ -2399,14 +2399,6 @@ function openHowToOverlay() {
 }
 
 
-  function openHowToOverlay() {
-    ensureHowToOverlay();
-    gamePaused = true;
-    if (howToOverlay) {
-      howToOverlay.style.display = "flex";
-    }
-  }
-
 function ensureInfoOverlay() {
   if (infoOverlay) return;
 
@@ -3483,6 +3475,9 @@ async function startGame() {
 
   setNextOrbTime();
   updateHUD();
+
+  // Show the how-to-play menu before the first upgrade
+  openHowToOverlay();
 
   // Always offer a common upgrade at the very start of the game
   // (same behavior as restartGame)
