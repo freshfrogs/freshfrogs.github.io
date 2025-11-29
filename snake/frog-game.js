@@ -1930,10 +1930,19 @@ function updateSnake(dt, width, height) {
 
 function getEpicUpgradeChoices() {
   const neon = "#4defff";
-  const speedPct = Math.round((1 - FROG_SPEED_UPGRADE_FACTOR) * 100);
-  const deathPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
-  const buffBonusPct  = 25; // ~25% extra here for epic
-  const orbStormCount = 10;
+  const totalColor = TOTAL_HIGHLIGHT_COLOR;
+
+  const deathPerPickPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
+  const currentDRChance = frogDeathRattleChance;
+  const nextDRChance    = Math.min(1, currentDRChance + EPIC_DEATHRATTLE_CHANCE);
+  const drTotalPct      = Math.round(nextDRChance * 100);
+
+  const epicBuffFactor  = BUFF_DURATION_UPGRADE_FACTOR + 0.25;
+  const buffPerPickPct  = Math.round((epicBuffFactor - 1) * 100);
+  const nextBuffFactor  = buffDurationFactor * epicBuffFactor;
+  const buffTotalPct    = Math.round((nextBuffFactor - 1) * 100);
+
+  const orbStormCount   = 10;
   const snakeEggBuffPct = 11; // +11% instead of +20%
 
   return [
@@ -1951,7 +1960,8 @@ function getEpicUpgradeChoices() {
       id: "epicDeathRattle",
       label: `
         💀 Deathrattle<br>
-        +<span style="color:${neon};">${deathPct}%</span> deathrattle chance
+        +<span style="color:${neon};">${deathPerPickPct}%</span> deathrattle chance
+        (<span style="color:${totalColor};">${drTotalPct}% total</span>)
       `,
       apply: () => {
         frogDeathRattleChance += EPIC_DEATHRATTLE_CHANCE;
@@ -1961,14 +1971,15 @@ function getEpicUpgradeChoices() {
       id: "epicBuffDuration",
       label: `
         ⏳ Buffs extended<br>
-        +<span style="color:${neon};">${buffBonusPct}%</span> buff duration
+        +<span style="color:${neon};">${buffPerPickPct}%</span> buff duration
+        (<span style="color:${totalColor};">${buffTotalPct}% total</span>)
       `,
       apply: () => {
-        buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR + 0.25;
+        buffDurationFactor *= epicBuffFactor;
       }
     },
 
-    // NEW EPIC: Cannibal Frog
+    // Cannibal Frog
     {
       id: "epicCannibalFrog",
       label: `
@@ -1983,7 +1994,7 @@ function getEpicUpgradeChoices() {
       }
     },
 
-    // 🌩️ ORB STORM – drop a bunch of orbs right now
+    // ORB STORM
     {
       id: "epicOrbStorm",
       label: `
@@ -1999,7 +2010,7 @@ function getEpicUpgradeChoices() {
       }
     },
 
-    // 🥚 SNAKE EGG – next shed snake only gets +11% speed instead of +20%
+    // SNAKE EGG
     {
       id: "snakeEgg",
       label: `
@@ -2012,7 +2023,7 @@ function getEpicUpgradeChoices() {
       }
     },
 
-    // NEW EPIC: Zombie Horde
+    // Zombie Horde
     {
       id: "zombieHorde",
       label: `
