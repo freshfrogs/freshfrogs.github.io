@@ -62,11 +62,11 @@
   const SNAKE_SLOW_DURATION    = 7;
   const SNAKE_CONFUSE_DURATION = 7;
   const SNAKE_SHRINK_DURATION  = 7;
-  const FROG_SHIELD_DURATION   = 10;
+  const FROG_SHIELD_DURATION   = 7;
   const TIME_SLOW_DURATION     = 5;
   const ORB_MAGNET_DURATION    = 10;
   const SCORE_MULTI_DURATION   = 20;
-  const PANIC_HOP_DURATION     = 5;
+  const PANIC_HOP_DURATION     = 7;
   const CLONE_SWARM_DURATION   = 1;
   const LIFE_STEAL_DURATION    = 10;
   // Permanent lifesteal upgrade: how many orbs it affects
@@ -85,12 +85,12 @@
   const SCORE_MULTI_FACTOR       = 2.0;  // score x2
 
   // Aura / champion / lucky
-  const CHAMPION_SPEED_FACTOR    = 0.85;
-  const CHAMPION_JUMP_FACTOR     = 1.25;
-  const AURA_JUMP_FACTOR         = 1.15;
-  const LUCKY_BUFF_DURATION_BOOST = 1.4;
-  const AURA_SPEED_FACTOR        = 0.9;
-  const LUCKY_SCORE_BONUS_PER    = 0.10; // +10% per Lucky frog
+  const CHAMPION_SPEED_FACTOR    = 0.75;
+  const CHAMPION_JUMP_FACTOR     = 1.35;
+  const AURA_JUMP_FACTOR         = 1.25;
+  const LUCKY_BUFF_DURATION_BOOST = 1.50;
+  const AURA_SPEED_FACTOR        = 0.80;
+  const LUCKY_SCORE_BONUS_PER    = 0.15; // +10% per Lucky frog
   
 
 
@@ -100,7 +100,7 @@
 
   // Normal upgrade multipliers
   const FROG_SPEED_UPGRADE_FACTOR     = 0.90; // ~15% faster hops each pick
-  const FROG_JUMP_UPGRADE_FACTOR      = 1.40; // ~70% higher jumps each pick
+  const FROG_JUMP_UPGRADE_FACTOR      = 1.25; // ~70% higher jumps each pick
   const BUFF_DURATION_UPGRADE_FACTOR  = 1.10; // +20% buff duration each pick
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
   const ORB_COLLECTOR_CHANCE = 0.10;
@@ -108,8 +108,8 @@
 
   // --- HARD CAPS for permanent upgrades / buffs ---
   // Frogs can't be faster than 50% of the original hop cycle
-  const MIN_FROG_SPEED_FACTOR         = 0.50;
-  const MAX_FROG_JUMP_FACTOR          = 3.0;
+  const MIN_FROG_SPEED_FACTOR         = 0.30;
+  const MAX_FROG_JUMP_FACTOR          = 3.5;
   const MAX_BUFF_DURATION_FACTOR      = 4.0;
   const MIN_ORB_SPAWN_INTERVAL_FACTOR = 0.35;
   const MAX_DEATHRATTLE_CHANCE        = 0.5;
