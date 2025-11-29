@@ -121,7 +121,7 @@
   const MAX_SNAKE_SEGMENTS = 200;
   const CANNIBAL_ROLE_CHANCE = 0.05;
 
-  const orbStormCount = 12;
+  const ORB_STORM_COUNT = 12;
   // Spawn amounts
   const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
   const EPIC_SPAWN_AMOUNT             = 30;   // epic menu
@@ -2028,12 +2028,12 @@ function getEpicUpgradeChoices() {
     id: "epicOrbStorm",
     label: `
         🌩️ Orb Storm<br>
-        Drop <span style="color:${neon};">${orbStormCount}</span> random orbs right now
+        Drop <span style="color:${neon};">${ORB_STORM_COUNT}</span> random orbs right now
       `,
     apply: () => {
       const width  = window.innerWidth;
       const height = window.innerHeight;
-      for (let i = 0; i < orbStormCount; i++) {
+      for (let i = 0; i < ORB_STORM_COUNT; i++) {
         spawnOrbRandom(width, height);
       }
     }
