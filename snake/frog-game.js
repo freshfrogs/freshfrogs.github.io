@@ -3447,16 +3447,13 @@ async function startGame() {
   setNextOrbTime();
   updateHUD();
 
-  // Show unified info panel once at the start of a fresh run
-  if (!hasShownHowToOverlay) {
-    hasShownHowToOverlay = true;
-    openInfoOverlay(0); // start on leaderboard page
-  } else {
-    openUpgradeOverlay("normal");
-  }
+  // Always offer a common upgrade at the very start of the game
+  // (same behavior as restartGame)
+  openUpgradeOverlay("normal");
 
   animId = requestAnimationFrame(drawFrame);
 }
+
 
   window.addEventListener("load", startGame);
 })();
