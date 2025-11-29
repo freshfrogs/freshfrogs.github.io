@@ -89,7 +89,7 @@
     scoreboardOverlay.id = "frog-scoreboard-overlay";
   
     // Fullscreen overlay inside the game container
-    scoreboardOverlay.style.position = "absolute";
+    scoreboardOverlay.style.position = "relative";
     scoreboardOverlay.style.inset = "0"; // top/right/bottom/left = 0
     scoreboardOverlay.style.display = "none"; // shown via showScoreboardOverlay
     scoreboardOverlay.style.alignItems = "center";
