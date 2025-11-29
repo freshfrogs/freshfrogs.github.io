@@ -40,8 +40,8 @@
   // SNAKE CONSTANTS
   // --------------------------------------------------
   const SNAKE_SEGMENT_SIZE  = 64;
-  const SNAKE_BASE_SPEED    = 90;
-  const SNAKE_TURN_RATE     = Math.PI * 0.80;
+  const SNAKE_BASE_SPEED    = 85;
+  const SNAKE_TURN_RATE     = Math.PI * 0.75;
   const SNAKE_SEGMENT_GAP   = 32;
   const SNAKE_INITIAL_SEGMENTS = 6;
   const SNAKE_EAT_RADIUS_BASE = 40;
@@ -62,23 +62,23 @@
   const SNAKE_SLOW_DURATION    = 7;
   const SNAKE_CONFUSE_DURATION = 7;
   const SNAKE_SHRINK_DURATION  = 7;
-  const FROG_SHIELD_DURATION   = 7;
+  const FROG_SHIELD_DURATION   = 10;
   const TIME_SLOW_DURATION     = 5;
   const ORB_MAGNET_DURATION    = 10;
   const SCORE_MULTI_DURATION   = 20;
   const PANIC_HOP_DURATION     = 5;
   const CLONE_SWARM_DURATION   = 1;
-  const LIFE_STEAL_DURATION    = 20;
+  const LIFE_STEAL_DURATION    = 10;
   // Permanent lifesteal upgrade: how many orbs it affects
   const PERMA_LIFESTEAL_ORB_COUNT = 20;
 
   // How strong each buff is
   const SPEED_BUFF_FACTOR        = 0.85;  // frogs act 2× faster (0.5 = half their cycle)
   const PANIC_HOP_SPEED_FACTOR   = 0.60;  // panic hop speed factor
-  const JUMP_BUFF_FACTOR         = 3.25;  // jump buff height multiplier
+  const JUMP_BUFF_FACTOR         = 2.50;  // jump buff height multiplier
 
   // Snake speed + Lucky config
-  const SNAKE_SLOW_FACTOR      = 0.5;  // snake slow buff → 50% speed
+  const SNAKE_SLOW_FACTOR      = 0.6;  // snake slow buff → 50% speed
   const TIME_SLOW_FACTOR       = 0.5;  // time slow → 40% speed
   const FRENZY_SPEED_FACTOR    = 1.25; // legendary Frenzy → +25% speed
 
@@ -98,7 +98,7 @@
 
   // Normal upgrade multipliers
   const FROG_SPEED_UPGRADE_FACTOR     = 0.90; // ~15% faster hops each pick
-  const FROG_JUMP_UPGRADE_FACTOR      = 1.50; // ~70% higher jumps each pick
+  const FROG_JUMP_UPGRADE_FACTOR      = 1.35; // ~70% higher jumps each pick
   const BUFF_DURATION_UPGRADE_FACTOR  = 1.10; // +20% buff duration each pick
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
   const ORB_COLLECTOR_CHANCE = 0.10;
@@ -107,8 +107,8 @@
   const CANNIBAL_ROLE_CHANCE = 0.05; // 5% chance eaten frog gains random role
 
   // Spawn amounts
-  const NORMAL_SPAWN_AMOUNT           = 15;   // normal menu
-  const EPIC_SPAWN_AMOUNT             = 25;   // epic menu
+  const NORMAL_SPAWN_AMOUNT           = 20;   // normal menu
+  const EPIC_SPAWN_AMOUNT             = 30;   // epic menu
   const LEGENDARY_SPAWN_AMOUNT        = 30;   // legendary menu
 
   // Deathrattle chances
