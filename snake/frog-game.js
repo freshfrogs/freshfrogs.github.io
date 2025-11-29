@@ -2010,7 +2010,7 @@ function getEpicUpgradeChoices() {
     });
   }
 
-  // Cannibal Frog – always allowed
+  /* Cannibal Frog – always allowed
   choices.push({
     id: "epicCannibalFrog",
     label: `
@@ -2023,7 +2023,7 @@ function getEpicUpgradeChoices() {
     apply: () => {
       spawnCannibalFrog();
     }
-  });
+  }); */
 
   // ORB STORM – always allowed
   choices.push({
@@ -2047,7 +2047,7 @@ function getEpicUpgradeChoices() {
     label: `
         🥚 Snake Egg<br>
         The <span style="color:${neon};">next shed</span> only gives the new snake
-        <span style="color:${neon};">+${snakeEggBuffPct}%</span> speed instead of +20%
+        <span style="color:${neon};">+${snakeEggBuffPct}%</span> speed instead of +27%
       `,
     apply: () => {
       snakeEggPending = true;
@@ -2134,7 +2134,7 @@ function getUpgradeChoices() {
     upgrades.push({
       id: "frogJump",
       label: `
-        🦘⬆️ Frogs jump higher<br>
+        🦘⬆️ Frogs hop higher<br>
         +<span style="color:${neon};">${jumpPerPickPct}%</span> jump height
       `,
       apply: () => {
