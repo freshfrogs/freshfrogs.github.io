@@ -1640,34 +1640,33 @@ function applyBuff(type, frog) {
           grantRandomPermaFrogUpgrade(collectedBy);
         } else {
           applyBuff(orb.type, collectedBy);
-
-          // Lifeline no longer spawns frogs from orbs.
-          // Only the permanent lifesteal upgrade still does.
-          let extraFrogsFromLifeSteal = 0;
-
-          // Permanent lifesteal upgrade: next N orbs → still spawn frogs
-          if (permaLifeStealOrbsRemaining > 0) {
-            permaLifeStealOrbsRemaining -= 1;
-            extraFrogsFromLifeSteal += 1;
-          }
-
-          if (extraFrogsFromLifeSteal > 0) {
-            spawnExtraFrogs(extraFrogsFromLifeSteal);
-          }
         }
 
-        // 🔹 Orb Specialist vs Orb Collector
+        // 🧪 Orb Specialist + Orb Collector + permanent lifesteal synergy
+        let frogsToSpawnFromOrb = 0;
+
+        // Orb Specialist: every orb always spawns 1 frog,
+        // plus a 50% chance for a second frog.
         if (orbSpecialistActive) {
-          // Every orb always spawns at least 1 frog,
-          // with a 50% chance to spawn 2.
-          let frogsToSpawn = 1;
+          frogsToSpawnFromOrb += 1; // guaranteed
           //if (Math.random() < 0.5) {
-          //  frogsToSpawn++;
+           // frogsToSpawnFromOrb += 1; // 50% extra
           //}
-          spawnExtraFrogs(frogsToSpawn);
-        } else if (orbCollectorChance > 0 && Math.random() < orbCollectorChance) {
-          // Orb Collector: stacking chance for extra frogs
-          spawnExtraFrogs(1);
+        }
+
+        // Permanent lifesteal upgrade: next N orbs also spawn frogs.
+        if (permaLifeStealOrbsRemaining > 0) {
+          permaLifeStealOrbsRemaining -= 1;
+          frogsToSpawnFromOrb += 1;
+        }
+
+        // Orb Collector: now adds an additional frog on top of the above.
+        if (orbCollectorChance > 0 && Math.random() < orbCollectorChance) {
+          frogsToSpawnFromOrb += 1;
+        }
+
+        if (frogsToSpawnFromOrb > 0) {
+          spawnExtraFrogs(frogsToSpawnFromOrb);
         }
 
         if (orb.el && orb.el.parentNode === container) {
