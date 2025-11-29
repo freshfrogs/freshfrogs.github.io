@@ -1,6 +1,7 @@
 // frog-leaderboard.js
 // Handles leaderboard fetch/save and UI overlays for the Frog Snake game.
 
+(function () {
   "use strict";
 
   // Cloudflare Worker URL
@@ -523,3 +524,4 @@
     hideScoreboardOverlay,
     getCurrentUserLabel: getCurrentUserLabelFromLeaderboard,
   };
+})();

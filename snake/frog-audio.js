@@ -2,6 +2,7 @@
 // Handles all sound loading & playback for the frog snake game,
 // using small audio pools + simple throttling so late-game doesn’t lag or glitch.
 
+(function () {
   "use strict";
 
   const AUDIO_BASE = "https://freshfrogs.github.io/snake/audio/";
@@ -237,3 +238,4 @@
     playPermanentChoiceSound,
     playPerFrogUpgradeSound
   };
+})();
