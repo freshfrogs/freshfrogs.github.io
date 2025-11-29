@@ -68,7 +68,7 @@
   const SCORE_MULTI_DURATION   = 20;
   const PANIC_HOP_DURATION     = 5;
   const CLONE_SWARM_DURATION   = 1;
-  const LIFE_STEAL_DURATION    = 20;
+  const LIFE_STEAL_DURATION    = 10;
   // Permanent lifesteal upgrade: how many orbs it affects
   const PERMA_LIFESTEAL_ORB_COUNT = 20;
 
