@@ -2457,58 +2457,51 @@ function setInfoPage(pageIndex) {
 
   if (infoPage === 0) {
     // PAGE 0 – Leaderboard
-    html += "<b>🏆 Leaderboard</b><br><br>";
-
-    // infoLeaderboardData can be either:
-    // - { entries: [...], myEntry: {...} }
-    // - or just an array of entries
-    let list = [];
-    let myEntry = null;
-
-    const data = infoLeaderboardData;
-    if (data) {
-      if (Array.isArray(data.entries)) {
-        list = data.entries;
-        myEntry = data.myEntry || null;
-      } else if (Array.isArray(data)) {
-        list = data;
-      }
-    }
-
+    html += "<b>🏆 Leaderboard --</b><br><br>";
+    const list = infoLeaderboardData || [];
     if (!list.length) {
       html += "<div>No scores yet — be the first to escape the snake.</div>";
     } else {
-      const myUserId = myEntry && myEntry.userId ? myEntry.userId : null;
-
       html += "<table style='width:100%; border-collapse:collapse; font-size:12px;'>";
       html += "<tr><th style='text-align:left;'>#</th><th style='text-align:left;'>Tag</th><th style='text-align:right;'>Score</th><th style='text-align:right;'>Time</th></tr>";
-
       list.slice(0, 10).forEach((entry, i) => {
         const rank = i + 1;
-        const tag  = entry.tag || entry.name || `Player ${rank}`;
+        const tagBase = entry.tag || entry.name || `Player ${rank}`;
 
-        // Use bestScore/bestTime from the worker; fall back to score/time if present
+        // ✅ Use bestScore / bestTime if score/time aren’t present
         const rawScore =
-          typeof entry.bestScore === "number"
-            ? entry.bestScore
-            : (typeof entry.score === "number" ? entry.score : null);
-        const scoreStr = rawScore == null ? "-" : Math.floor(rawScore);
+          typeof entry.score === "number"
+            ? entry.score
+            : typeof entry.bestScore === "number"
+              ? entry.bestScore
+              : null;
 
-        const rawSecs =
-          typeof entry.bestTime === "number"
-            ? entry.bestTime
-            : (typeof entry.time === "number" ? entry.time : 0);
-        const m = Math.floor(rawSecs / 60);
-        const s = Math.floor(rawSecs % 60);
+        const scoreStr = rawScore == null ? "—" : Math.floor(rawScore);
+
+        const secs =
+          typeof entry.time === "number"
+            ? entry.time
+            : typeof entry.bestTime === "number"
+              ? entry.bestTime
+              : 0;
+
+        const m = Math.floor(secs / 60);
+        const s = Math.floor(secs % 60);
         const tStr = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 
-        const isMe = myUserId && entry.userId === myUserId;
-        const trStyle = isMe
-          ? ` style="background:rgba(255,215,0,0.12); color:#ffd700; font-weight:bold;"`
+        // ✅ Highlight "me" (same flag used by the game-over overlay)
+        const isMe = !!entry.isMe;
+        const rowStyle = isMe
+          ? " style='background:rgba(255,215,0,0.18);color:#ffd700;'"
           : "";
 
+        const tag =
+          isMe
+            ? `${tagBase} <span style="font-size:10px;opacity:0.9;">(you)</span>`
+            : tagBase;
+
         html += `
-          <tr${trStyle}>
+          <tr${rowStyle}>
             <td>${rank}</td>
             <td>${tag}</td>
             <td style="text-align:right;">${scoreStr}</td>
@@ -2516,20 +2509,18 @@ function setInfoPage(pageIndex) {
           </tr>
         `;
       });
-
       html += "</table>";
       html += `<div style="margin-top:6px; font-size:11px; opacity:0.8;">
         Beat your own best score to update your entry.
       </div>`;
     }
   } else if (infoPage === 1) {
-
     // PAGE 1 – How to Play
     html = `
 <b>🐍 How to Play</b><br><br>
 • Avoid the snake and keep the frogs alive as long as possible.<br>
 • Frogs hop around the screen. Move your mouse to guide the swarm.<br>
-• Collect glowing orbs to trigger buffs and upgrades.<br>
+• Collect orbs to trigger buffs and upgrades.<br>
 • Every minute you choose a <span style="color:${neon};">common</span> upgrade.<br>
 • Every 3 minutes you get a <span style="color:${neon};">common + epic</span> upgrade chain.<br>
 • Every 5 minutes the snake sheds, gets stronger, and changes color.<br>
@@ -2555,7 +2546,7 @@ function setInfoPage(pageIndex) {
 ⭐ <b>PermaFrog</b> – upgrades one frog with a permanent role (Champion, Aura, Magnet, Lucky, Zombie, etc.).
 `;
   } else if (infoPage === 3) {
-    // PAGE 3 – Permanent frog roles (no shield frog)
+    // PAGE 3 – Permanent frog roles
     html = `
 <b>🐸 Permanent Frog Roles</b><br><br>
 🏅 <b>Champion</b> – that frog's hop cycle is faster and jumps are higher.<br>
@@ -2566,16 +2557,16 @@ function setInfoPage(pageIndex) {
 Perma roles stack with global upgrades and orb buffs, making some frogs into mini “heroes” of the swarm.
 `;
   } else if (infoPage === 4) {
-    // PAGE 4 – Global upgrades (common + epic; no shield frog, no legendary)
+    // PAGE 4 – Global upgrades
     html = `
 <b>🏗️ Global Upgrades</b><br><br>
 ⏩ <b>Frogs hop faster forever</b> – reduces the hop cycle, making the whole swarm act more often.<br>
 🦘⬆️ <b>Frogs jump higher forever</b> – increases base jump height for all frogs.<br>
-🐸💥 <b>Spawn frogs</b> – instant injections of ${NORMAL_SPAWN_AMOUNT}/${EPIC_SPAWN_AMOUNT} frogs from common / epic menus.<br>
+🐸💥 <b>Spawn frogs</b> – instant injections of frogs from common / epic menus.<br>
 ⏳ <b>Buffs last longer</b> – multiplies the duration of all temporary buffs (orb effects).<br>
 🎯 <b>More orbs</b> – orbs spawn more frequently over time.<br>
 💀 <b>Deathrattle</b> – dead frogs have a chance to respawn immediately (common and epic versions stack).<br>
-🏹 <b>Last Stand</b> – your final remaining frog always has a 50% deathrattle chance (one-time pick).<br>
+🏹 <b>Last Stand</b> – your final remaining frog has a strong chance to respawn instead of dying.<br>
 🌌 <b>Orb Collector</b> – every collected orb has a flat chance to spawn an extra frog (one-time pick).<br>
 🧟‍♂️ <b>Zombie Horde (epic)</b> – summons special zombie frogs with boosted deathrattle while they last.<br>
 🍖 <b>Cannibal Frog (epic)</b> – spawns a cannibal frog that eats nearby frogs and buffs global deathrattle while alive.<br>
