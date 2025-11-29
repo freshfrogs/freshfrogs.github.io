@@ -2467,11 +2467,21 @@ function setInfoPage(pageIndex) {
       list.slice(0, 10).forEach((entry, i) => {
         const rank = i + 1;
         const tag  = entry.tag || entry.name || `Player ${rank}`;
-        const score = typeof entry.score === "number" ? Math.floor(entry.score) : entry.score;
-        const secs  = entry.time || entry.bestTime || 0;
+
+        // Worker stores scores/times as bestScore & bestTime
+        const rawScore =
+          (typeof entry.bestScore === "number" ? entry.bestScore : entry.score);
+        const score =
+          typeof rawScore === "number"
+            ? Math.floor(rawScore)
+            : (rawScore ?? "0");
+
+        const secs =
+          (typeof entry.bestTime === "number" ? entry.bestTime : (entry.time || 0));
         const m = Math.floor(secs / 60);
         const s = Math.floor(secs % 60);
         const tStr = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+
         html += `
           <tr>
             <td>${rank}</td>
