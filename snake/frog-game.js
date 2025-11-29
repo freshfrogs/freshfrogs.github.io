@@ -3306,7 +3306,7 @@ function setBuffGuidePage(pageIndex) {
     return 1 + LUCKY_SCORE_BONUS_PER * count;
   }
 
-  function endGame() {
+function endGame() {
     gameOver = true;
 
     lastRunTime  = elapsedTime;
@@ -3316,7 +3316,17 @@ function setBuffGuidePage(pageIndex) {
       const posted = await submitScoreToServer(lastRunScore, lastRunTime);
       const topList = posted || await fetchLeaderboard() || [];
       updateMiniLeaderboard(topList);
-      openScoreboardOverlay(topList, lastRunScore, lastRunTime);
+
+      // Keep a copy of the latest leaderboard data for the info/read-more panel
+      infoLeaderboardData = Array.isArray(topList) ? topList : [];
+
+      // Instead of a separate scoreboard overlay, show the summary on page 1
+      // of the How to Play / Read More panel.
+      try {
+        openInfoOverlay(0);
+      } catch (e) {
+        // fail silently – game over screen will still show
+      }
     })();
 
     showGameOver();
@@ -3563,15 +3573,14 @@ function setBuffGuidePage(pageIndex) {
     setNextOrbTime();
     updateHUD();
   
-    // After the player closes the summary overlay, we want:
-    //   Readme / How to Play  -> first common upgrade -> game start
+    // After the player closes the info panel, we want:
+    //   Run summary / How to Play  -> first common upgrade -> game start
     if (!hasShownHowToOverlay) {
       hasShownHowToOverlay = true;
       pendingInitialUpgradeAfterInfo = true;
   
-      // Open the info panel on the “How to Play” page (page 1),
-      // since they just saw the scoreboard-style summary.
-      openInfoOverlay(1);
+      // Open the info panel on the Run summary page (page 0) first.
+      openInfoOverlay(0);
     } else {
       // On later runs, skip straight to first common upgrade.
       openUpgradeOverlay("normal");
