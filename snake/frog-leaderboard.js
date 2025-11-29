@@ -32,36 +32,38 @@
   }
 
   function formatTime(seconds) {
-    if (!seconds || seconds <= 0) return "00:00.0";
+    if (seconds == null || !isFinite(seconds) || seconds <= 0) {
+      return "00:00.0";
+    }
     const total = Math.max(0, seconds);
     const m = Math.floor(total / 60);
     const s = total - m * 60;
-    return `${pad2(m)}:${s.toFixed(1).padStart(4, "0")}`;
+    const sStr = s.toFixed(1);
+    return `${pad2(m)}:${sStr.padStart(4, "0")}`;
   }
 
+  // Always return a number, never undefined/NaN
   function getEntryScore(entry) {
     if (!entry || typeof entry !== "object") return 0;
-    if (typeof entry.bestScore === "number") return entry.bestScore;
-    if (typeof entry.score === "number") return entry.score;
-    // fallback: first numeric field considered "score-ish"
-    const keys = ["maxScore", "points", "value"];
+    const keys = ["bestScore", "score", "maxScore", "points", "value"];
     for (const k of keys) {
-      const v = entry[k];
+      if (!(k in entry)) continue;
+      let v = entry[k];
+      if (typeof v === "string") v = parseFloat(v);
       if (typeof v === "number" && isFinite(v)) return v;
     }
     return 0;
   }
 
+  // Always return a number, never undefined/NaN
   function getEntryTime(entry) {
     if (!entry || typeof entry !== "object") return 0;
-    const keys = ["seconds", "time", "bestTime", "duration"];
+    const keys = ["bestTime", "time", "seconds", "duration"];
     for (const k of keys) {
-      const v = entry[k];
+      if (!(k in entry)) continue;
+      let v = entry[k];
+      if (typeof v === "string") v = parseFloat(v);
       if (typeof v === "number" && isFinite(v) && v >= 0) return v;
-      if (typeof v === "string") {
-        const parsed = parseFloat(v);
-        if (!Number.isNaN(parsed) && parsed >= 0) return parsed;
-      }
     }
     return 0;
   }
@@ -79,7 +81,6 @@
   function ensureScoreboardOverlay(container) {
     if (scoreboardOverlay) return;
 
-    // Use the frog-game container if provided, otherwise fall back to body
     containerEl = container || document.body;
 
     scoreboardOverlay = document.createElement("div");
@@ -116,10 +117,8 @@
   }
 
   // --------------------------------------------------
-  // FIND "MY" ENTRY / ROW
+  // FIND "MY" ENTRY / ROW (for full overlay)
   // --------------------------------------------------
-  // Prefer the exact myEntry.userId from the worker; fall back to
-  // the old "closest score+time" heuristic only if needed.
   function findMyIndexInList(list, lastRunScore, lastRunTime) {
     if (!Array.isArray(list) || list.length === 0) {
       return { index: -1, entry: null };
@@ -135,7 +134,7 @@
       }
     }
 
-    // 2) Fallback: match by tag + score/time (for older data with no userId)
+    // 2) Fallback: match by tag + score/time
     if (lastMyEntry && lastMyEntry.tag) {
       let bestDist = Infinity;
       let bestIndex = -1;
@@ -160,12 +159,14 @@
       }
     }
 
-    // 3) Old behaviour: pick the row whose score+time is closest to this run
+    // 3) Old behaviour: closest score+time
     let bestDist = Infinity;
     let bestIndex = -1;
     let bestEntry = null;
-    const targetScore = lastRunScore || (lastMyEntry ? getEntryScore(lastMyEntry) : 0);
-    const targetTime = lastRunTime || (lastMyEntry ? getEntryTime(lastMyEntry) : 0);
+    const targetScore =
+      lastRunScore || (lastMyEntry ? getEntryScore(lastMyEntry) : 0);
+    const targetTime =
+      lastRunTime || (lastMyEntry ? getEntryTime(lastMyEntry) : 0);
 
     for (let i = 0; i < list.length; i++) {
       const e = list[i];
@@ -189,22 +190,20 @@
   // --------------------------------------------------
   // CURRENT USER TAG HELPERS
   // --------------------------------------------------
-  // Expose the most recent tag/name that the worker thinks belongs
-  // to this browser (based on cookies / userId). This lets the game
-  // show a consistent tag on the "Match summary" panel even on a
-  // fresh page load.
   function getCurrentUserLabelFromLeaderboard() {
     try {
       if (lastMyEntry) {
         if (typeof lastMyEntry.tag === "string" && lastMyEntry.tag.trim() !== "") {
           return lastMyEntry.tag;
         }
-        if (typeof lastMyEntry.name === "string" && lastMyEntry.name.trim() !== "") {
+        if (
+          typeof lastMyEntry.name === "string" &&
+          lastMyEntry.name.trim() !== ""
+        ) {
           return lastMyEntry.name;
         }
       }
 
-      // Fallback for older data that used localStorage on the client
       if (typeof localStorage !== "undefined") {
         const stored =
           localStorage.getItem("frogSnake_username") ||
@@ -216,7 +215,7 @@
         }
       }
     } catch (e) {
-      // Ignore and fall through to null
+      // ignore
     }
     return null;
   }
@@ -294,25 +293,49 @@
   // --------------------------------------------------
   // MINI LEADERBOARD (top-right HUD / pre-game view)
   // --------------------------------------------------
-  function updateMiniLeaderboard(topList) {
+  // This is the one you care about.
+  // It now highlights *your* row in gold if you're on the board.
+  function updateMiniLeaderboard(topList, myEntryOverride) {
     const mini = document.getElementById("frog-mini-leaderboard");
     if (!mini) return;
 
-    const safe = Array.isArray(topList) ? topList : [];
-    if (safe.length === 0) {
+    let entries = [];
+    let myEntry = myEntryOverride || null;
+
+    // Support either:
+    //  - updateMiniLeaderboard(array)
+    //  - updateMiniLeaderboard({ entries, myEntry })
+    if (Array.isArray(topList)) {
+      entries = topList;
+    } else if (topList && Array.isArray(topList.entries)) {
+      entries = topList.entries;
+      if (!myEntry && topList.myEntry) {
+        myEntry = topList.myEntry;
+      }
+    }
+
+    if (!Array.isArray(entries) || entries.length === 0) {
       mini.textContent = "No runs yet.";
       return;
     }
 
-    // Find this user's entry (if any) in the list
-    const { index: myIndex } = findMyIndexInList(safe, 0, 0);
+    // If no explicit myEntry passed, fall back to the last one from the server
+    if (!myEntry && lastMyEntry) {
+      myEntry = lastMyEntry;
+    }
 
-    // Build simple HTML rows so we can highlight "my" row
+    let myIndex = -1;
+    if (myEntry && myEntry.userId) {
+      myIndex = entries.findIndex(
+        (e) => e && e.userId && e.userId === myEntry.userId
+      );
+    }
+
     mini.innerHTML = "";
-    const maxRows = Math.min(5, safe.length);
+    const maxRows = Math.min(5, entries.length);
 
     for (let i = 0; i < maxRows; i++) {
-      const entry = safe[i] || {};
+      const entry = entries[i] || {};
       const rank = i + 1;
       const name = getDisplayName(entry, `Player ${rank}`);
       const score = getEntryScore(entry);
@@ -322,13 +345,11 @@
       row.style.fontFamily = "monospace";
       row.style.fontSize = "11px";
 
-      const label = `${rank}. ${name} — ${formatTime(time)}, ${Math.floor(
-        score
-      )}`;
+      row.textContent = `${rank}. ${name} — ${formatTime(
+        time
+      )}, ${Math.floor(score)}`;
 
-      row.textContent = label;
-
-      // Highlight this user's row (gold) if present on the board
+      // Highlight your row (gold + bold) if you're on the board
       if (i === myIndex) {
         row.style.color = "#ffd700";
         row.style.fontWeight = "bold";
@@ -339,7 +360,7 @@
   }
 
   // --------------------------------------------------
-  // FULL SCOREBOARD OVERLAY
+  // FULL SCOREBOARD OVERLAY (after a run)
   // --------------------------------------------------
   function openScoreboardOverlay(topList, lastRunScore, lastRunTime) {
     if (!scoreboardOverlay || !scoreboardOverlayInner) return;
@@ -433,10 +454,9 @@
 
         for (const td of [rankCell, nameCell, timeCell, scoreCell]) {
           td.style.padding = "2px 4px";
-          td.style.borderBottom = "1px solid " + "#222";
+          td.style.borderBottom = "1px solid #222";
         }
 
-        // Highlight the row that actually belongs to the current user
         if (i === myIndex) {
           nameCell.style.color = "#ffd700";
           nameCell.style.fontWeight = "bold";
@@ -485,6 +505,13 @@
     ensureScoreboardOverlay(container || document.body);
   }
 
+  // Also auto-load the mini leaderboard once on page load
+  document.addEventListener("DOMContentLoaded", function () {
+    fetchLeaderboard().then(function (entries) {
+      updateMiniLeaderboard(entries);
+    }).catch(function () {});
+  });
+
   // --------------------------------------------------
   // EXPORT
   // --------------------------------------------------
@@ -495,8 +522,6 @@
     updateMiniLeaderboard,
     openScoreboardOverlay,
     hideScoreboardOverlay,
-    // Let the game code ask: "what tag/name does the leaderboard
-    // currently associate with this browser?"
     getCurrentUserLabel: getCurrentUserLabelFromLeaderboard,
   };
 })();
