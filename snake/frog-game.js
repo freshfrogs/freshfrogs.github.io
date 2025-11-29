@@ -2527,143 +2527,115 @@ function openHowToOverlay() {
   
     let html = "";
   
-    if (infoPage === 0) {
-      // PAGE 0 – Run summary + compact leaderboard (replaces old standalone summary)
-      const hasRun = (lastRunTime > 0 || lastRunScore > 0);
-      const userLabel = (typeof getCurrentUserLabel === "function") ? getCurrentUserLabel() : "";
-      html += "<b>📊 Run summary</b><br><br>";
-  
-      if (!hasRun) {
-        html += `
-          <div style="font-size:13px; line-height:1.4;">
-            No previous runs yet.<br>
-            Start a game and try to keep your frogs alive as long as possible!
-          </div>
-        `;
-      } else {
-        const scoreStr = Math.floor(lastRunScore || 0);
-        const secs = Math.max(0, lastRunTime || 0);
-        const m = Math.floor(secs / 60);
-        const s = Math.floor(secs % 60);
-        const tStr = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-  
-        // Escape the current tag for safe HTML insertion
-        let tagLine = "";
-        if (userLabel && typeof userLabel === "string") {
-          const esc = userLabel.replace(/[&<>]/g, c => (
-            c === "&" ? "&amp;" :
-            c === "<" ? "&lt;"  :
-            c === ">" ? "&gt;"  : c
-          ));
-          tagLine = `
-            • Your tag: <span style="color:${neon}; font-weight:bold;">${esc}</span><br>
-          `;
+  if (infoPage === 0) {
+    // PAGE 0 – Match summary pulled from stored leaderboard + this session
+    const list = Array.isArray(infoLeaderboardData) ? infoLeaderboardData : [];
+    const userLabel = (typeof getCurrentUserLabel === "function")
+      ? getCurrentUserLabel()
+      : null;
+
+    // Find this user's row in the leaderboard, if any
+    let meRow = null;
+    if (userLabel && list.length > 0) {
+      const meLower = userLabel.trim().toLowerCase();
+      for (let i = 0; i < list.length; i++) {
+        const row = list[i];
+        if (!row) continue;
+
+        let tag =
+          (typeof row === "object")
+            ? (row.tag || row.username || row.user || row.name || row.label || null)
+            : String(row);
+
+        if (!tag) continue;
+        if (String(tag).trim().toLowerCase() === meLower) {
+          meRow = row;
+          break;
         }
-  
-        html += `
-          <div style="font-size:13px; line-height:1.5; margin-bottom:8px;">
-            <b>Last run</b><br>
-            • Time survived: <span style="color:${neon};">${tStr}</span><br>
-            • Score: <span style="color:${neon};">${scoreStr}</span><br>
-            ${tagLine}
-          </div>
+      }
+    }
+
+    const hasSessionRun    = (lastRunTime > 0 || lastRunScore > 0);
+    const hasLeaderboardRun = !!meRow;
+    const hasRun = hasSessionRun || hasLeaderboardRun;
+
+    html += "<b>📊 Match summary</b><br><br>";
+
+    if (!hasRun) {
+      // No session run and no row for this tag on the leaderboard
+      html += `
+        <div style="font-size:13px; line-height:1.4;">
+          No previous runs yet for this tag.<br>
+          Start a game and try to keep your frogs alive as long as possible!
+        </div>
+      `;
+    } else {
+      // Decide what numbers to show:
+      // 1) Prefer this-session last run if available
+      // 2) Otherwise fall back to best known run from leaderboard
+      let displayScore = 0;
+      let displaySecs  = 0;
+
+      if (hasSessionRun) {
+        displayScore = lastRunScore || 0;
+        displaySecs  = Math.max(0, lastRunTime || 0);
+      } else if (meRow && typeof meRow === "object") {
+        // Best guess for fields coming from the worker
+        let s = null;
+        let t = null;
+
+        if (meRow.score != null)       s = meRow.score;
+        else if (meRow.bestScore != null) s = meRow.bestScore;
+        else if (meRow.maxScore != null)  s = meRow.maxScore;
+        else if (meRow.points != null)    s = meRow.points;
+
+        if (meRow.seconds != null)     t = meRow.seconds;
+        else if (meRow.time != null)   t = meRow.time;
+        else if (meRow.bestTime != null)  t = meRow.bestTime;
+
+        if (typeof s === "string") {
+          const parsed = parseFloat(s);
+          if (!Number.isNaN(parsed)) s = parsed;
+        }
+        if (typeof t === "string") {
+          const parsed = parseFloat(t);
+          if (!Number.isNaN(parsed)) t = parsed;
+        }
+
+        if (typeof s === "number" && isFinite(s)) displayScore = s;
+        if (typeof t === "number" && isFinite(t) && t >= 0) displaySecs = t;
+      }
+
+      const secs = Math.max(0, displaySecs || 0);
+      const m = Math.floor(secs / 60);
+      const s = Math.floor(secs % 60);
+      const tStr = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+      const scoreStr = Math.floor(displayScore || 0);
+
+      // Escape tag safely for HTML
+      let tagLine = "";
+      if (userLabel && typeof userLabel === "string") {
+        const esc = userLabel.replace(/[&<>]/g, c => (
+          c === "&" ? "&amp;" :
+          c === "<" ? "&lt;"  :
+          c === ">" ? "&gt;"  : c
+        ));
+        tagLine = `
+          • Your tag: <span style="color:${neon}; font-weight:bold;">${esc}</span><br>
         `;
       }
-  
-      // Compact top-runs list (best guess based on available leaderboard data)
-      const list = Array.isArray(infoLeaderboardData) ? infoLeaderboardData : [];
-      if (list.length > 0) {
-        const meLower = (userLabel && typeof userLabel === "string")
-          ? userLabel.trim().toLowerCase()
-          : null;
-  
-        html += `
-          <div style="font-size:12px; line-height:1.4; margin-top:4px;">
-            <b>Top runs</b><br>
-        `;
-  
-        let shown = 0;
-        for (let i = 0; i < list.length && shown < 5; i++) {
-          const row = list[i];
-          if (!row) continue;
-  
-          let tag = null;
-          let scoreVal = null;
-          let secsVal = null;
-  
-          if (typeof row === "string" || typeof row === "number") {
-            tag = String(row);
-          } else if (typeof row === "object") {
-            tag = row.tag || row.username || row.user || row.name || row.label || null;
-            if (row.score != null) scoreVal = row.score;
-            else if (row.bestScore != null) scoreVal = row.bestScore;
-            else if (row.maxScore != null) scoreVal = row.maxScore;
-            else if (row.points != null) scoreVal = row.points;
-  
-            if (row.time != null) secsVal = row.time;
-            else if (row.seconds != null) secsVal = row.seconds;
-            else if (row.bestSeconds != null) secsVal = row.bestSeconds;
-            else if (row.bestTime != null) secsVal = row.bestTime;
-          }
-  
-          if (scoreVal == null && typeof row === "object" && row.value != null) {
-            scoreVal = row.value;
-          }
-  
-          let rank;
-          if (typeof row === "object") {
-            if (row.rank != null) rank = row.rank;
-            else if (row.position != null) rank = row.position;
-            else if (row.index != null) rank = row.index + 1;
-          }
-          if (rank == null) rank = i + 1;
-  
-          let scoreStr2 = "";
-          if (typeof scoreVal === "number" && isFinite(scoreVal)) {
-            scoreStr2 = `${Math.floor(scoreVal)}`;
-          } else if (typeof scoreVal === "string") {
-            scoreStr2 = scoreVal;
-          }
-  
-          let tStr2 = "";
-          if (secsVal != null) {
-            let num = secsVal;
-            if (typeof num === "string") {
-              const parsed = parseFloat(num);
-              if (!Number.isNaN(parsed)) num = parsed;
-            }
-            if (typeof num === "number" && num >= 0 && isFinite(num)) {
-              const mm = Math.floor(num / 60);
-              const ss = Math.floor(num % 60);
-              tStr2 = `${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
-            }
-          }
-  
-          const tagStr = tag ? String(tag) : "Unknown";
-          const isMe = !!(meLower && tagStr.toLowerCase() === meLower);
-          const rowStyle = isMe
-            ? `color:${neon}; font-weight:bold;`
-            : "";
-  
-          html += `
-            <div style="${rowStyle}">
-              #${rank} — ${tagStr}
-              ${scoreStr2 ? `· ${scoreStr2}` : ""}
-              ${tStr2 ? `· ${tStr2}` : ""}
-            </div>
-          `;
-          shown++;
-        }
-  
-        html += `
-            <div style="opacity:0.75; margin-top:4px;">
-              Your latest run and best scores are tracked here and on the live leaderboard.
-            </div>
-          </div>
-        `;
-      }
-  
-    } else if (infoPage === 1) {
+
+      html += `
+        <div style="font-size:13px; line-height:1.5;">
+          <b>Last / Best run</b><br>
+          • Time survived: <span style="color:${neon};">${tStr}</span><br>
+          • Score: <span style="color:${neon};">${scoreStr}</span><br>
+          ${tagLine}
+        </div>
+      `;
+    }
+
+  } else if (infoPage === 1) {
       // PAGE 1 – How to Play
       html = `
   <b>🐍 How to Play</b><br><br>
