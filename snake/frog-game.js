@@ -46,6 +46,8 @@
   const SNAKE_INITIAL_SEGMENTS = 6;
   const SNAKE_EAT_RADIUS_BASE = 40;
 
+  const SNAKE_EGG_BUFF_PCT = 1.18;
+
   // Base turn rate and cap
   const SNAKE_TURN_RATE_BASE = Math.PI * 0.80;
   const SNAKE_TURN_RATE_CAP  = Math.PI * 1.11;
@@ -197,7 +199,7 @@
   let nextPermanentChoiceTime = 60;
 
   // every 180 seconds we pause for an EPIC upgrade
-  let nextEpicChoiceTime = 180;
+  let nextEpicChoiceTime = 10;
 
   // 10-minute legendary choice
   const LEGENDARY_EVENT_TIME = 600; // 10 minutes
@@ -395,7 +397,7 @@
     // Normally +20%, but if Snake Egg is pending, only +11% (20% - 9%).
     let speedMult = SNAKE_SHED_SPEEDUP;
     if (snakeEggPending) {
-      speedMult = 1.11;   // +11% instead of +20%
+      speedMult = SNAKE_EGG_BUFF_PCT;   // +11% instead of +20%
       snakeEggPending = false; // consume the egg buff
     }
     snakePermanentSpeedFactor *= speedMult;
@@ -2043,7 +2045,7 @@ function getEpicUpgradeChoices() {
     label: `
         🥚 Snake Egg<br>
         The <span style="color:${neon};">next shed</span> only gives the new snake
-        <span style="color:${neon};">+${snakeEggBuffPct}%</span> speed instead of +27%
+        <span style="color:${neon};">+${SNAKE_EGG_BUFF_PCT}%</span> speed instead of +27%
       `,
     apply: () => {
       snakeEggPending = true;
