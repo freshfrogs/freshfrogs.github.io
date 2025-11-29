@@ -121,6 +121,7 @@
 
   // Legendary buff duration spike
   const LEGENDARY_BUFF_DURATION_FACTOR = 2.0; // x2 all buff durations
+  const LAST_STAND_MIN_CHANCE = 0.33;
 
   const container = document.getElementById("frog-game");
   if (!container) return;
