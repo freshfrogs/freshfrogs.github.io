@@ -244,6 +244,7 @@
   let lastStandActive = false;
   let orbCollectorActive   = false;
   let orbCollectorChance   = 0;    // current chance (0–1) that an orb spawns a frog
+  let orbSpecialistActive  = false;
 
   // Legendary Frenzy timer (snake + frogs go wild)
   let snakeFrenzyTime = 0;
@@ -1652,9 +1653,17 @@ function applyBuff(type, frog) {
           }
         }
 
-        // 🔹 Orb Collector: stacking chance for extra frogs
-        // orbCollectorChance is the TOTAL chance (0..1) built up from upgrades.
-        if (orbCollectorChance > 0 && Math.random() < orbCollectorChance) {
+        // 🔹 Orb Specialist vs Orb Collector
+        if (orbSpecialistActive) {
+          // Every orb always spawns at least 1 frog,
+          // with a 50% chance to spawn 2.
+          let frogsToSpawn = 1;
+          if (Math.random() < 0.5) {
+            frogsToSpawn++;
+          }
+          spawnExtraFrogs(frogsToSpawn);
+        } else if (orbCollectorChance > 0 && Math.random() < orbCollectorChance) {
+          // Orb Collector: stacking chance for extra frogs
           spawnExtraFrogs(1);
         }
 
@@ -2001,7 +2010,7 @@ function getEpicUpgradeChoices() {
     });
   }
 
-  /* Cannibal Frog – always allowed
+  // Cannibal Frog – always allowed
   choices.push({
     id: "epicCannibalFrog",
     label: `
@@ -2014,7 +2023,7 @@ function getEpicUpgradeChoices() {
     apply: () => {
       spawnCannibalFrog();
     }
-  });*/
+  });
 
   // ORB STORM – always allowed
   choices.push({
@@ -2038,7 +2047,7 @@ function getEpicUpgradeChoices() {
     label: `
         🥚 Snake Egg<br>
         The <span style="color:${neon};">next shed</span> only gives the new snake
-        <span style="color:${neon};">+${snakeEggBuffPct}%</span> speed instead of +27%
+        <span style="color:${neon};">+${snakeEggBuffPct}%</span> speed instead of +20%
       `,
     apply: () => {
       snakeEggPending = true;
@@ -2058,8 +2067,27 @@ function getEpicUpgradeChoices() {
     }
   });
 
+  // 🌠 Orb Specialist – only if not already active
+  if (!orbSpecialistActive) {
+    choices.push({
+      id: "epicOrbSpecialist",
+      label: `
+        🌠 Orb Specialist<br>
+        Every orb always spawns <span style="color:${neon};">1</span> frog<br>
+        with a <span style="color:${neon};">50%</span> chance to spawn <b>2</b>
+      `,
+      apply: () => {
+        orbSpecialistActive = true;
+        // Turn off Orb Collector if it was taken earlier
+        orbCollectorActive = false;
+        orbCollectorChance = 0;
+      }
+    });
+  }
+
   return choices;
 }
+
 
 function getUpgradeChoices() {
   const neon = "#4defff";
@@ -2072,6 +2100,14 @@ function getUpgradeChoices() {
   const deathPerPickPct     = Math.round(COMMON_DEATHRATTLE_CHANCE * 100);
   const orbPerPickPct       = Math.round(ORB_COLLECTOR_CHANCE * 100);
 
+  // caps
+  const MIN_FROG_SPEED_FACTOR         = 0.50; // 50% of original cycle
+  const MAX_FROG_JUMP_FACTOR          = 3.0;  // 300% jump height
+  const MAX_BUFF_DURATION_FACTOR      = 3.0;  // 3x buff duration
+  const MIN_ORB_SPAWN_INTERVAL_FACTOR = 0.35; // 65% faster orbs
+  const MAX_DEATHRATTLE_CHANCE        = 1.0;
+  const MAX_ORB_COLLECTOR_TOTAL       = 1.0;
+
   const lastStandPct = Math.round(LAST_STAND_MIN_CHANCE * 100);
 
   const upgrades = [];
@@ -2081,7 +2117,7 @@ function getUpgradeChoices() {
     upgrades.push({
       id: "frogSpeed",
       label: `
-        ⏩ Frogs hop speed<br>
+        ⏩ Frogs hop faster<br>
         ~<span style="color:${neon};">${speedPerPickPct}%</span> faster hop cycle
       `,
       apply: () => {
@@ -2098,7 +2134,7 @@ function getUpgradeChoices() {
     upgrades.push({
       id: "frogJump",
       label: `
-        🦘⬆️ Frogs hop higher<br>
+        🦘⬆️ Frogs jump higher<br>
         +<span style="color:${neon};">${jumpPerPickPct}%</span> jump height
       `,
       apply: () => {
@@ -2156,8 +2192,6 @@ function getUpgradeChoices() {
     });
   }
 
-  // (permaLifeSteal is still commented out here on purpose)
-
   // Global deathrattle (capped)
   if (frogDeathRattleChance < MAX_DEATHRATTLE_CHANCE - 1e-4) {
     upgrades.push({
@@ -2175,8 +2209,11 @@ function getUpgradeChoices() {
     });
   }
 
-  // Orb Collector (capped)
-  if (orbCollectorChance < MAX_ORB_COLLECTOR_TOTAL - 1e-4) {
+  // Orb Collector (capped) – ONLY if Orb Specialist is NOT active
+  if (
+    !orbSpecialistActive &&
+    orbCollectorChance < MAX_ORB_COLLECTOR_TOTAL - 1e-4
+  ) {
     upgrades.push({
       id: "orbCollector",
       label: `
@@ -2210,7 +2247,6 @@ function getUpgradeChoices() {
 
   return upgrades;
 }
-
 
   // LEGENDARY choices at 10 minutes (placeholders, TODO)
 function getLegendaryUpgradeChoices() {
@@ -3291,6 +3327,7 @@ function populateUpgradeOverlayChoices(mode) {
     nextPermanentChoiceTime  = 60;
     nextEpicChoiceTime       = 180;
     legendaryEventTriggered  = false;
+    orbSpecialistActive      = false; 
 
     snakeShedStage           = 0;
     snakeShedCount           = 0;
