@@ -2457,7 +2457,7 @@ function setInfoPage(pageIndex) {
 
   if (infoPage === 0) {
     // PAGE 0 – Leaderboard
-    html += "<b>🏆 Leaderboard --</b><br><br>";
+    html += "<b>🏆 Leaderboard</b><br><br>";
     const list = infoLeaderboardData || [];
     if (!list.length) {
       html += "<div>No scores yet — be the first to escape the snake.</div>";
