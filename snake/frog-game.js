@@ -226,7 +226,7 @@
   // Old snakes that are despawning chunk-by-chunk
   let dyingSnakes = [];
 
-    let speedBuffTime   = 0;
+  let speedBuffTime   = 0;
   let jumpBuffTime    = 0;
   let snakeSlowTime   = 0;
   let snakeConfuseTime= 0;
@@ -1955,7 +1955,7 @@ function getEpicUpgradeChoices() {
   const buffTotalPct    = Math.round((nextBuffFactor - 1) * 100);
 
   const orbStormCount   = 10;
-  const snakeEggBuffPct = 11; // +11% instead of +20%
+  const snakeEggBuffPct = 18; // +11% instead of +20%
 
   const choices = [];
 
@@ -2007,7 +2007,7 @@ function getEpicUpgradeChoices() {
     });
   }
 
-  // Cannibal Frog – permanent role, no cap
+  /* Cannibal Frog – permanent role, no cap
   choices.push({
     id: "epicCannibalFrog",
     label: `
@@ -2021,6 +2021,7 @@ function getEpicUpgradeChoices() {
       spawnCannibalFrog();
     }
   });
+  */
 
   // ORB STORM – always allowed
   choices.push({
@@ -2044,7 +2045,7 @@ function getEpicUpgradeChoices() {
     label: `
         🥚 Snake Egg<br>
         The <span style="color:${neon};">next shed</span> only gives the new snake
-        <span style="color:${neon};">+${snakeEggBuffPct}%</span> speed instead of +20%
+        <span style="color:${neon};">+${snakeEggBuffPct}%</span> speed instead of +27%
       `,
     apply: () => {
       snakeEggPending = true;
