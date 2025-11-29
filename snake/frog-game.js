@@ -25,33 +25,6 @@
   const openScoreboardOverlay  = LMod.openScoreboardOverlay  || function(){};
   const hideScoreboardOverlay  = LMod.hideScoreboardOverlay  || function(){};
 
-  function getCurrentUserLabel() {
-    try {
-      if (typeof LMod.getCurrentUserLabel === "function") {
-        return LMod.getCurrentUserLabel();
-      }
-      if (typeof LMod.getCurrentTag === "function") {
-        return LMod.getCurrentTag();
-      }
-
-      const direct =
-        LMod.currentUser ||
-        LMod.currentUsername ||
-        LMod.currentTag;
-      if (direct) return direct;
-
-      if (typeof localStorage !== "undefined") {
-        return (
-          localStorage.getItem("frogSnake_username") ||
-          localStorage.getItem("frogSnake_tag") ||
-          localStorage.getItem("frogSnakeUserTag") ||
-          null
-        );
-      }
-    } catch (e) {}
-    return null;
-  }
-
   // --------------------------------------------------
   // BASIC CONSTANTS
   // --------------------------------------------------
@@ -68,7 +41,7 @@
   // --------------------------------------------------
   const SNAKE_SEGMENT_SIZE  = 64;
   const SNAKE_BASE_SPEED    = 85;
-  const SNAKE_TURN_RATE     = Math.PI * 0.80;
+  const SNAKE_TURN_RATE     = Math.PI * 0.75;
   const SNAKE_SEGMENT_GAP   = 32;
   const SNAKE_INITIAL_SEGMENTS = 6;
   const SNAKE_EAT_RADIUS_BASE = 40;
@@ -89,7 +62,7 @@
   const SNAKE_SLOW_DURATION    = 7;
   const SNAKE_CONFUSE_DURATION = 7;
   const SNAKE_SHRINK_DURATION  = 7;
-  const FROG_SHIELD_DURATION   = 7;
+  const FROG_SHIELD_DURATION   = 10;
   const TIME_SLOW_DURATION     = 5;
   const ORB_MAGNET_DURATION    = 10;
   const SCORE_MULTI_DURATION   = 20;
@@ -102,10 +75,10 @@
   // How strong each buff is
   const SPEED_BUFF_FACTOR        = 0.85;  // frogs act 2× faster (0.5 = half their cycle)
   const PANIC_HOP_SPEED_FACTOR   = 0.60;  // panic hop speed factor
-  const JUMP_BUFF_FACTOR         = 3.25;  // jump buff height multiplier
+  const JUMP_BUFF_FACTOR         = 2.50;  // jump buff height multiplier
 
   // Snake speed + Lucky config
-  const SNAKE_SLOW_FACTOR      = 0.5;  // snake slow buff → 50% speed
+  const SNAKE_SLOW_FACTOR      = 0.6;  // snake slow buff → 50% speed
   const TIME_SLOW_FACTOR       = 0.5;  // time slow → 40% speed
   const FRENZY_SPEED_FACTOR    = 1.25; // legendary Frenzy → +25% speed
 
@@ -125,7 +98,7 @@
 
   // Normal upgrade multipliers
   const FROG_SPEED_UPGRADE_FACTOR     = 0.90; // ~15% faster hops each pick
-  const FROG_JUMP_UPGRADE_FACTOR      = 1.50; // ~70% higher jumps each pick
+  const FROG_JUMP_UPGRADE_FACTOR      = 1.35; // ~70% higher jumps each pick
   const BUFF_DURATION_UPGRADE_FACTOR  = 1.10; // +20% buff duration each pick
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
   const ORB_COLLECTOR_CHANCE = 0.10;
@@ -148,43 +121,6 @@
 
   const container = document.getElementById("frog-game");
   if (!container) return;
-
-    // --------------------------------------------------
-  // SCALING FOR SMALLER SCREENS
-  // --------------------------------------------------
-  let gameScale = 1;
-
-  function computeGameScale() {
-    // "Design" resolution the game was built around
-    const BASE_WIDTH  = 1200;
-    const BASE_HEIGHT = 800;
-
-    const scaleX = window.innerWidth  / BASE_WIDTH;
-    const scaleY = window.innerHeight / BASE_HEIGHT;
-
-    // Fit inside both dimensions
-    let s = Math.min(scaleX, scaleY);
-
-    // Clamp so it never gets *bigger* than original, or too tiny
-    s = Math.max(0.6, Math.min(1, s)); // 60%–100%
-
-    return s;
-  }
-
-  function applyGameScale() {
-    gameScale = computeGameScale();
-    container.style.transformOrigin = "top left";
-    container.style.transform = `scale(${gameScale})`;
-  }
-
-  function getGameWidth() {
-    return window.innerWidth / gameScale;
-  }
-
-  function getGameHeight() {
-    return window.innerHeight / gameScale;
-  }
-
 
   // Keep these arrays consistent with your scatter-frogs setup
   const SCATTER_ANIMATED_VALUES = new Set([
@@ -263,8 +199,7 @@
   let infoPrevBtn = null;
   let infoNextBtn = null;
   let infoLeaderboardData = [];
-  // After showing the info/readme at the start, open the first common upgrade
-  let pendingInitialUpgradeAfterInfo = false;
+
 
   // Shed state
   let snakeShedStage   = 0;          // 0 = base, 1 = yellow, 2 = orange, 3+ = red
@@ -319,12 +254,10 @@
   };
 
   window.addEventListener("mousemove", (e) => {
-    // Convert from screen pixels into game-space pixels
-    mouse.x = e.clientX / gameScale;
-    mouse.y = e.clientY / gameScale;
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
     mouse.active = true;
   });
-
 
   window.addEventListener("click", () => {
     if (gameOver) {
@@ -459,8 +392,8 @@
 
 
     // Spawn the new snake roughly where the old head was.
-    const width  = getGameWidth();
-    const height = getGameHeight();
+    const width  = window.innerWidth;
+    const height = window.innerHeight;
 
     const startX = (oldSnake.head && typeof oldSnake.head.x === "number")
       ? oldSnake.head.x
@@ -797,9 +730,8 @@
   }
 
     function spawnZombieHorde(count) {
-      const width  = getGameWidth();
-      const height = getGameHeight();
-  
+    const width  = window.innerWidth;
+    const height = window.innerHeight;
     const margin = 16;
 
     const toSpawn = Math.min(count, MAX_FROGS - frogs.length);
@@ -818,8 +750,8 @@
 
   function spawnExtraFrogs(n) {
     if (frogs.length >= MAX_FROGS) return;
-    const width  = getGameWidth();
-    const height = getGameHeight();
+    const width  = window.innerWidth;
+    const height = window.innerHeight;
     const margin = 16;
 
     const toSpawn = Math.min(n, MAX_FROGS - frogs.length);
@@ -2055,8 +1987,8 @@ function getEpicUpgradeChoices() {
         Drop <span style="color:${neon};">${orbStormCount}</span> random orbs right now
       `,
       apply: () => {
-        const width  = getGameWidth();
-        const height = getGameHeight();
+        const width  = window.innerWidth;
+        const height = window.innerHeight;
         for (let i = 0; i < orbStormCount; i++) {
           spawnOrbRandom(width, height);
         }
@@ -2258,8 +2190,7 @@ function ensureHowToOverlay() {
   howToOverlay = document.createElement("div");
   howToOverlay.className = "frog-howto-overlay";
 
-  // 🔥 key bits: position: fixed + append to body
-  howToOverlay.style.position = "fixed";
+  howToOverlay.style.position = "absolute";
   howToOverlay.style.inset = "0";
   howToOverlay.style.background = "rgba(0,0,0,0.7)";
   howToOverlay.style.display = "none";
@@ -2309,6 +2240,7 @@ function ensureHowToOverlay() {
     list.appendChild(li);
   });
 
+  // Buttons row: Start & Learn more
   const btnRow = document.createElement("div");
   btnRow.style.display = "flex";
   btnRow.style.justifyContent = "space-between";
@@ -2363,11 +2295,8 @@ function ensureHowToOverlay() {
   panel.appendChild(btnRow);
 
   howToOverlay.appendChild(panel);
-
-  // ⬇️ append to BODY instead of container so scaling doesn’t affect it
-  (document.body || container).appendChild(howToOverlay);
+  container.appendChild(howToOverlay);
 }
-
 
 function openHowToOverlay() {
   ensureHowToOverlay();
@@ -2386,343 +2315,259 @@ function openHowToOverlay() {
     }
   }
 
-  function ensureInfoOverlay() {
-    if (infoOverlay) return;
-  
-    infoOverlay = document.createElement("div");
-    infoOverlay.className = "frog-info-overlay";
-  
-    infoOverlay.style.position = "fixed";   // 🔥 fixed on viewport
-    infoOverlay.style.inset = "0";
-    infoOverlay.style.background = "rgba(0,0,0,0.75)";
-    infoOverlay.style.display = "none";
-    infoOverlay.style.zIndex = "180";
-    infoOverlay.style.alignItems = "center";
-    infoOverlay.style.justifyContent = "center";
-    infoOverlay.style.pointerEvents = "auto";
-  
-    const panel = document.createElement("div");
-    panel.style.background = "#111";
-    panel.style.padding = "16px 20px 12px 20px";
-    panel.style.borderRadius = "10px";
-    panel.style.border = "1px solid #444";
-    panel.style.color = "#fff";
-    panel.style.fontFamily = "monospace";
-    panel.style.textAlign = "left";
-    panel.style.minWidth = "260px";
-    panel.style.maxWidth = "480px";
-    panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
-  
-    const headerRow = document.createElement("div");
-    headerRow.style.display = "flex";
-    headerRow.style.justifyContent = "space-between";
-    headerRow.style.alignItems = "center";
-    headerRow.style.marginBottom = "6px";
-  
-    const title = document.createElement("div");
-    title.textContent = "escape the snake 🐍 – info";
-    title.style.fontSize = "14px";
-    title.style.fontWeight = "bold";
-  
-    const pageLabel = document.createElement("div");
-    pageLabel.style.fontSize = "11px";
-    pageLabel.style.opacity = "0.8";
-    infoPageLabel = pageLabel;
-  
-    headerRow.appendChild(title);
-    headerRow.appendChild(pageLabel);
-  
-    const content = document.createElement("div");
-    content.style.fontSize = "13px";
-    content.style.marginTop = "4px";
-    content.style.lineHeight = "1.4";
-    infoContentEl = content;
-  
-    const navRow = document.createElement("div");
-    navRow.style.display = "flex";
-    navRow.style.justifyContent = "space-between";
-    navRow.style.alignItems = "center";
-    navRow.style.marginTop = "10px";
-  
-    const leftBtns = document.createElement("div");
-    leftBtns.style.display = "flex";
-    leftBtns.style.gap = "6px";
-  
-    const prevBtn = document.createElement("button");
-    prevBtn.textContent = "◀ Prev";
-    prevBtn.style.fontFamily = "monospace";
-    prevBtn.style.fontSize = "12px";
-    prevBtn.style.padding = "4px 8px";
-    prevBtn.style.borderRadius = "6px";
-    prevBtn.style.border = "1px solid #555";
-    prevBtn.style.background = "#222";
-    prevBtn.style.color = "#fff";
-    prevBtn.style.cursor = "pointer";
-    prevBtn.onmouseenter = () => { prevBtn.style.background = "#333"; };
-    prevBtn.onmouseleave = () => { prevBtn.style.background = "#222"; };
-    prevBtn.onclick = () => setInfoPage(infoPage - 1);
-    infoPrevBtn = prevBtn;
-  
-    const nextBtn = document.createElement("button");
-    nextBtn.textContent = "Next ▶";
-    nextBtn.style.fontFamily = "monospace";
-    nextBtn.style.fontSize = "12px";
-    nextBtn.style.padding = "4px 8px";
-    nextBtn.style.borderRadius = "6px";
-    nextBtn.style.border = "1px solid #555";
-    nextBtn.style.background = "#222";
-    nextBtn.style.color = "#fff";
-    nextBtn.style.cursor = "pointer";
-    nextBtn.onmouseenter = () => { nextBtn.style.background = "#333"; };
-    nextBtn.onmouseleave = () => { nextBtn.style.background = "#222"; };
-    nextBtn.onclick = () => setInfoPage(infoPage + 1);
-    infoNextBtn = nextBtn;
-  
-    leftBtns.appendChild(prevBtn);
-    leftBtns.appendChild(nextBtn);
-  
-    const closeBtn = document.createElement("button");
-    closeBtn.textContent = "Close ×";
-    closeBtn.style.fontFamily = "monospace";
-    closeBtn.style.fontSize = "12px";
-    closeBtn.style.padding = "4px 8px";
-    closeBtn.style.borderRadius = "6px";
-    closeBtn.style.border = "1px solid #555";
-    closeBtn.style.background = "#222";
-    closeBtn.style.color = "#fff";
-    closeBtn.style.cursor = "pointer";
-    closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
-    closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
-    closeBtn.onclick = () => closeInfoOverlay();
-  
-    navRow.appendChild(leftBtns);
-    navRow.appendChild(closeBtn);
-  
-    panel.appendChild(headerRow);
-    panel.appendChild(content);
-    panel.appendChild(navRow);
-  
-    infoOverlay.appendChild(panel);
-  
-    // clicking dark background closes
-    infoOverlay.addEventListener("click", (e) => {
-      if (e.target === infoOverlay) {
-        closeInfoOverlay();
-      }
-    });
-  
-    // ⬇️ append to BODY, not #frog-game
-    (document.body || container).appendChild(infoOverlay);
-  
-    setInfoPage(0);
-  }
-  
-  function setInfoPage(pageIndex) {
-    if (!infoContentEl || !infoPageLabel) return;
-    const neon = "#4defff";
-  
-    // 0..4: 5 total pages (0 = Run Summary now)
-    const maxPage = 4;
-    infoPage = Math.max(0, Math.min(maxPage, pageIndex));
-  
-    let html = "";
-  
+function ensureInfoOverlay() {
+  if (infoOverlay) return;
+
+  infoOverlay = document.createElement("div");
+  infoOverlay.className = "frog-info-overlay";
+  infoOverlay.style.position = "absolute";
+  infoOverlay.style.inset = "0";
+  infoOverlay.style.background = "rgba(0,0,0,0.75)";
+  infoOverlay.style.display = "none";
+  infoOverlay.style.zIndex = "180";
+  infoOverlay.style.alignItems = "center";
+  infoOverlay.style.justifyContent = "center";
+  infoOverlay.style.pointerEvents = "auto";
+
+  const panel = document.createElement("div");
+  panel.style.background = "#111";
+  panel.style.padding = "16px 20px 12px 20px";
+  panel.style.borderRadius = "10px";
+  panel.style.border = "1px solid #444";
+  panel.style.color = "#fff";
+  panel.style.fontFamily = "monospace";
+  panel.style.textAlign = "left";
+  panel.style.minWidth = "260px";
+  panel.style.maxWidth = "480px";
+  panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
+
+  // Header row
+  const headerRow = document.createElement("div");
+  headerRow.style.display = "flex";
+  headerRow.style.justifyContent = "space-between";
+  headerRow.style.alignItems = "center";
+  headerRow.style.marginBottom = "6px";
+
+  const title = document.createElement("div");
+  title.textContent = "escape the snake 🐍 – info";
+  title.style.fontSize = "14px";
+  title.style.fontWeight = "bold";
+
+  const pageLabel = document.createElement("div");
+  pageLabel.style.fontSize = "11px";
+  pageLabel.style.opacity = "0.8";
+  infoPageLabel = pageLabel;
+
+  headerRow.appendChild(title);
+  headerRow.appendChild(pageLabel);
+
+  const content = document.createElement("div");
+  content.style.fontSize = "13px";
+  content.style.marginTop = "4px";
+  content.style.lineHeight = "1.4";
+  infoContentEl = content;
+
+  // Footer nav row
+  const navRow = document.createElement("div");
+  navRow.style.display = "flex";
+  navRow.style.justifyContent = "space-between";
+  navRow.style.alignItems = "center";
+  navRow.style.marginTop = "10px";
+
+  const leftBtns = document.createElement("div");
+  leftBtns.style.display = "flex";
+  leftBtns.style.gap = "6px";
+
+  const prevBtn = document.createElement("button");
+  prevBtn.textContent = "◀ Prev";
+  prevBtn.style.fontFamily = "monospace";
+  prevBtn.style.fontSize = "12px";
+  prevBtn.style.padding = "4px 8px";
+  prevBtn.style.borderRadius = "6px";
+  prevBtn.style.border = "1px solid #555";
+  prevBtn.style.background = "#222";
+  prevBtn.style.color = "#fff";
+  prevBtn.style.cursor = "pointer";
+  prevBtn.onmouseenter = () => { prevBtn.style.background = "#333"; };
+  prevBtn.onmouseleave = () => { prevBtn.style.background = "#222"; };
+  prevBtn.onclick = () => setInfoPage(infoPage - 1);
+  infoPrevBtn = prevBtn;
+
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = "Next ▶";
+  nextBtn.style.fontFamily = "monospace";
+  nextBtn.style.fontSize = "12px";
+  nextBtn.style.padding = "4px 8px";
+  nextBtn.style.borderRadius = "6px";
+  nextBtn.style.border = "1px solid #555";
+  nextBtn.style.background = "#222";
+  nextBtn.style.color = "#fff";
+  nextBtn.style.cursor = "pointer";
+  nextBtn.onmouseenter = () => { nextBtn.style.background = "#333"; };
+  nextBtn.onmouseleave = () => { nextBtn.style.background = "#222"; };
+  nextBtn.onclick = () => setInfoPage(infoPage + 1);
+  infoNextBtn = nextBtn;
+
+  leftBtns.appendChild(prevBtn);
+  leftBtns.appendChild(nextBtn);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "Close ×";
+  closeBtn.style.fontFamily = "monospace";
+  closeBtn.style.fontSize = "12px";
+  closeBtn.style.padding = "4px 8px";
+  closeBtn.style.borderRadius = "6px";
+  closeBtn.style.border = "1px solid #555";
+  closeBtn.style.background = "#222";
+  closeBtn.style.color = "#fff";
+  closeBtn.style.cursor = "pointer";
+  closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
+  closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
+  closeBtn.onclick = () => closeInfoOverlay();
+
+  navRow.appendChild(leftBtns);
+  navRow.appendChild(closeBtn);
+
+  panel.appendChild(headerRow);
+  panel.appendChild(content);
+  panel.appendChild(navRow);
+
+  infoOverlay.appendChild(panel);
+  container.appendChild(infoOverlay);
+
+  // clicking dark background closes the panel
+  infoOverlay.addEventListener("click", (e) => {
+    if (e.target === infoOverlay) {
+      closeInfoOverlay();
+    }
+  });
+
+  // start on page 0 (leaderboard)
+  setInfoPage(0);
+}
+
+function setInfoPage(pageIndex) {
+  if (!infoContentEl || !infoPageLabel) return;
+  const neon = "#4defff";
+
+  const maxPage = 4; // 0..4: 5 total pages
+  infoPage = Math.max(0, Math.min(maxPage, pageIndex));
+
+  let html = "";
+
   if (infoPage === 0) {
-    // PAGE 0 – Match summary pulled from stored leaderboard + this session
-    const list = Array.isArray(infoLeaderboardData) ? infoLeaderboardData : [];
-    const userLabel = (typeof getCurrentUserLabel === "function")
-      ? getCurrentUserLabel()
-      : null;
-
-    // Find this user's row in the leaderboard, if any
-    let meRow = null;
-    if (userLabel && list.length > 0) {
-      const meLower = userLabel.trim().toLowerCase();
-      for (let i = 0; i < list.length; i++) {
-        const row = list[i];
-        if (!row) continue;
-
-        let tag =
-          (typeof row === "object")
-            ? (row.tag || row.username || row.user || row.name || row.label || null)
-            : String(row);
-
-        if (!tag) continue;
-        if (String(tag).trim().toLowerCase() === meLower) {
-          meRow = row;
-          break;
-        }
-      }
-    }
-
-    const hasSessionRun    = (lastRunTime > 0 || lastRunScore > 0);
-    const hasLeaderboardRun = !!meRow;
-    const hasRun = hasSessionRun || hasLeaderboardRun;
-
-    html += "<b>📊 Match summary</b><br><br>";
-
-    if (!hasRun) {
-      // No session run and no row for this tag on the leaderboard
-      html += `
-        <div style="font-size:13px; line-height:1.4;">
-          No previous runs yet for this tag.<br>
-          Start a game and try to keep your frogs alive as long as possible!
-        </div>
-      `;
+    // PAGE 0 – Leaderboard
+    html += "<b>🏆 Leaderboard</b><br><br>";
+    const list = infoLeaderboardData || [];
+    if (!list.length) {
+      html += "<div>No scores yet — be the first to escape the snake.</div>";
     } else {
-      // Decide what numbers to show:
-      // 1) Prefer this-session last run if available
-      // 2) Otherwise fall back to best known run from leaderboard
-      let displayScore = 0;
-      let displaySecs  = 0;
-
-      if (hasSessionRun) {
-        displayScore = lastRunScore || 0;
-        displaySecs  = Math.max(0, lastRunTime || 0);
-      } else if (meRow && typeof meRow === "object") {
-        // Best guess for fields coming from the worker
-        let s = null;
-        let t = null;
-
-        if (meRow.score != null)       s = meRow.score;
-        else if (meRow.bestScore != null) s = meRow.bestScore;
-        else if (meRow.maxScore != null)  s = meRow.maxScore;
-        else if (meRow.points != null)    s = meRow.points;
-
-        if (meRow.seconds != null)     t = meRow.seconds;
-        else if (meRow.time != null)   t = meRow.time;
-        else if (meRow.bestTime != null)  t = meRow.bestTime;
-
-        if (typeof s === "string") {
-          const parsed = parseFloat(s);
-          if (!Number.isNaN(parsed)) s = parsed;
-        }
-        if (typeof t === "string") {
-          const parsed = parseFloat(t);
-          if (!Number.isNaN(parsed)) t = parsed;
-        }
-
-        if (typeof s === "number" && isFinite(s)) displayScore = s;
-        if (typeof t === "number" && isFinite(t) && t >= 0) displaySecs = t;
-      }
-
-      const secs = Math.max(0, displaySecs || 0);
-      const m = Math.floor(secs / 60);
-      const s = Math.floor(secs % 60);
-      const tStr = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-      const scoreStr = Math.floor(displayScore || 0);
-
-      // Escape tag safely for HTML
-      let tagLine = "";
-      if (userLabel && typeof userLabel === "string") {
-        const esc = userLabel.replace(/[&<>]/g, c => (
-          c === "&" ? "&amp;" :
-          c === "<" ? "&lt;"  :
-          c === ">" ? "&gt;"  : c
-        ));
-        tagLine = `
-          • Your tag: <span style="color:${neon}; font-weight:bold;">${esc}</span><br>
+      html += "<table style='width:100%; border-collapse:collapse; font-size:12px;'>";
+      html += "<tr><th style='text-align:left;'>#</th><th style='text-align:left;'>Tag</th><th style='text-align:right;'>Score</th><th style='text-align:right;'>Time</th></tr>";
+      list.slice(0, 10).forEach((entry, i) => {
+        const rank = i + 1;
+        const tag  = entry.tag || entry.name || `Player ${rank}`;
+        const score = typeof entry.score === "number" ? Math.floor(entry.score) : entry.score;
+        const secs  = entry.time || entry.bestTime || 0;
+        const m = Math.floor(secs / 60);
+        const s = Math.floor(secs % 60);
+        const tStr = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        html += `
+          <tr>
+            <td>${rank}</td>
+            <td>${tag}</td>
+            <td style="text-align:right;">${score}</td>
+            <td style="text-align:right;">${tStr}</td>
+          </tr>
         `;
-      }
-
-      html += `
-        <div style="font-size:13px; line-height:1.5;">
-          <b>Last / Best run</b><br>
-          • Time survived: <span style="color:${neon};">${tStr}</span><br>
-          • Score: <span style="color:${neon};">${scoreStr}</span><br>
-          ${tagLine}
-        </div>
-      `;
+      });
+      html += "</table>";
+      html += `<div style="margin-top:6px; font-size:11px; opacity:0.8;">
+        Beat your own best score to update your entry.
+      </div>`;
     }
-
   } else if (infoPage === 1) {
-      // PAGE 1 – How to Play
-      html = `
-  <b>🐍 How to Play</b><br><br>
-  • Avoid the snake and keep the frogs alive as long as possible.<br>
-  • Frogs hop around the screen. Move your mouse to guide the swarm.<br>
-  • Collect glowing orbs to trigger buffs and upgrades.<br>
-  • Every minute you choose a <span style="color:${neon};">common</span> upgrade.<br>
-  • Every 3 minutes you get a <span style="color:${neon};">common + epic</span> upgrade chain.<br>
-  • Every 5 minutes the snake sheds, gets stronger, and changes color.<br>
-  • Your run ends when <span style="color:${neon};">all frogs are gone</span>.
-  `;
-    } else if (infoPage === 2) {
-      // PAGE 2 – Orb buffs
-      html = `
-  <b>🟢 Orb Buffs</b><br><br>
-  ⚡ <b>Speed</b> – frogs act faster for a short time (stacks with upgrades).<br>
-  🦘 <b>Jump</b> – frogs jump much higher for a short time.<br>
-  🐸➕ <b>Spawn</b> – instantly spawns extra frogs (more if the collector is Lucky).<br>
-  🧊 <b>Snake Slow</b> – snake moves slower for a few seconds (less effective as it grows).<br>
-  🤪 <b>Confuse</b> – snake turns randomly instead of targeting frogs.<br>
-  📏 <b>Shrink</b> – snake body and bite radius shrink temporarily.<br>
-  🛡️ <b>Team Shield</b> – all frogs ignore snake hits for a short duration.<br>
-  ⏱️ <b>Time Slow</b> – slows the whole game (and the snake) briefly.<br>
-  🧲 <b>Orb Magnet</b> – orbs drift toward frogs, preferring magnet frogs.<br>
-  🐸🌊 <b>Mega Spawn</b> – large wave of frogs appears at once.<br>
-  💰 <b>Score ×2</b> – score gain is multiplied for a short window.<br>
-  😱 <b>Panic Hop</b> – frogs hop faster but in random directions.<br>
-  🩺 <b>Lifeline</b> – frogs that die during the buff have a chance to instantly respawn.<br>
-  ⭐ <b>PermaFrog</b> – upgrades one frog with a permanent role (Champion, Aura, Magnet, Lucky, Zombie, etc.).
-  `;
-    } else if (infoPage === 3) {
-      // PAGE 3 – Permanent frog roles (no shield frog)
-      html = `
-  <b>🐸 Permanent Frog Roles</b><br><br>
-  🏅 <b>Champion</b> – that frog's hop cycle is faster and jumps are higher.<br>
-  🌈 <b>Aura</b> – nearby frogs get bonus speed and jump height in a radius around this frog.<br>
-  🧲 <b>Magnet</b> – orbs in a radius are strongly pulled toward this frog.<br>
-  🍀 <b>Lucky</b> – buffs last longer, more frogs spawn from some effects, and score gain is boosted slightly per Lucky frog.<br>
-  🧟 <b>Zombie</b> – when this frog dies, it causes extra chaos (like extra frogs and snake debuffs).<br>
-  💀 <b>Cannibal</b> – hunts nearby frogs; sometimes “spares” a victim and grants it a random permanent role instead of killing it.<br><br>
-  Perma roles stack with global upgrades and orb buffs, making some frogs into mini “heroes” of the swarm.
-  `;
-    } else if (infoPage === 4) {
-      // PAGE 4 – Global upgrades (common + epic; no shield frog, no legendary)
-      html = `
-  <b>🏗️ Global Upgrades</b><br><br>
-  ⏩ <b>Frogs hop faster forever</b> – reduces the hop cycle, making the whole swarm act more often.<br>
-  🦘⬆️ <b>Frogs jump higher forever</b> – increases base jump height for all frogs.<br>
-  🐸💥 <b>Spawn frogs</b> – instant injections of ${NORMAL_SPAWN_AMOUNT}/${EPIC_SPAWN_AMOUNT} frogs from common / epic menus.<br>
-  ⏳ <b>Buffs last longer</b> – multiplies the duration of all temporary buffs (orb effects).<br>
-  🎯 <b>More orbs</b> – orbs spawn more frequently over time.<br>
-  💀 <b>Deathrattle</b> – dead frogs have a chance to respawn immediately (common and epic versions stack).<br>
-  🏹 <b>Last Stand</b> – your final remaining frog always has a 50% deathrattle chance (one-time pick).<br>
-  🌌 <b>Orb Collector</b> – every collected orb has a flat chance to spawn an extra frog (one-time pick).<br>
-  🧟‍♂️ <b>Zombie Horde (epic)</b> – summons special zombie frogs with boosted deathrattle while they last.<br>
-  🍖 <b>Cannibal Frog (epic)</b> – spawns a cannibal frog that eats nearby frogs and buffs global deathrattle while alive.<br>
-  🌩️ <b>Orb Storm (epic)</b> – unleashes a burst of orbs onto the field at once.<br>
-  🥚 <b>Snake Egg (epic)</b> – weakens the next snake after a shed by reducing its speed bonus.<br><br>
-  Synergize permanent upgrades, frog roles, and epic choices to keep the swarm alive deep into later sheds.
-  `;
-    }
-  
-    infoContentEl.innerHTML = html;
-    infoPageLabel.textContent = `Page ${infoPage + 1} / 5`;
-  
-    if (infoPrevBtn) {
-      infoPrevBtn.disabled = (infoPage === 0);
-      infoPrevBtn.style.opacity = infoPage === 0 ? "0.5" : "1";
-    }
-    if (infoNextBtn) {
-      infoNextBtn.disabled = (infoPage === maxPage);
-      infoNextBtn.style.opacity = infoNextBtn.disabled ? "0.5" : "1";
-    }
+    // PAGE 1 – How to Play
+    html = `
+<b>🐍 How to Play</b><br><br>
+• Avoid the snake and keep the frogs alive as long as possible.<br>
+• Frogs hop around the screen. Move your mouse to guide the swarm.<br>
+• Collect glowing orbs to trigger buffs and upgrades.<br>
+• Every minute you choose a <span style="color:${neon};">common</span> upgrade.<br>
+• Every 3 minutes you get a <span style="color:${neon};">common + epic</span> upgrade chain.<br>
+• Every 5 minutes the snake sheds, gets stronger, and changes color.<br>
+• Your run ends when <span style="color:${neon};">all frogs are gone</span>.
+`;
+  } else if (infoPage === 2) {
+    // PAGE 2 – Orb buffs
+    html = `
+<b>🟢 Orb Buffs</b><br><br>
+⚡ <b>Speed</b> – frogs act faster for a short time (stacks with upgrades).<br>
+🦘 <b>Jump</b> – frogs jump much higher for a short time.<br>
+🐸➕ <b>Spawn</b> – instantly spawns extra frogs (more if the collector is Lucky).<br>
+🧊 <b>Snake Slow</b> – snake moves slower for a few seconds (less effective as it grows).<br>
+🤪 <b>Confuse</b> – snake turns randomly instead of targeting frogs.<br>
+📏 <b>Shrink</b> – snake body and bite radius shrink temporarily.<br>
+🛡️ <b>Team Shield</b> – all frogs ignore snake hits for a short duration.<br>
+⏱️ <b>Time Slow</b> – slows the whole game (and the snake) briefly.<br>
+🧲 <b>Orb Magnet</b> – orbs drift toward frogs, preferring magnet frogs.<br>
+🐸🌊 <b>Mega Spawn</b> – large wave of frogs appears at once.<br>
+💰 <b>Score ×2</b> – score gain is multiplied for a short window.<br>
+😱 <b>Panic Hop</b> – frogs hop faster but in random directions.<br>
+🩺 <b>Lifeline</b> – frogs that die during the buff have a chance to instantly respawn.<br>
+⭐ <b>PermaFrog</b> – upgrades one frog with a permanent role (Champion, Aura, Magnet, Lucky, Zombie, etc.).
+`;
+  } else if (infoPage === 3) {
+    // PAGE 3 – Permanent frog roles (no shield frog)
+    html = `
+<b>🐸 Permanent Frog Roles</b><br><br>
+🏅 <b>Champion</b> – that frog's hop cycle is faster and jumps are higher.<br>
+🌈 <b>Aura</b> – nearby frogs get bonus speed and jump height in a radius around this frog.<br>
+🧲 <b>Magnet</b> – orbs in a radius are strongly pulled toward this frog.<br>
+🍀 <b>Lucky</b> – buffs last longer, more frogs spawn from some effects, and score gain is boosted slightly per Lucky frog.<br>
+🧟 <b>Zombie</b> – when this frog dies, it causes extra chaos (like extra frogs and snake debuffs).<br><br>
+Perma roles stack with global upgrades and orb buffs, making some frogs into mini “heroes” of the swarm.
+`;
+  } else if (infoPage === 4) {
+    // PAGE 4 – Global upgrades (common + epic; no shield frog, no legendary)
+    html = `
+<b>🏗️ Global Upgrades</b><br><br>
+⏩ <b>Frogs hop faster forever</b> – reduces the hop cycle, making the whole swarm act more often.<br>
+🦘⬆️ <b>Frogs jump higher forever</b> – increases base jump height for all frogs.<br>
+🐸💥 <b>Spawn frogs</b> – instant injections of ${NORMAL_SPAWN_AMOUNT}/${EPIC_SPAWN_AMOUNT} frogs from common / epic menus.<br>
+⏳ <b>Buffs last longer</b> – multiplies the duration of all temporary buffs (orb effects).<br>
+🎯 <b>More orbs</b> – orbs spawn more frequently over time.<br>
+💀 <b>Deathrattle</b> – dead frogs have a chance to respawn immediately (common and epic versions stack).<br>
+🏹 <b>Last Stand</b> – your final remaining frog always has a 50% deathrattle chance (one-time pick).<br>
+🌌 <b>Orb Collector</b> – every collected orb has a flat chance to spawn an extra frog (one-time pick).<br>
+🧟‍♂️ <b>Zombie Horde (epic)</b> – summons special zombie frogs with boosted deathrattle while they last.<br>
+🍖 <b>Cannibal Frog (epic)</b> – spawns a cannibal frog that eats nearby frogs and buffs global deathrattle while alive.<br>
+💫 <b>Orb Storm / Snake Egg (epic)</b> – high-impact utilities that affect orb spawns or the next snake after a shed.<br><br>
+Synergize permanent upgrades, frog roles, and epic choices to keep the swarm alive deep into later sheds.
+`;
   }
-  
 
+  infoContentEl.innerHTML = html;
+  infoPageLabel.textContent = `Page ${infoPage + 1} / 5`;
+
+  if (infoPrevBtn) {
+    infoPrevBtn.disabled = (infoPage === 0);
+    infoPrevBtn.style.opacity = infoPage === 0 ? "0.5" : "1";
+  }
+  if (infoNextBtn) {
+    infoNextBtn.disabled = (infoPage === maxPage);
+    infoNextBtn.style.opacity = infoNextBtn.disabled ? "0.5" : "1";
+  }
+}
 
 function openInfoOverlay(startPage) {
   ensureInfoOverlay();
-  gamePaused = true; // pause game while info is open
-
+  gamePaused = true;
   if (typeof startPage === "number") {
     setInfoPage(startPage);
   } else {
     setInfoPage(infoPage);
   }
-
   if (infoOverlay) {
     infoOverlay.style.display = "flex";
   }
@@ -2732,18 +2577,7 @@ function closeInfoOverlay() {
   if (infoOverlay) {
     infoOverlay.style.display = "none";
   }
-
-  // If this was the initial readme shown at the very start of the run,
-  // immediately open the first common upgrade instead of unpausing.
-  if (pendingInitialUpgradeAfterInfo && !initialUpgradeDone) {
-    pendingInitialUpgradeAfterInfo = false;
-
-    // Keep the game effectively paused; the upgrade overlay also pauses.
-    openUpgradeOverlay("normal");
-  } else {
-    // Normal case: just resume the game
-    gamePaused = false;
-  }
+  gamePaused = false;
 }
 
 
@@ -2752,7 +2586,7 @@ function ensureBuffGuideOverlay() {
 
   buffGuideOverlay = document.createElement("div");
   buffGuideOverlay.className = "frog-buff-guide-overlay";
-  buffGuideOverlay.style.position = "fixed";   // 🔥
+  buffGuideOverlay.style.position = "absolute";
   buffGuideOverlay.style.inset = "0";
   buffGuideOverlay.style.background = "rgba(0,0,0,0.75)";
   buffGuideOverlay.style.display = "none";
@@ -2863,19 +2697,18 @@ function ensureBuffGuideOverlay() {
   panel.appendChild(navRow);
 
   buffGuideOverlay.appendChild(panel);
+  container.appendChild(buffGuideOverlay);
 
+  // clicking the dim background also closes it
   buffGuideOverlay.addEventListener("click", (e) => {
     if (e.target === buffGuideOverlay) {
       closeBuffGuideOverlay();
     }
   });
 
-  // ⬇️ attach to BODY
-  (document.body || container).appendChild(buffGuideOverlay);
-
+  // start on page 0
   setBuffGuidePage(0);
 }
-
 function setBuffGuidePage(pageIndex) {
   if (!buffGuideContentEl || !buffGuidePageLabel) return;
 
@@ -3029,19 +2862,19 @@ function setBuffGuidePage(pageIndex) {
 
   function ensureUpgradeOverlay() {
     if (upgradeOverlay) return;
-  
+
     upgradeOverlay = document.createElement("div");
     upgradeOverlay.className = "frog-upgrade-overlay";
-  
-    upgradeOverlay.style.position = "fixed";   // 🔥 fixed on viewport
+
+    upgradeOverlay.style.position = "absolute";
     upgradeOverlay.style.inset = "0";
     upgradeOverlay.style.background = "rgba(0,0,0,0.7)";
-    upgradeOverlay.style.display = "none";
+    upgradeOverlay.style.display = "none"; // hidden by default
     upgradeOverlay.style.zIndex = "150";
     upgradeOverlay.style.alignItems = "center";
     upgradeOverlay.style.justifyContent = "center";
     upgradeOverlay.style.pointerEvents = "auto";
-  
+
     const panel = document.createElement("div");
     panel.style.background = "#111";
     panel.style.padding = "16px 20px";
@@ -3053,146 +2886,141 @@ function setBuffGuidePage(pageIndex) {
     panel.style.minWidth = "260px";
     panel.style.maxWidth = "360px";
     panel.style.boxShadow = "0 0 18px rgba(0,0,0,0.6)";
-  
+
     const title = document.createElement("div");
     title.textContent = "Choose an upgrade";
     title.style.marginBottom = "12px";
     title.style.fontSize = "14px";
     upgradeOverlayTitleEl = title;
-  
+
     const buttonsContainer = document.createElement("div");
     buttonsContainer.style.display = "flex";
     buttonsContainer.style.flexDirection = "column";
     buttonsContainer.style.gap = "8px";
     buttonsContainer.style.alignItems = "stretch";
+
     upgradeOverlayButtonsContainer = buttonsContainer;
-  
+
     panel.appendChild(title);
     panel.appendChild(buttonsContainer);
     upgradeOverlay.appendChild(panel);
-  
-    // ⬇️ attach to BODY, not container
-    (document.body || container).appendChild(upgradeOverlay);
+    container.appendChild(upgradeOverlay);
   }
-  
 
-  function populateUpgradeOverlayChoices(mode) {
-    ensureUpgradeOverlay();
-    const containerEl = upgradeOverlayButtonsContainer;
-    if (!containerEl) return;
-  
-    currentUpgradeOverlayMode = mode || "normal";
-    const isEpic      = currentUpgradeOverlayMode === "epic";
-    const isLegendary = currentUpgradeOverlayMode === "legendary";
-  
-    containerEl.innerHTML = "";
-    const neon = "#4defff";
-  
-    if (upgradeOverlayTitleEl) {
-      upgradeOverlayTitleEl.textContent = "Choose an upgrade";
+function populateUpgradeOverlayChoices(mode) {
+  ensureUpgradeOverlay();
+  const containerEl = upgradeOverlayButtonsContainer;
+  if (!containerEl) return;
+
+  currentUpgradeOverlayMode = mode || "normal";
+  const isEpic      = currentUpgradeOverlayMode === "epic";
+  const isLegendary = currentUpgradeOverlayMode === "legendary";
+
+  containerEl.innerHTML = "";
+  const neon = "#4defff";
+
+  if (upgradeOverlayTitleEl) {
+    upgradeOverlayTitleEl.textContent = "Choose an upgrade";
+  }
+
+  let choices = [];
+
+  if (isEpic) {
+    // 🔥 EPIC: pick a random 3 from the full epic pool
+    let pool = getEpicUpgradeChoices().slice();
+    while (choices.length < 3 && pool.length) {
+      const idx = Math.floor(Math.random() * pool.length);
+      choices.push(pool.splice(idx, 1)[0]);
     }
-  
-    let choices = [];
-  
-    if (isEpic) {
-      // 🔥 EPIC: pick a random 3 from the full epic pool
-      let pool = getEpicUpgradeChoices().slice();
+  } else if (isLegendary && typeof getLegendaryUpgradeChoices === "function") {
+    choices = getLegendaryUpgradeChoices().slice();
+  } else {
+    // normal per-minute upgrades
+    let pool = getUpgradeChoices().slice();
+
+    // Starting pre-game upgrade: no perma lifesteal yet
+    if (!initialUpgradeDone) {
+      pool = pool.filter(c => c.id !== "permaLifeSteal");
+    }
+
+    const isFirstTimedNormal = initialUpgradeDone && !firstTimedNormalChoiceDone;
+
+    if (isFirstTimedNormal) {
+      firstTimedNormalChoiceDone = true;
+
+      // guarantee spawn20 is one of the options
+      let spawnChoiceIndex = pool.findIndex(c => c.id === "spawn20");
+      let spawnChoice;
+
+      if (spawnChoiceIndex !== -1) {
+        spawnChoice = pool.splice(spawnChoiceIndex, 1)[0];
+      } else {
+        // fallback: create spawn20 choice if it somehow went missing
+        spawnChoice = {
+          id: "spawn20",
+          label: `
+            🐸➕ Spawn frogs<br>
+            <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
+          `,
+          apply: () => { spawnExtraFrogs(NORMAL_SPAWN_AMOUNT); }
+        };
+      }
+
+      choices.push(spawnChoice);
+
+      // fill remaining slots randomly until we have 3 choices total
       while (choices.length < 3 && pool.length) {
         const idx = Math.floor(Math.random() * pool.length);
         choices.push(pool.splice(idx, 1)[0]);
       }
-  
-    } else if (isLegendary && typeof getLegendaryUpgradeChoices === "function") {
-      choices = getLegendaryUpgradeChoices().slice();
-  
     } else {
-      // NORMAL per-minute upgrades
-      let pool = getUpgradeChoices().slice();
-  
-      // Starting pre-game upgrade: no perma lifesteal yet
-      if (!initialUpgradeDone) {
-        pool = pool.filter(c => c.id !== "permaLifeSteal");
-      }
-  
-      // This flag marks the *first* timed normal upgrade (the 1-minute mark)
-      const isFirstTimedNormal = initialUpgradeDone && !firstTimedNormalChoiceDone;
-  
-      if (isFirstTimedNormal) {
-        firstTimedNormalChoiceDone = true;
-  
-        // Guarantee spawn20 is one of the options at the 1-minute panel
-        let spawnChoiceIndex = pool.findIndex(c => c.id === "spawn20");
-        let spawnChoice;
-  
-        if (spawnChoiceIndex !== -1) {
-          spawnChoice = pool.splice(spawnChoiceIndex, 1)[0];
-        } else {
-          // Fallback: recreate it if somehow missing
-          spawnChoice = {
-            id: "spawn20",
-            label: `
-              🐸 Spawn frogs<br>
-              <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
-            `,
-            apply: () => { spawnExtraFrogs(NORMAL_SPAWN_AMOUNT); }
-          };
-        }
-  
-        choices.push(spawnChoice);
-  
-        // Fill remaining options randomly until we have 3 total
-        while (choices.length < 3 && pool.length) {
-          const idx = Math.floor(Math.random() * pool.length);
-          choices.push(pool.splice(idx, 1)[0]);
-        }
-  
-      } else {
-        // All other normal panels: just pick any 3 at random
-        while (choices.length < 3 && pool.length) {
-          const idx = Math.floor(Math.random() * pool.length);
-          choices.push(pool.splice(idx, 1)[0]);
-        }
+      // regular case: pick any 3 at random
+      while (choices.length < 3 && pool.length) {
+        const idx = Math.floor(Math.random() * pool.length);
+        choices.push(pool.splice(idx, 1)[0]);
       }
     }
-  
-    function makeButton(label, onClick) {
-      const btn = document.createElement("button");
-      btn.innerHTML = label;
-      btn.style.fontFamily = "monospace";
-      btn.style.fontSize = "13px";
-      btn.style.padding = "6px 8px";
-      btn.style.border = "1px solid #555";
-      btn.style.borderRadius = "6px";
-      btn.style.background = "#222";
-      btn.style.color = "#fff";
-      btn.style.cursor = "pointer";
-      btn.style.textAlign = "left";
-      btn.onmouseenter = () => { btn.style.background = "#333"; };
-      btn.onmouseleave = () => { btn.style.background = "#222"; };
-      btn.onclick = () => {
-        try {
-          onClick();
-        } catch (e) {
-          console.error("Error applying upgrade:", e);
-        }
-        playPermanentChoiceSound();
-        closeUpgradeOverlay();
-      };
-      return btn;
-    }
-  
-    if (!choices.length) {
-      const span = document.createElement("div");
-      span.textContent = "No upgrades available.";
-      span.style.fontSize = "13px";
-      containerEl.appendChild(span);
-      return;
-    }
-  
-    for (const choice of choices) {
-      containerEl.appendChild(makeButton(choice.label, choice.apply));
-    }
-  }  
+  }
+
+  function makeButton(label, onClick) {
+    const btn = document.createElement("button");
+    btn.innerHTML = label; // allow emojis + <span> highlight
+    btn.style.fontFamily = "monospace";
+    btn.style.fontSize = "13px";
+    btn.style.padding = "6px 8px";
+    btn.style.border = "1px solid #555";
+    btn.style.borderRadius = "6px";
+    btn.style.background = "#222";
+    btn.style.color = "#fff";
+    btn.style.cursor = "pointer";
+    btn.style.textAlign = "left";
+    btn.onmouseenter = () => { btn.style.background = "#333"; };
+    btn.onmouseleave = () => { btn.style.background = "#222"; };
+    btn.onclick = () => {
+      try {
+        onClick();
+      } catch (e) {
+        console.error("Error applying upgrade:", e);
+      }
+      playPermanentChoiceSound();
+      closeUpgradeOverlay();
+    };
+    return btn;
+  }
+
+  if (!choices.length) {
+    const span = document.createElement("div");
+    span.textContent = "No upgrades available.";
+    span.style.fontSize = "13px";
+    containerEl.appendChild(span);
+    return;
+  }
+
+  for (const choice of choices) {
+    containerEl.appendChild(makeButton(choice.label, choice.apply));
+  }
+}
+
 
     function makeButton(label, onClick) {
       const btn = document.createElement("button");
@@ -3278,7 +3106,7 @@ function setBuffGuidePage(pageIndex) {
     return 1 + LUCKY_SCORE_BONUS_PER * count;
   }
 
-function endGame() {
+  function endGame() {
     gameOver = true;
 
     lastRunTime  = elapsedTime;
@@ -3288,17 +3116,7 @@ function endGame() {
       const posted = await submitScoreToServer(lastRunScore, lastRunTime);
       const topList = posted || await fetchLeaderboard() || [];
       updateMiniLeaderboard(topList);
-
-      // Keep a copy of the latest leaderboard data for the info/read-more panel
-      infoLeaderboardData = Array.isArray(topList) ? topList : [];
-
-      // Instead of a separate scoreboard overlay, show the summary on page 1
-      // of the How to Play / Read More panel.
-      try {
-        openInfoOverlay(0);
-      } catch (e) {
-        // fail silently – game over screen will still show
-      }
+      openScoreboardOverlay(topList, lastRunScore, lastRunTime);
     })();
 
     showGameOver();
@@ -3375,7 +3193,6 @@ function endGame() {
     // Reset upgrade timing / sheds
     initialUpgradeDone       = false;
     nextPermanentChoiceTime  = 60;
-    firstTimedNormalChoiceDone = false;
     nextEpicChoiceTime       = 180;
     legendaryEventTriggered  = false;
 
@@ -3421,8 +3238,9 @@ function endGame() {
     if (upgradeOverlay) upgradeOverlay.style.display = "none";
     hideScoreboardOverlay();
 
-    const width  = getGameWidth();
-    const height = getGameHeight();
+    // Recreate frogs + snake
+    const width  = window.innerWidth;
+    const height = window.innerHeight;
 
     createInitialFrogs(width, height).then(() => {});
     initSnake(width, height);
@@ -3446,8 +3264,8 @@ function endGame() {
   // GAME LOOP
   // --------------------------------------------------
   function drawFrame(time) {
-    const width  = getGameWidth();
-    const height = getGameHeight();
+    const width  = window.innerWidth;
+    const height = window.innerHeight;
 
     if (!lastTime) lastTime = time;
     const dt = (time - lastTime) / 1000;
@@ -3519,51 +3337,39 @@ function endGame() {
   // --------------------------------------------------
   // INIT
   // --------------------------------------------------
-  async function startGame() {
-    initAudio();
-    initLeaderboard(container);
-    ensureUpgradeOverlay();
-    ensureInfoOverlay();  // unified info / readme panel
-    applyGameScale();
-  
-    // Fetch leaderboard so we can populate the mini board and Run Summary page
-    const topList = await fetchLeaderboard();
-    if (topList) {
-      updateMiniLeaderboard(topList);
-      infoLeaderboardData = Array.isArray(topList) ? topList : [];
-    } else {
-      infoLeaderboardData = [];
-    }
+async function startGame() {
+  initAudio();
+  initLeaderboard(container);
+  ensureUpgradeOverlay();
+  ensureInfoOverlay();  // unified info panel
 
-  
-    const width  = getGameWidth();
-    const height = getGameHeight();
-  
-    await createInitialFrogs(width, height);
-    initSnake(width, height);  
-  
-    setNextOrbTime();
-    updateHUD();
-  
-    // After the player closes the info panel, we want:
-    //   Run summary / How to Play  -> first common upgrade -> game start
-    if (!hasShownHowToOverlay) {
-      hasShownHowToOverlay = true;
-      pendingInitialUpgradeAfterInfo = true;
-  
-      // Open the info panel on the Run summary page (page 0) first.
-      openInfoOverlay(0);
-    } else {
-      // On later runs, skip straight to first common upgrade.
-      openUpgradeOverlay("normal");
-    }
-  
-    animId = requestAnimationFrame(drawFrame);
+  const topList = await fetchLeaderboard();
+  if (topList) {
+    updateMiniLeaderboard(topList);
+    infoLeaderboardData = topList;
+  } else {
+    infoLeaderboardData = [];
   }
-  
-  window.addEventListener("resize", () => {
-    applyGameScale();
-  });
+
+  const width  = window.innerWidth;
+  const height = window.innerHeight;
+
+  await createInitialFrogs(width, height);
+  initSnake(width, height);
+
+  setNextOrbTime();
+  updateHUD();
+
+  // Show unified info panel once at the start of a fresh run
+  if (!hasShownHowToOverlay) {
+    hasShownHowToOverlay = true;
+    openInfoOverlay(0); // start on leaderboard page
+  } else {
+    openUpgradeOverlay("normal");
+  }
+
+  animId = requestAnimationFrame(drawFrame);
+}
 
   window.addEventListener("load", startGame);
 })();
