@@ -25,6 +25,33 @@
   const openScoreboardOverlay  = LMod.openScoreboardOverlay  || function(){};
   const hideScoreboardOverlay  = LMod.hideScoreboardOverlay  || function(){};
 
+  function getCurrentUserLabel() {
+    try {
+      if (typeof LMod.getCurrentUserLabel === "function") {
+        return LMod.getCurrentUserLabel();
+      }
+      if (typeof LMod.getCurrentTag === "function") {
+        return LMod.getCurrentTag();
+      }
+
+      const direct =
+        LMod.currentUser ||
+        LMod.currentUsername ||
+        LMod.currentTag;
+      if (direct) return direct;
+
+      if (typeof localStorage !== "undefined") {
+        return (
+          localStorage.getItem("frogSnake_username") ||
+          localStorage.getItem("frogSnake_tag") ||
+          localStorage.getItem("frogSnakeUserTag") ||
+          null
+        );
+      }
+    } catch (e) {}
+    return null;
+  }
+
   // --------------------------------------------------
   // BASIC CONSTANTS
   // --------------------------------------------------
@@ -2501,8 +2528,9 @@ function openHowToOverlay() {
     let html = "";
   
     if (infoPage === 0) {
-      // PAGE 0 – Run summary (replaces old leaderboard page)
+      // PAGE 0 – Run summary + compact leaderboard (replaces old standalone summary)
       const hasRun = (lastRunTime > 0 || lastRunScore > 0);
+      const userLabel = (typeof getCurrentUserLabel === "function") ? getCurrentUserLabel() : "";
       html += "<b>📊 Run summary</b><br><br>";
   
       if (!hasRun) {
@@ -2519,13 +2547,118 @@ function openHowToOverlay() {
         const s = Math.floor(secs % 60);
         const tStr = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
   
+        // Escape the current tag for safe HTML insertion
+        let tagLine = "";
+        if (userLabel && typeof userLabel === "string") {
+          const esc = userLabel.replace(/[&<>]/g, c => (
+            c === "&" ? "&amp;" :
+            c === "<" ? "&lt;"  :
+            c === ">" ? "&gt;"  : c
+          ));
+          tagLine = `
+            • Your tag: <span style="color:${neon}; font-weight:bold;">${esc}</span><br>
+          `;
+        }
+  
         html += `
-          <div style="font-size:13px; line-height:1.5;">
+          <div style="font-size:13px; line-height:1.5; margin-bottom:8px;">
             <b>Last run</b><br>
             • Time survived: <span style="color:${neon};">${tStr}</span><br>
-            • Score: <span style="color:${neon};">${scoreStr}</span><br><br>
-            Keep playing to push your time and score higher.<br>
-            Your best scores still show in the main match summary panel.
+            • Score: <span style="color:${neon};">${scoreStr}</span><br>
+            ${tagLine}
+          </div>
+        `;
+      }
+  
+      // Compact top-runs list (best guess based on available leaderboard data)
+      const list = Array.isArray(infoLeaderboardData) ? infoLeaderboardData : [];
+      if (list.length > 0) {
+        const meLower = (userLabel && typeof userLabel === "string")
+          ? userLabel.trim().toLowerCase()
+          : null;
+  
+        html += `
+          <div style="font-size:12px; line-height:1.4; margin-top:4px;">
+            <b>Top runs</b><br>
+        `;
+  
+        let shown = 0;
+        for (let i = 0; i < list.length && shown < 5; i++) {
+          const row = list[i];
+          if (!row) continue;
+  
+          let tag = null;
+          let scoreVal = null;
+          let secsVal = null;
+  
+          if (typeof row === "string" || typeof row === "number") {
+            tag = String(row);
+          } else if (typeof row === "object") {
+            tag = row.tag || row.username || row.user || row.name || row.label || null;
+            if (row.score != null) scoreVal = row.score;
+            else if (row.bestScore != null) scoreVal = row.bestScore;
+            else if (row.maxScore != null) scoreVal = row.maxScore;
+            else if (row.points != null) scoreVal = row.points;
+  
+            if (row.time != null) secsVal = row.time;
+            else if (row.seconds != null) secsVal = row.seconds;
+            else if (row.bestSeconds != null) secsVal = row.bestSeconds;
+            else if (row.bestTime != null) secsVal = row.bestTime;
+          }
+  
+          if (scoreVal == null && typeof row === "object" && row.value != null) {
+            scoreVal = row.value;
+          }
+  
+          let rank;
+          if (typeof row === "object") {
+            if (row.rank != null) rank = row.rank;
+            else if (row.position != null) rank = row.position;
+            else if (row.index != null) rank = row.index + 1;
+          }
+          if (rank == null) rank = i + 1;
+  
+          let scoreStr2 = "";
+          if (typeof scoreVal === "number" && isFinite(scoreVal)) {
+            scoreStr2 = `${Math.floor(scoreVal)}`;
+          } else if (typeof scoreVal === "string") {
+            scoreStr2 = scoreVal;
+          }
+  
+          let tStr2 = "";
+          if (secsVal != null) {
+            let num = secsVal;
+            if (typeof num === "string") {
+              const parsed = parseFloat(num);
+              if (!Number.isNaN(parsed)) num = parsed;
+            }
+            if (typeof num === "number" && num >= 0 && isFinite(num)) {
+              const mm = Math.floor(num / 60);
+              const ss = Math.floor(num % 60);
+              tStr2 = `${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
+            }
+          }
+  
+          const tagStr = tag ? String(tag) : "Unknown";
+          const isMe = !!(meLower && tagStr.toLowerCase() === meLower);
+          const rowStyle = isMe
+            ? `color:${neon}; font-weight:bold;`
+            : "";
+  
+          html += `
+            <div style="${rowStyle}">
+              #${rank} — ${tagStr}
+              ${scoreStr2 ? `· ${scoreStr2}` : ""}
+              ${tStr2 ? `· ${tStr2}` : ""}
+            </div>
+          `;
+          shown++;
+        }
+  
+        html += `
+            <div style="opacity:0.75; margin-top:4px;">
+              Your latest run and best scores are tracked here and on the live leaderboard.
+            </div>
           </div>
         `;
       }
@@ -3411,18 +3544,15 @@ function setBuffGuidePage(pageIndex) {
     ensureInfoOverlay();  // unified info / readme panel
     applyGameScale();
   
-    // Fetch leaderboard and show the usual match-summary overlay on load
+    // Fetch leaderboard so we can populate the mini board and Run Summary page
     const topList = await fetchLeaderboard();
     if (topList) {
       updateMiniLeaderboard(topList);
-      infoLeaderboardData = topList;
-  
-      // Same summary overlay used at end of match:
-      // (lastRunScore / lastRunTime will be 0 on very first visit)
-      openScoreboardOverlay(topList, lastRunScore, lastRunTime);
+      infoLeaderboardData = Array.isArray(topList) ? topList : [];
     } else {
       infoLeaderboardData = [];
     }
+
   
     const width  = getGameWidth();
     const height = getGameHeight();
