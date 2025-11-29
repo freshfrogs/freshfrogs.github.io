@@ -1955,12 +1955,7 @@ function getEpicUpgradeChoices() {
   const deathPerPickPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
   const buffPerPickPct  = Math.round((BUFF_DURATION_UPGRADE_FACTOR + 0.25 - 1) * 100);
 
-  const MAX_BUFF_DURATION_FACTOR = 3.0;
-  const MAX_DEATHRATTLE_CHANCE   = 1.0;
-
   const epicBuffFactor  = BUFF_DURATION_UPGRADE_FACTOR + 0.25;
-  const orbStormCount   = 10;
-  const snakeEggBuffPct = 11; // +11% instead of +20%
 
   const choices = [];
 
@@ -2099,14 +2094,6 @@ function getUpgradeChoices() {
   const orbFasterPerPickPct = Math.round((1 - ORB_INTERVAL_UPGRADE_FACTOR) * 100);
   const deathPerPickPct     = Math.round(COMMON_DEATHRATTLE_CHANCE * 100);
   const orbPerPickPct       = Math.round(ORB_COLLECTOR_CHANCE * 100);
-
-  // caps
-  const MIN_FROG_SPEED_FACTOR         = 0.50; // 50% of original cycle
-  const MAX_FROG_JUMP_FACTOR          = 3.0;  // 300% jump height
-  const MAX_BUFF_DURATION_FACTOR      = 3.0;  // 3x buff duration
-  const MIN_ORB_SPAWN_INTERVAL_FACTOR = 0.35; // 65% faster orbs
-  const MAX_DEATHRATTLE_CHANCE        = 1.0;
-  const MAX_ORB_COLLECTOR_TOTAL       = 1.0;
 
   const lastStandPct = Math.round(LAST_STAND_MIN_CHANCE * 100);
 
