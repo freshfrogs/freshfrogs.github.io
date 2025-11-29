@@ -1,39 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>escape the snake 🐍</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <head>
+    <meta charset="UTF-8" />
+    <title>escape the snake 🐍</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Adjust path if your CSS is elsewhere -->
-  <link rel="stylesheet" href="/style.css" />
+    <!-- Adjust path if your CSS is elsewhere -->
+    <link rel="stylesheet" href="/style.css" />
 
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      background: #7cc1ff; /* light blue */
-    }
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        background: #7cc1ff; /* light blue */
+      }
 
-    #frog-bg {
-      position: fixed;
-      inset: 0;
-      pointer-events: auto;
-    }
-  </style>
-</head>
-<body>
-  <!-- data-snake-game turns on snake logic in scatter-frogs.js -->
-  <div id="frog-game"></div>
-  <script src="frog-audio.js"></script>
-  <script src="frog-leaderboard.js"></script>
-
-  <script src="frog-game.js"></script>
-  <script src="frog-game-ui.js"></script>
-  <script src="frog-game-main.js"></script>
-
-</body>
+      #frog-bg {
+        position: fixed;
+        inset: 0;
+        pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="frog-audio.js"></script>
+    <script src="frog-leaderboard.js"></script>
+    <script src="frog-game.js"></script>
+    <script src="frog-game-ui.js"></script>
+    <script src="frog-game-main.js"></script>
+  </body>
 </html>
