@@ -2458,39 +2458,65 @@ function setInfoPage(pageIndex) {
   if (infoPage === 0) {
     // PAGE 0 – Leaderboard
     html += "<b>🏆 Leaderboard --</b><br><br>";
-    const list = infoLeaderboardData || [];
+
+    // infoLeaderboardData can be either:
+    // - { entries: [...], myEntry: {...} }
+    // - or just an array of entries
+    let list = [];
+    let myEntry = null;
+
+    const data = infoLeaderboardData;
+    if (data) {
+      if (Array.isArray(data.entries)) {
+        list = data.entries;
+        myEntry = data.myEntry || null;
+      } else if (Array.isArray(data)) {
+        list = data;
+      }
+    }
+
     if (!list.length) {
       html += "<div>No scores yet — be the first to escape the snake.</div>";
     } else {
+      const myUserId = myEntry && myEntry.userId ? myEntry.userId : null;
+
       html += "<table style='width:100%; border-collapse:collapse; font-size:12px;'>";
       html += "<tr><th style='text-align:left;'>#</th><th style='text-align:left;'>Tag</th><th style='text-align:right;'>Score</th><th style='text-align:right;'>Time</th></tr>";
+
       list.slice(0, 10).forEach((entry, i) => {
         const rank = i + 1;
         const tag  = entry.tag || entry.name || `Player ${rank}`;
 
-        // Worker stores scores/times as bestScore & bestTime
+        // Use bestScore/bestTime from the worker; fall back to score/time if present
         const rawScore =
-          (typeof entry.bestScore === "number" ? entry.bestScore : entry.score);
-        const score =
-          typeof rawScore === "number"
-            ? Math.floor(rawScore)
-            : (rawScore ?? "0");
+          typeof entry.bestScore === "number"
+            ? entry.bestScore
+            : (typeof entry.score === "number" ? entry.score : null);
+        const scoreStr = rawScore == null ? "-" : Math.floor(rawScore);
 
-        const secs =
-          (typeof entry.bestTime === "number" ? entry.bestTime : (entry.time || 0));
-        const m = Math.floor(secs / 60);
-        const s = Math.floor(secs % 60);
-        const tStr = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        const rawSecs =
+          typeof entry.bestTime === "number"
+            ? entry.bestTime
+            : (typeof entry.time === "number" ? entry.time : 0);
+        const m = Math.floor(rawSecs / 60);
+        const s = Math.floor(rawSecs % 60);
+        const tStr = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+
+        const isMe = myUserId && entry.userId === myUserId;
+        const trStyle = isMe
+          ? ` style="background:rgba(255,215,0,0.12); color:#ffd700; font-weight:bold;"`
+          : "";
 
         html += `
-          <tr>
+          <tr${trStyle}>
             <td>${rank}</td>
             <td>${tag}</td>
-            <td style="text-align:right;">${score}</td>
+            <td style="text-align:right;">${scoreStr}</td>
             <td style="text-align:right;">${tStr}</td>
           </tr>
         `;
       });
+
       html += "</table>";
       html += `<div style="margin-top:6px; font-size:11px; opacity:0.8;">
         Beat your own best score to update your entry.
