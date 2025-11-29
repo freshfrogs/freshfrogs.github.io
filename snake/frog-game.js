@@ -2466,25 +2466,16 @@ function setInfoPage(pageIndex) {
       html += "<tr><th style='text-align:left;'>#</th><th style='text-align:left;'>Tag</th><th style='text-align:right;'>Score</th><th style='text-align:right;'>Time</th></tr>";
       list.slice(0, 10).forEach((entry, i) => {
         const rank = i + 1;
-        const tagRaw = entry.tag || entry.name || `Player ${rank}`;
-
-        // If your backend marks the current user, we honor it:
-        const isSelf = !!(entry.isSelf || entry.isYou || entry.isCurrentUser);
-
-        const tagHtml = isSelf
-          ? `<span style="color:${neon}; font-weight:bold; text-shadow:0 0 6px rgba(255,255,0,0.8);">${tagRaw}</span>`
-          : `<span style="color:${neon};">${tagRaw}</span>`;
-
+        const tag  = entry.tag || entry.name || `Player ${rank}`;
         const score = typeof entry.score === "number" ? Math.floor(entry.score) : entry.score;
         const secs  = entry.time || entry.bestTime || 0;
         const m = Math.floor(secs / 60);
         const s = Math.floor(secs % 60);
         const tStr = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-
         html += `
           <tr>
             <td>${rank}</td>
-            <td>${tagHtml}</td>
+            <td>${tag}</td>
             <td style="text-align:right;">${score}</td>
             <td style="text-align:right;">${tStr}</td>
           </tr>
@@ -2492,7 +2483,7 @@ function setInfoPage(pageIndex) {
       });
       html += "</table>";
       html += `<div style="margin-top:6px; font-size:11px; opacity:0.8;">
-        Your tag entry will glow when it appears in the top list.
+        Beat your own best score to update your entry.
       </div>`;
     }
   } else if (infoPage === 1) {
@@ -2569,7 +2560,6 @@ Synergize permanent upgrades, frog roles, and epic choices to keep the swarm ali
   }
 }
 
-
 function openInfoOverlay(startPage) {
   ensureInfoOverlay();
   gamePaused = true;
@@ -2588,13 +2578,8 @@ function closeInfoOverlay() {
     infoOverlay.style.display = "none";
   }
   gamePaused = false;
-
-  // 🔹 If this is the very start of the match,
-  // immediately show the common upgrade menu.
-  if (!initialUpgradeDone && elapsedTime === 0 && !gameOver) {
-    openUpgradeOverlay("normal");
-  }
 }
+
 
 function ensureBuffGuideOverlay() {
   if (buffGuideOverlay) return;
