@@ -1661,9 +1661,9 @@ function applyBuff(type, frog) {
           // Every orb always spawns at least 1 frog,
           // with a 50% chance to spawn 2.
           let frogsToSpawn = 1;
-          if (Math.random() < 0.5) {
-            frogsToSpawn++;
-          }
+          //if (Math.random() < 0.5) {
+          //  frogsToSpawn++;
+          //}
           spawnExtraFrogs(frogsToSpawn);
         } else if (orbCollectorChance > 0 && Math.random() < orbCollectorChance) {
           // Orb Collector: stacking chance for extra frogs
@@ -2073,7 +2073,6 @@ function getEpicUpgradeChoices() {
       label: `
         🌠 Orb Specialist<br>
         Every orb always spawns <span style="color:${neon};">1</span> frog<br>
-        with a <span style="color:${neon};">50%</span> chance to spawn <b>2</b>
       `,
       apply: () => {
         orbSpecialistActive = true;
