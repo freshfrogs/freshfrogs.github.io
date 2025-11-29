@@ -3070,120 +3070,123 @@ function setBuffGuidePage(pageIndex) {
   }
   
 
-function populateUpgradeOverlayChoices(mode) {
-  ensureUpgradeOverlay();
-  const containerEl = upgradeOverlayButtonsContainer;
-  if (!containerEl) return;
-
-  currentUpgradeOverlayMode = mode || "normal";
-  const isEpic      = currentUpgradeOverlayMode === "epic";
-  const isLegendary = currentUpgradeOverlayMode === "legendary";
-
-  containerEl.innerHTML = "";
-  const neon = "#4defff";
-
-  if (upgradeOverlayTitleEl) {
-    upgradeOverlayTitleEl.textContent = "Choose an upgrade";
-  }
-
-  let choices = [];
-
-  if (isEpic) {
-    // 🔥 EPIC: pick a random 3 from the full epic pool
-    let pool = getEpicUpgradeChoices().slice();
-    while (choices.length < 3 && pool.length) {
-      const idx = Math.floor(Math.random() * pool.length);
-      choices.push(pool.splice(idx, 1)[0]);
+  function populateUpgradeOverlayChoices(mode) {
+    ensureUpgradeOverlay();
+    const containerEl = upgradeOverlayButtonsContainer;
+    if (!containerEl) return;
+  
+    currentUpgradeOverlayMode = mode || "normal";
+    const isEpic      = currentUpgradeOverlayMode === "epic";
+    const isLegendary = currentUpgradeOverlayMode === "legendary";
+  
+    containerEl.innerHTML = "";
+    const neon = "#4defff";
+  
+    if (upgradeOverlayTitleEl) {
+      upgradeOverlayTitleEl.textContent = "Choose an upgrade";
     }
-  } else if (isLegendary && typeof getLegendaryUpgradeChoices === "function") {
-    choices = getLegendaryUpgradeChoices().slice();
-  } else {
-    // normal per-minute upgrades
-    let pool = getUpgradeChoices().slice();
-
-    // Starting pre-game upgrade: no perma lifesteal yet
-    if (!initialUpgradeDone) {
-      pool = pool.filter(c => c.id !== "permaLifeSteal");
-    }
-
-    const isFirstTimedNormal = initialUpgradeDone && !firstTimedNormalChoiceDone;
-
-    if (isFirstTimedNormal) {
-      firstTimedNormalChoiceDone = true;
-
-      // guarantee spawn20 is one of the options
-      let spawnChoiceIndex = pool.findIndex(c => c.id === "spawn20");
-      let spawnChoice;
-
-      if (spawnChoiceIndex !== -1) {
-        spawnChoice = pool.splice(spawnChoiceIndex, 1)[0];
-      } else {
-        // fallback: create spawn20 choice if it somehow went missing
-        spawnChoice = {
-          id: "spawn20",
-          label: `
-            🐸➕ Spawn frogs<br>
-            <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
-          `,
-          apply: () => { spawnExtraFrogs(NORMAL_SPAWN_AMOUNT); }
-        };
-      }
-
-      choices.push(spawnChoice);
-
-      // fill remaining slots randomly until we have 3 choices total
+  
+    let choices = [];
+  
+    if (isEpic) {
+      // 🔥 EPIC: pick a random 3 from the full epic pool
+      let pool = getEpicUpgradeChoices().slice();
       while (choices.length < 3 && pool.length) {
         const idx = Math.floor(Math.random() * pool.length);
         choices.push(pool.splice(idx, 1)[0]);
       }
+  
+    } else if (isLegendary && typeof getLegendaryUpgradeChoices === "function") {
+      choices = getLegendaryUpgradeChoices().slice();
+  
     } else {
-      // regular case: pick any 3 at random
-      while (choices.length < 3 && pool.length) {
-        const idx = Math.floor(Math.random() * pool.length);
-        choices.push(pool.splice(idx, 1)[0]);
+      // NORMAL per-minute upgrades
+      let pool = getUpgradeChoices().slice();
+  
+      // Starting pre-game upgrade: no perma lifesteal yet
+      if (!initialUpgradeDone) {
+        pool = pool.filter(c => c.id !== "permaLifeSteal");
+      }
+  
+      // This flag marks the *first* timed normal upgrade (the 1-minute mark)
+      const isFirstTimedNormal = initialUpgradeDone && !firstTimedNormalChoiceDone;
+  
+      if (isFirstTimedNormal) {
+        firstTimedNormalChoiceDone = true;
+  
+        // Guarantee spawn20 is one of the options at the 1-minute panel
+        let spawnChoiceIndex = pool.findIndex(c => c.id === "spawn20");
+        let spawnChoice;
+  
+        if (spawnChoiceIndex !== -1) {
+          spawnChoice = pool.splice(spawnChoiceIndex, 1)[0];
+        } else {
+          // Fallback: recreate it if somehow missing
+          spawnChoice = {
+            id: "spawn20",
+            label: `
+              🐸 Spawn frogs<br>
+              <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
+            `,
+            apply: () => { spawnExtraFrogs(NORMAL_SPAWN_AMOUNT); }
+          };
+        }
+  
+        choices.push(spawnChoice);
+  
+        // Fill remaining options randomly until we have 3 total
+        while (choices.length < 3 && pool.length) {
+          const idx = Math.floor(Math.random() * pool.length);
+          choices.push(pool.splice(idx, 1)[0]);
+        }
+  
+      } else {
+        // All other normal panels: just pick any 3 at random
+        while (choices.length < 3 && pool.length) {
+          const idx = Math.floor(Math.random() * pool.length);
+          choices.push(pool.splice(idx, 1)[0]);
+        }
       }
     }
-  }
-
-  function makeButton(label, onClick) {
-    const btn = document.createElement("button");
-    btn.innerHTML = label; // allow emojis + <span> highlight
-    btn.style.fontFamily = "monospace";
-    btn.style.fontSize = "13px";
-    btn.style.padding = "6px 8px";
-    btn.style.border = "1px solid #555";
-    btn.style.borderRadius = "6px";
-    btn.style.background = "#222";
-    btn.style.color = "#fff";
-    btn.style.cursor = "pointer";
-    btn.style.textAlign = "left";
-    btn.onmouseenter = () => { btn.style.background = "#333"; };
-    btn.onmouseleave = () => { btn.style.background = "#222"; };
-    btn.onclick = () => {
-      try {
-        onClick();
-      } catch (e) {
-        console.error("Error applying upgrade:", e);
-      }
-      playPermanentChoiceSound();
-      closeUpgradeOverlay();
-    };
-    return btn;
-  }
-
-  if (!choices.length) {
-    const span = document.createElement("div");
-    span.textContent = "No upgrades available.";
-    span.style.fontSize = "13px";
-    containerEl.appendChild(span);
-    return;
-  }
-
-  for (const choice of choices) {
-    containerEl.appendChild(makeButton(choice.label, choice.apply));
-  }
-}
-
+  
+    function makeButton(label, onClick) {
+      const btn = document.createElement("button");
+      btn.innerHTML = label;
+      btn.style.fontFamily = "monospace";
+      btn.style.fontSize = "13px";
+      btn.style.padding = "6px 8px";
+      btn.style.border = "1px solid #555";
+      btn.style.borderRadius = "6px";
+      btn.style.background = "#222";
+      btn.style.color = "#fff";
+      btn.style.cursor = "pointer";
+      btn.style.textAlign = "left";
+      btn.onmouseenter = () => { btn.style.background = "#333"; };
+      btn.onmouseleave = () => { btn.style.background = "#222"; };
+      btn.onclick = () => {
+        try {
+          onClick();
+        } catch (e) {
+          console.error("Error applying upgrade:", e);
+        }
+        playPermanentChoiceSound();
+        closeUpgradeOverlay();
+      };
+      return btn;
+    }
+  
+    if (!choices.length) {
+      const span = document.createElement("div");
+      span.textContent = "No upgrades available.";
+      span.style.fontSize = "13px";
+      containerEl.appendChild(span);
+      return;
+    }
+  
+    for (const choice of choices) {
+      containerEl.appendChild(makeButton(choice.label, choice.apply));
+    }
+  }  
 
     function makeButton(label, onClick) {
       const btn = document.createElement("button");
@@ -3356,6 +3359,7 @@ function populateUpgradeOverlayChoices(mode) {
     // Reset upgrade timing / sheds
     initialUpgradeDone       = false;
     nextPermanentChoiceTime  = 60;
+    firstTimedNormalChoiceDone = false;
     nextEpicChoiceTime       = 180;
     legendaryEventTriggered  = false;
 
