@@ -129,6 +129,9 @@
   const EPIC_DEATHRATTLE_CHANCE       = 0.15; // 25%
   const LEGENDARY_DEATHRATTLE_CHANCE  = 0.25; // 50%
 
+  const GRAVE_WAVE_MIN_GHOSTS = 10;
+  const GRAVE_WAVE_MAX_GHOSTS = 20;
+
   // Legendary buff duration spike
   const LEGENDARY_BUFF_DURATION_FACTOR = 2.0; // x2 all buff durations
   const LAST_STAND_MIN_CHANCE = 0.33;
@@ -258,6 +261,9 @@
   let snakePermanentSpeedFactor= 1.0;
   let buffDurationFactor       = 1.0; // >1 = longer temp buffs
   let orbSpawnIntervalFactor   = 1.0; // <1 = more orbs
+
+  let graveWaveActive   = false;
+  let frogEatFrogActive = false;
 
   const AURA_RADIUS  = 200;
   const AURA_RADIUS2 = AURA_RADIUS * AURA_RADIUS;
@@ -488,6 +494,13 @@
 
     // Apply the appropriate color tint for this shed stage
     applySnakeAppearance();
+
+    // Grave Wave: every shed, raise a wave of ghost frogs
+    if (graveWaveActive) {
+      const ghostCount = randInt(GRAVE_WAVE_MIN_GHOSTS, GRAVE_WAVE_MAX_GHOSTS);
+      spawnGhostWave(ghostCount);
+    }
+
   }
 
   function updateDyingSnakes(dt) {
@@ -781,6 +794,31 @@
       createFrogAt(x, y, tokenId);
     }
   }
+
+  function markGhostFrog(frog) {
+    if (!frog) return;
+    frog.isGhost = true;
+    // Visual: slightly faded, ghosty look
+    frog.el.style.opacity = "0.7";
+    frog.el.style.filter = "grayscale(1) brightness(1.2)";
+  }
+
+  function spawnGhostWave(count) {
+    if (frogs.length >= MAX_FROGS) return;
+    const width  = window.innerWidth;
+    const height = window.innerHeight;
+    const margin = 16;
+
+    const toSpawn = Math.min(count, MAX_FROGS - frogs.length);
+    for (let i = 0; i < toSpawn; i++) {
+      const x = margin + Math.random() * (width - margin * 2 - FROG_SIZE);
+      const y = margin + Math.random() * (height - margin * 2 - FROG_SIZE);
+      const tokenId = randInt(1, MAX_TOKEN_ID);
+      const frog = createFrogAt(x, y, tokenId);
+      markGhostFrog(frog);
+    }
+  }
+
 
   function getSpeedFactor(frog) {
     let factor = frogPermanentSpeedFactor * (frog.speedMult || 1);
@@ -1098,6 +1136,11 @@ function getJumpFactor(frog) {
           markCannibalFrog(newFrog);
         }
 
+        // Frog Eat Frog: any deathrattle respawn comes back with a random role
+        if (frogEatFrogActive) {
+          grantRandomPermaFrogUpgrade(newFrog);
+        }
+
         // NOTE: we do NOT copy frog.extraDeathRattleChance:
         // special 50% bonuses (Zombie Horde) only apply to that one life.
       }
@@ -1314,13 +1357,13 @@ function applyBuff(type, frog) {
     let goalX = null;
     let goalY = null;
 
-    if (mouse.follow && mouse.active) {
+    if (mouse.follow && mouse.active && !frog.isGhost) {
       goalX = mouse.x - FROG_SIZE / 2;
       goalY = mouse.y - FROG_SIZE / 2;
     }
 
-    // During panic Hop / Frenzy, frogs ignore the mouse and dart randomly
-    if (panicHopTime > 0) {
+    // Ghost frogs + panic hop ignore mouse and dart randomly
+    if (panicHopTime > 0 || frog.isGhost) {
       goalX = null;
       goalY = null;
     }
@@ -1441,13 +1484,21 @@ function applyBuff(type, frog) {
         frog.cloneEl = null;
       }
     }
-        // --- Cannibal Frogs: eat nearby frogs that get in their way --- // NEW
-    const cannibals = frogs.filter(f => f.isCannibal);
+    // --- Cannibal Frogs & Frog Eat Frog --- //
+    const cannibals = frogs.filter(f => f.isCannibal || frogEatFrogActive);
     if (cannibals.length > 0) {
       const eatRadius = FROG_SIZE * 0.6;
       const eatR2 = eatRadius * eatRadius;
 
       for (const cannibal of cannibals) {
+        // For global Frog Eat Frog, non-cannibal frogs only sometimes try to eat
+        if (frogEatFrogActive && !cannibal.isCannibal) {
+          const eatChance = Math.max(0, Math.min(1, frogDeathRattleChance || 0));
+          if (eatChance <= 0 || Math.random() >= eatChance) {
+            continue; // skip this frame
+          }
+        }
+
         let victim = null;
         let bestD2 = Infinity;
 
