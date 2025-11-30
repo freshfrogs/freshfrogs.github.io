@@ -50,10 +50,7 @@
 
   // Base turn rate and cap
   const SNAKE_TURN_RATE_BASE = Math.PI * 0.80;
-  const SNAKE_TURN_RATE_CAP  = Math.PI * 1.11;
-
-  // This is the value actually used in movement and scaled on each shed
-  let snakeTurnRate        = SNAKE_TURN_RATE_BASE;
+  const SNAKE_TURN_RATE_CAP  = Math.PI * 1.60;
 
   // --------------------------------------------------
   // BUFFS
@@ -110,15 +107,15 @@
 
   // --- HARD CAPS for permanent upgrades / buffs ---
   // Frogs can't be faster than 50% of the original hop cycle
-  const MIN_FROG_SPEED_FACTOR         = 0.30;
-  const MAX_FROG_JUMP_FACTOR          = 3.5;
-  const MAX_BUFF_DURATION_FACTOR      = 4.0;
-  const MIN_ORB_SPAWN_INTERVAL_FACTOR = 0.35;
-  const MAX_DEATHRATTLE_CHANCE        = 0.5;
+  const MIN_FROG_SPEED_FACTOR         = 0.50;
+  const MAX_FROG_JUMP_FACTOR          = 3.0;
+  const MAX_BUFF_DURATION_FACTOR      = 3.5;
+  const MIN_ORB_SPAWN_INTERVAL_FACTOR = 0.40;
+  const MAX_DEATHRATTLE_CHANCE        = 0.40;
   const MAX_ORB_COLLECTOR_TOTAL       = 1.0;
   const SNAKE_SHED_SPEEDUP = 1.27;
 
-  const MAX_SNAKE_SEGMENTS = 200;
+  const MAX_SNAKE_SEGMENTS = 150;
   const CANNIBAL_ROLE_CHANCE = 0.05;
 
   const ORB_STORM_COUNT = 12;
@@ -216,6 +213,9 @@
   let infoPrevBtn = null;
   let infoNextBtn = null;
   let infoLeaderboardData = [];
+
+    // This is the value actually used in movement and scaled on each shed
+  let snakeTurnRate        = SNAKE_TURN_RATE_BASE;
 
 
   // Shed state
