@@ -1026,30 +1026,32 @@ function getJumpFactor(frog) {
     return createFrogAt(x, y, tokenId);
   }
 
-  // Global + per-frog deathrattle calculation
-  function computeDeathRattleChanceForFrog(frog) {
-    let chance = frogDeathRattleChance || 0;
+function computeDeathRattleChanceForFrog(frog) {
+  let chance = frogDeathRattleChance || 0;
 
-    // Cannibal aura: +5% per cannibal frog alive (while they exist)
-    if (cannibalFrogCount > 0) {
-      chance += cannibalFrogCount * 0.05;
-    }
-
-    // Per-frog bonus (Zombie Horde, Cannibal stats, etc.)
-    if (frog && frog.extraDeathRattleChance) {
-      chance += frog.extraDeathRattleChance;
-    }
-
-    // 🔴 Lifeline: while active, all frogs that die respawn
-    if (lifeStealTime > 0) {
-      chance = 1.0;
-    }
-
-    // Hard cap at 100% and floor at 0%
-    if (chance > 1.0) chance = 1.0;
-    if (chance < 0)   chance = 0;
-    return chance;
+  // Cannibal aura: +5% per cannibal frog alive (while they exist)
+  if (cannibalFrogCount > 0) {
+    chance += cannibalFrogCount * 0.05;
   }
+
+  // Per-frog bonus (Zombie Horde, Cannibal stats, etc.)
+  if (frog && frog.extraDeathRattleChance) {
+    chance += frog.extraDeathRattleChance;
+  }
+
+  // Lifeline: push the chance up to at least the configured max,
+  // but don't exceed it.
+  if (lifeStealTime > 0) {
+    chance = Math.max(chance, MAX_DEATHRATTLE_CHANCE);
+  }
+
+  // Hard cap at configured max and floor at 0%
+  if (chance > MAX_DEATHRATTLE_CHANCE) chance = MAX_DEATHRATTLE_CHANCE;
+  if (chance < 0)                       chance = 0;
+
+  return chance;
+}
+
 
     // Attempt to kill a frog at index `index`, with a specific source ("snake", "cannibal", etc.)
   function tryKillFrogAtIndex(index, source) {
@@ -1110,17 +1112,18 @@ function getJumpFactor(frog) {
       }
     }
 
-    // Base deathrattle from global + cannibal aura + per-frog bonus + Lifeline
     let drChance = computeDeathRattleChanceForFrog(frog);
 
-    // Last Stand: if active and this was the last frog, guarantee at least 50%
+    // Last Stand: if active and this was the last frog, guarantee at least X%,
+    // but still never exceed the global cap.
     if (lastStandActive && wasLastFrog) {
       drChance = Math.max(drChance, LAST_STAND_MIN_CHANCE);
+      if (drChance > MAX_DEATHRATTLE_CHANCE) {
+        drChance = MAX_DEATHRATTLE_CHANCE;
+      }
     }
 
-    // Clamp to [0, 1]
-    if (drChance > 1.0) drChance = 1.0;
-    if (drChance < 0)   drChance = 0;
+    // No need to clamp to 1.0 here anymore — it's already handled.
 
     if (drChance > 0 && Math.random() < drChance) {
       // Spawn a replacement frog
@@ -1136,8 +1139,8 @@ function getJumpFactor(frog) {
           markCannibalFrog(newFrog);
         }
 
-        // Frog Eat Frog: any deathrattle respawn comes back with a random role
-        if (frogEatFrogActive) {
+        // Frog Eat Frog: ONLY if this frog was eaten by another frog
+        if (frogEatFrogActive && source === "cannibal") {
           grantRandomPermaFrogUpgrade(newFrog);
         }
 
