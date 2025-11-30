@@ -3048,46 +3048,49 @@ function populateUpgradeOverlayChoices(mode) {
   } else if (isLegendary && typeof getLegendaryUpgradeChoices === "function") {
     choices = getLegendaryUpgradeChoices().slice();
   } else {
-    // normal per-minute upgrades
+    // 🟢 NORMAL per-minute upgrades
     let pool = getUpgradeChoices().slice();
 
-    // Starting pre-game upgrade: no perma lifesteal yet
+    // Starting pre-game upgrade: optionally filter stuff out here
     if (!initialUpgradeDone) {
-      pool = pool.filter(c => c.id !== "permaLifeSteal");
+      pool = pool.filter(c => c.id !== "permaLifeSteal"); // safe even if commented out
     }
 
+    // This is the FIRST timed common after the run has started (~1:00 mark)
     const isFirstTimedNormal = initialUpgradeDone && !firstTimedNormalChoiceDone;
 
     if (isFirstTimedNormal) {
       firstTimedNormalChoiceDone = true;
 
-      // guarantee spawn20 is one of the options
+      // ✅ Guarantee spawn20 is in the options
       let spawnChoiceIndex = pool.findIndex(c => c.id === "spawn20");
       let spawnChoice;
 
       if (spawnChoiceIndex !== -1) {
         spawnChoice = pool.splice(spawnChoiceIndex, 1)[0];
       } else {
-        // fallback: create spawn20 choice if it somehow went missing
+        // Fallback: recreate the spawn20 choice if it somehow went missing
         spawnChoice = {
           id: "spawn20",
           label: `
-            🐸➕ Spawn frogs<br>
+            🐸 Spawn frogs<br>
             <span style="color:${neon};">${NORMAL_SPAWN_AMOUNT}</span> frogs right now
           `,
-          apply: () => { spawnExtraFrogs(NORMAL_SPAWN_AMOUNT); }
+          apply: () => {
+            spawnExtraFrogs(NORMAL_SPAWN_AMOUNT);
+          }
         };
       }
 
       choices.push(spawnChoice);
 
-      // fill remaining slots randomly until we have 3 choices total
+      // Fill remaining slots randomly until we have 3 total
       while (choices.length < 3 && pool.length) {
         const idx = Math.floor(Math.random() * pool.length);
         choices.push(pool.splice(idx, 1)[0]);
       }
     } else {
-      // regular case: pick any 3 at random
+      // All other common upgrades: just pick any 3 at random
       while (choices.length < 3 && pool.length) {
         const idx = Math.floor(Math.random() * pool.length);
         choices.push(pool.splice(idx, 1)[0]);
@@ -3133,7 +3136,6 @@ function populateUpgradeOverlayChoices(mode) {
     containerEl.appendChild(makeButton(choice.label, choice.apply));
   }
 }
-
 
     function makeButton(label, onClick) {
       const btn = document.createElement("button");
