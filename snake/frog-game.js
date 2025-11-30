@@ -249,7 +249,7 @@
   let cannibalFrogCount = 0;       // how many cannibal frogs are currently alive
   let lastStandActive = false;
   let orbCollectorActive   = false;
-  let orbCollectorChance   = 0;    // current chance (0–1) that an orb spawns a frog
+  let orbCollectorChance   = 0.10;    // current chance (0–1) that an orb spawns a frog
   let orbSpecialistActive  = false;
 
   // Legendary Frenzy timer (snake + frogs go wild)
@@ -3377,7 +3377,7 @@ function populateUpgradeOverlayChoices(mode) {
 
     snakeEggPending          = false;
     orbCollectorActive       = false;
-    orbCollectorChance       = 0;
+    orbCollectorChance       = 0.10;
     lastStandActive          = false;
 
     snakeTurnRate            = SNAKE_TURN_RATE_BASE;
