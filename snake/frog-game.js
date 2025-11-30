@@ -982,7 +982,7 @@ function getJumpFactor(frog) {
 
     // Visual bones icon overlay (placeholder asset)
     const icon = document.createElement("img");
-    icon.src = "/snake/bones.png";   // placeholder sprite
+    icon.src = "https://freshfrogs.github.io/snake/bones.png";   // placeholder sprite
     icon.alt = "";
     icon.style.position = "absolute";
     icon.style.width = "24px";
@@ -1577,7 +1577,7 @@ function applyBuff(type, frog) {
     el.style.zIndex = "20";
 
     // orb.gif in center
-    el.style.backgroundImage = "url(/snake/orb.gif)";
+    el.style.backgroundImage = "url(https://freshfrogs.github.io/snake/orb.gif)";
     el.style.backgroundSize = "contain";
     el.style.backgroundRepeat = "no-repeat";
     el.style.backgroundPosition = "center";
