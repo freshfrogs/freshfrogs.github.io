@@ -139,44 +139,6 @@
   const container = document.getElementById("frog-game");
   if (!container) return;
 
-  // --------------------------------------------------
-  // RESPONSIVE SCALING – ONLY FOR SMALL SCREENS
-  // --------------------------------------------------
-  let gamePixelScale = 1;
-
-  function updateGameScaleForSmallScreens() {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-
-    // Below this size we start shrinking the game
-    const minWidth = 900;
-    const minHeight = 600;
-
-    let scale = 1;
-    if (vw < minWidth || vh < minHeight) {
-      const scaleW = vw / minWidth;
-      const scaleH = vh / minHeight;
-      scale = Math.min(scaleW, scaleH, 1);
-    }
-
-    gamePixelScale = scale;
-
-    // Make the logical game area bigger so that, after scaling,
-    // it fills the viewport on small screens.
-    const logicalWidth = vw / gamePixelScale;
-    const logicalHeight = vh / gamePixelScale;
-
-    container.style.position = "relative";
-    container.style.width = logicalWidth + "px";
-    container.style.height = logicalHeight + "px";
-    container.style.overflow = "hidden";
-    container.style.transformOrigin = "top left";
-    container.style.transform = `scale(${gamePixelScale})`;
-  }
-
-  updateGameScaleForSmallScreens();
-  window.addEventListener("resize", updateGameScaleForSmallScreens);
-
   // Keep these arrays consistent with your scatter-frogs setup
   const SCATTER_ANIMATED_VALUES = new Set([
     "goldenDartFrog",
@@ -315,44 +277,20 @@
     active: false,
     follow: false
   };
-
-  function updateMouseFromClient(clientX, clientY) {
-    const rect = container.getBoundingClientRect();
-    // Convert from screen coords → game coords (undo scale)
-    const localX = (clientX - rect.left) / gamePixelScale;
-    const localY = (clientY - rect.top) / gamePixelScale;
-    mouse.x = localX;
-    mouse.y = localY;
-    mouse.active = true;
-  }
-
+  
   window.addEventListener("mousemove", (e) => {
-    updateMouseFromClient(e.clientX, e.clientY);
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    mouse.active = true;
   });
-
-  window.addEventListener("click", (e) => {
-    updateMouseFromClient(e.clientX, e.clientY);
-
+  
+  window.addEventListener("click", () => {
     if (gameOver) {
       restartGame();
       return;
     }
     mouse.follow = true;
-  });
-
-  // Optional: touch = mouse on mobile
-  window.addEventListener("touchstart", (e) => {
-    if (!e.touches || !e.touches.length) return;
-    const t = e.touches[0];
-    updateMouseFromClient(t.clientX, t.clientY);
-    mouse.follow = true;
-  }, { passive: true });
-
-  window.addEventListener("touchmove", (e) => {
-    if (!e.touches || !e.touches.length) return;
-    const t = e.touches[0];
-    updateMouseFromClient(t.clientX, t.clientY);
-  }, { passive: true });
+  });  
 
   // --------------------------------------------------
   // HUD
