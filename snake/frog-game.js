@@ -74,7 +74,7 @@
   // How strong each buff is
   const SPEED_BUFF_FACTOR        = 0.85;  // frogs act 2× faster (0.5 = half their cycle)
   const PANIC_HOP_SPEED_FACTOR   = 0.60;  // panic hop speed factor
-  const JUMP_BUFF_FACTOR         = 2.50;  // jump buff height multiplier
+  const JUMP_BUFF_FACTOR         = 3.00;  // jump buff height multiplier
 
   // Snake speed + Lucky config
   const SNAKE_SLOW_FACTOR      = 0.6;  // snake slow buff → 50% speed
