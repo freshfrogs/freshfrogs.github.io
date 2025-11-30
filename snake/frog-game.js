@@ -2006,6 +2006,7 @@ function updateSnake(dt, width, height) {
 
 function getEpicUpgradeChoices() {
   const neon = "#4defff";
+  const epicTitleColor = "#ffb347"; // soft orange for EPIC titles
   const totalColor = TOTAL_HIGHLIGHT_COLOR;
 
   const deathPerPickPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
@@ -2027,7 +2028,7 @@ function getEpicUpgradeChoices() {
     {
       id: "epicSpawn50",
       label: `
-        🐸 Spawn Frogs<br>
+        <span style="color:${epicTitleColor};">🐸 Spawn Frogs</span><br>
         Spawn <span style="color:${neon};">${EPIC_SPAWN_AMOUNT}</span> frogs now
       `,
       apply: () => {
@@ -2037,7 +2038,7 @@ function getEpicUpgradeChoices() {
     {
       id: "epicDeathRattle",
       label: `
-        💀 Deathrattle<br>
+        <span style="color:${epicTitleColor};">💀 Deathrattle</span><br>
         +<span style="color:${neon};">${deathPerPickPct}%</span> deathrattle chance
         (<span style="color:${totalColor};">${drTotalPct}%</span>)
       `,
@@ -2048,7 +2049,7 @@ function getEpicUpgradeChoices() {
     {
       id: "epicBuffDuration",
       label: `
-        ⏳ Buffs extended<br>
+        <span style="color:${epicTitleColor};">⏳ Buffs extended</span><br>
         +<span style="color:${neon};">${buffPerPickPct}%</span> buff duration
         (<span style="color:${totalColor};">${buffTotalPct}%</span>)
       `,
@@ -2074,7 +2075,7 @@ function getEpicUpgradeChoices() {
     {
       id: "epicOrbStorm",
       label: `
-        🌩️ Orb Storm<br>
+        <span style="color:${epicTitleColor};">🌩️ Orb Storm</span><br>
         Drop <span style="color:${neon};">${orbStormCount}</span> random orbs right now
       `,
       apply: () => {
@@ -2089,7 +2090,7 @@ function getEpicUpgradeChoices() {
     {
       id: "snakeEgg",
       label: `
-        🥚 Snake Egg<br>
+        <span style="color:${epicTitleColor};">🥚 Snake Egg</span><br>
         The <span style="color:${neon};">next shed</span> only gives the new snake
         <span style="color:${neon};">+${snakeEggBuffPct}%</span> speed instead of +20%
       `,
@@ -2101,7 +2102,7 @@ function getEpicUpgradeChoices() {
     {
       id: "zombieHorde",
       label: `
-        🧟🧟🧟 Zombie Horde<br>
+        <span style="color:${epicTitleColor};">🧟🧟🧟 Zombie Horde</span><br>
         Summon <span style="color:${neon};">3</span> zombie frogs
         with <span style="color:${neon};">50%</span> deathrattle
       `,
@@ -2116,7 +2117,7 @@ function getEpicUpgradeChoices() {
     upgrades.push({
       id: "graveWave",
       label: `
-        👻 Grave Wave<br>
+        <span style="color:${epicTitleColor};">👻 Grave Wave</span><br>
         Each shed summons <span style="color:${neon};">10–20</span> uncontrollable ghost frogs
       `,
       apply: () => {
@@ -2130,7 +2131,7 @@ function getEpicUpgradeChoices() {
     upgrades.push({
       id: "frogEatFrog",
       label: `
-        🍖 Frog Eat Frog<br>
+        <span style="color:${epicTitleColor};">🍖 Frog Eat Frog</span><br>
         Frogs sometimes eat each other; respawns gain random roles
       `,
       apply: () => {
