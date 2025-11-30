@@ -2057,7 +2057,7 @@ function getEpicUpgradeChoices() {
         buffDurationFactor *= epicBuffFactor;
       }
     },
-    // Cannibal Frog
+    /* Cannibal Frog
     {
       id: "epicCannibalFrog",
       label: `
@@ -2070,7 +2070,7 @@ function getEpicUpgradeChoices() {
       apply: () => {
         spawnCannibalFrog();
       }
-    },
+    },*/
     // ORB STORM
     {
       id: "epicOrbStorm",
