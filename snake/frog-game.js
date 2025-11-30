@@ -260,7 +260,7 @@
   let frogPermanentJumpFactor  = 1.0; // >1 = higher hops
   let snakePermanentSpeedFactor= 1.0;
   let buffDurationFactor       = 1.0; // >1 = longer temp buffs
-  let orbSpawnIntervalFactor   = 1.0; // <1 = more orbs
+  let orbSpawnIntervalFactor   = 0.9; // <1 = more orbs
 
   let graveWaveActive   = false;
   let frogEatFrogActive = false;
@@ -3409,7 +3409,7 @@ function populateUpgradeOverlayChoices(mode) {
     frogPermanentSpeedFactor = 1.0;
     frogPermanentJumpFactor  = 1.0;
     buffDurationFactor       = 1.0;
-    orbSpawnIntervalFactor   = 1.0;
+    orbSpawnIntervalFactor   = 0.9;
     snakePermanentSpeedFactor= 1.0;
 
     // Hide overlays
