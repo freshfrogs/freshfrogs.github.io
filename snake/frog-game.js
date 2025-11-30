@@ -139,6 +139,36 @@
   const container = document.getElementById("frog-game");
   if (!container) return;
 
+  // --------------------------------------------------
+  // RESPONSIVE SCALING FOR SMALLER SCREENS
+  // --------------------------------------------------
+  let gamePixelScale = 1;
+
+  function updateGameScaleForSmallScreens() {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // Target "desktop layout" width. Lower this if you want it bigger on phones.
+    const targetWidth = 1024;
+
+    // Only scale down when viewport is narrower than our target.
+    const scale = Math.min(1, vw / targetWidth);
+
+    gamePixelScale = scale;
+
+    // Make the game fill the viewport, then visually shrink it.
+    container.style.position = "relative";
+    container.style.width = "100vw";
+    container.style.height = "100vh";
+    container.style.overflow = "hidden";
+    container.style.transformOrigin = "top left";
+    container.style.transform = `scale(${gamePixelScale})`;
+  }
+
+  // Run once and on resize
+  updateGameScaleForSmallScreens();
+  window.addEventListener("resize", updateGameScaleForSmallScreens);
+
   // Keep these arrays consistent with your scatter-frogs setup
   const SCATTER_ANIMATED_VALUES = new Set([
     "goldenDartFrog",
@@ -278,11 +308,27 @@
     follow: false
   };
 
-  window.addEventListener("mousemove", (e) => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
+  function updateMousePositionFromEvent(e) {
+    const rect = container.getBoundingClientRect();
+    // Convert from screen pixels → game layout coords (undo CSS scale)
+    const localX = (e.clientX - rect.left) / gamePixelScale;
+    const localY = (e.clientY - rect.top) / gamePixelScale;
+
+    mouse.x = localX;
+    mouse.y = localY;
     mouse.active = true;
+  }
+
+  window.addEventListener("mousemove", (e) => {
+    updateMousePositionFromEvent(e);
   });
+
+  // Optional: basic touch support (finger = mouse)
+  window.addEventListener("touchmove", (e) => {
+    if (e.touches && e.touches.length > 0) {
+      updateMousePositionFromEvent(e.touches[0]);
+    }
+  }, { passive: true });
 
   window.addEventListener("click", () => {
     if (gameOver) {
