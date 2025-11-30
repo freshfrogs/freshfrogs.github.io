@@ -3543,7 +3543,7 @@ async function startGame() {
 
   // Always offer a common upgrade at the very start of the game
   // (same behavior as restartGame)
-  openUpgradeOverlay("normal");
+  openUpgradeOverlay("epic");
 
   animId = requestAnimationFrame(drawFrame);
 }
