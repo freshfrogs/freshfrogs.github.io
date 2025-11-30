@@ -2416,7 +2416,7 @@ function ensureHowToOverlay() {
     if (howToOverlay) {
       howToOverlay.style.display = "none";
     }
-    openUpgradeOverlay("epic");
+    openUpgradeOverlay("normal");
   };
 
   const learnBtn = document.createElement("button");
@@ -3428,7 +3428,7 @@ function populateUpgradeOverlayChoices(mode) {
     updateHUD();
 
     // Show the upgrade menu again at the start of a new run
-    openUpgradeOverlay("normal");
+    openUpgradeOverlay("epic");
 
     animId = requestAnimationFrame(drawFrame);
   }
