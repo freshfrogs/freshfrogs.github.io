@@ -49,7 +49,7 @@
   const SNAKE_EGG_BUFF_PCT = 1.18;
 
   // Base turn rate and cap
-  const SNAKE_TURN_RATE_BASE = Math.PI * 0.80;
+  const SNAKE_TURN_RATE_BASE = Math.PI * 0.75;
   const SNAKE_TURN_RATE_CAP  = Math.PI * 1.60;
 
   // --------------------------------------------------
@@ -58,11 +58,11 @@
   const SPEED_BUFF_DURATION = 10;
   const JUMP_BUFF_DURATION  = 10;
 
-  const SNAKE_SLOW_DURATION    = 7;
+  const SNAKE_SLOW_DURATION    = 10;
   const SNAKE_CONFUSE_DURATION = 10;
   const SNAKE_SHRINK_DURATION  = 10;
-  const FROG_SHIELD_DURATION   = 7;
-  const TIME_SLOW_DURATION     = 7;
+  const FROG_SHIELD_DURATION   = 10;
+  const TIME_SLOW_DURATION     = 10;
   const ORB_MAGNET_DURATION    = 10;
   const SCORE_MULTI_DURATION   = 20;
   const PANIC_HOP_DURATION     = 7;
