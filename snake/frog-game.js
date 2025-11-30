@@ -1557,7 +1557,6 @@ function applyBuff(type, frog) {
       "snakeConfuse",
       "snakeShrink",
       "frogShield",
-      "timeSlow",
       "orbMagnet",
       "megaSpawn",
       "scoreMulti",
