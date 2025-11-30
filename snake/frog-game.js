@@ -3428,7 +3428,7 @@ function populateUpgradeOverlayChoices(mode) {
     updateHUD();
 
     // Show the upgrade menu again at the start of a new run
-    openUpgradeOverlay("epic");
+    openUpgradeOverlay("normal");
 
     animId = requestAnimationFrame(drawFrame);
   }
@@ -3544,7 +3544,7 @@ async function startGame() {
 
   // Always offer a common upgrade at the very start of the game
   // (same behavior as restartGame)
-  openUpgradeOverlay("epic");
+  openUpgradeOverlay("normal");
 
   animId = requestAnimationFrame(drawFrame);
 }
