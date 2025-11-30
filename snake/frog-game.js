@@ -2165,7 +2165,7 @@ function getUpgradeChoices() {
       id: "frogSpeed",
       label: `
         ⏩ Frogs hop faster<br>
-        ~<span style="color:${neon};">${speedPerPickPct}%</span> faster hop cycle
+        ~<span style="color:${neon};">${speedPerPickPct}%</span> faster hop cycle (stacks)
       `,
       apply: () => {
         frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
@@ -2182,7 +2182,7 @@ function getUpgradeChoices() {
       id: "frogJump",
       label: `
         🦘⬆️ Frogs hop higher<br>
-        +<span style="color:${neon};">${jumpPerPickPct}%</span> jump height
+        +<span style="color:${neon};">${jumpPerPickPct}%</span> jump height (stacks)
       `,
       apply: () => {
         frogPermanentJumpFactor *= FROG_JUMP_UPGRADE_FACTOR;
@@ -2211,7 +2211,7 @@ function getUpgradeChoices() {
       id: "buffDuration",
       label: `
         ⏳ Buffs last longer<br>
-        +<span style="color:${neon};">${buffPerPickPct}%</span> buff duration
+        +<span style="color:${neon};">${buffPerPickPct}%</span> buff duration (stacks)
       `,
       apply: () => {
         buffDurationFactor *= BUFF_DURATION_UPGRADE_FACTOR;
@@ -2228,7 +2228,7 @@ function getUpgradeChoices() {
       id: "moreOrbs",
       label: `
         🎯 More orbs over time<br>
-        ~<span style="color:${neon};">${orbFasterPerPickPct}%</span> faster orb spawns
+        ~<span style="color:${neon};">${orbFasterPerPickPct}%</span> faster orb spawns (stacks)
       `,
       apply: () => {
         orbSpawnIntervalFactor *= ORB_INTERVAL_UPGRADE_FACTOR;
@@ -2245,7 +2245,7 @@ function getUpgradeChoices() {
       id: "commonDeathRattle",
       label: `
         💀 Deathrattle<br>
-        +<span style="color:${neon};">${deathPerPickPct}%</span> chance that dead frogs respawn
+        +<span style="color:${neon};">${deathPerPickPct}%</span> chance that dead frogs respawn (stacks)
       `,
       apply: () => {
         frogDeathRattleChance = Math.min(
@@ -2265,7 +2265,7 @@ function getUpgradeChoices() {
       id: "orbCollector",
       label: `
         🌌 Orb Collector<br>
-        Every orb gains +<span style="color:${neon};">${orbPerPickPct}%</span> chance to spawn a frog
+        Every orb gains +<span style="color:${neon};">${orbPerPickPct}%</span> chance to spawn a frog (stacks)
       `,
       apply: () => {
         orbCollectorActive = true;
