@@ -2007,136 +2007,140 @@ function updateSnake(dt, width, height) {
 
 function getEpicUpgradeChoices() {
   const neon = "#4defff";
+  const totalColor = TOTAL_HIGHLIGHT_COLOR;
 
   const deathPerPickPct = Math.round(EPIC_DEATHRATTLE_CHANCE * 100);
-  const eggPct = Math.round((SNAKE_EGG_BUFF_PCT - 1) * 100);
-  const buffPerPickPct  = Math.round((BUFF_DURATION_UPGRADE_FACTOR + 0.25 - 1) * 100);
+  const currentDRChance = frogDeathRattleChance;
+  const nextDRChance    = Math.min(1, currentDRChance + EPIC_DEATHRATTLE_CHANCE);
+  const drTotalPct      = Math.round(nextDRChance * 100);
 
   const epicBuffFactor  = BUFF_DURATION_UPGRADE_FACTOR + 0.25;
+  const buffPerPickPct  = Math.round((epicBuffFactor - 1) * 100);
+  const nextBuffFactor  = buffDurationFactor * epicBuffFactor;
+  const buffTotalPct    = Math.round((nextBuffFactor - 1) * 100);
 
-  const choices = [];
+  const orbStormCount   = 10;
+  const snakeEggBuffPct = 11; // +11% instead of +20%
 
-  // Spawn frogs – always
-  choices.push({
-    id: "epicSpawn50",
-    label: `
+  const upgrades = [];
+
+  upgrades.push(
+    {
+      id: "epicSpawn50",
+      label: `
         🐸 Spawn Frogs<br>
         Spawn <span style="color:${neon};">${EPIC_SPAWN_AMOUNT}</span> frogs now
       `,
-    apply: () => {
-      spawnExtraFrogs(EPIC_SPAWN_AMOUNT);
-    }
-  });
-
-  // Epic deathrattle – only if under cap
-  if (frogDeathRattleChance < MAX_DEATHRATTLE_CHANCE - 1e-4) {
-    choices.push({
+      apply: () => {
+        spawnExtraFrogs(EPIC_SPAWN_AMOUNT);
+      }
+    },
+    {
       id: "epicDeathRattle",
       label: `
-        💀 Deathrattle (epic)<br>
+        💀 Deathrattle<br>
         +<span style="color:${neon};">${deathPerPickPct}%</span> deathrattle chance
+        (<span style="color:${totalColor};">${drTotalPct}%</span>)
       `,
       apply: () => {
-        frogDeathRattleChance = Math.min(
-          MAX_DEATHRATTLE_CHANCE,
-          frogDeathRattleChance + EPIC_DEATHRATTLE_CHANCE
-        );
+        frogDeathRattleChance += EPIC_DEATHRATTLE_CHANCE;
       }
-    });
-  }
-
-  // Epic buff duration – only if under cap
-  if (buffDurationFactor < MAX_BUFF_DURATION_FACTOR - 1e-4) {
-    choices.push({
+    },
+    {
       id: "epicBuffDuration",
       label: `
-        ⏳ Buffs extended (epic)<br>
+        ⏳ Buffs extended<br>
         +<span style="color:${neon};">${buffPerPickPct}%</span> buff duration
+        (<span style="color:${totalColor};">${buffTotalPct}%</span>)
       `,
       apply: () => {
         buffDurationFactor *= epicBuffFactor;
-        if (buffDurationFactor > MAX_BUFF_DURATION_FACTOR) {
-          buffDurationFactor = MAX_BUFF_DURATION_FACTOR;
-        }
       }
-    });
-  }
-
-  /* Cannibal Frog – always allowed
-  choices.push({
-    id: "epicCannibalFrog",
-    label: `
+    },
+    // Cannibal Frog
+    {
+      id: "epicCannibalFrog",
+      label: `
         🦴 Cannibal Frog<br>
         Spawn a <span style="color:${neon};">Cannibal</span> frog with<br>
         +<span style="color:${neon};">5%</span> deathrattle chance<br>
         +<span style="color:${neon};">5%</span> overall stats<br>
         • Eats nearby frogs that get in its way
       `,
-    apply: () => {
-      spawnCannibalFrog();
-    }
-  }); */
-
-  // ORB STORM – always allowed
-  choices.push({
-    id: "epicOrbStorm",
-    label: `
-        🌩️ Orb Storm<br>
-        Drop <span style="color:${neon};">${ORB_STORM_COUNT}</span> random orbs right now
-      `,
-    apply: () => {
-      const width  = window.innerWidth;
-      const height = window.innerHeight;
-      for (let i = 0; i < ORB_STORM_COUNT; i++) {
-        spawnOrbRandom(width, height);
+      apply: () => {
+        spawnCannibalFrog();
       }
-    }
-  });
-
-  // SNAKE EGG – always allowed
-  choices.push({
-    id: "snakeEgg",
-    label: `
+    },
+    // ORB STORM
+    {
+      id: "epicOrbStorm",
+      label: `
+        🌩️ Orb Storm<br>
+        Drop <span style="color:${neon};">${orbStormCount}</span> random orbs right now
+      `,
+      apply: () => {
+        const width  = window.innerWidth;
+        const height = window.innerHeight;
+        for (let i = 0; i < orbStormCount; i++) {
+          spawnOrbRandom(width, height);
+        }
+      }
+    },
+    // SNAKE EGG
+    {
+      id: "snakeEgg",
+      label: `
         🥚 Snake Egg<br>
         The <span style="color:${neon};">next shed</span> only gives the new snake
-        <span style="color:${neon};">+${eggPct}%</span> speed instead of +27%
+        <span style="color:${neon};">+${snakeEggBuffPct}%</span> speed instead of +20%
       `,
-    apply: () => {
-      snakeEggPending = true;
-    }
-  });
-
-  // Zombie Horde – always allowed
-  choices.push({
-    id: "zombieHorde",
-    label: `
+      apply: () => {
+        snakeEggPending = true;
+      }
+    },
+    // Zombie Horde
+    {
+      id: "zombieHorde",
+      label: `
         🧟🧟🧟 Zombie Horde<br>
         Summon <span style="color:${neon};">3</span> zombie frogs
         with <span style="color:${neon};">50%</span> deathrattle
       `,
-    apply: () => {
-      spawnZombieHorde(3);
+      apply: () => {
+        spawnZombieHorde(3);
+      }
     }
-  });
+  );
 
-  // 🌠 Orb Specialist – only if not already active
-  if (!orbSpecialistActive) {
-    choices.push({
-      id: "epicOrbSpecialist",
+  // 🔹 NEW EPIC: Grave Wave (only once)
+  if (!graveWaveActive) {
+    upgrades.push({
+      id: "graveWave",
       label: `
-        🌠 Orb Specialist<br>
-        Every orb always spawns <span style="color:${neon};">1</span> frog<br>
+        👻 Grave Wave<br>
+        Each shed summons <span style="color:${neon};">10–20</span> uncontrollable ghost frogs
       `,
       apply: () => {
-        orbSpecialistActive = true;
-        // Turn off Orb Collector if it was taken earlier
-        orbCollectorActive = false;
-        orbCollectorChance = 0;
+        graveWaveActive = true;
       }
     });
   }
 
-  return choices;
+  // 🔹 NEW EPIC: Frog Eat Frog (only once)
+  if (!frogEatFrogActive) {
+    upgrades.push({
+      id: "frogEatFrog",
+      label: `
+        🍖 Frog Eat Frog<br>
+        Frogs sometimes eat each other; respawns gain random roles
+      `,
+      apply: () => {
+        frogEatFrogActive = true;
+      }
+    });
+  }
+
+  return upgrades;
 }
 
 
@@ -3377,6 +3381,8 @@ function populateUpgradeOverlayChoices(mode) {
     lastStandActive          = false;
 
     snakeTurnRate            = SNAKE_TURN_RATE_BASE;
+    graveWaveActive   = false;
+    frogEatFrogActive = false;
 
     // Reset all temporary buff timers
     speedBuffTime   = 0;
