@@ -244,7 +244,7 @@
   let panicHopTime    = 0;
   let cloneSwarmTime  = 0;
   let lifeStealTime   = 0;
-  let frogDeathRattleChance = 0.0;  // 0.25 when epic is picked
+  let frogDeathRattleChance = 0.05;  // 0.25 when epic is picked
   let permaLifeStealOrbsRemaining = 0;
   let cannibalFrogCount = 0;       // how many cannibal frogs are currently alive
   let lastStandActive = false;
@@ -3402,7 +3402,7 @@ function populateUpgradeOverlayChoices(mode) {
     setSnakeFrenzyVisual(false);
 
     // Reset EPIC deathrattle
-    frogDeathRattleChance = 0.0;
+    frogDeathRattleChance = 0.05;
     cannibalFrogCount = 0;
 
     // Reset global permanent buffs
