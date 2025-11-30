@@ -249,7 +249,7 @@
   let cannibalFrogCount = 0;       // how many cannibal frogs are currently alive
   let lastStandActive = false;
   let orbCollectorActive   = false;
-  let orbCollectorChance   = 0.10;    // current chance (0–1) that an orb spawns a frog
+  let orbCollectorChance   = 0;    // current chance (0–1) that an orb spawns a frog
   let orbSpecialistActive  = false;
 
   // Legendary Frenzy timer (snake + frogs go wild)
@@ -260,7 +260,7 @@
   let frogPermanentJumpFactor  = 1.0; // >1 = higher hops
   let snakePermanentSpeedFactor= 1.0;
   let buffDurationFactor       = 1.0; // >1 = longer temp buffs
-  let orbSpawnIntervalFactor   = 0.9; // <1 = more orbs
+  let orbSpawnIntervalFactor   = 0.95; // <1 = more orbs
 
   let graveWaveActive   = false;
   let frogEatFrogActive = false;
