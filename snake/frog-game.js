@@ -2416,7 +2416,7 @@ function ensureHowToOverlay() {
     if (howToOverlay) {
       howToOverlay.style.display = "none";
     }
-    openUpgradeOverlay("normal");
+    openUpgradeOverlay("epic");
   };
 
   const learnBtn = document.createElement("button");
