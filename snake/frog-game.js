@@ -2040,7 +2040,6 @@ function getEpicUpgradeChoices() {
       label: `
         <span style="color:${epicTitleColor};">💀 Deathrattle</span><br>
         +<span style="color:${neon};">${deathPerPickPct}%</span> deathrattle chance
-        (<span style="color:${totalColor};">${drTotalPct}%</span>)
       `,
       apply: () => {
         frogDeathRattleChance += EPIC_DEATHRATTLE_CHANCE;
