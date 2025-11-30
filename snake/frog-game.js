@@ -72,7 +72,7 @@
   const PERMA_LIFESTEAL_ORB_COUNT = 20;
 
   // How strong each buff is
-  const SPEED_BUFF_FACTOR        = 0.85;  // frogs act 2× faster (0.5 = half their cycle)
+  const SPEED_BUFF_FACTOR        = 0.80;  // frogs act 2× faster (0.5 = half their cycle)
   const PANIC_HOP_SPEED_FACTOR   = 0.60;  // panic hop speed factor
   const JUMP_BUFF_FACTOR         = 3.00;  // jump buff height multiplier
 
