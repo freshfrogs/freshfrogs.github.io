@@ -2124,7 +2124,7 @@ function getEpicUpgradeChoices() {
     });
   }
 
-  // 🔹 NEW EPIC: Frog Eat Frog (only once)
+  /* 🔹 NEW EPIC: Frog Eat Frog (only once)
   if (!frogEatFrogActive) {
     upgrades.push({
       id: "frogEatFrog",
@@ -2136,7 +2136,7 @@ function getEpicUpgradeChoices() {
         frogEatFrogActive = true;
       }
     });
-  }
+  }*/
 
   return upgrades;
 }
