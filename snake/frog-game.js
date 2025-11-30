@@ -2258,7 +2258,7 @@ function getUpgradeChoices() {
 
   // Orb Collector (capped) – ONLY if Orb Specialist is NOT active
   if (
-    !orbSpecialistActive &&
+    //!orbSpecialistActive &&
     orbCollectorChance < MAX_ORB_COLLECTOR_TOTAL - 1e-4
   ) {
     upgrades.push({
