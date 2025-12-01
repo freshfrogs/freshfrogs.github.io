@@ -3398,12 +3398,16 @@ function populateUpgradeOverlayChoices(mode) {
       //totalCannibalEvents,
     };
   
-    (async () => {
-      const posted = await submitScoreToServer(lastRunScore, lastRunTime, finalStats);
-      const topList = posted || (await fetchLeaderboard()) || [];
-      updateMiniLeaderboard(topList);
-      openScoreboardOverlay(topList, lastRunScore, lastRunTime, finalStats);
-    })();  
+  (async () => {
+    const posted  = await submitScoreToServer(lastRunScore, lastRunTime, finalStats);
+    const rawList = posted || (await fetchLeaderboard()) || [];
+
+    // ✅ Hard cap: only keep top 10 entries
+    const topList = rawList.slice(0, 10);
+
+    updateMiniLeaderboard(topList);
+    openScoreboardOverlay(topList, lastRunScore, lastRunTime, finalStats);
+  })();
 
     showGameOver();
   }
