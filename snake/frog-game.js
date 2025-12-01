@@ -3024,56 +3024,36 @@ function setBuffGuidePage(pageIndex) {
 
 ⚡ <b>Speed</b><br>
 &nbsp;&nbsp;• Frogs act faster for <span style="color:${neon};">${secFromConst(speedDur, 10)}</span>.<br>
-&nbsp;&nbsp;• Hop cycle ≈ <span style="color:${neon};">${fasterPercentFromFactor(panicSpeedFact, 0.6)}</span> faster when active (stacks with upgrades).<br><br>
-
+&nbsp;&nbsp;• Hop cycle ≈ <span style="color:${neon};">${fasterPercentFromFactor(panicSpeedFact, 0.6)}</span> faster when active (stacks with upgrades).<br>
 🦘 <b>Jump</b><br>
 &nbsp;&nbsp;• Frogs jump higher for <span style="color:${neon};">${secFromConst(jumpDur, 10)}</span>.<br>
-&nbsp;&nbsp;• Jump height ≈ <span style="color:${neon};">${multFromFactor(jumpBuffFactor, 3.0)}</span> normal.<br><br>
-
-🐸➕ <b>Spawn</b><br>
-&nbsp;&nbsp;• Spawns <span style="color:${neon};">${normalSpawnAmt}</span> extra frogs instantly.<br>
-&nbsp;&nbsp;• Lucky frogs can roll a few extra on top.<br><br>
-
+&nbsp;&nbsp;• Jump height ≈ <span style="color:${neon};">${multFromFactor(jumpBuffFactor, 3.0)}</span> normal.<br>
 🐸🌊 <b>Mega Spawn</b><br>
 &nbsp;&nbsp;• Big burst of <span style="color:${neon};">${megaSpawnMin}–${megaSpawnMax}</span> frogs.<br>
-&nbsp;&nbsp;• Huge refill if your swarm has been wiped out.<br><br>
-
+&nbsp;&nbsp;• Huge refill if your swarm has been wiped out.<br>
 🧊 <b>Snake Slow</b><br>
 &nbsp;&nbsp;• Snake speed set to <span style="color:${neon};">${percentFromFactor(snakeSlowFact, 0.6)}</span> for <span style="color:${neon};">${secFromConst(slowDur, 10)}</span>.<br>
-&nbsp;&nbsp;• Duration shrinks as the snake builds resistance over the run.<br><br>
-
+&nbsp;&nbsp;• Duration shrinks as the snake builds resistance over the run.<br>
 🤪 <b>Confuse</b><br>
-&nbsp;&nbsp;• Snake steering becomes random for <span style="color:${neon};">${secFromConst(confuseDur, 10)}</span>.<br><br>
-
+&nbsp;&nbsp;• Snake steering becomes random for <span style="color:${neon};">${secFromConst(confuseDur, 10)}</span>.<br>
 📏 <b>Shrink</b><br>
 &nbsp;&nbsp;• Snake body & bite radius shrink for <span style="color:${neon};">${secFromConst(shrinkDur, 10)}</span>.<br>
-&nbsp;&nbsp;• Easier to slip between segments and dodge bites.<br><br>
-
+&nbsp;&nbsp;• Easier to slip between segments and dodge bites.<br>
 🛡️ <b>Team Shield</b><br>
-&nbsp;&nbsp;• All frogs ignore snake hits for <span style="color:${neon};">${secFromConst(shieldDur, 10)}</span>.<br><br>
-
+&nbsp;&nbsp;• All frogs ignore snake hits for <span style="color:${neon};">${secFromConst(shieldDur, 10)}</span>.<br>
 ⏱️ <b>Time Slow</b><br>
 &nbsp;&nbsp;• Whole game runs at ~<span style="color:${neon};">${percentFromFactor(timeSlowFact, 0.5)}</span> speed for <span style="color:${neon};">${secFromConst(timeSlowDur, 10)}</span>.<br>
-&nbsp;&nbsp;• Snake movement + orb drift also slow.<br><br>
-
+&nbsp;&nbsp;• Snake movement + orb drift also slow.<br>
 🧲 <b>Orb Magnet</b><br>
-&nbsp;&nbsp;• Orbs home in on frogs for <span style="color:${neon};">${secFromConst(orbMagDur, 10)}</span> (prefers Magnet frogs).<br><br>
-
+&nbsp;&nbsp;• Orbs home in on frogs for <span style="color:${neon};">${secFromConst(orbMagDur, 10)}</span> (prefers Magnet frogs).<br>
 💰 <b>Score x${scoreMultiFact.toFixed(1)}</b><br>
-&nbsp;&nbsp;• Score gain multiplied by <span style="color:${neon};">${multFromFactor(scoreMultiFact, 2.0)}</span> for <span style="color:${neon};">${secFromConst(scoreDur, 20)}</span>.<br><br>
-
+&nbsp;&nbsp;• Score gain multiplied by <span style="color:${neon};">${multFromFactor(scoreMultiFact, 2.0)}</span> for <span style="color:${neon};">${secFromConst(scoreDur, 20)}</span>.<br>
 😱 <b>Panic Hop</b><br>
 &nbsp;&nbsp;• Frogs hop faster but in random directions for <span style="color:${neon};">${secFromConst(panicDur, 7)}</span>.<br>
-&nbsp;&nbsp;• Hop timing ≈ <span style="color:${neon};">${multFromFactor(panicSpeedFact, 0.6)}</span> vs normal (very jittery).<br><br>
-
+&nbsp;&nbsp;• Hop timing ≈ <span style="color:${neon};">${multFromFactor(panicSpeedFact, 0.6)}</span> vs normal (very jittery).<br>
 🩸 <b>Life Steal</b><br>
 &nbsp;&nbsp;• For <span style="color:${neon};">${secFromConst(lifeStealDur, 10)}</span>, deaths “leech” value back as score / orb value.<br>
-&nbsp;&nbsp;• Life steal strength ≈ <span style="color:${neon};">${multFromFactor(lifeStealFact, 0.5)}</span> of the lost frog.<br><br>
-
-🩺 <b>Lifeline</b><br>
-&nbsp;&nbsp;• For <span style="color:${neon};">${secFromConst(lifelineDur, 10)}</span>, frogs that die get an extra roll to respawn instead of being lost.<br>
-&nbsp;&nbsp;• Uses your global deathrattle chance + any cannibal / zombie bonuses.<br><br>
-
+&nbsp;&nbsp;• Life steal strength ≈ <span style="color:${neon};">${multFromFactor(lifeStealFact, 0.5)}</span> of the lost frog.<br>
 🔥 <b>Frenzy (legendary)</b><br>
 &nbsp;&nbsp;• For <span style="color:${neon};">${secFromConst(frenzyDur, 13)}</span>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;– Hop speed ≈ <span style="color:${neon};">${multFromFactor(frenzySpeedFact, 1.25)}</span>.<br>
