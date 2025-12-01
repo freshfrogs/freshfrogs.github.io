@@ -1534,7 +1534,7 @@ function applyBuff(type, frog) {
 
         if (victim) {
           // 50% chance to actually eat the frog
-          if (Math.random() < 0.5) {
+          if (Math.random() < 0.33) {
             const idx = frogs.indexOf(victim);
             if (idx !== -1) {
               // Cannibal kill; uses deathrattle logic but no snake growth
