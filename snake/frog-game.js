@@ -2904,6 +2904,7 @@ function ensureBuffGuideOverlay() {
   // start on page 0
   setBuffGuidePage(0);
 }
+
 function setBuffGuidePage(pageIndex) {
   if (!buffGuideContentEl || !buffGuidePageLabel) return;
 
@@ -2938,6 +2939,11 @@ function setBuffGuidePage(pageIndex) {
     return Math.round(pct) + "%";
   }
 
+  function minsFromSeconds(secVal, fallback) {
+    const v = (typeof secVal !== "undefined" ? secVal : fallback);
+    return Math.max(0, Math.round(v / 60)) + "m";
+  }
+
   // radius from AURA_RADIUS2 if present
   const auraRadiusPx = (typeof AURA_RADIUS2 !== "undefined")
     ? Math.round(Math.sqrt(AURA_RADIUS2))
@@ -2945,84 +2951,238 @@ function setBuffGuidePage(pageIndex) {
 
   // --- resolve constants / defaults we care about ---
 
-  const speedDur       = typeof SPEED_BUFF_DURATION       !== "undefined" ? SPEED_BUFF_DURATION       : 15;
-  const jumpDur        = typeof JUMP_BUFF_DURATION        !== "undefined" ? JUMP_BUFF_DURATION        : 18;
-  const slowDur        = typeof SNAKE_SLOW_DURATION       !== "undefined" ? SNAKE_SLOW_DURATION       : 8;
-  const confuseDur     = typeof SNAKE_CONFUSE_DURATION    !== "undefined" ? SNAKE_CONFUSE_DURATION    : 6;
-  const shrinkDur      = typeof SNAKE_SHRINK_DURATION     !== "undefined" ? SNAKE_SHRINK_DURATION     : 8;
-  const shieldDur      = typeof FROG_SHIELD_DURATION      !== "undefined" ? FROG_SHIELD_DURATION      : 6;
-  const timeSlowDur    = typeof TIME_SLOW_DURATION        !== "undefined" ? TIME_SLOW_DURATION        : 6;
-  const orbMagDur      = typeof ORB_MAGNET_DURATION       !== "undefined" ? ORB_MAGNET_DURATION       : 10;
-  const scoreDur       = typeof SCORE_MULTI_DURATION      !== "undefined" ? SCORE_MULTI_DURATION      : 10;
-  const panicDur       = typeof PANIC_HOP_DURATION        !== "undefined" ? PANIC_HOP_DURATION        : 8;
-  const lifeStealDur   = typeof LIFE_STEAL_DURATION       !== "undefined" ? LIFE_STEAL_DURATION       : 12;
+  // Orb / timed buffs
+  const speedDur       = (typeof SPEED_BUFF_DURATION       !== "undefined" ? SPEED_BUFF_DURATION       : 10);
+  const jumpDur        = (typeof JUMP_BUFF_DURATION        !== "undefined" ? JUMP_BUFF_DURATION        : 10);
+  const slowDur        = (typeof SNAKE_SLOW_DURATION       !== "undefined" ? SNAKE_SLOW_DURATION       : 10);
+  const confuseDur     = (typeof SNAKE_CONFUSE_DURATION    !== "undefined" ? SNAKE_CONFUSE_DURATION    : 10);
+  const shrinkDur      = (typeof SNAKE_SHRINK_DURATION     !== "undefined" ? SNAKE_SHRINK_DURATION     : 10);
+  const shieldDur      = (typeof FROG_SHIELD_DURATION      !== "undefined" ? FROG_SHIELD_DURATION      : 10);
+  const timeSlowDur    = (typeof TIME_SLOW_DURATION        !== "undefined" ? TIME_SLOW_DURATION        : 10);
+  const orbMagDur      = (typeof ORB_MAGNET_DURATION       !== "undefined" ? ORB_MAGNET_DURATION       : 10);
+  const scoreDur       = (typeof SCORE_MULTI_DURATION      !== "undefined" ? SCORE_MULTI_DURATION      : 20);
+  const panicDur       = (typeof PANIC_HOP_DURATION        !== "undefined" ? PANIC_HOP_DURATION        : 7);
+  const lifeStealDur   = (typeof LIFE_STEAL_DURATION       !== "undefined" ? LIFE_STEAL_DURATION       : 10);
+  const lifelineDur    = (typeof LIFELINE_DURATION         !== "undefined" ? LIFELINE_DURATION         : 10);
+  const frenzyDur      = (typeof LEGENDARY_FRENZY_DURATION !== "undefined" ? LEGENDARY_FRENZY_DURATION : 13);
 
-  const jumpBuffFactor = typeof JUMP_BUFF_FACTOR          !== "undefined" ? JUMP_BUFF_FACTOR          : 3.2;
-  const snakeSlowFact  = typeof SNAKE_SLOW_FACTOR         !== "undefined" ? SNAKE_SLOW_FACTOR         : 0.5;
-  const timeSlowFact   = typeof TIME_SLOW_FACTOR          !== "undefined" ? TIME_SLOW_FACTOR          : 0.4;
-  const scoreMultiFact = typeof SCORE_MULTI_FACTOR        !== "undefined" ? SCORE_MULTI_FACTOR        : 2.0;
-  const panicSpeedFact = typeof PANIC_HOP_SPEED_FACTOR    !== "undefined" ? PANIC_HOP_SPEED_FACTOR    : 0.6;
+  const jumpBuffFactor = (typeof JUMP_BUFF_FACTOR          !== "undefined" ? JUMP_BUFF_FACTOR          : 3.0);
+  const snakeSlowFact  = (typeof SNAKE_SLOW_FACTOR         !== "undefined" ? SNAKE_SLOW_FACTOR         : 0.6);
+  const timeSlowFact   = (typeof TIME_SLOW_FACTOR          !== "undefined" ? TIME_SLOW_FACTOR          : 0.5);
+  const scoreMultiFact = (typeof SCORE_MULTI_FACTOR        !== "undefined" ? SCORE_MULTI_FACTOR        : 2.0);
+  const panicSpeedFact = (typeof PANIC_HOP_SPEED_FACTOR    !== "undefined" ? PANIC_HOP_SPEED_FACTOR    : 0.6);
+  const lifeStealFact  = (typeof LIFE_STEAL_FACTOR         !== "undefined" ? LIFE_STEAL_FACTOR         : 0.5);
+  const frenzySpeedFact= (typeof FRENZY_SPEED_FACTOR       !== "undefined" ? FRENZY_SPEED_FACTOR       : 1.25);
+  const frenzyJumpFact = (typeof FRENZY_JUMP_FACTOR        !== "undefined" ? FRENZY_JUMP_FACTOR        : 1.25);
 
-  const champSpeedFact = typeof CHAMPION_SPEED_FACTOR     !== "undefined" ? CHAMPION_SPEED_FACTOR     : 0.85;
-  const champJumpFact  = typeof CHAMPION_JUMP_FACTOR      !== "undefined" ? CHAMPION_JUMP_FACTOR      : 1.25;
-  const auraJumpFact   = typeof AURA_JUMP_FACTOR          !== "undefined" ? AURA_JUMP_FACTOR          : 1.15;
-  const luckyDurBoost  = typeof LUCKY_BUFF_DURATION_BOOST !== "undefined" ? LUCKY_BUFF_DURATION_BOOST : 1.4;
-  const luckyScorePer  = typeof LUCKY_SCORE_BONUS_PER     !== "undefined" ? LUCKY_SCORE_BONUS_PER     : 0.10;
+  // Spawn amounts
+  const normalSpawnAmt = (typeof NORMAL_SPAWN_AMOUNT       !== "undefined" ? NORMAL_SPAWN_AMOUNT       : 20);
+  const epicSpawnAmt   = (typeof EPIC_SPAWN_AMOUNT         !== "undefined" ? EPIC_SPAWN_AMOUNT         : 30);
+  const megaSpawnMin   = (typeof MEGA_SPAWN_MIN            !== "undefined" ? MEGA_SPAWN_MIN            : 15);
+  const megaSpawnMax   = (typeof MEGA_SPAWN_MAX            !== "undefined" ? MEGA_SPAWN_MAX            : 25);
+
+  // Permanent roles
+  const champSpeedFact = (typeof CHAMPION_SPEED_FACTOR     !== "undefined" ? CHAMPION_SPEED_FACTOR     : 0.75);
+  const champJumpFact  = (typeof CHAMPION_JUMP_FACTOR      !== "undefined" ? CHAMPION_JUMP_FACTOR      : 1.35);
+  const auraJumpFact   = (typeof AURA_JUMP_FACTOR          !== "undefined" ? AURA_JUMP_FACTOR          : 1.25);
+  const luckyDurBoost  = (typeof LUCKY_BUFF_DURATION_BOOST !== "undefined" ? LUCKY_BUFF_DURATION_BOOST : 1.5);
+  const luckyScorePer  = (typeof LUCKY_SCORE_BONUS_PER     !== "undefined" ? LUCKY_SCORE_BONUS_PER     : 0.15);
+  const zombieSpawnOnDeath = (typeof ZOMBIE_SPAWN_ON_DEATH !== "undefined" ? ZOMBIE_SPAWN_ON_DEATH    : 5);
+  const cannibalDeathBonus = (typeof CANNIBAL_DEATHRATTLE_BONUS !== "undefined" ? CANNIBAL_DEATHRATTLE_BONUS : 0.05);
 
   // upgrade factors (safe fallbacks)
-  const frogSpeedUp    = typeof FROG_SPEED_UPGRADE_FACTOR    !== "undefined" ? FROG_SPEED_UPGRADE_FACTOR    : 0.9;
-  const frogJumpUp     = typeof FROG_JUMP_UPGRADE_FACTOR     !== "undefined" ? FROG_JUMP_UPGRADE_FACTOR     : 1.25;
-  const buffDurUp      = typeof BUFF_DURATION_UPGRADE_FACTOR !== "undefined" ? BUFF_DURATION_UPGRADE_FACTOR : 1.15;
-  const orbIntervalUp  = typeof ORB_INTERVAL_UPGRADE_FACTOR  !== "undefined" ? ORB_INTERVAL_UPGRADE_FACTOR  : 0.85;
+  const frogSpeedUp    = (typeof FROG_SPEED_UPGRADE_FACTOR    !== "undefined" ? FROG_SPEED_UPGRADE_FACTOR    : 0.90);
+  const frogJumpUp     = (typeof FROG_JUMP_UPGRADE_FACTOR     !== "undefined" ? FROG_JUMP_UPGRADE_FACTOR     : 1.30);
+  const buffDurUp      = (typeof BUFF_DURATION_UPGRADE_FACTOR !== "undefined" ? BUFF_DURATION_UPGRADE_FACTOR : 1.10);
+  const orbIntervalUp  = (typeof ORB_INTERVAL_UPGRADE_FACTOR  !== "undefined" ? ORB_INTERVAL_UPGRADE_FACTOR  : 0.85);
 
-  const epicDeathChance  = typeof EPIC_DEATHRATTLE_CHANCE    !== "undefined" ? EPIC_DEATHRATTLE_CHANCE      : 0.25;
-  const legDeathChance   = typeof LEGENDARY_DEATHRATTLE_CHANCE !== "undefined" ? LEGENDARY_DEATHRATTLE_CHANCE : 0.50;
-  const frenzyDur        = typeof LEGENDARY_FRENZY_DURATION  !== "undefined" ? LEGENDARY_FRENZY_DURATION    : 13;
-  const frenzySpeedFact  = typeof FRENZY_SPEED_FACTOR        !== "undefined" ? FRENZY_SPEED_FACTOR          : 1.25;
+  // deathrattle / last stand / orb collector
+  const commonDeathChance = (typeof COMMON_DEATHRATTLE_CHANCE    !== "undefined" ? COMMON_DEATHRATTLE_CHANCE    : 0.05);
+  const epicDeathChance   = (typeof EPIC_DEATHRATTLE_CHANCE      !== "undefined" ? EPIC_DEATHRATTLE_CHANCE      : 0.15);
+  const legDeathChance    = (typeof LEGENDARY_DEATHRATTLE_CHANCE !== "undefined" ? LEGENDARY_DEATHRATTLE_CHANCE : 0.25);
+  const deathBaseCap      = (typeof DEATHRATTLE_BASE_CAP         !== "undefined" ? DEATHRATTLE_BASE_CAP         : 0.45);
+
+  const lastStandMin      = (typeof LAST_STAND_MIN_CHANCE        !== "undefined" ? LAST_STAND_MIN_CHANCE        : 0.33);
+  const lastStandMax      = (typeof LAST_STAND_MAX_CHANCE        !== "undefined" ? LAST_STAND_MAX_CHANCE        : 0.50);
+
+  const orbCollectorStep  = (typeof ORB_COLLECTOR_CHANCE_PER     !== "undefined" ? ORB_COLLECTOR_CHANCE_PER     : 0.10);
+  const orbCollectorCap   = (typeof ORB_COLLECTOR_MAX_CHANCE     !== "undefined" ? ORB_COLLECTOR_MAX_CHANCE     : 1.00);
+
+  // legendary / epic globals
+  const zombieHordeCount  = (typeof ZOMBIE_HORDE_COUNT           !== "undefined" ? ZOMBIE_HORDE_COUNT           : 3);
+  const zombieHordeDR     = (typeof ZOMBIE_HORDE_DEATHRATTLE     !== "undefined" ? ZOMBIE_HORDE_DEATHRATTLE     : 0.50);
+  const orbStormCount     = (typeof ORB_STORM_COUNT              !== "undefined" ? ORB_STORM_COUNT              : 12);
+
+  const snakeShedInterval = (typeof SNAKE_SHED_INTERVAL          !== "undefined" ? SNAKE_SHED_INTERVAL          : 300);
+  const snakeShedSpeedFact= (typeof SNAKE_SHED_SPEED_FACTOR      !== "undefined" ? SNAKE_SHED_SPEED_FACTOR      : 1.27);
+  const snakeEggSpeedFact = (typeof SNAKE_EGG_SPEED_FACTOR       !== "undefined" ? SNAKE_EGG_SPEED_FACTOR       : 1.11);
 
   const pages = [
-    // Page 0 – orb buffs
+    // Page 0 – orb buffs / timed effects
     `
-<b>🟢 Orb buffs</b><br><br>
-⚡ <b>Speed</b> – frogs act faster for <span style="color:${neon};">${secFromConst(speedDur, 15)}</span> (longer with upgrades).<br>
-🦘 <b>Jump</b> – frogs jump higher for <span style="color:${neon};">${secFromConst(jumpDur, 18)}</span> (about <span style="color:${neon};">${multFromFactor(jumpBuffFactor, 3.2)}</span> height).<br>
-🐸➕ <b>Spawn</b> – spawn <span style="color:${neon};">1–10</span> frogs (+ extra if Lucky).<br>
-🧊 <b>Snake slow</b> – snake speed cut to <span style="color:${neon};">${percentFromFactor(snakeSlowFact, 0.5)}</span> for <span style="color:${neon};">${secFromConst(slowDur, 8)}</span> (before resistance).<br>
-🤪 <b>Confuse</b> – snake steers randomly for <span style="color:${neon};">${secFromConst(confuseDur, 6)}</span>.<br>
-📏 <b>Shrink</b> – snake smaller, eat radius shrinks for <span style="color:${neon};">${secFromConst(shrinkDur, 8)}</span> (bite zone reduced).<br>
-🛡️ <b>Team shield</b> – all frogs ignore snake hits for <span style="color:${neon};">${secFromConst(shieldDur, 6)}</span>.<br>
-⏱️ <b>Time slow</b> – game + snake run at ~<span style="color:${neon};">${percentFromFactor(timeSlowFact, 0.4)}</span> speed for <span style="color:${neon};">${secFromConst(timeSlowDur, 6)}</span>.<br>
-🧲 <b>Orb magnet</b> – orbs drift toward frogs for <span style="color:${neon};">${secFromConst(orbMagDur, 10)}</span>, preferring magnets.<br>
-🐸🌊 <b>Mega spawn</b> – spawn <span style="color:${neon};">15–25</span> frogs (+ bonus if Lucky).<br>
-💰 <b>Score x2</b> – score gain boosted by <span style="color:${neon};">${multFromFactor(scoreMultiFact, 2.0)}</span> for <span style="color:${neon};">${secFromConst(scoreDur, 10)}</span>.<br>
-😱 <b>Panic hop</b> – frogs hop faster but in random directions for <span style="color:${neon};">${secFromConst(panicDur, 8)}</span>.<br>
-🩺 <b>Lifeline</b> – frogs that die during this buff have a chance to respawn instead of being lost.<br>
-⭐ <b>PermaFrog</b> – gives that frog a random permanent role.
+<b>🟢 Orb buffs & timed effects</b><br><br>
+
+⚡ <b>Speed</b><br>
+&nbsp;&nbsp;• Frogs act faster for <span style="color:${neon};">${secFromConst(speedDur, 10)}</span>.<br>
+&nbsp;&nbsp;• Hop cycle ≈ <span style="color:${neon};">${fasterPercentFromFactor(panicSpeedFact, 0.6)}</span> faster when active (stacks with upgrades).<br><br>
+
+🦘 <b>Jump</b><br>
+&nbsp;&nbsp;• Frogs jump higher for <span style="color:${neon};">${secFromConst(jumpDur, 10)}</span>.<br>
+&nbsp;&nbsp;• Jump height ≈ <span style="color:${neon};">${multFromFactor(jumpBuffFactor, 3.0)}</span> normal.<br><br>
+
+🐸➕ <b>Spawn</b><br>
+&nbsp;&nbsp;• Spawns <span style="color:${neon};">${normalSpawnAmt}</span> extra frogs instantly.<br>
+&nbsp;&nbsp;• Lucky frogs can roll a few extra on top.<br><br>
+
+🐸🌊 <b>Mega Spawn</b><br>
+&nbsp;&nbsp;• Big burst of <span style="color:${neon};">${megaSpawnMin}–${megaSpawnMax}</span> frogs.<br>
+&nbsp;&nbsp;• Huge refill if your swarm has been wiped out.<br><br>
+
+🧊 <b>Snake Slow</b><br>
+&nbsp;&nbsp;• Snake speed set to <span style="color:${neon};">${percentFromFactor(snakeSlowFact, 0.6)}</span> for <span style="color:${neon};">${secFromConst(slowDur, 10)}</span>.<br>
+&nbsp;&nbsp;• Duration shrinks as the snake builds resistance over the run.<br><br>
+
+🤪 <b>Confuse</b><br>
+&nbsp;&nbsp;• Snake steering becomes random for <span style="color:${neon};">${secFromConst(confuseDur, 10)}</span>.<br><br>
+
+📏 <b>Shrink</b><br>
+&nbsp;&nbsp;• Snake body & bite radius shrink for <span style="color:${neon};">${secFromConst(shrinkDur, 10)}</span>.<br>
+&nbsp;&nbsp;• Easier to slip between segments and dodge bites.<br><br>
+
+🛡️ <b>Team Shield</b><br>
+&nbsp;&nbsp;• All frogs ignore snake hits for <span style="color:${neon};">${secFromConst(shieldDur, 10)}</span>.<br><br>
+
+⏱️ <b>Time Slow</b><br>
+&nbsp;&nbsp;• Whole game runs at ~<span style="color:${neon};">${percentFromFactor(timeSlowFact, 0.5)}</span> speed for <span style="color:${neon};">${secFromConst(timeSlowDur, 10)}</span>.<br>
+&nbsp;&nbsp;• Snake movement + orb drift also slow.<br><br>
+
+🧲 <b>Orb Magnet</b><br>
+&nbsp;&nbsp;• Orbs home in on frogs for <span style="color:${neon};">${secFromConst(orbMagDur, 10)}</span> (prefers Magnet frogs).<br><br>
+
+💰 <b>Score x${scoreMultiFact.toFixed(1)}</b><br>
+&nbsp;&nbsp;• Score gain multiplied by <span style="color:${neon};">${multFromFactor(scoreMultiFact, 2.0)}</span> for <span style="color:${neon};">${secFromConst(scoreDur, 20)}</span>.<br><br>
+
+😱 <b>Panic Hop</b><br>
+&nbsp;&nbsp;• Frogs hop faster but in random directions for <span style="color:${neon};">${secFromConst(panicDur, 7)}</span>.<br>
+&nbsp;&nbsp;• Hop timing ≈ <span style="color:${neon};">${multFromFactor(panicSpeedFact, 0.6)}</span> vs normal (very jittery).<br><br>
+
+🩸 <b>Life Steal</b><br>
+&nbsp;&nbsp;• For <span style="color:${neon};">${secFromConst(lifeStealDur, 10)}</span>, deaths “leech” value back as score / orb value.<br>
+&nbsp;&nbsp;• Life steal strength ≈ <span style="color:${neon};">${multFromFactor(lifeStealFact, 0.5)}</span> of the lost frog.<br><br>
+
+🩺 <b>Lifeline</b><br>
+&nbsp;&nbsp;• For <span style="color:${neon};">${secFromConst(lifelineDur, 10)}</span>, frogs that die get an extra roll to respawn instead of being lost.<br>
+&nbsp;&nbsp;• Uses your global deathrattle chance + any cannibal / zombie bonuses.<br><br>
+
+🔥 <b>Frenzy (legendary)</b><br>
+&nbsp;&nbsp;• For <span style="color:${neon};">${secFromConst(frenzyDur, 13)}</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;– Hop speed ≈ <span style="color:${neon};">${multFromFactor(frenzySpeedFact, 1.25)}</span>.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;– Jump height ≈ <span style="color:${neon};">${multFromFactor(frenzyJumpFact, 1.25)}</span>.<br>
+&nbsp;&nbsp;• Great when stacked with Speed / Jump upgrades.<br><br>
+
+⭐ <b>PermaFrog</b><br>
+&nbsp;&nbsp;• Permanently gives that frog a new role (Champion, Aura, Magnet, Lucky, Zombie, Cannibal, etc.).<br>
 `,
-    // Page 1 – permanent frog roles (shield frog removed)
+
+    // Page 1 – permanent frog roles
     `
 <b>🐸 Permanent frog roles</b><br><br>
-🏅 <b>Champion</b> – that frog's hop cycle is ~<span style="color:${neon};">${fasterPercentFromFactor(champSpeedFact, 0.85)}</span> faster and jumps <span style="color:${neon};">${multFromFactor(champJumpFact, 1.25)}</span> higher.<br>
-🌈 <b>Aura</b> – nearby frogs get faster + higher jumps in a <span style="color:${neon};">${auraRadiusPx}</span>px radius (jump <span style="color:${neon};">${multFromFactor(auraJumpFact, 1.15)}</span>).<br>
-🧲 <b>Magnet</b> – orbs within ~<span style="color:${neon};">220px</span> home in on this frog.<br>
-🍀 <b>Lucky</b> – buffs last <span style="color:${neon};">${multFromFactor(luckyDurBoost, 1.4)}</span> longer, spawn more frogs, and each Lucky frog adds <span style="color:${neon};">${percentFromBonus(luckyScorePer, 0.10)}</span> score rate.<br>
-🧟 <b>Zombie</b> – on death: spawn <span style="color:${neon};">5</span> frogs and briefly slow the snake.<br>
-💀 <b>Cannibal</b> – hunts nearby frogs; sometimes “spares” a victim and grants it a random permanent role instead of killing it.
+
+🏅 <b>Champion</b><br>
+&nbsp;&nbsp;• Hop cycle ≈ <span style="color:${neon};">${fasterPercentFromFactor(champSpeedFact, 0.75)}</span> faster than a normal frog.<br>
+&nbsp;&nbsp;• Jumps ≈ <span style="color:${neon};">${multFromFactor(champJumpFact, 1.35)}</span> higher.<br><br>
+
+🌈 <b>Aura</b><br>
+&nbsp;&nbsp;• Buffs nearby frogs in a ~<span style="color:${neon};">${auraRadiusPx}</span>px radius.<br>
+&nbsp;&nbsp;• Nearby frogs hop faster and jump higher (jump ≈ <span style="color:${neon};">${multFromFactor(auraJumpFact, 1.25)}</span>).<br><br>
+
+🧲 <b>Magnet</b><br>
+&nbsp;&nbsp;• Orbs within ~<span style="color:${neon};">220px</span> are strongly pulled toward this frog.<br>
+&nbsp;&nbsp;• Synergizes hard with Orb Magnet buff & Orb Collector upgrades.<br><br>
+
+🍀 <b>Lucky</b><br>
+&nbsp;&nbsp;• Buffs they collect last ≈ <span style="color:${neon};">${multFromFactor(luckyDurBoost, 1.5)}</span> longer.<br>
+&nbsp;&nbsp;• Many spawn effects roll extra frogs when collected by Lucky.<br>
+&nbsp;&nbsp;• Each Lucky frog adds ≈ <span style="color:${neon};">${percentFromBonus(luckyScorePer, 0.15)}</span> bonus score rate, stacking across the swarm.<br><br>
+
+🧟 <b>Zombie</b><br>
+&nbsp;&nbsp;• On death, spawns <span style="color:${neon};">${zombieSpawnOnDeath}</span> new frogs.<br>
+&nbsp;&nbsp;• Often causes a brief slow on the snake right after dying.<br>
+&nbsp;&nbsp;• Gets even better when global deathrattle is high (dead zombies can come back again).<br><br>
+
+💀 <b>Cannibal</b><br>
+&nbsp;&nbsp;• Hunts nearby frogs, thinning your swarm but “charging” deathrattle.<br>
+&nbsp;&nbsp;• Each living cannibal adds ≈ <span style="color:${neon};">${percentFromBonus(cannibalDeathBonus, 0.05)}</span> global deathrattle.<br>
+&nbsp;&nbsp;• Sometimes “spares” a victim and re-rolls it into a new permanent role instead of killing it (frog-eat-frog synergy).<br><br>
+
+⭐ <b>PermaFrog synergy</b><br>
+&nbsp;&nbsp;• Using PermaFrog on special roles can stack (e.g., multiple Lucky / Champion / Aura frogs).<br>
+&nbsp;&nbsp;• Roles combine with global upgrades and orb buffs for wild builds.<br>
 `,
-    // Page 2 – global upgrades / epic / special rules
+
+    // Page 2 – global upgrades & snake rules
     `
-<b>🏗️ Global upgrades & special rules</b><br><br>
-⏩ <b>Frogs hop faster</b> – each pick makes hops ~<span style="color:${neon};">${percentFromBonus(1 - frogSpeedUp, 0.1)}</span> faster (stacks).<br>
-🦘⬆️ <b>Frogs jump higher</b> – each pick adds ~<span style="color:${neon};">${percentFromBonus(frogJumpUp - 1, 0.25)}</span> jump height (stacks).<br>
-🐸💥 <b>Spawn ${NORMAL_SPAWN_AMOUNT}/${EPIC_SPAWN_AMOUNT}</b> – instant extra frogs from normal / epic choices.<br>
-⏳ <b>Buffs last longer</b> – each pick multiplies durations by <span style="color:${neon};">${multFromFactor(buffDurUp, 1.15)}</span> (stacks).<br>
-🎯 <b>More orbs</b> – orbs spawn faster every time you pick this (interval factor <span style="color:${neon};">${multFromFactor(orbIntervalUp, 0.85)}</span> per pick).<br>
-💀 <b>Deathrattle (global)</b> – increases the base chance that any dead frog respawns.<br>
-🏹 <b>Last Stand</b> – when this upgrade is taken, your <span style="color:${neon};">final frog</span> has up to <span style="color:${neon};">50%</span> chance to respawn instead of dying.<br>
-🧟‍♂️ <b>Zombie Horde (epic)</b> – summons special zombies with a high deathrattle chance; if they respawn, they lose that bonus but stay zombies.<br>
-🌩️ <b>Orb Storm (epic)</b> – unleashes a burst of orbs onto the field at once.<br>
-🥚 <b>Snake Egg (epic)</b> – weakens the <span style="color:${neon};">next</span> snake that enters, reducing its shed speed bonus.<br>
-🔥 <b>Snake sheds</b> – every 5 minutes the snake sheds, gains permanent speed, and respawns shorter and deadlier.
+<b>🏗️ Global upgrades & epic effects</b><br><br>
+
+⏩ <b>Frogs hop faster (common)</b><br>
+&nbsp;&nbsp;• Each pick: hops ~<span style="color:${neon};">${percentFromBonus(1 - frogSpeedUp, 0.10)}</span> faster (stacks).<br><br>
+
+🦘⬆️ <b>Frogs jump higher (common)</b><br>
+&nbsp;&nbsp;• Each pick: jump height +<span style="color:${neon};">${percentFromBonus(frogJumpUp - 1, 0.30)}</span> (stacks).<br><br>
+
+🐸💥 <b>Spawn ${normalSpawnAmt}/${epicSpawnAmt}</b><br>
+&nbsp;&nbsp;• Common: spawns <span style="color:${neon};">${normalSpawnAmt}</span> frogs instantly.<br>
+&nbsp;&nbsp;• Epic: spawns <span style="color:${neon};">${epicSpawnAmt}</span> frogs instantly.<br><br>
+
+⏳ <b>Buffs last longer (common)</b><br>
+&nbsp;&nbsp;• Each pick: buff durations ×<span style="color:${neon};">${multFromFactor(buffDurUp, 1.10)}</span> (~${percentFromBonus(buffDurUp - 1, 0.10)} longer, stacks).<br><br>
+
+🎯 <b>More orbs (common)</b><br>
+&nbsp;&nbsp;• Each pick: orb spawn interval ×<span style="color:${neon};">${multFromFactor(orbIntervalUp, 0.85)}</span> (~${fasterPercentFromFactor(orbIntervalUp, 0.85)} more orbs, stacks).<br><br>
+
+💀 <b>Deathrattle (global)</b><br>
+&nbsp;&nbsp;• Common pick: +<span style="color:${neon};">${percentFromBonus(commonDeathChance, 0.05)}</span> base respawn chance.<br>
+&nbsp;&nbsp;• Epic pick: +<span style="color:${neon};">${percentFromBonus(epicDeathChance, 0.15)}</span> base respawn chance.<br>
+&nbsp;&nbsp;• Legendary pick: +<span style="color:${neon};">${percentFromBonus(legDeathChance, 0.25)}</span> base respawn chance.<br>
+&nbsp;&nbsp;• Base deathrattle is capped at about <span style="color:${neon};">${percentFromBonus(deathBaseCap, 0.45)}</span>.<br>
+&nbsp;&nbsp;• Cannibals, zombies & Lifeline can push individual deaths even higher.<br><br>
+
+🏹 <b>Last Stand (global)</b><br>
+&nbsp;&nbsp;• When you are down to your <span style="color:${neon};">final frog</span>, it has at least<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:${neon};">${percentFromBonus(lastStandMin, 0.33)}</span> chance to respawn instead of dying.<br>
+&nbsp;&nbsp;• With enough upgrades it can reach up to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:${neon};">${percentFromBonus(lastStandMax, 0.50)}</span> (or your build’s cap).<br><br>
+
+🌌 <b>Orb Collector (global)</b><br>
+&nbsp;&nbsp;• Each pick: +<span style="color:${neon};">${percentFromBonus(orbCollectorStep, 0.10)}</span> flat chance that <i>any</i> orb also spawns a frog.<br>
+&nbsp;&nbsp;• Capped around <span style="color:${neon};">${percentFromBonus(orbCollectorCap, 1.00)}</span>.<br>
+&nbsp;&nbsp;• Combos super hard with Orb Magnet, Magnet frogs, and Orb Storm.<br><br>
+
+🧟‍♂️ <b>Zombie Horde (epic)</b><br>
+&nbsp;&nbsp;• Summons <span style="color:${neon};">${zombieHordeCount}</span> special zombies.<br>
+&nbsp;&nbsp;• Each has ≈ <span style="color:${neon};">${percentFromBonus(zombieHordeDR, 0.50)}</span> personal deathrattle while alive.<br>
+&nbsp;&nbsp;• If they respawn, they keep the zombie role but lose the massive bonus chance.<br><br>
+
+🌩️ <b>Orb Storm (epic)</b><br>
+&nbsp;&nbsp;• Drops about <span style="color:${neon};">${orbStormCount}</span> random orbs at once across the arena.<br>
+&nbsp;&nbsp;• Great with high Orb Collector & Magnet builds.<br><br>
+
+🥚 <b>Snake Egg (epic)</b><br>
+&nbsp;&nbsp;• The <span style="color:${neon};">next</span> snake that sheds gets a weaker speed bonus.<br>
+&nbsp;&nbsp;• Normal shed: speed ×<span style="color:${neon};">${multFromFactor(snakeShedSpeedFact, 1.27)}</span> (~${percentFromBonus(snakeShedSpeedFact - 1, 0.27)} faster).<br>
+&nbsp;&nbsp;• Egg shed: speed only ×<span style="color:${neon};">${multFromFactor(snakeEggSpeedFact, 1.11)}</span> (~${percentFromBonus(snakeEggSpeedFact - 1, 0.11)} faster).<br><br>
+
+🔥 <b>Snake sheds & difficulty</b><br>
+&nbsp;&nbsp;• Every <span style="color:${neon};">${minsFromSeconds(snakeShedInterval, 300)}</span> (about 5 minutes) the snake sheds and a new one appears.<br>
+&nbsp;&nbsp;• Each shed:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;– Increases base snake speed permanently.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;– Resets body length so it starts shorter but deadlier.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;– Buffs some legendary / epic effects that trigger on shed (like Grave Wave, if enabled).<br><br>
+
+<b>⏱ Upgrade timing</b><br>
+&nbsp;&nbsp;• Every <span style="color:${neon};">60s</span>: common upgrade choice.<br>
+&nbsp;&nbsp;• Every <span style="color:${neon};">180s</span>: common + epic chain choice.<br>
+&nbsp;&nbsp;• Every <span style="color:${neon};">300s</span>: snake shed phase & big difficulty spike.
 `
   ];
 
