@@ -3322,7 +3322,7 @@ function populateUpgradeOverlayChoices(mode) {
       const posted = await submitScoreToServer(lastRunScore, lastRunTime, finalStats);
       const topList = posted || (await fetchLeaderboard()) || [];
       updateMiniLeaderboard(topList);
-      openScoreboardOverlay(topList, lastRunScore, lastRunTime);
+      openScoreboardOverlay(topList, lastRunScore, lastRunTime, finalStats);
     })();  
 
     showGameOver();

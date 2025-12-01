@@ -355,25 +355,26 @@
   // --------------------------------------------------
   // FULL SCOREBOARD OVERLAY (after a run)
   // --------------------------------------------------
-  function openScoreboardOverlay(topList, lastRunScore, lastRunTime) {
+  function openScoreboardOverlay(entries, lastScore, lastTime, finalStats) {
+
     if (!scoreboardOverlay || !scoreboardOverlayInner) return;
-
-    const safeList = Array.isArray(topList) ? topList : [];
-
+  
+    const safeList = Array.isArray(entries) ? entries : [];
+  
     scoreboardOverlayInner.innerHTML = "";
-
+  
     const title = document.createElement("div");
     title.textContent = "Run summary & leaderboard";
     title.style.fontSize = "14px";
     title.style.marginBottom = "10px";
     title.style.textAlign = "center";
     scoreboardOverlayInner.appendChild(title);
-
+  
     const { index: myIndex, entry: myEntry } =
-      findMyIndexInList(safeList, lastRunScore, lastRunTime);
-
+      findMyIndexInList(safeList, lastScore, lastTime);
+  
     const myName = getDisplayName(myEntry, "You");
-
+  
     const summary = document.createElement("div");
     summary.style.marginBottom = "12px";
     summary.style.fontSize = "13px";
@@ -382,79 +383,79 @@
       `<span style="color:#ffd700;font-weight:bold;">${escapeHtml(
         myName
       )}</span>` +
-      ` — Time ${formatTime(lastRunTime)}, Score ${Math.floor(lastRunScore)}`;
+      ` — Time ${formatTime(lastTime)}, Score ${Math.floor(lastScore)}`;
     scoreboardOverlayInner.appendChild(summary);
-
+  
     const hr = document.createElement("div");
     hr.style.height = "1px";
     hr.style.background = "#333";
     hr.style.margin = "8px 0 10px 0";
     scoreboardOverlayInner.appendChild(hr);
-
+  
     const table = document.createElement("table");
     table.style.width = "100%";
     table.style.borderCollapse = "collapse";
     table.style.fontSize = "12px";
-
+  
     const thead = document.createElement("thead");
     const headRow = document.createElement("tr");
-
+  
     const thRank = document.createElement("th");
     const thName = document.createElement("th");
     const thTime = document.createElement("th");
     const thScore = document.createElement("th");
-
+  
     thRank.textContent = "#";
     thName.textContent = "Name";
     thTime.textContent = "Time";
     thScore.textContent = "Score";
-
+  
     for (const th of [thRank, thName, thTime, thScore]) {
       th.style.borderBottom = "1px solid #444";
       th.style.padding = "2px 4px";
       th.style.textAlign = "left";
       th.style.fontWeight = "bold";
     }
-
+  
     headRow.appendChild(thRank);
     headRow.appendChild(thName);
     headRow.appendChild(thTime);
     headRow.appendChild(thScore);
     thead.appendChild(headRow);
     table.appendChild(thead);
-
+  
     const tbody = document.createElement("tbody");
-
+  
     if (safeList.length > 0) {
       for (let i = 0; i < safeList.length; i++) {
         const entry = safeList[i] || {};
         const tr = document.createElement("tr");
-
+  
         const rankCell = document.createElement("td");
         const nameCell = document.createElement("td");
         const timeCell = document.createElement("td");
         const scoreCell = document.createElement("td");
-
+  
         const rank = i + 1;
         const name = getDisplayName(entry, `Player ${rank}`);
         const score = getEntryScore(entry);
         const time = getEntryTime(entry);
-
+  
         rankCell.textContent = String(rank);
         nameCell.textContent = name;
         timeCell.textContent = formatTime(time);
         scoreCell.textContent = String(Math.floor(score));
-
+  
         for (const td of [rankCell, nameCell, timeCell, scoreCell]) {
           td.style.padding = "2px 4px";
           td.style.borderBottom = "1px solid #222";
         }
-
+  
         if (i === myIndex) {
           nameCell.style.color = "#ffd700";
           nameCell.style.fontWeight = "bold";
         }
-
+  
         tr.appendChild(rankCell);
         tr.appendChild(nameCell);
         tr.appendChild(timeCell);
@@ -471,10 +472,56 @@
       tr.appendChild(td);
       tbody.appendChild(tr);
     }
-
+  
     table.appendChild(tbody);
     scoreboardOverlayInner.appendChild(table);
-
+  
+    // ---- Run stats block (uses finalStats if provided) ----
+    if (finalStats && typeof finalStats === "object") {
+      const s = finalStats;
+  
+      const statsBox = document.createElement("div");
+      statsBox.style.marginTop = "10px";
+      statsBox.style.padding = "8px 10px";
+      statsBox.style.borderTop = "1px solid #333";
+      statsBox.style.fontSize = "11px";
+      statsBox.style.textAlign = "left";
+  
+      function fmtPct(val) {
+        return typeof val === "number" ? (val * 100).toFixed(1) + "%" : "—";
+      }
+  
+      function fmtMult(val) {
+        return typeof val === "number" ? "×" + val.toFixed(2) : "—";
+      }
+  
+      function fmtInt(val) {
+        return typeof val === "number" ? String(Math.floor(val)) : "—";
+      }
+  
+      const deathrattleChance =
+        typeof s.deathrattleChance === "number"
+          ? s.deathrattleChance
+          : (typeof s.frogDeathRattleChance === "number"
+              ? s.frogDeathRattleChance
+              : null);
+  
+      statsBox.innerHTML = `
+        <div style="font-weight:bold; margin-bottom:4px;">Run stats</div>
+        <div>Deathrattle chance: ${fmtPct(deathrattleChance)}</div>
+        <div>Frog speed factor: ${fmtMult(s.frogSpeedFactor)}</div>
+        <div>Frog jump factor: ${fmtMult(s.frogJumpFactor)}</div>
+        <div>Buff duration: ${fmtMult(s.buffDurationFactor)}</div>
+        <div>Orb spawn interval factor: ${fmtMult(s.orbSpawnIntervalFactor)}</div>
+        <div>Orb collector chance: ${fmtPct(s.orbCollectorChance)}</div>
+        <div>Total frogs spawned: ${fmtInt(s.totalFrogsSpawned)}</div>
+        <div>Total orbs spawned: ${fmtInt(s.totalOrbsSpawned)}</div>
+        <div>Total orbs collected: ${fmtInt(s.totalOrbsCollected)}</div>
+      `;
+  
+      scoreboardOverlayInner.appendChild(statsBox);
+    }
+  
     const hint = document.createElement("div");
     hint.textContent = "Click outside this panel to close.";
     hint.style.marginTop = "8px";
@@ -482,9 +529,9 @@
     hint.style.opacity = "0.8";
     hint.style.textAlign = "center";
     scoreboardOverlayInner.appendChild(hint);
-
+  
     scoreboardOverlay.style.display = "flex";
-  }
+  }  
 
   function hideScoreboardOverlay() {
     if (!scoreboardOverlay) return;
