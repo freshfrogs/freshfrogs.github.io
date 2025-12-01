@@ -513,7 +513,6 @@
         <div>Frog jump factor: ${fmtMult(s.frogJumpFactor)}</div>
         <div>Buff duration: ${fmtMult(s.buffDurationFactor)}</div>
         <div>Orb spawn interval factor: ${fmtMult(s.orbSpawnIntervalFactor)}</div>
-        <div>Orb collector chance: ${fmtPct(s.orbCollectorChance)}</div>
         <div>Total frogs spawned: ${fmtInt(s.totalFrogsSpawned)}</div>
       `;
   
