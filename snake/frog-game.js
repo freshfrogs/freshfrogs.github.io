@@ -3023,12 +3023,11 @@ function setBuffGuidePage(pageIndex) {
 <b>🟢 Orb buffs – movement & control</b><br><br>
 ⚡ <b>Speed</b> – frogs act faster for <span style="color:${neon};">${secFromConst(speedDur, 10)}</span>.<br>
 🦘 <b>Jump</b> – jump ≈ <span style="color:${neon};">${multFromFactor(jumpBuffFactor, 3.0)}</span> higher for <span style="color:${neon};">${secFromConst(jumpDur, 10)}</span>.<br>
-🛡️ <b>Team shield</b> – frogs ignore snake hits for <span style="color:${neon};">${secFromConst(shieldDur, 10)}</span>.<br>
-⏱️ <b>Time slow</b> – world runs at ~<span style="color:${neon};">${percentFromFactor(timeSlowFact, 0.5)}</span> speed for <span style="color:${neon};">${secFromConst(timeSlowDur, 10)}</span>.<br>
+🛡️ <b>Frog Shield</b> – frogs ignore snake hits for <span style="color:${neon};">${secFromConst(shieldDur, 10)}</span>.<br>
 🧊 <b>Snake slow</b> – snake speed set to <span style="color:${neon};">${percentFromFactor(snakeSlowFact, 0.6)}</span> for <span style="color:${neon};">${secFromConst(slowDur, 10)}</span>.<br>
 🤪 <b>Confuse</b> – snake steering is random for <span style="color:${neon};">${secFromConst(confuseDur, 10)}</span>.<br>
 📏 <b>Shrink</b> – snake + bite radius shrink for <span style="color:${neon};">${secFromConst(shrinkDur, 10)}</span>.<br>
-😱 <b>Panic hop</b> – frogs hop in random directions ~<span style="color:${neon};">${multFromFactor(panicSpeedFact, 0.6)}</span> faster for <span style="color:${neon};">${secFromConst(panicDur, 7)}</span>.<br>
+😱 <b>Panic hop</b> – frogs hop in random directions for <span style="color:${neon};">${secFromConst(panicDur, 7)}</span>.<br>
 `,
 
     // Page 1 – orb buffs (score & survival)
@@ -3038,8 +3037,7 @@ function setBuffGuidePage(pageIndex) {
 🐸🌊 <b>Mega spawn</b> – +<span style="color:${neon};">${megaSpawnMin}–${megaSpawnMax}</span> frogs in a burst.<br>
 🧲 <b>Orb magnet</b> – orbs drift toward frogs for <span style="color:${neon};">${secFromConst(orbMagDur, 10)}</span> (prefers Magnet frogs).<br>
 💰 <b>Score x${scoreMultiFact.toFixed(1)}</b> – score gain ×<span style="color:${neon};">${multFromFactor(scoreMultiFact, 2.0)}</span> for <span style="color:${neon};">${secFromConst(scoreDur, 20)}</span>.<br>
-🩸 <b>Life steal</b> – for <span style="color:${neon};">${secFromConst(lifeStealDur, 10)}</span>, deaths refund ≈ <span style="color:${neon};">${multFromFactor(lifeStealFact, 0.5)}</span> value as score/orbs.<br>
-🩺 <b>Lifeline</b> – for <span style="color:${neon};">${secFromConst(lifelineDur, 10)}</span>, dying frogs get an extra respawn roll.<br>
+🩺 <b>Life steal</b> – for <span style="color:${neon};">${secFromConst(lifelineDur, 10)}</span>, dying frogs get an extra respawn roll.<br>
 🔥 <b>Frenzy</b> – for <span style="color:${neon};">${secFromConst(frenzyDur, 13)}</span>, hops ≈ <span style="color:${neon};">${multFromFactor(frenzySpeedFact, 1.25)}</span> faster, jumps ≈ <span style="color:${neon};">${multFromFactor(frenzyJumpFact, 1.25)}</span> higher.<br>
 ⭐ <b>PermaFrog</b> – permanently gives that frog a random role (Champion, Aura, Lucky, etc.).<br>
 `,
