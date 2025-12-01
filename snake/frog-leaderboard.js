@@ -427,7 +427,6 @@ function openScoreboardOverlay(entries, lastScore, lastTime, finalStats) {
     mkRow("Orb frog chance", finalStats.orbFrogChance, v => `${Math.round(v * 100)}%`);
     mkRow("Buff duration", finalStats.buffDurationFactor, v => `${Math.round(v * 100)}%`);
     mkRow("Frog speed", finalStats.frogSpeed, v => v.toFixed(2));
-
     mkRow("Frogs spawned", finalStats.totalFrogsSpawned, v => v | 0);
     mkRow("Orbs collected", finalStats.totalOrbsCollected, v => v | 0);
     mkRow("Buffs taken", finalStats.totalBuffsTaken, v => v | 0);
