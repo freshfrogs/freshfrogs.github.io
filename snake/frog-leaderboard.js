@@ -515,8 +515,6 @@
         <div>Orb spawn interval factor: ${fmtMult(s.orbSpawnIntervalFactor)}</div>
         <div>Orb collector chance: ${fmtPct(s.orbCollectorChance)}</div>
         <div>Total frogs spawned: ${fmtInt(s.totalFrogsSpawned)}</div>
-        <div>Total orbs spawned: ${fmtInt(s.totalOrbsSpawned)}</div>
-        <div>Total orbs collected: ${fmtInt(s.totalOrbsCollected)}</div>
       `;
   
       scoreboardOverlayInner.appendChild(statsBox);
