@@ -952,28 +952,36 @@ function getJumpFactor(frog) {
     playPerFrogUpgradeSound("zombie");
   }
 
-  function grantRandomPermaFrogUpgrade(frog) {
-    if (!frog) return;
-    const roles = ["champion", "aura", "shield", "magnet", "lucky", "zombie"];
-    const available = roles.filter((r) => {
-      switch (r) {
-        case "champion": return !frog.isChampion;
-        case "aura":     return !frog.isAura;
-        case "magnet":   return !frog.isMagnet;
-        case "lucky":    return !frog.isLucky;
-        case "zombie":   return !frog.isZombie;
-      }
-    });
-    const pool = available.length ? available : roles;
-    const role = pool[Math.floor(Math.random() * pool.length)];
-    switch (role) {
-      case "champion": grantChampionFrog(frog); break;
-      case "aura":     grantAuraFrog(frog);     break;
-      case "magnet":   grantMagnetFrog(frog);   break;
-      case "lucky":    grantLuckyFrog(frog);    break;
-      case "zombie":   grantZombieFrog(frog);   break;
+function grantRandomPermaFrogUpgrade(frog) {
+  if (!frog) return;
+  const roles = ["champion", "aura", "shield", "magnet", "lucky", "zombie", "cannibal"];
+
+  const available = roles.filter((r) => {
+    switch (r) {
+      case "champion": return !frog.isChampion;
+      case "aura":     return !frog.isAura;
+      case "shield":   return !frog.hasPermaShield;
+      case "magnet":   return !frog.isMagnet;
+      case "lucky":    return !frog.isLucky;
+      case "zombie":   return !frog.isZombie;
+      case "cannibal": return !frog.isCannibal;
+      default:         return true;
     }
+  });
+
+  const pool = available.length ? available : roles;
+  const role = pool[Math.floor(Math.random() * pool.length)];
+
+  switch (role) {
+    case "champion": grantChampionFrog(frog);   break;
+    case "aura":     grantAuraFrog(frog);       break;
+    case "shield":   grantShieldFrog(frog);     break;
+    case "magnet":   grantMagnetFrog(frog);     break;
+    case "lucky":    grantLuckyFrog(frog);      break;
+    case "zombie":   grantZombieFrog(frog);     break;
+    case "cannibal": markCannibalFrog(frog);    break;
   }
+}
 
   // --------------------------------------------------
   // SPECIAL ROLES: CANNIBAL & HELPERS
@@ -1498,21 +1506,13 @@ function applyBuff(type, frog) {
         frog.cloneEl = null;
       }
     }
-    // --- Cannibal Frogs & Frog Eat Frog --- //
-    const cannibals = frogs.filter(f => f.isCannibal || frogEatFrogActive);
+    // --- Cannibal Frogs --- //
+    const cannibals = frogs.filter(f => f.isCannibal);
     if (cannibals.length > 0) {
       const eatRadius = FROG_SIZE * 0.6;
       const eatR2 = eatRadius * eatRadius;
 
       for (const cannibal of cannibals) {
-        // For global Frog Eat Frog, non-cannibal frogs only sometimes try to eat
-        if (frogEatFrogActive && !cannibal.isCannibal) {
-          const eatChance = Math.max(0, Math.min(1, frogDeathRattleChance || 0));
-          if (eatChance <= 0 || Math.random() >= eatChance) {
-            continue; // skip this frame
-          }
-        }
-
         let victim = null;
         let bestD2 = Infinity;
 
@@ -1533,14 +1533,18 @@ function applyBuff(type, frog) {
         }
 
         if (victim) {
-          const idx = frogs.indexOf(victim);
-          if (idx !== -1) {
-            // Cannibal kill; uses the same deathrattle logic but no snake growth
-            tryKillFrogAtIndex(idx, "cannibal");
+          // 50% chance to actually eat the frog
+          if (Math.random() < 0.5) {
+            const idx = frogs.indexOf(victim);
+            if (idx !== -1) {
+              // Cannibal kill; uses deathrattle logic but no snake growth
+              tryKillFrogAtIndex(idx, "cannibal");
+            }
           }
         }
       }
     }
+
   }
 
   // --------------------------------------------------
