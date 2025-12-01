@@ -355,140 +355,114 @@
   // --------------------------------------------------
   // FULL SCOREBOARD OVERLAY (after a run)
   // --------------------------------------------------
-function openScoreboardOverlay(entries, lastScore, lastTime, finalStats) {
-  if (!scoreboardOverlay || !scoreboardOverlayInner) return;
+  function openScoreboardOverlay(entries, lastScore, lastTime, finalStats) {
 
-  const safeList = Array.isArray(topList) ? topList : [];
-  scoreboardOverlayInner.innerHTML = "";
-
-  // Make overlay scrollable if it's tall
-  scoreboardOverlayInner.style.maxHeight = "80vh";
-  scoreboardOverlayInner.style.overflowY = "auto";
-
-  // Title
-  const title = document.createElement("div");
-  title.textContent = "Run summary & leaderboard";
-  title.style.fontSize = "14px";
-  title.style.marginBottom = "10px";
-  title.style.textAlign = "center";
-  scoreboardOverlayInner.appendChild(title);
-
-  // Figure out "my" entry from the full list
-  const { index: myIndex, entry: myEntry } =
-    findMyIndexInList(safeList, lastRunScore, lastRunTime);
-
-  const myName = getDisplayName(myEntry, "You");
-
-  // Run summary line
-  const summary = document.createElement("div");
-  summary.style.marginBottom = "8px";
-  summary.style.fontSize = "13px";
-  summary.innerHTML =
-    "Run summary:<br>" +
-    `<span style="color:#ffd700;font-weight:bold;">${escapeHtml(
-      myName
-    )}</span>` +
-    ` — Time ${formatTime(lastRunTime)}, Score ${Math.floor(lastRunScore)}`;
-  scoreboardOverlayInner.appendChild(summary);
-
-  // --- Final stats (if provided) ---
-  if (finalStats && typeof finalStats === "object") {
-    const statsBox = document.createElement("div");
-    statsBox.style.fontSize = "11px";
-    statsBox.style.marginBottom = "10px";
-    statsBox.style.padding = "6px 8px";
-    statsBox.style.border = "1px solid #333";
-    statsBox.style.borderRadius = "4px";
-    statsBox.style.background = "#111";
-
-    const statsTitle = document.createElement("div");
-    statsTitle.textContent = "Final stats";
-    statsTitle.style.fontWeight = "bold";
-    statsTitle.style.marginBottom = "4px";
-    statsBox.appendChild(statsTitle);
-
-    const mkRow = (label, value, formatter) => {
-      if (value === undefined || value === null) return;
-      const row = document.createElement("div");
-      row.style.display = "flex";
-      row.style.justifyContent = "space-between";
-      row.style.marginBottom = "2px";
-      const left = document.createElement("span");
-      const right = document.createElement("span");
-      left.textContent = label;
-      right.textContent = formatter ? formatter(value) : String(value);
-      left.style.opacity = "0.8";
-      row.appendChild(left);
-      row.appendChild(right);
-      statsBox.appendChild(row);
-    };
-
-    mkRow("Deathrattle chance", finalStats.deathrattleChance, v => `${Math.round(v * 100)}%`);
-    mkRow("Orb frog chance", finalStats.orbFrogChance, v => `${Math.round(v * 100)}%`);
-    mkRow("Buff duration", finalStats.buffDurationFactor, v => `${Math.round(v * 100)}%`);
-    mkRow("Frog speed", finalStats.frogSpeed, v => v.toFixed(2));
-
-    mkRow("Frogs spawned", finalStats.totalFrogsSpawned, v => v | 0);
-    mkRow("Orbs collected", finalStats.totalOrbsCollected, v => v | 0);
-    mkRow("Buffs taken", finalStats.totalBuffsTaken, v => v | 0);
-    mkRow("Sheds", finalStats.totalSheds, v => v | 0);
-    mkRow("Max frogs on screen", finalStats.maxSimultaneousFrogs, v => v | 0);
-    mkRow("Snakes at end", finalStats.snakesAlive, v => v | 0);
-
-    scoreboardOverlayInner.appendChild(statsBox);
-  }
-
-  // Divider
-  const hr = document.createElement("div");
-  hr.style.height = "1px";
-  hr.style.background = "#333";
-  hr.style.margin = "8px 0 10px 0";
-  scoreboardOverlayInner.appendChild(hr);
-
-  // Leaderboard table
-  const table = document.createElement("table");
-  table.style.width = "100%";
-  table.style.borderCollapse = "collapse";
-  table.style.fontSize = "12px";
-
-  const thead = document.createElement("thead");
-  const headRow = document.createElement("tr");
-
-  const thRank = document.createElement("th");
-  const thName = document.createElement("th");
-  const thTime = document.createElement("th");
-  const thScore = document.createElement("th");
-
-  thRank.textContent = "#";
-  thName.textContent = "Name";
-  thTime.textContent = "Time";
-  thScore.textContent = "Score";
-
-  for (const th of [thRank, thName, thTime, thScore]) {
-    th.style.borderBottom = "1px solid #444";
-    th.style.padding = "2px 4px";
-    th.style.textAlign = "left";
-    th.style.fontWeight = "bold";
-  }
-
-  headRow.appendChild(thRank);
-  headRow.appendChild(thName);
-  headRow.appendChild(thTime);
-  headRow.appendChild(thScore);
-  thead.appendChild(headRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement("tbody");
-  table.appendChild(tbody);
-  scoreboardOverlayInner.appendChild(table);
-
-  const MAX_VISIBLE = 10;
-  let showingAll = false;
-
-  function renderRows() {
-    tbody.innerHTML = "";
-
-    if (safeList.length === 0) {
+    if (!scoreboardOverlay || !scoreboardOverlayInner) return;
+  
+    const safeList = Array.isArray(entries) ? entries : [];
+  
+    scoreboardOverlayInner.innerHTML = "";
+  
+    const title = document.createElement("div");
+    title.textContent = "Run summary & leaderboard";
+    title.style.fontSize = "14px";
+    title.style.marginBottom = "10px";
+    title.style.textAlign = "center";
+    scoreboardOverlayInner.appendChild(title);
+  
+    const { index: myIndex, entry: myEntry } =
+      findMyIndexInList(safeList, lastScore, lastTime);
+  
+    const myName = getDisplayName(myEntry, "You");
+  
+    const summary = document.createElement("div");
+    summary.style.marginBottom = "12px";
+    summary.style.fontSize = "13px";
+    summary.innerHTML =
+      "Run summary:<br>" +
+      `<span style="color:#ffd700;font-weight:bold;">${escapeHtml(
+        myName
+      )}</span>` +
+      ` — Time ${formatTime(lastTime)}, Score ${Math.floor(lastScore)}`;
+    scoreboardOverlayInner.appendChild(summary);
+  
+    const hr = document.createElement("div");
+    hr.style.height = "1px";
+    hr.style.background = "#333";
+    hr.style.margin = "8px 0 10px 0";
+    scoreboardOverlayInner.appendChild(hr);
+  
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.fontSize = "12px";
+  
+    const thead = document.createElement("thead");
+    const headRow = document.createElement("tr");
+  
+    const thRank = document.createElement("th");
+    const thName = document.createElement("th");
+    const thTime = document.createElement("th");
+    const thScore = document.createElement("th");
+  
+    thRank.textContent = "#";
+    thName.textContent = "Name";
+    thTime.textContent = "Time";
+    thScore.textContent = "Score";
+  
+    for (const th of [thRank, thName, thTime, thScore]) {
+      th.style.borderBottom = "1px solid #444";
+      th.style.padding = "2px 4px";
+      th.style.textAlign = "left";
+      th.style.fontWeight = "bold";
+    }
+  
+    headRow.appendChild(thRank);
+    headRow.appendChild(thName);
+    headRow.appendChild(thTime);
+    headRow.appendChild(thScore);
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+  
+    const tbody = document.createElement("tbody");
+  
+    if (safeList.length > 0) {
+      for (let i = 0; i < safeList.length; i++) {
+        const entry = safeList[i] || {};
+        const tr = document.createElement("tr");
+  
+        const rankCell = document.createElement("td");
+        const nameCell = document.createElement("td");
+        const timeCell = document.createElement("td");
+        const scoreCell = document.createElement("td");
+  
+        const rank = i + 1;
+        const name = getDisplayName(entry, `Player ${rank}`);
+        const score = getEntryScore(entry);
+        const time = getEntryTime(entry);
+  
+        rankCell.textContent = String(rank);
+        nameCell.textContent = name;
+        timeCell.textContent = formatTime(time);
+        scoreCell.textContent = String(Math.floor(score));
+  
+        for (const td of [rankCell, nameCell, timeCell, scoreCell]) {
+          td.style.padding = "2px 4px";
+          td.style.borderBottom = "1px solid #222";
+        }
+  
+        if (i === myIndex) {
+          nameCell.style.color = "#ffd700";
+          nameCell.style.fontWeight = "bold";
+        }
+  
+        tr.appendChild(rankCell);
+        tr.appendChild(nameCell);
+        tr.appendChild(timeCell);
+        tr.appendChild(scoreCell);
+        tbody.appendChild(tr);
+      }
+    } else {
       const tr = document.createElement("tr");
       const td = document.createElement("td");
       td.colSpan = 4;
@@ -497,87 +471,64 @@ function openScoreboardOverlay(entries, lastScore, lastTime, finalStats) {
       td.style.textAlign = "center";
       tr.appendChild(td);
       tbody.appendChild(tr);
-      return;
     }
-
-    const limit = showingAll ? safeList.length : Math.min(MAX_VISIBLE, safeList.length);
-
-    for (let i = 0; i < limit; i++) {
-      const entry = safeList[i] || {};
-      const tr = document.createElement("tr");
-
-      const rankCell = document.createElement("td");
-      const nameCell = document.createElement("td");
-      const timeCell = document.createElement("td");
-      const scoreCell = document.createElement("td");
-
-      const rank = i + 1;
-      const name = getDisplayName(entry, `Player ${rank}`);
-      const score = getEntryScore(entry);
-      const time = getEntryTime(entry);
-
-      rankCell.textContent = String(rank);
-      nameCell.textContent = name;
-      timeCell.textContent = formatTime(time);
-      scoreCell.textContent = String(Math.floor(score));
-
-      for (const td of [rankCell, nameCell, timeCell, scoreCell]) {
-        td.style.padding = "2px 4px";
-        td.style.borderBottom = "1px solid #222";
+  
+    table.appendChild(tbody);
+    scoreboardOverlayInner.appendChild(table);
+  
+    // ---- Run stats block (uses finalStats if provided) ----
+    if (finalStats && typeof finalStats === "object") {
+      const s = finalStats;
+  
+      const statsBox = document.createElement("div");
+      statsBox.style.marginTop = "10px";
+      statsBox.style.padding = "8px 10px";
+      statsBox.style.borderTop = "1px solid #333";
+      statsBox.style.fontSize = "11px";
+      statsBox.style.textAlign = "left";
+  
+      function fmtPct(val) {
+        return typeof val === "number" ? (val * 100).toFixed(1) + "%" : "—";
       }
-
-      if (i === myIndex) {
-        nameCell.style.color = "#ffd700";
-        nameCell.style.fontWeight = "bold";
+  
+      function fmtMult(val) {
+        return typeof val === "number" ? "×" + val.toFixed(2) : "—";
       }
-
-      tr.appendChild(rankCell);
-      tr.appendChild(nameCell);
-      tr.appendChild(timeCell);
-      tr.appendChild(scoreCell);
-      tbody.appendChild(tr);
+  
+      function fmtInt(val) {
+        return typeof val === "number" ? String(Math.floor(val)) : "—";
+      }
+  
+      const deathrattleChance =
+        typeof s.deathrattleChance === "number"
+          ? s.deathrattleChance
+          : (typeof s.frogDeathRattleChance === "number"
+              ? s.frogDeathRattleChance
+              : null);
+  
+      statsBox.innerHTML = `
+        <div style="font-weight:bold; margin-bottom:4px;">Run stats</div>
+        <div>Deathrattle chance: ${fmtPct(deathrattleChance)}</div>
+        <div>Frog speed factor: ${fmtMult(s.frogSpeedFactor)}</div>
+        <div>Frog jump factor: ${fmtMult(s.frogJumpFactor)}</div>
+        <div>Buff duration: ${fmtMult(s.buffDurationFactor)}</div>
+        <div>Orb spawn interval factor: ${fmtMult(s.orbSpawnIntervalFactor)}</div>
+        <div>Total frogs spawned: ${fmtInt(s.totalFrogsSpawned)}</div>
+      `;
+  
+      scoreboardOverlayInner.appendChild(statsBox);
     }
-  }
-
-  renderRows();
-
-  // Toggle button for full leaderboard vs top 10
-  if (safeList.length > MAX_VISIBLE) {
-    const toggleBtn = document.createElement("button");
-    toggleBtn.textContent = "Show full leaderboard";
-    toggleBtn.style.marginTop = "8px";
-    toggleBtn.style.fontSize = "11px";
-    toggleBtn.style.padding = "4px 8px";
-    toggleBtn.style.borderRadius = "4px";
-    toggleBtn.style.border = "1px solid #444";
-    toggleBtn.style.background = "#111";
-    toggleBtn.style.color = "#eee";
-    toggleBtn.style.cursor = "pointer";
-    toggleBtn.style.display = "block";
-    toggleBtn.style.marginLeft = "auto";
-    toggleBtn.style.marginRight = "auto";
-
-    toggleBtn.addEventListener("click", () => {
-      showingAll = !showingAll;
-      toggleBtn.textContent = showingAll
-        ? "Show top 10 only"
-        : "Show full leaderboard";
-      renderRows();
-    });
-
-    scoreboardOverlayInner.appendChild(toggleBtn);
-  }
-
-  const hint = document.createElement("div");
-  hint.textContent = "Click outside this panel to close.";
-  hint.style.marginTop = "8px";
-  hint.style.fontSize = "11px";
-  hint.style.opacity = "0.8";
-  hint.style.textAlign = "center";
-  scoreboardOverlayInner.appendChild(hint);
-
-  scoreboardOverlay.style.display = "flex";
-}
+  
+    const hint = document.createElement("div");
+    hint.textContent = "Click outside this panel to close.";
+    hint.style.marginTop = "8px";
+    hint.style.fontSize = "11px";
+    hint.style.opacity = "0.8";
+    hint.style.textAlign = "center";
+    scoreboardOverlayInner.appendChild(hint);
+  
+    scoreboardOverlay.style.display = "flex";
+  }  
 
   function hideScoreboardOverlay() {
     if (!scoreboardOverlay) return;
