@@ -506,6 +506,7 @@
               ? s.frogDeathRattleChance
               : null);
   
+      /*
       statsBox.innerHTML = `
         <div style="font-weight:bold; margin-bottom:4px;">Run stats</div>
         <div>Deathrattle chance: ${fmtPct(deathrattleChance)}</div>
@@ -515,8 +516,10 @@
         <div>Orb spawn interval factor: ${fmtMult(s.orbSpawnIntervalFactor)}</div>
         <div>Total frogs spawned: ${fmtInt(s.totalFrogsSpawned)}</div>
       `;
+
   
       scoreboardOverlayInner.appendChild(statsBox);
+      */
     }
   
     const hint = document.createElement("div");
