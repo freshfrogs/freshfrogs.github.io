@@ -2091,7 +2091,7 @@ function getEpicUpgradeChoices() {
       id: "epicOrbStorm",
       label: `
         🌩️ Orb Storm<br>
-        Drop <span style="color:${epicTitleColor};">${orbStormCount}</span> random orbs right now
+        Drop <span style="color:${epicTitleColor};">${ORB_STORM_COUNT}</span> random orbs right now
       `,
       apply: () => {
         const width  = window.innerWidth;
