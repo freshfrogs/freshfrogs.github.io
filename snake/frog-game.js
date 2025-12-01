@@ -2137,6 +2137,19 @@ function getEpicUpgradeChoices() {
     });
   }
 
+  // 🧪 Orb Specialist – orbs always spawn at least one frog
+  if (!orbSpecialistActive) {
+    upgrades.push({
+      id: "epicOrbSpecialist",
+      label:
+        `<span style="color:${epicTitleColor};font-weight:bold;">Orb Specialist</span><br>` +
+        "Orbs always spawn 1 frog. Orb Collector chance rolls for extra frogs.",
+      apply: () => {
+        orbSpecialistActive = true;
+      },
+    });
+  }
+
   /* 🔹 NEW EPIC: Frog Eat Frog (only once)
   if (!frogEatFrogActive) {
     upgrades.push({
