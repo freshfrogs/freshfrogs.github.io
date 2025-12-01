@@ -3071,8 +3071,8 @@ function setBuffGuidePage(pageIndex) {
 <b>🐍 Epics & snake rules</b><br><br>
 🧟‍♂️ <b>Zombie Horde</b> – summons <span style="color:${neon};">${zombieHordeCount}</span> zombies with ≈ <span style="color:${neon};">${percentFromBonus(zombieHordeDR, 0.50)}</span> deathrattle each; if they respawn, they keep zombie but lose the huge bonus.<br>
 🌩️ <b>Orb Storm</b> – drops about <span style="color:${neon};">${orbStormCount}</span> orbs at once, strong with Magnet / Orb Collector builds.<br>
-🥚 <b>Snake Egg</b> – next shed snake only gets speed ×<span style="color:${neon};">${multFromFactor(snakeEggSpeedFact, 1.11)}</span> instead of ×<span style="color:${neon};">${multFromFactor(snakeShedSpeedFact, 1.27)}</span>.<br><br>
-🧪 <b>Orb specialist</b> – every collected orb always spawns 1 frog; Orb Collector can add extra frogs. (stacks with Orb Collector)<br>
+🥚 <b>Snake Egg</b> – next shed snake only gets speed ×<span style="color:${neon};">${multFromFactor(snakeEggSpeedFact, 1.11)}</span> instead of ×<span style="color:${neon};">${multFromFactor(snakeShedSpeedFact, 1.27)}</span>.<br>
+🧪 <b>Orb specialist</b> – every collected orb always spawns 1 frog; Orb Collector can add extra frogs.<br><br>
 🔥 <b>Snake sheds</b><br>
 • Every ~<span style="color:${neon};">${minsFromSeconds(snakeShedInterval, 300)}</span> the snake sheds and a new one spawns.<br>
 • Each shed: speed up, shorter body, higher danger.<br><br>
