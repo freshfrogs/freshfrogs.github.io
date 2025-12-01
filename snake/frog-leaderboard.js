@@ -253,43 +253,36 @@
     }
   }
 
-  async function submitScoreToServer(score, time) {
+  async function submitScoreToServer(score, time, stats) {
     try {
-      const payload = {
-        score: Math.floor(score),
-        time: time,
-      };
-
       const res = await fetch(LEADERBOARD_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          score,
+          time,
+          stats: stats || null, // <- NEW
+        }),
       });
-
+  
       if (!res.ok) {
-        console.warn("submitScoreToServer non-OK:", res.status);
+        console.warn("Failed to submit score:", res.status, res.statusText);
         return null;
       }
-
+  
       const data = await res.json();
-
-      let entries = null;
-      lastMyEntry = null;
-
-      if (Array.isArray(data)) {
-        entries = data;
-      } else if (data && Array.isArray(data.entries)) {
-        entries = data.entries;
-        if (data.myEntry) lastMyEntry = data.myEntry;
+      if (!data || !Array.isArray(data.entries)) {
+        console.warn("Leaderboard response missing entries:", data);
+        return null;
       }
-
-      return entries;
+  
+      return data.entries;
     } catch (err) {
-      console.error("submitScoreToServer error", err);
+      console.error("Error submitting score:", err);
       return null;
     }
   }
-
+  
   // --------------------------------------------------
   // MINI LEADERBOARD (top-right HUD / pre-game view)
   // --------------------------------------------------

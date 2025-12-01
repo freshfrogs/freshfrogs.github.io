@@ -262,6 +262,15 @@
   let buffDurationFactor       = 1.0; // >1 = longer temp buffs
   let orbSpawnIntervalFactor   = 0.95; // <1 = more orbs
 
+  // ---- RUN STATS (for leaderboard / post-run summary) ----
+  let totalFrogsSpawned = 0;
+  let totalOrbsSpawned = 0;
+  let totalOrbsCollected = 0;
+
+  // Optional extras if you want them:
+  let totalGhostFrogsSpawned = 0;  // for Grave Wave, etc.
+  let totalCannibalEvents = 0;     // number of Frog-eat-Frog kills
+
   let graveWaveActive   = false;
   let frogEatFrogActive = false;
 
@@ -740,6 +749,8 @@
 
     frogs.push(frog);
     refreshFrogPermaGlow(frog);
+
+    totalFrogsSpawned++;
 
     fetchMetadata(tokenId)
       .then(meta => buildLayersForFrog(frog, meta))
@@ -1600,6 +1611,8 @@ function applyBuff(type, frog) {
 
     container.appendChild(el);
     orbs.push({ type, x, y, ttl: ORB_TTL, el });
+
+    totalOrbsSpawned++;
 
     playRandomOrbSpawnSound();
   }
@@ -3283,12 +3296,34 @@ function populateUpgradeOverlayChoices(mode) {
     lastRunTime  = elapsedTime;
     lastRunScore = score;
 
+    const finalStats = {
+      // Core run results
+      score: lastRunScore,
+      timeSeconds: lastRunTime,
+  
+      // Live buff values at the end of the run
+      deathrattleChance: frogDeathRattleChance,
+      frogSpeedFactor: frogPermanentSpeedFactor,
+      frogJumpFactor: frogPermanentJumpFactor,
+      buffDurationFactor,
+      orbSpawnIntervalFactor,
+      orbCollectorChance,
+      orbSpecialistActive,
+  
+      // Totals for this run
+      totalFrogsSpawned,
+      totalOrbsSpawned,
+      totalOrbsCollected,
+      totalGhostFrogsSpawned,
+      totalCannibalEvents,
+    };
+  
     (async () => {
-      const posted = await submitScoreToServer(lastRunScore, lastRunTime);
-      const topList = posted || await fetchLeaderboard() || [];
+      const posted = await submitScoreToServer(lastRunScore, lastRunTime, finalStats);
+      const topList = posted || (await fetchLeaderboard()) || [];
       updateMiniLeaderboard(topList);
       openScoreboardOverlay(topList, lastRunScore, lastRunTime);
-    })();
+    })();  
 
     showGameOver();
   }
