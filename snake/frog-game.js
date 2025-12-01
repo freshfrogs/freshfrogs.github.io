@@ -3312,10 +3312,10 @@ function populateUpgradeOverlayChoices(mode) {
   
       // Totals for this run
       totalFrogsSpawned,
-      totalOrbsSpawned,
-      totalOrbsCollected,
-      totalGhostFrogsSpawned,
-      totalCannibalEvents,
+      //totalOrbsSpawned,
+      //totalOrbsCollected,
+      //totalGhostFrogsSpawned,
+      //totalCannibalEvents,
     };
   
     (async () => {
