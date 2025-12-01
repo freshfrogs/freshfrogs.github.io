@@ -2147,7 +2147,7 @@ function getEpicUpgradeChoices() {
       id: "epicOrbSpecialist",
       label:
         `🧪 Orb specialist<br>
-        Orbs always spawn 1 frog. Orb Collector chance rolls for extra frogs.
+        Orbs always spawn <span style="color:${epicTitleColor};">1</span> frog. Orb Collector chance rolls for extra frogs.
         `,
       apply: () => {
         orbSpecialistActive = true;
