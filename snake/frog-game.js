@@ -1818,50 +1818,54 @@ function applyBuff(type, frog) {
     applySnakeAppearance();
   }
 
-  function growSnake(extraSegments) {
-    if (!snake) return;
-    extraSegments = extraSegments || 1;
+function growSnake(extraSegments) {
+  if (!snake) return;
+  extraSegments = extraSegments || 1;
 
-    // 🔒 Do not grow beyond MAX_SNAKE_SEGMENTS
-    const currentLen = snake.segments.length;
-    const allowedExtra = Math.max(0, MAX_SNAKE_SEGMENTS - currentLen);
-    if (allowedExtra <= 0) {
-      return; // already at or above cap
-    }
-
-    extraSegments = Math.min(extraSegments, allowedExtra);
-
-    for (let i = 0; i < extraSegments; i++) {
-      const tailIndex = snake.segments.length - 1;
-      const tailSeg = snake.segments[tailIndex];
-
-      const segEl = document.createElement("div");
-      segEl.className = "snake-body";
-      segEl.style.position = "absolute";
-      segEl.style.width = SNAKE_SEGMENT_SIZE + "px";
-      segEl.style.height = SNAKE_SEGMENT_SIZE + "px";
-      segEl.style.imageRendering = "pixelated";
-      segEl.style.backgroundSize = "contain";
-      segEl.style.backgroundRepeat = "no-repeat";
-      segEl.style.pointerEvents = "none";
-      segEl.style.zIndex = "29";
-      segEl.style.backgroundImage = "url(https://freshfrogs.github.io/snake/body.png)";
-      container.appendChild(segEl);
-
-      snake.segments.splice(tailIndex, 0, {
-        el: segEl,
-        x: tailSeg ? tailSeg.x : snake.head.x,
-        y: tailSeg ? tailSeg.y : snake.head.y
-      });
-    }
-
-    const desiredPathLength =
-      (snake.segments.length + 2) * SNAKE_SEGMENT_GAP + 2;
-    while (snake.path.length < desiredPathLength) {
-      const last = snake.path[snake.path.length - 1];
-      snake.path.push({ x: last.x, y: last.y });
-    }
+  // 🔒 Do not grow beyond MAX_SNAKE_SEGMENTS
+  const currentLen = snake.segments.length;
+  const allowedExtra = Math.max(0, MAX_SNAKE_SEGMENTS - currentLen);
+  if (allowedExtra <= 0) {
+    return; // already at or above cap
   }
+
+  extraSegments = Math.min(extraSegments, allowedExtra);
+
+  for (let i = 0; i < extraSegments; i++) {
+    const tailIndex = snake.segments.length - 1;
+    const tailSeg = snake.segments[tailIndex];
+
+    const segEl = document.createElement("div");
+    segEl.className = "snake-body";
+    segEl.style.position = "absolute";
+    segEl.style.width = SNAKE_SEGMENT_SIZE + "px";
+    segEl.style.height = SNAKE_SEGMENT_SIZE + "px";
+    segEl.style.imageRendering = "pixelated";
+    segEl.style.backgroundSize = "contain";
+    segEl.style.backgroundRepeat = "no-repeat";
+    segEl.style.pointerEvents = "none";
+    segEl.style.zIndex = "29";
+    segEl.style.backgroundImage = "url(https://freshfrogs.github.io/snake/body.png)";
+    container.appendChild(segEl);
+
+    snake.segments.splice(tailIndex, 0, {
+      el: segEl,
+      x: tailSeg ? tailSeg.x : snake.head.x,
+      y: tailSeg ? tailSeg.y : snake.head.y
+    });
+  }
+
+  const desiredPathLength =
+    (snake.segments.length + 2) * SNAKE_SEGMENT_GAP + 2;
+  while (snake.path.length < desiredPathLength) {
+    const last = snake.path[snake.path.length - 1];
+    snake.path.push({ x: last.x, y: last.y });
+  }
+
+  // ✅ Make sure new segments match current shed color / frenzy tint
+  applySnakeAppearance();
+}
+
 
 function updateSnake(dt, width, height) {
   if (!snake) return;
