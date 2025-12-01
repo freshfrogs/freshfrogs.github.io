@@ -2640,7 +2640,7 @@ function setInfoPage(pageIndex) {
     } else {
       html += "<table style='width:100%; border-collapse:collapse; font-size:12px;'>";
       html += "<tr><th style='text-align:left;'>#</th><th style='text-align:left;'>Tag</th><th style='text-align:right;'>Score</th><th style='text-align:right;'>Time</th></tr>";
-      list.slice(0, 10).forEach((entry, i) => {
+      list.slice(0, 20).forEach((entry, i) => {
         const rank = i + 1;
         const tagBase = entry.tag || entry.name || `Player ${rank}`;
 
@@ -3403,7 +3403,7 @@ function populateUpgradeOverlayChoices(mode) {
     const rawList = posted || (await fetchLeaderboard()) || [];
 
     // ✅ Hard cap: only keep top 10 entries
-    const topList = rawList.slice(0, 10);
+    const topList = rawList.slice(0, 20);
 
     updateMiniLeaderboard(topList);
     openScoreboardOverlay(topList, lastRunScore, lastRunTime, finalStats);
