@@ -178,7 +178,7 @@
   }
 
   function playButtonClick() {
-    if (!audioEnabled) return;            // whatever flag you use in that file
+    //if (!audioEnabled) return;            // whatever flag you use in that file
     const s = new Audio("buttonClick.mp3");
     s.volume = masterVolume * 0.7 || 0.7; // adjust to your mix
     s.play().catch(() => {});
