@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  const AUDIO_BASE = "assets/audio/";
+  const AUDIO_BASE = "audio/";
 
   // ------------------------------------------------------------
   // SIMPLE AUDIO POOLING
