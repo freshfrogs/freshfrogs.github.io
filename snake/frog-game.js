@@ -102,7 +102,7 @@
   const FROG_JUMP_UPGRADE_FACTOR      = 1.30; // ~70% higher jumps each pick
   const BUFF_DURATION_UPGRADE_FACTOR  = 1.10; // +20% buff duration each pick
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
-  const ORB_COLLECTOR_CHANCE = 0.10;
+  const ORB_COLLECTOR_CHANCE = 0.20;
   const TOTAL_HIGHLIGHT_COLOR = "#ffb347"; // for showing new total values
 
   // --- HARD CAPS for permanent upgrades / buffs ---
