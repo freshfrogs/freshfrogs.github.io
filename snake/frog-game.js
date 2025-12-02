@@ -2552,8 +2552,23 @@ function ensureHowToOverlay() {
   panel.appendChild(list);
   panel.appendChild(btnRow);
 
+  // Bottom line: site link
+  const linkLine = document.createElement("div");
+  linkLine.style.marginTop = "10px";
+  linkLine.style.fontSize = "11px";
+  linkLine.style.opacity = "0.9";
+  linkLine.innerHTML =
+    'Best played in browser at ' +
+    '<a href="https://freshfrogs.github.io/snake" ' +
+    'target="_blank" rel="noopener noreferrer" ' +
+    'style="color:#9cff9c;text-decoration:underline;">' +
+    'freshfrogs.github.io/snake</a>';
+
+  panel.appendChild(linkLine);
+
   howToOverlay.appendChild(panel);
   container.appendChild(howToOverlay);
+
 }
 
 function openHowToOverlay() {
