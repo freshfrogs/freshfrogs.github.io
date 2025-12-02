@@ -38,8 +38,8 @@
   const MAX_FROGS       = 100;
 
   // ORBS
-  const ORB_RADIUS  = 24;
-  const ORB_TTL     = 30;
+  const ORB_RADIUS  = 12;
+  const ORB_TTL     = 24;
   const ORB_SPAWN_INTERVAL_MIN = 4;
   const ORB_SPAWN_INTERVAL_MAX = 9;
 
