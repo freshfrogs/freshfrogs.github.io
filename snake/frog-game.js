@@ -2801,9 +2801,9 @@ Perma roles stack with global upgrades and orb buffs, making some frogs into min
     // PAGE 4 – Global upgrades
     html = `
 <b>🏗️ Global Upgrades</b><br><br>
-⏩ <b>Frogs hop faster forever</b> – reduces the hop cycle, making the whole swarm act more often.<br>
-🦘⬆️ <b>Frogs jump higher forever</b> – increases base jump height for all frogs.<br>
-🐸💥 <b>Spawn frogs</b> – instant injections of frogs from common / epic menus.<br>
+💨 <b>Frogs hop faster forever</b> – reduces the hop cycle, making the whole swarm act more often.<br>
+🦘 <b>Frogs jump higher forever</b> – increases base jump height for all frogs.<br>
+🐸 <b>Spawn frogs</b> – instant injections of frogs from common / epic menus.<br>
 ⏳ <b>Buffs last longer</b> – multiplies the duration of all temporary buffs (orb effects).<br>
 🎯 <b>More orbs</b> – orbs spawn more frequently over time.<br>
 💀 <b>Deathrattle</b> – dead frogs have a chance to respawn immediately (common and epic versions stack).<br>
