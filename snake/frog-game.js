@@ -3567,6 +3567,7 @@ function populateUpgradeOverlayChoices(mode) {
     snakeShedCount           = 0;
     nextShedTime             = SHED_INTERVAL;
     dyingSnakes              = [];
+    currentSnakeShedCount     = 0;
 
     snakeEggPending          = false;
     orbCollectorActive       = false;
