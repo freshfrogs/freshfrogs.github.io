@@ -433,7 +433,7 @@
       findMyIndexInList(safeList, lastScore, lastTime);
     let summary = null;
 
-    // ---- Optional player tag input (show whenever there is no saved tag) ----
+    // ---- Player tag input (always shown in summary; pre-filled if saved) ----
     (function setupTagInput() {
       let storedTag = null;
 
@@ -444,11 +444,6 @@
         }
       } catch (e) {
         // ignore
-      }
-
-      // If we already have a saved tag, don't show the input
-      if (storedTag) {
-        return;
       }
 
       const tagBox = document.createElement("div");
@@ -473,6 +468,12 @@
       tagInput.style.color = "#eee";
       tagInput.style.fontFamily = "inherit";
       tagInput.style.fontSize = "12px";
+
+      // If we already have a saved tag, pre-fill the input with it
+      if (storedTag) {
+        tagInput.value = storedTag;
+      }
+
       tagBox.appendChild(tagInput);
 
       const buttonsRow = document.createElement("div");
@@ -513,8 +514,10 @@
 
       function finish(tagValue) {
         try {
-          if (typeof localStorage !== "undefined" && tagValue) {
-            localStorage.setItem(TAG_STORAGE_KEY, tagValue);
+          if (typeof localStorage !== "undefined") {
+            if (tagValue) {
+              localStorage.setItem(TAG_STORAGE_KEY, tagValue);
+            }
           }
         } catch (e) {
           // ignore
@@ -576,13 +579,12 @@
         finish(raw);
       });
 
-      // Skip: just hide for this run; will show again next run if no tag saved
+      // Skip: just hide for this run; will show again next run
       skipBtn.addEventListener("click", () => {
         error.textContent = "";
         tagBox.style.display = "none";
       });
     })();
-
 
     const myName = getDisplayName(myEntry, "You");
 
