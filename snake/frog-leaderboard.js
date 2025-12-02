@@ -253,29 +253,54 @@
     }
   }
 
-  async function submitScoreToServer(score, time, stats) {
+  async function submitScoreToServer(score, time, stats, tag) {
     try {
+      let finalTag = tag;
+
+      // If the game doesn't pass a tag, fall back to anything we might
+      // already have in localStorage (keeps it compatible with older code).
+      if (
+        (finalTag == null || String(finalTag).trim() === "") &&
+        typeof localStorage !== "undefined"
+      ) {
+        try {
+          finalTag =
+            localStorage.getItem("frogSnake_username") ||
+            localStorage.getItem("frogSnake_tag") ||
+            localStorage.getItem("frogSnakeUserTag") ||
+            null;
+        } catch (e) {
+          finalTag = null;
+        }
+      }
+
+      const payload = {
+        score,
+        time,
+        stats: stats || null,
+      };
+
+      if (finalTag && String(finalTag).trim() !== "") {
+        payload.tag = String(finalTag).trim();
+      }
+
       const res = await fetch(LEADERBOARD_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          score,
-          time,
-          stats: stats || null, // <- NEW
-        }),
+        body: JSON.stringify(payload),
       });
-  
+
       if (!res.ok) {
         console.warn("Failed to submit score:", res.status, res.statusText);
         return null;
       }
-  
+
       const data = await res.json();
       if (!data || !Array.isArray(data.entries)) {
         console.warn("Leaderboard response missing entries:", data);
         return null;
       }
-  
+
       return data.entries;
     } catch (err) {
       console.error("Error submitting score:", err);
