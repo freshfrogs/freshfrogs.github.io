@@ -1866,7 +1866,6 @@ function growSnake(extraSegments) {
   applySnakeAppearance();
 }
 
-
 function updateSnake(dt, width, height) {
   if (!snake) return;
 
@@ -1875,6 +1874,10 @@ function updateSnake(dt, width, height) {
 
   const head = snake.head;
   if (!head) return;
+
+  // 🔹 Responsive spacing between segments:
+  // smaller gap on mobile, default on desktop
+  const segmentGap = (width <= 768 ? 20 : SNAKE_SEGMENT_GAP);
 
   // -----------------------------
   // Targeting logic
@@ -1942,13 +1945,14 @@ function updateSnake(dt, width, height) {
   // Path + segments follow
   // -----------------------------
   snake.path.unshift({ x: head.x, y: head.y });
-  const maxPathLength = (snake.segments.length + 2) * SNAKE_SEGMENT_GAP + 2;
+  const maxPathLength = (snake.segments.length + 2) * segmentGap + 2;
   while (snake.path.length > maxPathLength) {
     snake.path.pop();
   }
 
   const shrinkScale = snakeShrinkTime > 0 ? 0.8 : 1.0;
 
+  // 🔸 Head: fully rotate with movement
   head.el.style.transform =
     `translate3d(${head.x}px, ${head.y}px, 0) rotate(${head.angle}rad) scale(${shrinkScale})`;
 
@@ -1956,7 +1960,7 @@ function updateSnake(dt, width, height) {
     const seg = snake.segments[i];
     const idx = Math.min(
       snake.path.length - 1,
-      (i + 1) * SNAKE_SEGMENT_GAP
+      (i + 1) * segmentGap
     );
     const p = snake.path[idx] || snake.path[snake.path.length - 1];
 
@@ -1977,14 +1981,18 @@ function updateSnake(dt, width, height) {
   const eatRadius = getSnakeEatRadius();
   const eatR2 = eatRadius * eatRadius;
 
+  // ✅ Use the *center* of the head sprite as the bite point
+  const headCx = head.x + SNAKE_SEGMENT_SIZE / 2;
+  const headCy = head.y + SNAKE_SEGMENT_SIZE / 2;
+
   for (let i = frogs.length - 1; i >= 0; i--) {
     const frog = frogs[i];
     if (!frog || !frog.el) continue;
 
     const fx = frog.x + FROG_SIZE / 2;
     const fy = frog.baseY + FROG_SIZE / 2;
-    const dx = fx - head.x;
-    const dy = fy - head.y;
+    const dx = fx - headCx;
+    const dy = fy - headCy;
     const d2 = dx * dx + dy * dy;
 
     if (d2 <= eatR2) {
