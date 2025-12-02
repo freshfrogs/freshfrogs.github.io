@@ -299,13 +299,22 @@
     mouse.active = true;
   });
   
-  window.addEventListener("click", () => {
+  window.addEventListener("click", (ev) => {
+    // If the scoreboard overlay is open and we clicked inside it,
+    // don't treat this as a "restart" click.
+    const overlayEl = document.getElementById("frog-scoreboard-overlay");
+    if (overlayEl && overlayEl.contains(ev.target)) {
+      // Let the leaderboard UI handle this click (Prev/Next/etc.)
+      return;
+    }
+
     if (gameOver) {
       restartGame();
       return;
     }
+
     mouse.follow = true;
-  });  
+  });
 
   // --------------------------------------------------
   // HUD
