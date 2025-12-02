@@ -807,6 +807,24 @@
     }
   }
 
+function spawnFrogPromotion(count) {
+  const width  = window.innerWidth;
+  const height = window.innerHeight;
+  const margin = 16;
+
+  const toSpawn = Math.min(count, MAX_FROGS - frogs.length);
+  for (let i = 0; i < toSpawn; i++) {
+    const x = margin + Math.random() * (width - margin * 2 - FROG_SIZE);
+    const y = margin + Math.random() * (height - margin * 2 - FROG_SIZE);
+    const tokenId = randInt(1, MAX_TOKEN_ID);
+    const frog = createFrogAt(x, y, tokenId);
+
+    // Give each spawned frog a random permanent role
+    grantRandomPermaFrogUpgrade(frog);
+    refreshFrogPermaGlow(frog);
+  }
+}
+
   function markGhostFrog(frog) {
     if (!frog) return;
     frog.isGhost = true;
@@ -906,52 +924,90 @@ function getJumpFactor(frog) {
     return Math.max(0, Math.min(maxResist, extraSegments * RESIST_PER_SEGMENT));
   }
 
-  // per-frog permanent upgrades
-  function grantChampionFrog(frog) {
-    if (frog.isChampion) return;
-    frog.isChampion = true;
-    frog.speedMult *= 0.85;
-    frog.jumpMult  *= 1.25;
-    refreshFrogPermaGlow(frog);
-    playPerFrogUpgradeSound("champion");
-  }
+function grantChampionFrog(frog) {
+  if (frog.isChampion) return;
+  frog.isChampion = true;
+  frog.speedMult *= 0.85;
+  frog.jumpMult  *= 1.25;
+  refreshFrogPermaGlow(frog);
+  updateFrogRoleEmoji(frog);
+  playPerFrogUpgradeSound("champion");
+}
 
-  function grantAuraFrog(frog) {
-    if (frog.isAura) return;
-    frog.isAura = true;
-    refreshFrogPermaGlow(frog);
-    playPerFrogUpgradeSound("aura");
-  }
+function grantAuraFrog(frog) {
+  if (frog.isAura) return;
+  frog.isAura = true;
+  refreshFrogPermaGlow(frog);
+  updateFrogRoleEmoji(frog);
+  playPerFrogUpgradeSound("aura");
+}
 
-  function grantShieldFrog(frog) {
-    if (!frog) return;
-    frog.hasPermaShield = true;
-    frog.shieldGrantedAt = elapsedTime;  // start 40s timer from now
-    refreshFrogPermaGlow(frog);
-    playPerFrogUpgradeSound("shield");
-  }
+function grantShieldFrog(frog) {
+  if (!frog) return;
+  frog.hasPermaShield = true;
+  frog.shieldGrantedAt = elapsedTime;  // start 40s timer from now
+  refreshFrogPermaGlow(frog);
+  updateFrogRoleEmoji(frog);
+  playPerFrogUpgradeSound("shield");
+}
 
+function grantMagnetFrog(frog) {
+  if (frog.isMagnet) return;
+  frog.isMagnet = true;
+  refreshFrogPermaGlow(frog);
+  updateFrogRoleEmoji(frog);
+  playPerFrogUpgradeSound("magnet");
+}
 
-  function grantMagnetFrog(frog) {
-    if (frog.isMagnet) return;
-    frog.isMagnet = true;
-    refreshFrogPermaGlow(frog);
-    playPerFrogUpgradeSound("magnet");
-  }
+function grantLuckyFrog(frog) {
+  if (frog.isLucky) return;
+  frog.isLucky = true;
+  refreshFrogPermaGlow(frog);
+  updateFrogRoleEmoji(frog);
+  playPerFrogUpgradeSound("lucky");
+}
 
-  function grantLuckyFrog(frog) {
-    if (frog.isLucky) return;
-    frog.isLucky = true;
-    refreshFrogPermaGlow(frog);
-    playPerFrogUpgradeSound("lucky");
-  }
+function grantZombieFrog(frog) {
+  if (frog.isZombie) return;
+  frog.isZombie = true;
+  refreshFrogPermaGlow(frog);
+  updateFrogRoleEmoji(frog);
+  playPerFrogUpgradeSound("zombie");
+}
 
-  function grantZombieFrog(frog) {
-    if (frog.isZombie) return;
-    frog.isZombie = true;
-    refreshFrogPermaGlow(frog);
-    playPerFrogUpgradeSound("zombie");
+function updateFrogRoleEmoji(frog) {
+  if (!frog || !frog.el) return;
+
+  // Remove previous badge, if any
+  if (frog.cannibalIcon && frog.cannibalIcon.parentNode === frog.el) {
+    frog.el.removeChild(frog.cannibalIcon);
   }
+  frog.cannibalIcon = null;
+
+  const emojis = [];
+  if (frog.isChampion)     emojis.push("🏅");
+  if (frog.isAura)         emojis.push("🌈");
+  if (frog.hasPermaShield) emojis.push("🛡️");
+  if (frog.isMagnet)       emojis.push("🧲");
+  if (frog.isLucky)        emojis.push("🍀");
+  if (frog.isZombie)       emojis.push("🧟");
+  if (frog.isCannibal)     emojis.push("🦴");
+
+  if (!emojis.length) return;
+
+  const badge = document.createElement("div");
+  badge.className = "frog-role-emoji";
+  badge.textContent = emojis.join("");
+  badge.style.position = "absolute";
+  badge.style.bottom = "-2px";
+  badge.style.right = "-2px";
+  badge.style.fontSize = "11px";
+  badge.style.pointerEvents = "none";
+  badge.style.textShadow = "0 0 2px #000";
+
+  frog.el.appendChild(badge);
+  frog.cannibalIcon = badge;
+}
 
 function grantRandomPermaFrogUpgrade(frog) {
   if (!frog) return;
@@ -984,53 +1040,36 @@ function grantRandomPermaFrogUpgrade(frog) {
   }
 }
 
-  // --------------------------------------------------
-  // SPECIAL ROLES: CANNIBAL & HELPERS
-  // --------------------------------------------------
+// --------------------------------------------------
+// SPECIAL ROLES: CANNIBAL & HELPERS
+// --------------------------------------------------
 
-  function markCannibalFrog(frog) {
-    if (!frog || frog.isCannibal) return;
+function markCannibalFrog(frog) {
+  if (!frog || frog.isCannibal) return;
 
-    frog.isCannibal = true;
+  frog.isCannibal = true;
 
-    // +5% "overall stats": slightly faster cycle + higher jumps
-    frog.speedMult *= 0.95;          // 5% faster hops
-    frog.jumpMult  *= 1.05;          // 5% higher jumps
+  // +5% "overall stats": slightly faster cycle + higher jumps
+  frog.speedMult *= 0.95;          // 5% faster hops
+  frog.jumpMult  *= 1.05;          // 5% higher jumps
 
-    // +5% personal deathrattle
-    frog.extraDeathRattleChance = (frog.extraDeathRattleChance || 0) + 0.05;
+  // +5% personal deathrattle
+  frog.extraDeathRattleChance = (frog.extraDeathRattleChance || 0) + 0.05;
 
-    // Visual bones icon overlay (placeholder asset)
-    const icon = document.createElement("img");
-    icon.src = "assets/images/bones.png";   // placeholder sprite
-    icon.alt = "";
-    icon.style.position = "absolute";
-    icon.style.width = "24px";
-    icon.style.height = "24px";
-    icon.style.right = "-4px";
-    icon.style.top = "-8px";
-    icon.style.imageRendering = "pixelated";
-    icon.style.pointerEvents = "none";
-    frog.el.appendChild(icon);
-    frog.cannibalIcon = icon;
+  cannibalFrogCount++;
+  refreshFrogPermaGlow(frog);
+  updateFrogRoleEmoji(frog);
+}
 
-    cannibalFrogCount++;
-    refreshFrogPermaGlow(frog);
-  }
+function unmarkCannibalFrog(frog) {
+  if (!frog || !frog.isCannibal) return;
 
-  function unmarkCannibalFrog(frog) {
-    if (!frog || !frog.isCannibal) return;
+  frog.isCannibal = false;
+  cannibalFrogCount = Math.max(0, cannibalFrogCount - 1);
+  refreshFrogPermaGlow(frog);
+  updateFrogRoleEmoji(frog);
+}
 
-    frog.isCannibal = false;
-
-    if (frog.cannibalIcon && frog.cannibalIcon.parentNode === frog.el) {
-      frog.el.removeChild(frog.cannibalIcon);
-    }
-    frog.cannibalIcon = null;
-
-    cannibalFrogCount = Math.max(0, cannibalFrogCount - 1);
-    refreshFrogPermaGlow(frog);
-  }
 
   // Spawn a single "random" frog at a random position and return it
   function createRandomFrog() {
@@ -1532,10 +1571,9 @@ function applyBuff(type, frog) {
             victim = candidate;
           }
         }
-
         if (victim) {
-          // 50% chance to actually eat the frog
-          if (Math.random() < 0.33) {
+          // Chance to actually eat the frog (from config, default 10%)
+          if (Math.random() < cannibalEatChance) {
             const idx = frogs.indexOf(victim);
             if (idx !== -1) {
               // Cannibal kill; uses deathrattle logic but no snake growth
@@ -2126,16 +2164,15 @@ function getEpicUpgradeChoices() {
         snakeEggPending = true;
       }
     },
-    // Zombie Horde
     {
-      id: "zombieHorde",
+      id: "frogPromotion",
       label: `
-        🧟🧟🧟 Zombie Horde<br>
-        Summon <span style="color:${epicTitleColor};">3</span> zombie frogs
-        with <span style="color:${epicTitleColor};">50%</span> deathrattle
+        🐸⭐ Frog Promotion<br>
+        Summon <span style="color:${epicTitleColor};">10</span> frogs,<br>
+        each with a random permanent role
       `,
       apply: () => {
-        spawnZombieHorde(3);
+        spawnFrogPromotion(10);
       }
     }
   );
@@ -2764,7 +2801,7 @@ Perma roles stack with global upgrades and orb buffs, making some frogs into min
 💀 <b>Deathrattle</b> – dead frogs have a chance to respawn immediately (common and epic versions stack).<br>
 🏹 <b>Last Stand</b> – your final remaining frog has a strong chance to respawn instead of dying.<br>
 🌌 <b>Orb Collector</b> – every collected orb has a flat chance to spawn an extra frog (one-time pick).<br>
-🧟‍♂️ <b>Zombie Horde (epic)</b> – summons special zombie frogs with boosted deathrattle while they last.<br>
+🐸⭐ <b>Frog Promotion (epic)</b> – summons multiple frogs, each with a random permanent role.<br>
 🍖 <b>Cannibal Frog (epic)</b> – spawns a cannibal frog that eats nearby frogs and buffs global deathrattle while alive.<br>
 💫 <b>Orb Storm / Snake Egg (epic)</b> – high-impact utilities that affect orb spawns or the next snake after a shed.<br><br>
 Synergize permanent upgrades, frog roles, and epic choices to keep the swarm alive deep into later sheds.
@@ -3027,6 +3064,10 @@ function setBuffGuidePage(pageIndex) {
   const luckyScorePer  = (typeof LUCKY_SCORE_BONUS_PER     !== "undefined" ? LUCKY_SCORE_BONUS_PER     : 0.15);
   const zombieSpawnOnDeath = (typeof ZOMBIE_SPAWN_ON_DEATH !== "undefined" ? ZOMBIE_SPAWN_ON_DEATH    : 5);
   const cannibalDeathBonus = (typeof CANNIBAL_DEATHRATTLE_BONUS !== "undefined" ? CANNIBAL_DEATHRATTLE_BONUS : 0.05);
+  const cannibalEatChance  = (typeof CANNIBAL_EAT_CHANCE        !== "undefined" ? CANNIBAL_EAT_CHANCE        : 0.10);
+
+// upgrade factors (safe fallbacks)
+
 
   // upgrade factors (safe fallbacks)
   const frogSpeedUp    = (typeof FROG_SPEED_UPGRADE_FACTOR    !== "undefined" ? FROG_SPEED_UPGRADE_FACTOR    : 0.90);
@@ -3107,7 +3148,7 @@ function setBuffGuidePage(pageIndex) {
     // Page 4 – epic effects & snake rules
     `
 <b>🐍 Epics & snake rules</b><br><br>
-🧟‍♂️ <b>Zombie Horde</b> – summons <span style="color:${neon};">${zombieHordeCount}</span> zombies with ≈ <span style="color:${neon};">${percentFromBonus(zombieHordeDR, 0.50)}</span> deathrattle each; if they respawn, they keep zombie but lose the huge bonus.<br>
+🐸⭐ <b>Frog Promotion</b> – summons <span style="color:${neon};">10</span> frogs, each with a random permanent role.<br>
 🌩️ <b>Orb Storm</b> – drops about <span style="color:${neon};">${orbStormCount}</span> orbs at once, strong with Magnet / Orb Collector builds.<br>
 🥚 <b>Snake Egg</b> – next shed snake only gets speed ×<span style="color:${neon};">${multFromFactor(snakeEggSpeedFact, 1.11)}</span> instead of ×<span style="color:${neon};">${multFromFactor(snakeShedSpeedFact, 1.27)}</span>.<br>
 🧪 <b>Orb specialist</b> – every collected orb always spawns 1 frog; Orb Collector can add extra frogs.<br>
