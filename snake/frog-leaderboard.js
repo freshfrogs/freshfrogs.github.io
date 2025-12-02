@@ -392,89 +392,173 @@
     hr.style.margin = "8px 0 10px 0";
     scoreboardOverlayInner.appendChild(hr);
   
+    // ----- Leaderboard table with pagination (10 per page) -----
+    const PAGE_SIZE = 10;
+    let currentPage = 0;
+    const totalEntries = safeList.length;
+    const totalPages = Math.max(1, Math.ceil(totalEntries / PAGE_SIZE));
+
     const table = document.createElement("table");
     table.style.width = "100%";
     table.style.borderCollapse = "collapse";
     table.style.fontSize = "12px";
-  
+
     const thead = document.createElement("thead");
     const headRow = document.createElement("tr");
-  
+
     const thRank = document.createElement("th");
     const thName = document.createElement("th");
     const thTime = document.createElement("th");
     const thScore = document.createElement("th");
-  
+
     thRank.textContent = "#";
     thName.textContent = "Name";
     thTime.textContent = "Time";
     thScore.textContent = "Score";
-  
+
     for (const th of [thRank, thName, thTime, thScore]) {
       th.style.borderBottom = "1px solid #444";
       th.style.padding = "2px 4px";
       th.style.textAlign = "left";
       th.style.fontWeight = "bold";
     }
-  
+
     headRow.appendChild(thRank);
     headRow.appendChild(thName);
     headRow.appendChild(thTime);
     headRow.appendChild(thScore);
     thead.appendChild(headRow);
     table.appendChild(thead);
-  
+
     const tbody = document.createElement("tbody");
-  
-    if (safeList.length > 0) {
-      for (let i = 0; i < safeList.length; i++) {
-        const entry = safeList[i] || {};
+    table.appendChild(tbody);
+    scoreboardOverlayInner.appendChild(table);
+
+    // Pagination controls
+    const pager = document.createElement("div");
+    pager.style.display = "flex";
+    pager.style.alignItems = "center";
+    pager.style.justifyContent = "space-between";
+    pager.style.marginTop = "6px";
+    pager.style.fontSize = "11px";
+
+    const prevBtn = document.createElement("button");
+    prevBtn.textContent = "◀ Prev";
+    prevBtn.style.padding = "2px 6px";
+    prevBtn.style.background = "#222";
+    prevBtn.style.border = "1px solid #444";
+    prevBtn.style.color = "#eee";
+    prevBtn.style.borderRadius = "3px";
+    prevBtn.style.cursor = "pointer";
+
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "Next ▶";
+    nextBtn.style.padding = "2px 6px";
+    nextBtn.style.background = "#222";
+    nextBtn.style.border = "1px solid #444";
+    nextBtn.style.color = "#eee";
+    nextBtn.style.borderRadius = "3px";
+    nextBtn.style.cursor = "pointer";
+
+    const pageInfo = document.createElement("div");
+    pageInfo.style.flex = "1";
+    pageInfo.style.textAlign = "center";
+    pageInfo.style.opacity = "0.85";
+
+    pager.appendChild(prevBtn);
+    pager.appendChild(pageInfo);
+    pager.appendChild(nextBtn);
+    scoreboardOverlayInner.appendChild(pager);
+
+    function renderPage() {
+      tbody.innerHTML = "";
+
+      if (totalEntries === 0) {
         const tr = document.createElement("tr");
-  
+        const td = document.createElement("td");
+        td.colSpan = 4;
+        td.textContent = "No scores yet.";
+        td.style.padding = "4px";
+        td.style.textAlign = "center";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+
+        pageInfo.textContent = "No entries";
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        prevBtn.style.opacity = "0.4";
+        nextBtn.style.opacity = "0.4";
+        return;
+      }
+
+      const startIndex = currentPage * PAGE_SIZE;
+      const endIndex = Math.min(startIndex + PAGE_SIZE, totalEntries);
+
+      for (let i = startIndex; i < endIndex; i++) {
+        const e = safeList[i];
+        if (!e) continue;
+
+        const rank = i + 1; // global rank
+        const name = getDisplayName(e, `Frog #${rank}`);
+        const score = getEntryScore(e);
+        const time = getEntryTime(e);
+
+        const tr = document.createElement("tr");
+
         const rankCell = document.createElement("td");
         const nameCell = document.createElement("td");
         const timeCell = document.createElement("td");
         const scoreCell = document.createElement("td");
-  
-        const rank = i + 1;
-        const name = getDisplayName(entry, `Player ${rank}`);
-        const score = getEntryScore(entry);
-        const time = getEntryTime(entry);
-  
-        rankCell.textContent = String(rank);
+
+        rankCell.textContent = rank;
         nameCell.textContent = name;
         timeCell.textContent = formatTime(time);
-        scoreCell.textContent = String(Math.floor(score));
-  
+        scoreCell.textContent = Math.floor(score);
+
         for (const td of [rankCell, nameCell, timeCell, scoreCell]) {
           td.style.padding = "2px 4px";
           td.style.borderBottom = "1px solid #222";
         }
-  
+
+        // Highlight "you" if this is your entry
         if (i === myIndex) {
           nameCell.style.color = "#ffd700";
           nameCell.style.fontWeight = "bold";
         }
-  
+
         tr.appendChild(rankCell);
         tr.appendChild(nameCell);
         tr.appendChild(timeCell);
         tr.appendChild(scoreCell);
         tbody.appendChild(tr);
       }
-    } else {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = 4;
-      td.textContent = "No scores yet.";
-      td.style.padding = "4px";
-      td.style.textAlign = "center";
-      tr.appendChild(td);
-      tbody.appendChild(tr);
+
+      const fromNum = startIndex + 1;
+      const toNum = endIndex;
+      pageInfo.textContent = `Showing ${fromNum}–${toNum} of ${totalEntries}`;
+
+      prevBtn.disabled = currentPage === 0;
+      nextBtn.disabled = currentPage >= totalPages - 1;
+      prevBtn.style.opacity = prevBtn.disabled ? "0.4" : "1.0";
+      nextBtn.style.opacity = nextBtn.disabled ? "0.4" : "1.0";
     }
-  
-    table.appendChild(tbody);
-    scoreboardOverlayInner.appendChild(table);
+
+    prevBtn.addEventListener("click", () => {
+      if (currentPage > 0) {
+        currentPage--;
+        renderPage();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentPage < totalPages - 1) {
+        currentPage++;
+        renderPage();
+      }
+    });
+
+    // Initial render
+    renderPage();
   
     // ---- Run stats block (uses finalStats if provided) ----
     if (finalStats && typeof finalStats === "object") {
