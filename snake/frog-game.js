@@ -208,6 +208,10 @@
   // Snake shedding every 5 minutes
   const SHED_INTERVAL = 300; // 5 minutes
 
+  // How many sheds a single snake can go through before we respawn a fresh one
+  const SNAKE_MAX_SHEDS_PER_SNAKE = 3;
+
+
   let legendaryEventTriggered = false;
 
   let infoOverlay = null;
@@ -224,8 +228,9 @@
 
   // Shed state
   let snakeShedStage   = 0;          // 0 = base, 1 = yellow, 2 = orange, 3+ = red
-  let snakeShedCount   = 0;          // how many times we've shed this run
+  let snakeShedCount   = 0;          // how many times we've shed this run (total)
   let nextShedTime     = SHED_INTERVAL;
+  let currentSnakeShedCount = 0;     // sheds for the current snake only
 
   let snakeEggPending = false; // EPIC: next shed uses reduced speed bonus
   let epicChainPending = false;
@@ -3647,9 +3652,27 @@ function populateUpgradeOverlayChoices(mode) {
         //
         if (elapsedTime >= nextShedTime) {
           snakeShedCount += 1;
-          // Stage 1 = yellow, 2 = orange, 3+ = red
-          const stage = Math.min(snakeShedCount, 3);
-          snakeShed(stage);
+          currentSnakeShedCount += 1;
+
+          if (currentSnakeShedCount >= SNAKE_MAX_SHEDS_PER_SNAKE) {
+            // This snake reached its shed cap (e.g. ~20 minutes of sheds).
+            // Instead of shedding again, spawn a fresh snake like at the start.
+            currentSnakeShedCount = 0;
+
+            // Reset snake-only permanent factors so it really feels like a new snake.
+            snakePermanentSpeedFactor = 1.0;
+            snakeTurnRate             = SNAKE_TURN_RATE_BASE;
+            snakeShedStage            = 0;
+
+            const width  = window.innerWidth;
+            const height = window.innerHeight;
+            initSnake(width, height);
+          } else {
+            // Stage 1 = yellow, 2 = orange, 3+ = red
+            const stage = Math.min(currentSnakeShedCount, 3);
+            snakeShed(stage);
+          }
+
           nextShedTime += SHED_INTERVAL;
         }
 
