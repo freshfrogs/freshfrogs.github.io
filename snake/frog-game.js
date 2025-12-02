@@ -2260,7 +2260,7 @@ function getUpgradeChoices() {
     upgrades.push({
       id: "frogJump",
       label: `
-        🦘Higher Hops<br>
+        🦘 Higher Hops<br>
         +<span style="color:${neon};">${jumpPerPickPct}%</span> jump height (stacks)
       `,
       apply: () => {
