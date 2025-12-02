@@ -19,9 +19,8 @@
   // PLAYER TAG CONFIG (client-side only)
   // --------------------------------------------------
   const TAG_STORAGE_KEY   = "frogSnake_username";
-  const TAG_PROMPTED_KEY  = "frogSnake_tagPrompted";
   const TAG_MIN_LENGTH    = 2;
-  const TAG_MAX_LENGTH    = 20;
+  const TAG_MAX_LENGTH    = 12;
 
   // Simple profanity filter (client-side only)
   const PROFANE_TAG_SUBSTRINGS = [
@@ -434,24 +433,21 @@
       findMyIndexInList(safeList, lastScore, lastTime);
     let summary = null;
 
-    // ---- Optional player tag input (only once per browser) ----
+    // ---- Optional player tag input (show whenever there is no saved tag) ----
     (function setupTagInput() {
       let storedTag = null;
-      let alreadyPrompted = false;
 
       try {
         if (typeof localStorage !== "undefined") {
           storedTag = localStorage.getItem(TAG_STORAGE_KEY);
           if (storedTag) storedTag = storedTag.trim();
-          alreadyPrompted = localStorage.getItem(TAG_PROMPTED_KEY) === "1";
         }
       } catch (e) {
         // ignore
       }
 
-      // If we already have a saved tag or the user has previously declined,
-      // don't show the input again.
-      if (storedTag || alreadyPrompted) {
+      // If we already have a saved tag, don't show the input
+      if (storedTag) {
         return;
       }
 
@@ -515,15 +511,10 @@
 
       scoreboardOverlayInner.appendChild(tagBox);
 
-      function finish(tagValue, markPrompted) {
+      function finish(tagValue) {
         try {
-          if (typeof localStorage !== "undefined") {
-            if (markPrompted) {
-              localStorage.setItem(TAG_PROMPTED_KEY, "1");
-            }
-            if (tagValue) {
-              localStorage.setItem(TAG_STORAGE_KEY, tagValue);
-            }
+          if (typeof localStorage !== "undefined" && tagValue) {
+            localStorage.setItem(TAG_STORAGE_KEY, tagValue);
           }
         } catch (e) {
           // ignore
@@ -582,14 +573,16 @@
           return;
         }
         error.textContent = "";
-        finish(raw, true);
+        finish(raw);
       });
 
+      // Skip: just hide for this run; will show again next run if no tag saved
       skipBtn.addEventListener("click", () => {
         error.textContent = "";
-        finish(null, true);
+        tagBox.style.display = "none";
       });
     })();
+
 
     const myName = getDisplayName(myEntry, "You");
 
