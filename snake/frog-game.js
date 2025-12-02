@@ -80,8 +80,8 @@
 
   // How strong each buff is
   const SPEED_BUFF_FACTOR        = 0.80;  // frogs act 2× faster (0.5 = half their cycle)
-  const PANIC_HOP_SPEED_FACTOR   = 0.60;  // panic hop speed factor
-  const JUMP_BUFF_FACTOR         = 3.00;  // jump buff height multiplier
+  const PANIC_HOP_SPEED_FACTOR   = 0.80;  // panic hop speed factor
+  const JUMP_BUFF_FACTOR         = 2.00;  // jump buff height multiplier
 
   // Snake speed + Lucky config
   const SNAKE_SLOW_FACTOR      = 0.6;  // snake slow buff → 50% speed
@@ -106,7 +106,7 @@
 
   // Normal upgrade multipliers
   const FROG_SPEED_UPGRADE_FACTOR     = 0.90; // ~15% faster hops each pick
-  const FROG_JUMP_UPGRADE_FACTOR      = 1.30; // ~70% higher jumps each pick
+  const FROG_JUMP_UPGRADE_FACTOR      = 1.25; // ~70% higher jumps each pick
   const BUFF_DURATION_UPGRADE_FACTOR  = 1.10; // +20% buff duration each pick
   const ORB_INTERVAL_UPGRADE_FACTOR   = 0.85; // ~15% faster orb spawns each pick
   const ORB_COLLECTOR_CHANCE = 0.20;
@@ -114,9 +114,9 @@
 
   // --- HARD CAPS for permanent upgrades / buffs ---
   // Frogs can't be faster than 50% of the original hop cycle
-  const MIN_FROG_SPEED_FACTOR         = 0.50;
-  const MAX_FROG_JUMP_FACTOR          = 3.0;
-  const MAX_BUFF_DURATION_FACTOR      = 3.5;
+  const MIN_FROG_SPEED_FACTOR         = 0.60;
+  const MAX_FROG_JUMP_FACTOR          = 2.00;
+  const MAX_BUFF_DURATION_FACTOR      = 2.00;
   const MIN_ORB_SPAWN_INTERVAL_FACTOR = 0.40;
   const MAX_DEATHRATTLE_CHANCE        = 0.45;
   const MAX_ORB_COLLECTOR_TOTAL       = 1.0;
