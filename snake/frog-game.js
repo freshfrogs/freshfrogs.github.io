@@ -2243,8 +2243,8 @@ function getUpgradeChoices() {
     upgrades.push({
       id: "frogSpeed",
       label: `
-        ⏩ Frogs hop faster<br>
-        ~<span style="color:${neon};">${speedPerPickPct}%</span> faster hop cycle (stacks)
+        💨 Quicker Hops<br>
+        Frogs hop ~<span style="color:${neon};">${speedPerPickPct}%</span> faster (stacks)
       `,
       apply: () => {
         frogPermanentSpeedFactor *= FROG_SPEED_UPGRADE_FACTOR;
@@ -2260,7 +2260,7 @@ function getUpgradeChoices() {
     upgrades.push({
       id: "frogJump",
       label: `
-        🦘⬆️ Frogs hop higher<br>
+        🦘Higher Hops<br>
         +<span style="color:${neon};">${jumpPerPickPct}%</span> jump height (stacks)
       `,
       apply: () => {
