@@ -683,7 +683,7 @@
     if (frog.isMagnet)        glows.push("0 0 10px rgba(173,255,47,0.9)");
     if (frog.isLucky)         glows.push("0 0 10px rgba(255,105,180,0.9)");
     if (frog.isZombie)        glows.push("0 0 10px rgba(148,0,211,0.9)");
-    if (frog.isCannibal)      glows.push("0 0 12px rgba(255,69,0,0.95)"); // NEW
+    //if (frog.isCannibal)      glows.push("0 0 12px rgba(255,69,0,0.95)"); // NEW
     frog.el.style.boxShadow = glows.join(", ");
   }
 
@@ -1025,7 +1025,7 @@ function updateFrogRoleEmoji(frog) {
 
 function grantRandomPermaFrogUpgrade(frog) {
   if (!frog) return;
-  const roles = ["champion", "aura", "shield", "magnet", "lucky", "zombie", "cannibal"];
+  const roles = ["champion", "aura", "shield", "magnet", "lucky", "zombie"];
 
   const available = roles.filter((r) => {
     switch (r) {
@@ -1035,7 +1035,6 @@ function grantRandomPermaFrogUpgrade(frog) {
       case "magnet":   return !frog.isMagnet;
       case "lucky":    return !frog.isLucky;
       case "zombie":   return !frog.isZombie;
-      case "cannibal": return !frog.isCannibal;
       default:         return true;
     }
   });
@@ -1050,7 +1049,6 @@ function grantRandomPermaFrogUpgrade(frog) {
     case "magnet":   grantMagnetFrog(frog);     break;
     case "lucky":    grantLuckyFrog(frog);      break;
     case "zombie":   grantZombieFrog(frog);     break;
-    case "cannibal": markCannibalFrog(frog);    break;
   }
 }
 
