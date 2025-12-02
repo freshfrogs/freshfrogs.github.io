@@ -462,7 +462,7 @@
     headEl.style.backgroundRepeat = "no-repeat";
     headEl.style.pointerEvents = "none";
     headEl.style.zIndex = "30";
-    headEl.style.backgroundImage = "url(https://freshfrogs.github.io/snakeassets/images/head.png)";
+    headEl.style.backgroundImage = "url(https://freshfrogs.github.io/snake/images/head.png)";
     container.appendChild(headEl);
 
     // Create new segments
@@ -480,8 +480,8 @@
       segEl.style.pointerEvents = "none";
       segEl.style.zIndex = "29";
       segEl.style.backgroundImage = isTail
-        ? "url(https://freshfrogs.github.io/snakeassets/images/tail.png)"
-        : "url(https://freshfrogs.github.io/snakeassets/images/body.png)";
+        ? "url(https://freshfrogs.github.io/snake/images/tail.png)"
+        : "url(https://freshfrogs.github.io/snake/images/body.png)";
       container.appendChild(segEl);
 
       segments.push({ el: segEl, x: startX, y: startY });
@@ -1631,7 +1631,7 @@ function applyBuff(type, frog) {
     el.style.zIndex = "20";
 
     // orb.gif in center
-    el.style.backgroundImage = "url(https://freshfrogs.github.io/snake/assets/images/orb.gif)";
+    el.style.backgroundImage = "url(https://freshfrogs.github.io/snake/images/orb.gif)";
     el.style.backgroundSize = "contain";
     el.style.backgroundRepeat = "no-repeat";
     el.style.backgroundPosition = "center";
@@ -1817,7 +1817,7 @@ function applyBuff(type, frog) {
     headEl.style.backgroundRepeat = "no-repeat";
     headEl.style.pointerEvents = "none";
     headEl.style.zIndex = "30";
-    headEl.style.backgroundImage = "url(https://freshfrogs.github.io/snakeassets/images/head.png)";
+    headEl.style.backgroundImage = "url(https://freshfrogs.github.io/snake/images/head.png)";
     container.appendChild(headEl);
 
     const segments = [];
@@ -1834,8 +1834,8 @@ function applyBuff(type, frog) {
       segEl.style.pointerEvents = "none";
       segEl.style.zIndex = "29";
       segEl.style.backgroundImage = isTail
-        ? "url(https://freshfrogs.github.io/snakeassets/images/tail.png)"
-        : "url(https://freshfrogs.github.io/snakeassets/images/body.png)";
+        ? "url(https://freshfrogs.github.io/snake/images/tail.png)"
+        : "url(https://freshfrogs.github.io/snake/images/body.png)";
       container.appendChild(segEl);
 
       segments.push({ el: segEl, x: startX, y: startY });
@@ -1884,7 +1884,7 @@ function growSnake(extraSegments) {
     segEl.style.backgroundRepeat = "no-repeat";
     segEl.style.pointerEvents = "none";
     segEl.style.zIndex = "29";
-    segEl.style.backgroundImage = "url(https://freshfrogs.github.io/snakeassets/images/body.png)";
+    segEl.style.backgroundImage = "url(https://freshfrogs.github.io/snake/images/body.png)";
     container.appendChild(segEl);
 
     snake.segments.splice(tailIndex, 0, {
