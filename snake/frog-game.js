@@ -44,7 +44,7 @@
   const SNAKE_TURN_RATE     = Math.PI * 0.75;
   const SNAKE_SEGMENT_GAP   = 48;
   const SNAKE_INITIAL_SEGMENTS = 6;
-  const SNAKE_EAT_RADIUS_BASE = 40;
+  const SNAKE_EAT_RADIUS_BASE = 32;
 
   const SNAKE_EGG_BUFF_PCT = 1.18;
 
