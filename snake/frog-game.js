@@ -40,13 +40,13 @@
   // SNAKE CONSTANTS
   // --------------------------------------------------
   const SNAKE_SEGMENT_SIZE  = 64;
-  const SNAKE_BASE_SPEED    = 85;
+  const SNAKE_BASE_SPEED    = 90;
   const SNAKE_TURN_RATE     = Math.PI * 0.75;
   const SNAKE_SEGMENT_GAP   = 48;
   const SNAKE_INITIAL_SEGMENTS = 6;
   const SNAKE_EAT_RADIUS_BASE = 48;
 
-  const SNAKE_EGG_BUFF_PCT = 1.18;
+  const SNAKE_EGG_BUFF_PCT = 1.11;
 
   // Base turn rate and cap
   const SNAKE_TURN_RATE_BASE = Math.PI * 0.75;
@@ -113,7 +113,7 @@
   const MIN_ORB_SPAWN_INTERVAL_FACTOR = 0.40;
   const MAX_DEATHRATTLE_CHANCE        = 0.45;
   const MAX_ORB_COLLECTOR_TOTAL       = 1.0;
-  const SNAKE_SHED_SPEEDUP = 1.27;
+  const SNAKE_SHED_SPEEDUP = 1.20;
 
   const MAX_SNAKE_SEGMENTS = 150;
   const CANNIBAL_ROLE_CHANCE = 0.05;
