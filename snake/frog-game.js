@@ -3136,7 +3136,6 @@ function setBuffGuidePage(pageIndex) {
 🧲 <b>Magnet</b> – orbs within ~<span style="color:${neon};">220px</span> are pulled to this frog.<br>
 🍀 <b>Lucky</b> – buffs last ≈ <span style="color:${neon};">${multFromFactor(luckyDurBoost, 1.5)}</span> longer and each Lucky frog adds ≈ <span style="color:${neon};">${percentFromBonus(luckyScorePer, 0.15)}</span> score rate.<br>
 🧟 <b>Zombie</b> – on death, spawns <span style="color:${neon};">${zombieSpawnOnDeath}</span> frogs and often slows the snake briefly.<br>
-💀 <b>Cannibal</b> – eats frogs but adds ≈ <span style="color:${neon};">${percentFromBonus(cannibalDeathBonus, 0.05)}</span> global deathrattle per cannibal; sometimes “spares” a victim and rerolls its role.<br>
 `,
 
     // Page 3 – global upgrades
