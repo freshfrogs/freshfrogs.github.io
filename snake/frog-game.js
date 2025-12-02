@@ -1020,7 +1020,7 @@ function updateFrogRoleEmoji(frog) {
 
 function grantRandomPermaFrogUpgrade(frog) {
   if (!frog) return;
-  const roles = ["champion", "aura", "shield", "magnet", "lucky", "zombie", "cannibal"];
+  const roles = ["champion", "aura", "shield", "magnet", "lucky", "zombie"];
 
   const available = roles.filter((r) => {
     switch (r) {
@@ -1030,7 +1030,6 @@ function grantRandomPermaFrogUpgrade(frog) {
       case "magnet":   return !frog.isMagnet;
       case "lucky":    return !frog.isLucky;
       case "zombie":   return !frog.isZombie;
-      case "cannibal": return !frog.isCannibal;
       default:         return true;
     }
   });
@@ -1045,7 +1044,6 @@ function grantRandomPermaFrogUpgrade(frog) {
     case "magnet":   grantMagnetFrog(frog);     break;
     case "lucky":    grantLuckyFrog(frog);      break;
     case "zombie":   grantZombieFrog(frog);     break;
-    case "cannibal": markCannibalFrog(frog);    break;
   }
 }
 
@@ -2177,11 +2175,11 @@ function getEpicUpgradeChoices() {
       id: "frogPromotion",
       label: `
         🐸⭐ Frog Promotion<br>
-        Summon <span style="color:${epicTitleColor};">10</span> frogs,<br>
+        Summon <span style="color:${epicTitleColor};">7</span> frogs,<br>
         each with a random permanent role
       `,
       apply: () => {
-        spawnFrogPromotion(10);
+        spawnFrogPromotion(7);
       }
     }
   );
