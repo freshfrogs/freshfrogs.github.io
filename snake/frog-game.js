@@ -209,7 +209,7 @@
   const SHED_INTERVAL = 300; // 5 minutes
 
   // How many sheds a single snake can go through before we respawn a fresh one
-  const SNAKE_MAX_SHEDS_PER_SNAKE = 10;
+  const SNAKE_MAX_SHEDS_PER_SNAKE = 20;
 
 
   let legendaryEventTriggered = false;
