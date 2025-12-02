@@ -2553,6 +2553,7 @@ function ensureHowToOverlay() {
   panel.appendChild(btnRow);
 
   // Bottom line: site link (only if NOT already on freshfrogs.github.io/snake)
+  /*
   try {
     const loc = window.location;
     const isMainSnakePage =
@@ -2576,6 +2577,7 @@ function ensureHowToOverlay() {
   } catch (e) {
     // If something weird happens with window.location, just skip the link.
   }
+  */
 
   howToOverlay.appendChild(panel);
   container.appendChild(howToOverlay);
