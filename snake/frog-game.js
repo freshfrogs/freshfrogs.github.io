@@ -92,7 +92,7 @@
   const AURA_SPEED_FACTOR        = 0.80;
   const LUCKY_SCORE_BONUS_PER    = 0.15; // +10% per Lucky frog
   
-
+  const CANNIBAL_EAT_CHANCE = 0.10;
 
   // --------------------------------------------------
   // UPGRADE CONFIG (permanent choices)
@@ -1573,7 +1573,7 @@ function applyBuff(type, frog) {
         }
         if (victim) {
           // Chance to actually eat the frog (from config, default 10%)
-          if (Math.random() < cannibalEatChance) {
+          if (Math.random() < CANNIBAL_EAT_CHANCE) {
             const idx = frogs.indexOf(victim);
             if (idx !== -1) {
               // Cannibal kill; uses deathrattle logic but no snake growth
