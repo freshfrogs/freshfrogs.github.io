@@ -3089,8 +3089,6 @@ function ensureBuffGuideOverlay() {
     <span style="color:${neon};">${luckyDurBoostPct}</span> longer, and each Lucky frog adds
     roughly <span style="color:${neon};">${luckyScoreBonusPct}</span> to your score rate.<br>
   🧟 <b>Zombie</b> – on death, spawns extra frogs and usually slows the snake briefly.<br>
-  🦴 <b>Cannibal</b> (epic role) – moves slightly faster and has an extra deathrattle bump
-    while it roams around eating nearby frogs.<br>
   `,
 
       // ------------------------------------------------------------------
