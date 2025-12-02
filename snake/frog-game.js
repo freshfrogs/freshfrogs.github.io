@@ -16,6 +16,7 @@
   const playBuffSound            = AudioMod.playBuffSound            || function(){};
   const playPermanentChoiceSound = AudioMod.playPermanentChoiceSound || function(){};
   const playPerFrogUpgradeSound  = AudioMod.playPerFrogUpgradeSound  || function(){};
+  const playButtonClick          = AudioMod.playButtonClick          || function(){};
 
   const LMod = window.FrogGameLeaderboard || {};
   const initLeaderboard        = LMod.initLeaderboard        || function(){};
@@ -2453,6 +2454,7 @@ function ensureHowToOverlay() {
   startBtn.onmouseenter = () => { startBtn.style.background = "#333"; };
   startBtn.onmouseleave = () => { startBtn.style.background = "#222"; };
   startBtn.onclick = () => {
+    playButtonClick();
     hasShownHowToOverlay = true;
     if (howToOverlay) {
       howToOverlay.style.display = "none";
@@ -2474,6 +2476,7 @@ function ensureHowToOverlay() {
   learnBtn.onmouseenter = () => { learnBtn.style.background = "#333"; };
   learnBtn.onmouseleave = () => { learnBtn.style.background = "#222"; };
   learnBtn.onclick = () => {
+    playButtonClick();
     ensureBuffGuideOverlay();
     openBuffGuideOverlay();
   };
@@ -2574,7 +2577,10 @@ function ensureInfoOverlay() {
   prevBtn.style.cursor = "pointer";
   prevBtn.onmouseenter = () => { prevBtn.style.background = "#333"; };
   prevBtn.onmouseleave = () => { prevBtn.style.background = "#222"; };
-  prevBtn.onclick = () => setInfoPage(infoPage - 1);
+    prevBtn.onclick = () => {
+    playButtonClick();
+    setInfoPage(infoPage - 1);
+  };
   infoPrevBtn = prevBtn;
 
   const nextBtn = document.createElement("button");
@@ -2589,7 +2595,10 @@ function ensureInfoOverlay() {
   nextBtn.style.cursor = "pointer";
   nextBtn.onmouseenter = () => { nextBtn.style.background = "#333"; };
   nextBtn.onmouseleave = () => { nextBtn.style.background = "#222"; };
-  nextBtn.onclick = () => setInfoPage(infoPage + 1);
+    nextBtn.onclick = () => {
+    playButtonClick();
+    setInfoPage(infoPage + 1);
+  };
   infoNextBtn = nextBtn;
 
   leftBtns.appendChild(prevBtn);
@@ -2607,7 +2616,10 @@ function ensureInfoOverlay() {
   closeBtn.style.cursor = "pointer";
   closeBtn.onmouseenter = () => { closeBtn.style.background = "#333"; };
   closeBtn.onmouseleave = () => { closeBtn.style.background = "#222"; };
-  closeBtn.onclick = () => closeInfoOverlay();
+  closeBtn.onclick = () => {
+    playButtonClick();
+    closeInfoOverlay();
+  };
 
   navRow.appendChild(leftBtns);
   navRow.appendChild(closeBtn);
@@ -2866,7 +2878,10 @@ function ensureBuffGuideOverlay() {
   prevBtn.style.cursor = "pointer";
   prevBtn.onmouseenter = () => { prevBtn.style.background = "#333"; };
   prevBtn.onmouseleave = () => { prevBtn.style.background = "#222"; };
-  prevBtn.onclick = () => setBuffGuidePage(buffGuidePage - 1);
+  prevBtn.onclick = () => {
+    playButtonClick();
+    setBuffGuidePage(buffGuidePage - 1);
+  };
   buffGuidePrevBtn = prevBtn;
 
   const nextBtn = document.createElement("button");
@@ -2881,7 +2896,10 @@ function ensureBuffGuideOverlay() {
   nextBtn.style.cursor = "pointer";
   nextBtn.onmouseenter = () => { nextBtn.style.background = "#333"; };
   nextBtn.onmouseleave = () => { nextBtn.style.background = "#222"; };
-  nextBtn.onclick = () => setBuffGuidePage(buffGuidePage + 1);
+  nextBtn.onclick = () => {
+    playButtonClick();
+    setBuffGuidePage(buffGuidePage + 1);
+  };
   buffGuideNextBtn = nextBtn;
 
   leftBtns.appendChild(prevBtn);
@@ -2899,7 +2917,10 @@ function ensureBuffGuideOverlay() {
   backBtn.style.cursor = "pointer";
   backBtn.onmouseenter = () => { backBtn.style.background = "#333"; };
   backBtn.onmouseleave = () => { backBtn.style.background = "#222"; };
-  backBtn.onclick = () => closeBuffGuideOverlay();
+  backBtn.onclick = () => {
+    playButtonClick();
+    closeBuffGuideOverlay();
+  };
 
   navRow.appendChild(leftBtns);
   navRow.appendChild(backBtn);
@@ -3270,6 +3291,7 @@ function populateUpgradeOverlayChoices(mode) {
     btn.onmouseenter = () => { btn.style.background = "#333"; };
     btn.onmouseleave = () => { btn.style.background = "#222"; };
     btn.onclick = () => {
+      playButtonClick();
       try {
         onClick();
       } catch (e) {
