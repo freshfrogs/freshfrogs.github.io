@@ -30,10 +30,10 @@
   // BASIC CONSTANTS
   // --------------------------------------------------
   const FROG_SIZE       = 64;
-  const MAX_TOKEN_ID    = 200;
-  const META_BASE       = "../frog/json/";
+  const MAX_TOKEN_ID    = 4040;
+  const META_BASE       = "https://freshfrogs.github.io/frog/json/";
   const META_EXT        = ".json";
-  const BUILD_BASE      = "../frog/build_files";
+  const BUILD_BASE      = "https://freshfrogs.github.io/frog/build_files";
   const STARTING_FROGS  = 50;
   const MAX_FROGS       = 100;
 
@@ -462,7 +462,7 @@
     headEl.style.backgroundRepeat = "no-repeat";
     headEl.style.pointerEvents = "none";
     headEl.style.zIndex = "30";
-    headEl.style.backgroundImage = "url(assets/images/head.png)";
+    headEl.style.backgroundImage = "url(https://freshfrogs.github.io/snake/head.png)";
     container.appendChild(headEl);
 
     // Create new segments
@@ -480,8 +480,8 @@
       segEl.style.pointerEvents = "none";
       segEl.style.zIndex = "29";
       segEl.style.backgroundImage = isTail
-        ? "url(assets/images/tail.png)"
-        : "url(assets/images/body.png)";
+        ? "url(https://freshfrogs.github.io/snake/tail.png)"
+        : "url(https://freshfrogs.github.io/snake/body.png)";
       container.appendChild(segEl);
 
       segments.push({ el: segEl, x: startX, y: startY });
@@ -1002,7 +1002,7 @@ function grantRandomPermaFrogUpgrade(frog) {
 
     // Visual bones icon overlay (placeholder asset)
     const icon = document.createElement("img");
-    icon.src = "assets/images/bones.png";   // placeholder sprite
+    icon.src = "https://freshfrogs.github.io/snake/bones.png";   // placeholder sprite
     icon.alt = "";
     icon.style.position = "absolute";
     icon.style.width = "24px";
@@ -1593,7 +1593,7 @@ function applyBuff(type, frog) {
     el.style.zIndex = "20";
 
     // orb.gif in center
-    el.style.backgroundImage = "url(assets/images/orb.gif)";
+    el.style.backgroundImage = "url(https://freshfrogs.github.io/snake/orb.gif)";
     el.style.backgroundSize = "contain";
     el.style.backgroundRepeat = "no-repeat";
     el.style.backgroundPosition = "center";
@@ -1779,7 +1779,7 @@ function applyBuff(type, frog) {
     headEl.style.backgroundRepeat = "no-repeat";
     headEl.style.pointerEvents = "none";
     headEl.style.zIndex = "30";
-    headEl.style.backgroundImage = "assets/images/head.png";
+    headEl.style.backgroundImage = "url(https://freshfrogs.github.io/snake/head.png)";
     container.appendChild(headEl);
 
     const segments = [];
@@ -1796,8 +1796,8 @@ function applyBuff(type, frog) {
       segEl.style.pointerEvents = "none";
       segEl.style.zIndex = "29";
       segEl.style.backgroundImage = isTail
-        ? "assets/images/tail.png"
-        : "assets/images/body.png";
+        ? "url(https://freshfrogs.github.io/snake/tail.png)"
+        : "url(https://freshfrogs.github.io/snake/body.png)";
       container.appendChild(segEl);
 
       segments.push({ el: segEl, x: startX, y: startY });
@@ -1846,7 +1846,7 @@ function growSnake(extraSegments) {
     segEl.style.backgroundRepeat = "no-repeat";
     segEl.style.pointerEvents = "none";
     segEl.style.zIndex = "29";
-    segEl.style.backgroundImage = "assets/images/body.png";
+    segEl.style.backgroundImage = "url(https://freshfrogs.github.io/snake/body.png)";
     container.appendChild(segEl);
 
     snake.segments.splice(tailIndex, 0, {
