@@ -462,7 +462,7 @@
     headEl.style.backgroundRepeat = "no-repeat";
     headEl.style.pointerEvents = "none";
     headEl.style.zIndex = "30";
-    headEl.style.backgroundImage = "assets/images/head.png";
+    headEl.style.backgroundImage = "url(https://freshfrogs.github.io/snakeassets/images/head.png)";
     container.appendChild(headEl);
 
     // Create new segments
@@ -480,8 +480,8 @@
       segEl.style.pointerEvents = "none";
       segEl.style.zIndex = "29";
       segEl.style.backgroundImage = isTail
-        ? "assets/images/tail.png"
-        : "assets/images/body.png";
+        ? "url(https://freshfrogs.github.io/snakeassets/images/tail.png)"
+        : "url(https://freshfrogs.github.io/snakeassets/images/body.png)";
       container.appendChild(segEl);
 
       segments.push({ el: segEl, x: startX, y: startY });
@@ -1817,7 +1817,7 @@ function applyBuff(type, frog) {
     headEl.style.backgroundRepeat = "no-repeat";
     headEl.style.pointerEvents = "none";
     headEl.style.zIndex = "30";
-    headEl.style.backgroundImage = "assets/images/head.png";
+    headEl.style.backgroundImage = "url(https://freshfrogs.github.io/snakeassets/images/head.png)";
     container.appendChild(headEl);
 
     const segments = [];
@@ -1834,8 +1834,8 @@ function applyBuff(type, frog) {
       segEl.style.pointerEvents = "none";
       segEl.style.zIndex = "29";
       segEl.style.backgroundImage = isTail
-        ? "assets/images/tail.png"
-        : "assets/images/body.png";
+        ? "url(https://freshfrogs.github.io/snakeassets/images/tail.png)"
+        : "url(https://freshfrogs.github.io/snakeassets/images/body.png)";
       container.appendChild(segEl);
 
       segments.push({ el: segEl, x: startX, y: startY });
@@ -1884,7 +1884,7 @@ function growSnake(extraSegments) {
     segEl.style.backgroundRepeat = "no-repeat";
     segEl.style.pointerEvents = "none";
     segEl.style.zIndex = "29";
-    segEl.style.backgroundImage = "assets/images/body.png";
+    segEl.style.backgroundImage = "url(https://freshfrogs.github.io/snakeassets/images/body.png)";
     container.appendChild(segEl);
 
     snake.segments.splice(tailIndex, 0, {
