@@ -22,25 +22,78 @@
   const TAG_MIN_LENGTH    = 2;
   const TAG_MAX_LENGTH    = 12;
 
-  // Simple profanity filter (client-side only)
-  const PROFANE_TAG_SUBSTRINGS = [
+  // Root patterns we want to block after normalization.
+  // (Avoid very short generic roots like "ass" to prevent false positives.)
+  const PROFANE_ROOTS = [
     "fuck",
     "shit",
     "bitch",
     "cunt",
     "asshole",
     "dick",
+    "cock",
+    "pussy",
+    "slut",
+    "whore",
     "bastard",
     "piss",
+    "damn",
     "nigger",
     "faggot",
+    "retard",
+    "kike",
+    "spic",
+    "chink",
   ];
+
+  /**
+   * Normalize a tag for profanity matching:
+   * - lowercase
+   * - convert common leetspeak (0->o, 1->i, @->a, $->s, etc.)
+   * - strip non-alphanumeric chars (spaces, underscores, punctuation)
+   */
+  function normalizeForProfanity(str) {
+    const map = {
+      "0": "o",
+      "1": "i",
+      "2": "z",
+      "3": "e",
+      "4": "a",
+      "5": "s",
+      "6": "g",
+      "7": "t",
+      "8": "b",
+      "9": "g",
+      "@": "a",
+      "$": "s",
+      "!": "i",
+      "+": "t",
+    };
+
+    const lower = String(str).toLowerCase();
+    let out = "";
+    for (let i = 0; i < lower.length; i++) {
+      const ch = lower[i];
+      if (map[ch]) {
+        out += map[ch];
+      } else if (/[a-z0-9]/.test(ch)) {
+        out += ch;
+      } else {
+        // drop spaces, punctuation, emojis, etc.
+      }
+    }
+    return out;
+  }
 
   function isProfaneTag(tag) {
     if (!tag) return false;
-    const lower = String(tag).toLowerCase();
-    for (const bad of PROFANE_TAG_SUBSTRINGS) {
-      if (lower.includes(bad)) return true;
+    const norm = normalizeForProfanity(tag);
+    if (!norm) return false;
+
+    for (const bad of PROFANE_ROOTS) {
+      if (norm.includes(bad)) {
+        return true;
+      }
     }
     return false;
   }
