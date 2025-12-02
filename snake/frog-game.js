@@ -1877,7 +1877,7 @@ function updateSnake(dt, width, height) {
 
   // 🔹 Responsive spacing between segments:
   // smaller gap on mobile, default on desktop
-  const segmentGap = (width <= 768 ? 16 : SNAKE_SEGMENT_GAP);
+  const segmentGap = (width <= 100 ? 16 : SNAKE_SEGMENT_GAP);
 
   // -----------------------------
   // Targeting logic
