@@ -85,8 +85,8 @@
   const SCORE_MULTI_FACTOR       = 2.0;  // score x2
 
   // Aura / champion / lucky
-  const CHAMPION_SPEED_FACTOR    = 0.75;
-  const CHAMPION_JUMP_FACTOR     = 1.35;
+  const CHAMPION_SPEED_FACTOR    = 0.80;
+  const CHAMPION_JUMP_FACTOR     = 1.25;
   const AURA_JUMP_FACTOR         = 1.25;
   const LUCKY_BUFF_DURATION_BOOST = 1.50;
   const AURA_SPEED_FACTOR        = 0.80;
