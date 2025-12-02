@@ -115,7 +115,7 @@
       createPool("frogDeath", "frogDeath.mp3", { poolSize: 3, volume: 0.9, minIntervalMs: 120 });
       createPool("snakeMunch", "munch.mp3",    { poolSize: 4, volume: 0.9, minIntervalMs: 50 });
 
-      createPool("buttonClick", "buttonClick.mp3",    { poolSize: 2, volume: 0.9, minIntervalMs: 120 });
+      createPool("buttonClick", "buttonClick3.mp3",    { poolSize: 2, volume: 0.9, minIntervalMs: 120 });
 
       createPool("orbSpawn1", "orbSpawn.mp3",    { poolSize: 2, volume: 0.9, minIntervalMs: 120 });
       createPool("orbSpawn2", "orbSpawnTwo.mp3", { poolSize: 2, volume: 0.9, minIntervalMs: 120 });
