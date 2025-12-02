@@ -816,23 +816,24 @@
     }
   }
 
-function spawnFrogPromotion(count) {
-  const width  = window.innerWidth;
-  const height = window.innerHeight;
-  const margin = 16;
+  function spawnFrogPromotion(count) {
+    const width  = window.innerWidth;
+    const height = window.innerHeight;
+    const margin = 16;
 
-  const toSpawn = Math.min(count, MAX_FROGS - frogs.length);
-  for (let i = 0; i < toSpawn; i++) {
-    const x = margin + Math.random() * (width - margin * 2 - FROG_SIZE);
-    const y = margin + Math.random() * (height - margin * 2 - FROG_SIZE);
-    const tokenId = randInt(1, MAX_TOKEN_ID);
-    const frog = createFrogAt(x, y, tokenId);
+    const toSpawn = Math.min(count, MAX_FROGS - frogs.length);
+    for (let i = 0; i < toSpawn; i++) {
+      const x = margin + Math.random() * (width - margin * 2 - FROG_SIZE);
+      const y = margin + Math.random() * (height - margin * 2 - FROG_SIZE);
+      const tokenId = randInt(1, MAX_TOKEN_ID);
+      const frog = createFrogAt(x, y, tokenId);
 
-    // Give each spawned frog a random permanent role
-    grantRandomPermaFrogUpgrade(frog);
-    refreshFrogPermaGlow(frog);
+      // Give each spawned frog a random permanent role
+      grantRandomPermaFrogUpgrade(frog);
+      refreshFrogPermaGlow(frog);
+      updateFrogRoleEmoji(frog);  // 🔹 ensure the emoji badge shows up
+    }
   }
-}
 
   function markGhostFrog(frog) {
     if (!frog) return;
