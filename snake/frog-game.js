@@ -2489,7 +2489,8 @@ function ensureHowToOverlay() {
     "Avoid the snake and stay alive as long as possible!",
     "Collect orbs to gain buffs and upgrades.",
     "Beat the high score to get on the leaderboard.",
-    "Control frogs with your mouse."
+    "Control frogs with your mouse.",
+    "Best played in browser at <span style='color: lightgreen'><a href='https://freshfrogs.github.io/snake'>freshfrogs.github.io</a></span>"
   ].forEach(text => {
     const li = document.createElement("li");
     li.textContent = text;
