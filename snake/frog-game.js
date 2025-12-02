@@ -1631,7 +1631,7 @@ function applyBuff(type, frog) {
     el.style.zIndex = "20";
 
     // orb.gif in center
-    el.style.backgroundImage = "url(assets/images/orb.gif)";
+    el.style.backgroundImage = "url(https://freshfrogs.github.io/snake/assets/images/orb.gif)";
     el.style.backgroundSize = "contain";
     el.style.backgroundRepeat = "no-repeat";
     el.style.backgroundPosition = "center";
