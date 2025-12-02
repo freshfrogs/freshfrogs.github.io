@@ -16,6 +16,37 @@
   let lastMyEntry = null;
 
   // --------------------------------------------------
+  // PLAYER TAG CONFIG (client-side only)
+  // --------------------------------------------------
+  const TAG_STORAGE_KEY   = "frogSnake_username";
+  const TAG_PROMPTED_KEY  = "frogSnake_tagPrompted";
+  const TAG_MIN_LENGTH    = 2;
+  const TAG_MAX_LENGTH    = 20;
+
+  // Simple profanity filter (client-side only)
+  const PROFANE_TAG_SUBSTRINGS = [
+    "fuck",
+    "shit",
+    "bitch",
+    "cunt",
+    "asshole",
+    "dick",
+    "bastard",
+    "piss",
+    "nigger",
+    "faggot",
+  ];
+
+  function isProfaneTag(tag) {
+    if (!tag) return false;
+    const lower = String(tag).toLowerCase();
+    for (const bad of PROFANE_TAG_SUBSTRINGS) {
+      if (lower.includes(bad)) return true;
+    }
+    return false;
+  }
+
+  // --------------------------------------------------
   // HELPERS
   // --------------------------------------------------
   function escapeHtml(str) {
@@ -255,22 +286,21 @@
 
   async function submitScoreToServer(score, time, stats, tag) {
     try {
-      let finalTag = tag;
+      let finalTag = null;
 
-      // If the game doesn't pass a tag, fall back to anything we might
-      // already have in localStorage (keeps it compatible with older code).
-      if (
-        (finalTag == null || String(finalTag).trim() === "") &&
-        typeof localStorage !== "undefined"
-      ) {
+      if (typeof tag === "string") {
+        finalTag = tag.trim();
+      }
+
+      // Fallback: if caller didn't pass a tag, try localStorage
+      if (!finalTag && typeof localStorage !== "undefined") {
         try {
-          finalTag =
-            localStorage.getItem("frogSnake_username") ||
-            localStorage.getItem("frogSnake_tag") ||
-            localStorage.getItem("frogSnakeUserTag") ||
-            null;
+          const stored = localStorage.getItem(TAG_STORAGE_KEY);
+          if (stored && stored.trim() !== "") {
+            finalTag = stored.trim();
+          }
         } catch (e) {
-          finalTag = null;
+          // ignore
         }
       }
 
@@ -280,8 +310,8 @@
         stats: stats || null,
       };
 
-      if (finalTag && String(finalTag).trim() !== "") {
-        payload.tag = String(finalTag).trim();
+      if (finalTag && finalTag.length > 0) {
+        payload.tag = finalTag;
       }
 
       const res = await fetch(LEADERBOARD_URL, {
@@ -289,19 +319,24 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
+      
       if (!res.ok) {
         console.warn("Failed to submit score:", res.status, res.statusText);
         return null;
       }
-
-      const data = await res.json();
+      
+      const data = await res.json().catch(() => null);
       if (!data || !Array.isArray(data.entries)) {
         console.warn("Leaderboard response missing entries:", data);
         return null;
       }
 
-      return data.entries;
+      const entries = data.entries;
+      if (data.myEntry) {
+        lastMyEntry = data.myEntry;
+      }
+      
+      return entries;
     } catch (err) {
       console.error("Error submitting score:", err);
       return null;
@@ -397,10 +432,168 @@
   
     const { index: myIndex, entry: myEntry } =
       findMyIndexInList(safeList, lastScore, lastTime);
-  
+    let summary = null;
+
+    // ---- Optional player tag input (only once per browser) ----
+    (function setupTagInput() {
+      let storedTag = null;
+      let alreadyPrompted = false;
+
+      try {
+        if (typeof localStorage !== "undefined") {
+          storedTag = localStorage.getItem(TAG_STORAGE_KEY);
+          if (storedTag) storedTag = storedTag.trim();
+          alreadyPrompted = localStorage.getItem(TAG_PROMPTED_KEY) === "1";
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      // If we already have a saved tag or the user has previously declined,
+      // don't show the input again.
+      if (storedTag || alreadyPrompted) {
+        return;
+      }
+
+      const tagBox = document.createElement("div");
+      tagBox.style.marginBottom = "10px";
+      tagBox.style.fontSize = "12px";
+
+      const label = document.createElement("div");
+      label.textContent =
+        "Choose a player tag to show on the leaderboard (optional):";
+      label.style.marginBottom = "4px";
+      tagBox.appendChild(label);
+
+      const tagInput = document.createElement("input");
+      tagInput.type = "text";
+      tagInput.placeholder = "Example: SwampWizard";
+      tagInput.maxLength = TAG_MAX_LENGTH;
+      tagInput.style.width = "100%";
+      tagInput.style.padding = "4px 6px";
+      tagInput.style.borderRadius = "4px";
+      tagInput.style.border = "1px solid #444";
+      tagInput.style.background = "#000";
+      tagInput.style.color = "#eee";
+      tagInput.style.fontFamily = "inherit";
+      tagInput.style.fontSize = "12px";
+      tagBox.appendChild(tagInput);
+
+      const buttonsRow = document.createElement("div");
+      buttonsRow.style.display = "flex";
+      buttonsRow.style.gap = "6px";
+      buttonsRow.style.marginTop = "6px";
+
+      const saveBtn = document.createElement("button");
+      saveBtn.textContent = "Save tag";
+      saveBtn.style.padding = "2px 6px";
+      saveBtn.style.background = "#222";
+      saveBtn.style.border = "1px solid #444";
+      saveBtn.style.color = "#eee";
+      saveBtn.style.borderRadius = "3px";
+      saveBtn.style.cursor = "pointer";
+
+      const skipBtn = document.createElement("button");
+      skipBtn.textContent = "Skip";
+      skipBtn.style.padding = "2px 6px";
+      skipBtn.style.background = "transparent";
+      skipBtn.style.border = "1px solid #444";
+      skipBtn.style.color = "#aaa";
+      skipBtn.style.borderRadius = "3px";
+      skipBtn.style.cursor = "pointer";
+
+      const error = document.createElement("div");
+      error.style.marginTop = "4px";
+      error.style.fontSize = "11px";
+      error.style.color = "#ff8080";
+      error.style.minHeight = "14px";
+
+      buttonsRow.appendChild(saveBtn);
+      buttonsRow.appendChild(skipBtn);
+      tagBox.appendChild(buttonsRow);
+      tagBox.appendChild(error);
+
+      scoreboardOverlayInner.appendChild(tagBox);
+
+      function finish(tagValue, markPrompted) {
+        try {
+          if (typeof localStorage !== "undefined") {
+            if (markPrompted) {
+              localStorage.setItem(TAG_PROMPTED_KEY, "1");
+            }
+            if (tagValue) {
+              localStorage.setItem(TAG_STORAGE_KEY, tagValue);
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+
+        if (tagValue) {
+          // Update current in-memory entry so the highlight + name use this tag
+          if (myEntry) {
+            myEntry.tag = tagValue;
+          }
+          lastMyEntry = lastMyEntry || {};
+          lastMyEntry.tag = tagValue;
+
+          // Send a lightweight update to the worker so the stored entry
+          // gets this tag as well (score/time only matter for PB logic).
+          const safeScore =
+            typeof lastScore === "number" ? lastScore : getEntryScore(myEntry);
+          const safeTime =
+            typeof lastTime === "number" ? lastTime : getEntryTime(myEntry);
+
+          submitScoreToServer(
+            typeof safeScore === "number" ? safeScore : 0,
+            typeof safeTime === "number" ? safeTime : 0,
+            null,
+            tagValue
+          );
+
+          // Refresh summary text (if it already exists)
+          if (summary) {
+            const newName = getDisplayName(myEntry, "You");
+            summary.innerHTML =
+              "Run summary:<br>" +
+              `<span style="color:#ffd700;font-weight:bold;">${escapeHtml(
+                newName
+              )}</span>` +
+              ` — Time ${formatTime(lastTime)}, Score ${Math.floor(lastScore)}`;
+          }
+        }
+
+        tagBox.style.display = "none";
+      }
+
+      saveBtn.addEventListener("click", () => {
+        const raw = (tagInput.value || "").trim();
+        if (!raw) {
+          error.textContent = "Enter at least 2 characters, or click Skip.";
+          return;
+        }
+        if (raw.length < TAG_MIN_LENGTH || raw.length > TAG_MAX_LENGTH) {
+          error.textContent = `Tag must be ${TAG_MIN_LENGTH}-${TAG_MAX_LENGTH} characters.`;
+          return;
+        }
+        if (isProfaneTag(raw)) {
+          error.textContent =
+            "That tag isn't allowed. Please choose something cleaner.";
+          return;
+        }
+        error.textContent = "";
+        finish(raw, true);
+      });
+
+      skipBtn.addEventListener("click", () => {
+        error.textContent = "";
+        finish(null, true);
+      });
+    })();
+
     const myName = getDisplayName(myEntry, "You");
-  
-    const summary = document.createElement("div");
+
+    summary = document.createElement("div");
     summary.style.marginBottom = "12px";
     summary.style.fontSize = "13px";
     summary.innerHTML =
@@ -410,12 +603,6 @@
       )}</span>` +
       ` — Time ${formatTime(lastTime)}, Score ${Math.floor(lastScore)}`;
     scoreboardOverlayInner.appendChild(summary);
-  
-    const hr = document.createElement("div");
-    hr.style.height = "1px";
-    hr.style.background = "#333";
-    hr.style.margin = "8px 0 10px 0";
-    scoreboardOverlayInner.appendChild(hr);
   
     // ----- Leaderboard table with pagination (10 per page) -----
     const PAGE_SIZE = 10;

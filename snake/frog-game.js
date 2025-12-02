@@ -27,116 +27,21 @@
   const hideScoreboardOverlay  = LMod.hideScoreboardOverlay  || function(){};
 
   // --------------------------------------------------
-  // PLAYER TAG (NAME) CONFIG
+  // PLAYER TAG STORAGE (client-side only)
   // --------------------------------------------------
-  const TAG_STORAGE_KEY   = "frogSnake_username";   // reused in leaderboard helpers
-  const TAG_PROMPTED_KEY  = "frogSnake_tagPrompted";
-  const TAG_MIN_LENGTH    = 2;
-  const TAG_MAX_LENGTH    = 20;
+  const TAG_STORAGE_KEY   = "frogSnake_username";
 
-  // Simple profanity filter (client-side; mirror this in the worker too)
-  const PROFANE_TAG_SUBSTRINGS = [
-    "fuck",
-    "shit",
-    "bitch",
-    "cunt",
-    "asshole",
-    "dick",
-    "bastard",
-    "piss",
-    "nigger",
-    "faggot"
-  ];
-
-  function isProfaneTag(tag) {
-    if (!tag) return false;
-    const lower = String(tag).toLowerCase();
-    for (const bad of PROFANE_TAG_SUBSTRINGS) {
-      if (lower.includes(bad)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Returns the saved player tag if we already have one.
-   * Otherwise, (once) prompts the user to choose one.
-   *
-   * If they cancel or leave it blank, we do NOT save a tag
-   * and we let the worker assign a random one.
-   */
-  function getOrPromptForPlayerTag() {
-    let storage = null;
+  function getSavedPlayerTag() {
     try {
-      storage = window.localStorage;
+      if (typeof localStorage === "undefined") return null;
+      const val = localStorage.getItem(TAG_STORAGE_KEY);
+      if (val && String(val).trim() !== "") {
+        return String(val).trim();
+      }
     } catch (e) {
-      storage = null;
+      // ignore
     }
-
-    // 1) Already have a tag? Just use it.
-    if (storage) {
-      const existing = storage.getItem(TAG_STORAGE_KEY);
-      if (existing && existing.trim() !== "") {
-        return existing.trim();
-      }
-
-      const alreadyPrompted = storage.getItem(TAG_PROMPTED_KEY) === "1";
-      if (alreadyPrompted) {
-        // User was already asked in a previous run and declined.
-        return null;
-      }
-    }
-
-    // 2) Ask the user (only on this first run / until they respond)
-    let chosenTag = null;
-
-    while (true) {
-      const input = window.prompt(
-        "Choose a player tag (2–20 characters).\nLeave blank or press Cancel to stay anonymous.",
-        ""
-      );
-
-      if (input === null) {
-        // Cancel → decline
-        break;
-      }
-
-      const tag = input.trim();
-      if (tag === "") {
-        // Empty → decline
-        break;
-      }
-
-      if (tag.length < TAG_MIN_LENGTH || tag.length > TAG_MAX_LENGTH) {
-        window.alert(
-          `Tag must be between ${TAG_MIN_LENGTH} and ${TAG_MAX_LENGTH} characters.`
-        );
-        continue;
-      }
-
-      if (isProfaneTag(tag)) {
-        window.alert("That tag isn't allowed. Please choose something more family-friendly.");
-        continue;
-      }
-
-      chosenTag = tag;
-      break;
-    }
-
-    // 3) Record that we prompted this browser exactly once.
-    if (storage) {
-      try {
-        storage.setItem(TAG_PROMPTED_KEY, "1");
-        if (chosenTag) {
-          storage.setItem(TAG_STORAGE_KEY, chosenTag);
-        }
-      } catch (e) {
-        // ignore storage errors
-      }
-    }
-
-    return chosenTag;
+    return null;
   }
 
   // --------------------------------------------------
@@ -3555,7 +3460,7 @@ function populateUpgradeOverlayChoices(mode) {
       // Core run results
       score: lastRunScore,
       timeSeconds: lastRunTime,
-
+  
       // Live buff values at the end of the run
       deathrattleChance: frogDeathRattleChance,
       frogSpeedFactor: frogPermanentSpeedFactor,
@@ -3564,7 +3469,7 @@ function populateUpgradeOverlayChoices(mode) {
       orbSpawnIntervalFactor,
       orbCollectorChance,
       orbSpecialistActive,
-
+  
       // Totals for this run
       totalFrogsSpawned,
       //totalOrbsSpawned,
@@ -3573,11 +3478,9 @@ function populateUpgradeOverlayChoices(mode) {
       //totalCannibalEvents,
     };
 
-    // 🔹 Ask for a player tag once per browser BEFORE we submit the score.
-    // If the user cancels or leaves it blank, this returns null and the
-    // worker will keep using / assigning a random tag.
-    const playerTag = getOrPromptForPlayerTag();
-
+    // Grab whatever tag the user has already saved (if any)
+    const playerTag = getSavedPlayerTag();
+  
     (async () => {
       const posted  = await submitScoreToServer(
         lastRunScore,
@@ -3586,14 +3489,13 @@ function populateUpgradeOverlayChoices(mode) {
         playerTag
       );
       const rawList = posted || (await fetchLeaderboard()) || [];
-
-      // Keep top 50 entries
+  
       const topList = rawList.slice(0, 50);
-
+  
       updateMiniLeaderboard(topList);
       openScoreboardOverlay(topList, lastRunScore, lastRunTime, finalStats);
     })();
-
+  
     showGameOver();
   }
 
