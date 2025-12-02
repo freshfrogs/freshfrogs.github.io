@@ -3465,7 +3465,7 @@ function populateUpgradeOverlayChoices(mode) {
     const rawList = posted || (await fetchLeaderboard()) || [];
 
     // ✅ Hard cap: only keep top 10 entries
-    const topList = rawList.slice(0, 30);
+    const topList = rawList.slice(0, 50);
 
     updateMiniLeaderboard(topList);
     openScoreboardOverlay(topList, lastRunScore, lastRunTime, finalStats);
