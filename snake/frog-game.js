@@ -462,7 +462,7 @@
     headEl.style.backgroundRepeat = "no-repeat";
     headEl.style.pointerEvents = "none";
     headEl.style.zIndex = "30";
-    headEl.style.backgroundImage = "url(assets/images/head.png)";
+    headEl.style.backgroundImage = "assets/images/head.png";
     container.appendChild(headEl);
 
     // Create new segments
@@ -480,8 +480,8 @@
       segEl.style.pointerEvents = "none";
       segEl.style.zIndex = "29";
       segEl.style.backgroundImage = isTail
-        ? "url(assets/images/tail.png)"
-        : "url(assets/images/body.png)";
+        ? "assets/images/tail.png"
+        : "assets/images/body.png";
       container.appendChild(segEl);
 
       segments.push({ el: segEl, x: startX, y: startY });
