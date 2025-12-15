@@ -7,20 +7,22 @@
   <link rel="stylesheet" href="../style.css" />
 </head>
 <body class="layout-4">
-  <!-- Random trait-built frogs background 
-  <div id="frog-bg"></div> -->
+  
 
   <div class="page">
     <!-- HEADER (hidden until wallet is connected) -->
-    <header class="site-header" style="display:none;">
+    <header class="site-header">
       <nav class="nav">
-        <a href="/" data-view="collection">Collection</a>
-        <a href="/rarity/" data-view="rarity">Rarity</a>
-        <a href="/pond/" data-view="pond">Pond</a>
-        <a href="/morph/" data-view="morph">Morph</a>
-
-        <a href="#" id="header-connect-wallet-btn">Connect</a>
-        <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
+        <div class="nav-left">
+          <a href="/" data-view="collection">Collection</a>
+          <a href="/rarity/" data-view="rarity">Rarity</a>
+          <a href="/pond/" data-view="pond">Pond</a>
+          <a href="/morph/" data-view="morph">Morph</a>
+        </div>
+        <div class="nav-right">
+          <a href="#" id="header-connect-wallet-btn">Connect Wallet</a>
+          <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
+        </div>
       </nav>
     </header>
 
@@ -59,7 +61,7 @@
     </section>
 
     <!-- MAIN DASHBOARD LAYOUT (hidden until connected) -->
-    <main class="dashboard-main" style="display:none;">
+    <main class="dashboard-main">
       <!-- Recent Activity (sales / stakes / morphs) -->
       <section
         class="panel dashboard-section"
@@ -164,7 +166,7 @@
     </main>
 
     <!-- FOOTER (hidden until connected) -->
-    <footer class="site-footer" style="display:none;">
+    <footer class="site-footer">
       <span class="footer-links" style="color: white;">
         <a href="#">freshfrogs.github.io</a>
       </span>
@@ -184,60 +186,5 @@
 
   <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
   <script src="/assets/site.js"></script>
-
-  <!-- Scatter Frogs background 
-  <script src="/assets/scatter-frogs.js"></script> -->
-
-  <!-- Simple gating: hero always visible, rest shows after wallet connects -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const header        = document.querySelector('.site-header');
-      const main          = document.querySelector('.dashboard-main');
-      const footer        = document.querySelector('.site-footer');
-      const landingBtn    = document.getElementById('landing-connect-btn');
-      const headerConnect = document.getElementById('header-connect-wallet-btn');
-      const walletNav     = document.getElementById('wallet-nav-link');
-
-      if (!landingBtn) return;
-
-      function showFullSiteIfConnected() {
-        if (!walletNav) return false;
-        // wallet-nav-link should be visible + have text once connected
-        if (walletNav.style.display !== 'none' && walletNav.textContent.trim() !== '') {
-          if (header) header.style.display = '';
-          if (main)   main.style.display = '';
-          if (footer) footer.style.display = '';
-          landingBtn.style.display = 'none';
-          return true;
-        }
-        return false;
-      }
-
-      // If already connected from a previous session, reveal everything shortly after load
-      setTimeout(showFullSiteIfConnected, 1000);
-
-      landingBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-
-        // Trigger your existing wallet connect logic
-        if (headerConnect) {
-          headerConnect.click();
-        }
-
-        // If it connects instantly, reveal right away
-        if (showFullSiteIfConnected()) return;
-
-        // Otherwise poll for a few seconds while wallet UI is open
-        let tries = 0;
-        const maxTries = 40; // ~10 seconds at 250ms
-        const interval = setInterval(function () {
-          tries++;
-          if (showFullSiteIfConnected() || tries > maxTries) {
-            clearInterval(interval);
-          }
-        }, 250);
-      });
-    });
-  </script>
 </body>
 </html>
