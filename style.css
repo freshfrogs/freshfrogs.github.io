@@ -824,3 +824,7 @@ a {
   pointer-events: none;
   border-radius: 100%;
 }
+
+.site-header{position:sticky;top:0;z-index:50;}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.nav-left,.nav-right{display:flex;align-items:center;gap:12px;}
