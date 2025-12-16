@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<!-- Twitter universal website tag code -->
+<script>
+  !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+  },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+  a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+  // Insert Twitter Pixel ID and Standard Event data below
+  twq('init','o8j78');
+  twq('track','PageView');
+  </script>
+  <!-- End Twitter universal website tag code -->
 <style>
   html{
     background-image: url("/assets/background.png");
@@ -534,7 +544,7 @@
   }
 </style>
 <html lang="{{ site.lang | default: "en-US" }}">
-  <link rel="icon" href="./assets/logo.png">
+  <link rel="icon" href="../assets/logo.png">
   <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -678,6 +688,7 @@
           //console.log(res)
           var { assets } = res
           var nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
+          
           // Messages Sent to Terminal
           document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
           document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
@@ -748,6 +759,10 @@
           nextId = await f0.api.nextId().call();
           nextIdC = parseInt(nextId);
 
+          //for (var i = 1; i < nextIdC; i++) {
+          //  let frog_owner = await f0.api.ownerOf(i).call()
+          //  console.log('Owner of Frog #'+i+' \n '+frog_owner);
+          //}
           userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
           getInvites(); // Check and Confirm Invite Keys
           
@@ -883,14 +898,12 @@
           let thisInvite = userInviteKeys[i]
           if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
             // NF7UOS / C7AR Bypass
-            if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || userAcc === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) { // 0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25
+            if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase()) {
               // Unlimited Free Mints
               userInvite = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4";
               //consoleOutput("<div> Invite code applied... Valid for <b>"+mintLimit+" FROG(s) @ 0.00 ΞETH</b></div>"+"<br>")
-              console.log('Invite Code: '+userInvite)
               break;
             } else {
-              console.log('Invite Code: '+userInvite)
               break;
             }
           }
@@ -899,7 +912,6 @@
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
         document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
-        console.log('Invite Code: '+userInvite)
         //consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
       }
 
@@ -958,7 +970,7 @@
           <div id="mintingTray">
             <ul class="downloads2">
               <li><a id="mintTransact" href="https://freshfrogs.io/" class="pointer"><strong>LINK WALLET</strong></a></li>
-              <li><a id="mintTotal"><strong>0.01 ΞETH</strong>Plus gas</a></li>
+              <li><a id="mintTotal"><strong>0 ΞETH</strong>Plus gas</a></li>
               <li><a class="pointer"><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</a></li>
             </ul>
             <div class="bigContainer">
@@ -987,21 +999,23 @@
           <br>
           <div id="thePad" class="thePad"></div>
           <br>
+          <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Fresh Frogs <a href="https://twitter.com/hashtag/NFT?src=hash&amp;ref_src=twsrc%5Etfw">#NFT</a> 🐸✌️<br>A collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!<a href="https://twitter.com/hashtag/Ethereum?src=hash&amp;ref_src=twsrc%5Etfw">#Ethereum</a> <a href="https://twitter.com/hashtag/blockchain?src=hash&amp;ref_src=twsrc%5Etfw">#blockchain</a><br><br>See Collection <a href="https://twitter.com/opensea?ref_src=twsrc%5Etfw">@opensea</a> <a href="https://twitter.com/hashtag/openseanfts?src=hash&amp;ref_src=twsrc%5Etfw">#openseanfts</a><a href="https://t.co/PXA9vVEY25">https://t.co/PXA9vVEY25</a></p>&mdash; Fresh Frogs (@FreshFrogs_NFT) <a href="https://twitter.com/FreshFrogs_NFT/status/1498024181664993284?ref_src=twsrc%5Etfw">February 27, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+          <br>
           <div class="divTimeline">
-            <img style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/FLY.gif">
+            <img style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="../assets/frogs/FLY.gif">
             <h3 class="headerDiv">What is Fresh Frogs NFT?</h3><br>
             <div class="pTimeline">
               <p>Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more!</p>
               <b>Ethereum Blockchain</b><a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b">ERC-721 Standard 0xBE4B..C51b ↗️</a>
               <hr class="hr2">
               <headline class="headLine2">
-                <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/twitter.png"></a>
-                <a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/discord.png"></a>
-                <a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/opensea.png"></a>
-                <a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="./assets/nftCalendar.png"></a>
-                <a href="https://nftdroops.com/nft/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/droops2.png"></a>
-                <a href="https://rarible.com/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/Rarible.png"></a>
-                <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="display: inline !important;"><img class="headLineImg" src="./assets/etherScan.png"></a>
+                <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/twitter.png"></a>
+                <a href="https://discord.gg/t84NyjpS3H" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/discord.png"></a>
+                <a href="https://opensea.io/collection/fresh-frogs" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/opensea.png"></a>
+                <a href="https://nftcalendar.io/event/fresh-frogs-nft-collection-release/" target="_blank" style="display: inline !important;"><img background="white" class="headLineImg" src="../assets/nftCalendar.png"></a>
+                <a href="https://nftdroops.com/nft/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/droops2.png"></a>
+                <a href="https://rarible.com/fresh-frogs/" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/Rarible.png"></a>
+                <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="display: inline !important;"><img class="headLineImg" src="../assets/etherScan.png"></a>
               </headline>
             </div>
             <div class="pTimeline">
@@ -1009,7 +1023,7 @@
             </div>
             <div class="pTimeline">
               <h3 class="headerDiv">Frog Token Combinations!</h3><br>
-              <img href="./the-pad" style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/previewMorph5.png"><br>
+              <img href="../the-pad" style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="../assets/frogs/previewMorph5.png"><br>
               <p>After the full collection of <b>4,040 Frogs</b> has been minted, Frog holders will be able to "Morph" their Frogs into a new NFT on Ethereum, combining their attributes and traits!</p>
               <p>Owners can try out this feature at <a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs.io/the-pad</b> ↗️</a></p>
             </div>
@@ -1019,4 +1033,7 @@
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
+  <footer>
+    © Copyright. All Rights Reserved
+  </footer>
 </html>
