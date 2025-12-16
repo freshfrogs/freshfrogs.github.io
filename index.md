@@ -45,7 +45,7 @@ The collection will begin with a five percent royalty, that will increase to sev
 ### Mint Info (Updated)
 **Cost to Mint**
 
-Each token is randomly generated through code and individually unique! The Fresh Frogs NFT collection consists of many different attributes and traits with a total supply of 4,040 Frogs!
+Each FROG token is randomly generated and individually unique! The Fresh Frogs NFT collection consists of many different attributes and traits with a total supply of 4,040 Frogs!
 
 First 3,232 Frogs will free
 Final 808 Frogs will cost 0.01
