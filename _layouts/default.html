@@ -686,14 +686,7 @@
             document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
 
             assets.forEach((frog) => { // For Each FROG
-              var { name, token_metadata, permalink, traits } = frog
-
-              // Attribute Rarities
-              //console.log('Loading... '+name);
-              for (var i = 0; i < traits.length; i++) {
-                attributesTotal[traits[i].value] = traits[i].trait_count
-              }
-              //console.log('Next ID: '+nextIdC)
+              var { name, permalink } = frog
               let thisToken = frog.name.replace('Frog #', '');
 
               loadFreshFrog(thisToken);
