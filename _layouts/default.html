@@ -1,14 +1,4 @@
 <!DOCTYPE html>
-<!-- Twitter universal website tag code -->
-<script>
-  !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
-  },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
-  a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
-  // Insert Twitter Pixel ID and Standard Event data below
-  twq('init','o8j78');
-  twq('track','PageView');
-  </script>
-  <!-- End Twitter universal website tag code -->
 <style>
   html{
     background-image: url("/assets/background.png");
@@ -690,7 +680,7 @@
           var nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
           // Messages Sent to Terminal
           document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
-          document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
+          document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
 
           assets.forEach((frog) => { // For Each FROG
             var { name, token_metadata, permalink, traits } = frog
@@ -705,7 +695,7 @@
 
             loadFreshFrog(thisToken);
             openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
-            document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b> ↗️'+'</a>';
+            document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b>'+'</a>';
             
             fetch(token_metadata)
             .then((metadata) => metadata.json())
@@ -718,13 +708,12 @@
                 var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
                 let trait_type = attribute.trait_type
                 let value = attribute.value
-                let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(2);
+                let trait_rarity = roundToTwo((attributesTotal[value]/nextIdC))
 
                 // Build Fresh Frogs Attributes
                 loadAttribute(trait_type, value, frog.name)
                 newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
-                  else { newAttribute.innerHTML = value + ' <b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                newAttribute.innerHTML = value + ' <b><i class="trait">'+trait_rarity+'%</i></b>';
                 newAttribute.className = value;
                 space = document.createElement('br')
                 document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
@@ -733,9 +722,7 @@
             })
           })
         }) // End OpenSea API
-        .catch((e) => {
-          console.log('Could not talk to OpenSea! '+e.message)
-        })
+
 
 
         try {   // Connect Wallet
@@ -770,7 +757,7 @@
           
           // Messages Sent to Terminal (Again)
           document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
-          document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
+          document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
 
           // ----------------------------->
 
@@ -793,12 +780,12 @@
         //document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
         consoleOutput("<div id='mintingText'>Please connect an Ethereum wallet... <b><i>"+addressCut+" ✓</b></i>"+"<br><b>FROG #"+nextIdC+"</b> available to mint... Limit: <b>"+mintLimit+" Frogs</b> per Wallet")
 
-        consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs.github.io/the-pad</b> ↗️</a>');
+        consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs.io/the-pad</b> ↗️</a>');
         // Recent Mints
         // Event Listeners 
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          if (mint === 0) { // || nextIdC >= 3021
+          if (mint === 0 || nextIdC >= 3021) {
             consoleOutput("<div class='mintingTextRed'><b>Mint Open 04/22/22 8:00 PM (UTC)</b>"+"<b><u><a class='pointer' target='_blank' href='https://discord.gg/xWMFWgpvd3'>Join Discord!</b></u></a></div>")
             return; // BREAK!
 
@@ -817,7 +804,7 @@
               return; // BREAK!
             }
             // MINT SENT NO PROBLEMS!
-            document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.github.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
+            document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
             document.getElementById('mintingText').className = "mintingTextGreen"
             return; // BREAK!
           }
@@ -853,19 +840,19 @@
             if (frogCount <= 2) {
               newFrog = document.createElement("div")
               newFrog.className = "imgWrapperMint"
-              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
               document.getElementById("frogContainer3").appendChild(newFrog)
               frogCount = frogCount + 1
             } else if (frogCount <= 5) {
               newFrog = document.createElement("div")
               newFrog.className = "imgWrapperMint"
-              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
               document.getElementById("frogContainer2").appendChild(newFrog)
               frogCount = frogCount + 1
             } else if (frogCount <= 8) {
               newFrog = document.createElement("div")
               newFrog.className = "imgWrapperMint"
-              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.github.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
               document.getElementById("frogContainer").appendChild(newFrog)
               frogCount = frogCount + 1
             }
@@ -882,16 +869,16 @@
           }
         })
       })
-      function roundToTwo(number) { // Round Numbers
-        let result = Math.round((number + Number.EPSILON) * 100)
-        if (result < 1) { return '<1' } else { return result }
+      // Round Numbers
+      function roundToTwo(num) {
+        let result = ((Math.round(num + "e+2")  + "e-2"))*100
+        if (result <= 1) { return '<1' } else { return result }
       }
-      
       // Get User's Invite Codes
       async function getInvites() {
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
           let thisInvite = userInviteKeys[i]
-          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
+          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d_1") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
             // NF7UOS / C7AR Bypass
             if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase()) {
               // Unlimited Free Mints
@@ -944,13 +931,13 @@
         newAttribute.className = "frogImg2" //shadesAnimation
         newAttribute.style.cursor = "pointer"
         if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
-          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".gif"
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
         } else if (attribute === "morphAnimation") {
-          newAttribute.src = "https://freshfrogs.github.io/the-pad/Frog/loadMorph.gif"
+          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
         } else if (attribute === "shadesAnimation") {
-          newAttribute.src = "https://freshfrogs.github.io/the-pad/Eyes/shadesAnimation.gif"
+          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
         } else {
-          newAttribute.src = "https://freshfrogs.github.io/the-pad/"+trait+"/"+attribute+".png"
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
         }
         newAttribute.alt = attribute
         document.getElementById(where).appendChild(newAttribute)
@@ -964,7 +951,7 @@
         <div class="downloads pre">
           <div id="mintingTray">
             <ul class="downloads2">
-              <li><a id="mintTransact" href="https://freshfrogs.github.io/" class="pointer"><strong>LINK WALLET</strong></a></li>
+              <li><a id="mintTransact" href="https://freshfrogs.io/" class="pointer"><strong>LINK WALLET</strong></a></li>
               <li><a id="mintTotal"><strong>0 ΞETH</strong>Plus gas</a></li>
               <li><a class="pointer"><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</a></li>
             </ul>
@@ -972,7 +959,7 @@
               <div id="frogContainer" class="containerMint"></div>
               <div id="frogContainer2" class="containerMint"></div>
               <div id="frogContainer3" class="containerMint">
-                <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.github.io/assets/frogs/preview2.gif"/></div>
+                <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>
               </div>
             </div>
             <h3 class="headerDiv" id="supply">FROG 4,040 Total Supply</h3>
@@ -980,15 +967,15 @@
         </div>
       </header>
       <section>
-        <div class="top">{{ content }}<h2 style="color: white !important;"><b>freshfrogs.github.io</b></h2></div>
+        <div class="top">{{ content }}<h2 style="color: white !important;"><b>freshfrogs.io</b></h2></div>
         <div class="downloads pre">
           <div id="netStatus" style="color: white;">
             <br>
             Please connect an Ethereum wallet...
-            <b><a class="pointer" href="https://freshfrogs.github.io/">Connect Wallet</a></b>
+            <b><a class="pointer" href="https://freshfrogs.io/">Connect Wallet</a></b>
             <hr class="hr2">Don't have a wallet?...
             <b><a class="pointer" href="https://metamask.io/download/" target="_blank">Download MetaMask 🦊</a></b>
-            <hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>
+            <hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>
           </div>
           <div id="pre" class="consoleOutput"></div>
           <div id="thePad" class="thePad"></div>
@@ -1017,7 +1004,7 @@
               <h3 class="headerDiv">Frog Token Combinations!</h3><br>
               <img href="./the-pad" style="image-rendering: pixelated; margin: auto; border-radius: 10px; display: block; width: 256px" src="./assets/frogs/previewMorph5.png"><br>
               <p>After the full collection of <b>4,040 Frogs</b> has been minted, Frog holders will be able to "Morph" their Frogs into a new NFT on Ethereum, combining their attributes and traits!</p>
-              <p>Owners can try out this feature at <a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs.github.io/the-pad</b> ↗️</a></p>
+              <p>Owners can try out this feature at <a class="pointer" href="https://freshfrogs.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a></p>
             </div>
           </div>
         </div>
@@ -1025,4 +1012,7 @@
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
+  <footer>
+    © Copyright. All Rights Reserved
+  </footer>
 </html>

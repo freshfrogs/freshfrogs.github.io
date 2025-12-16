@@ -694,7 +694,7 @@
 
             loadFreshFrog(thisToken);
             openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
-            document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b> ↗️'+'</a>';
+            document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b>'+'</a>';
             
             fetch(token_metadata)
             .then((metadata) => metadata.json())
@@ -712,8 +712,7 @@
                 // Build Fresh Frogs Attributes
                 loadAttribute(trait_type, value, frog.name)
                 newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
-                  else { newAttribute.innerHTML = value + ' <b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                newAttribute.innerHTML = value + ' <b><i class="trait">'+trait_rarity+'%</i></b>';
                 newAttribute.className = value;
                 space = document.createElement('br')
                 document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
@@ -722,9 +721,7 @@
             })
           })
         }) // End OpenSea API
-        .catch((e) => {
-          console.log('Could not talk to OpenSea! '+e.message)
-        })
+
 
 
         try {   // Connect Wallet
@@ -787,7 +784,7 @@
         // Event Listeners 
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
-          if (mint === 0) { // || nextIdC >= 3021
+          if (mint === 0 || nextIdC >= 3021) {
             consoleOutput("<div class='mintingTextRed'><b>Mint Open 04/22/22 8:00 PM (UTC)</b>"+"<b><u><a class='pointer' target='_blank' href='https://discord.gg/xWMFWgpvd3'>Join Discord!</b></u></a></div>")
             return; // BREAK!
 
@@ -871,16 +868,16 @@
           }
         })
       })
-      function roundToTwo(number) { // Round Numbers
-        let result = Math.round((number + Number.EPSILON) * 100)
+      // Round Numbers
+      function roundToTwo(num) {
+        let result = ((Math.round(num + "e+2")  + "e-2"))*100
         if (result <= 1) { return '<1' } else { return result }
       }
-      
       // Get User's Invite Codes
       async function getInvites() {
         for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
           let thisInvite = userInviteKeys[i]
-          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d_0") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
+          if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d_1") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
             // NF7UOS / C7AR Bypass
             if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase()) {
               // Unlimited Free Mints
@@ -1014,4 +1011,7 @@
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
+  <footer>
+    © Copyright. All Rights Reserved
+  </footer>
 </html>

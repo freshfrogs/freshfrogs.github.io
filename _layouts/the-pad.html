@@ -622,7 +622,7 @@
           // Display Two Random Frogs!
           //combineTokens(baseFrog, subFrog);
           if (ownedFrogs <= 0) { // ❌ No FROGS
-            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i>"+addressCut+" ✓</i></b>"+"<br>❌ It seems you do not own any FROGS!<br>\n<br>"
+            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i>"+addressCut+' ✓</i></b>'+'<br>❌ It seems you do not own any FROGS!<br>\n<br>'
           } else {
             document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
 
@@ -651,7 +651,7 @@
                 //
                 loadFreshFrog(thisToken);
                 openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
-                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b> ↗️'+'</a>';
+                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b>'+'</a>';
 
                 // Progress Bar!
                 percent = parseInt((thisToken/ownedFrogs)*100);
@@ -672,13 +672,12 @@
                     var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
                     let trait_type = attribute.trait_type
                     let value = attribute.value
-                    let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(2);
+                    let trait_rarity = roundToTwo((attributesTotal[value]/nextIdC))
 
                     // Build Fresh Frogs Attributes
                     loadAttribute(trait_type, value, frog.name)
                     newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                    if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
-                      else { newAttribute.innerHTML = value + ' <b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                    newAttribute.innerHTML = value + ' <b><i class="trait">'+trait_rarity+'%</i></b>';
                     newAttribute.className = value;
                     space = document.createElement('br')
                     document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
@@ -693,7 +692,7 @@
               width = percent
               width++;
               elem.style.width = width + "%";
-              document.getElementById('netStatus').innerHTML = "<div id='mintingText'><b><i>"+addressCut+"</i></b> ✔️ This address holds <b>[ "+ownedFrogs+" ]</b> FROG(S)...</div><br><hr class='hr2'>" //"<div id='mintingText'>Connect to view 'FROG' tokens... <b><i>("+ownedFrogs+")</b> FROG(S)</i>"+'<br><b>'+userAcc.toUpperCase()+' ✓</b>'+'<br>\n<br>'
+              document.getElementById('netStatus').innerHTML = ''
               console.log(attributesTotal)
             })
           }
@@ -701,10 +700,10 @@
           consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong><a href='https://discord.gg/xWMFWgpvd3' target='_blank'><b><u>Discord #Support</u></b></a></div>");
         }
       })
-      // Round to Hundredth place
-      const roundToHundredth = (value) => {
-        return Number(value.toFixed(2));
-      };
+      function roundToTwo(num) {
+        let result = ((Math.round(num + "e+2")  + "e-2"))*100
+        if (result <= 1) { return '<1' } else { return result }
+      }
       // Load Fresh Frog
       function loadFreshFrog(tokenID) {
         newFrog = document.createElement("div")
@@ -1087,4 +1086,7 @@
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
+  <footer>
+    © Copyright. All Rights Reserved
+  </footer>
 </html>
