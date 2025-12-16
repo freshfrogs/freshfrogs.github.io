@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<!-- Twitter universal website tag code -->
+<script>
+  !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+  },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+  a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+  // Insert Twitter Pixel ID and Standard Event data below
+  twq('init','o8j78');
+  twq('track','PageView');
+  </script>
+  <!-- End Twitter universal website tag code -->
 <style>
   html{
     background-image: url("/assets/background.png");
@@ -382,12 +392,12 @@
     color: #333 !important;
   }
   .mintingTextWhite {
-    background-color: white;
+    background-color: #faff99;
     border-radius: 5px;
     border: 0px solid white;
     box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
     padding: 4px;
-    color: #7cc1ff !important;
+    color: #333 !important;
   }
   .mintingTextRed {
     background-color: #ff99b6;
@@ -414,7 +424,7 @@
     text-align: center;
     border: 1px solid #7cc1ff;
     border-radius: 5px;
-    padding: 4px;
+    padding: 10px;
     padding-top: 0px;
     padding-bottom: 0px;
     margin: 2px;
@@ -423,12 +433,11 @@
   .attributeList {
     border: 1px solid white;
     border-radius: 5px;
-    padding: 6px;
+    padding: 4px;
     overflow: hidden;
     background-color: white;
     color: #333;
     box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
-    width: 128px;
   }
   .trait{
     border-radius: 2px;
@@ -547,7 +556,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
     <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
     <script src="https://unpkg.com/f0js/dist/f0.js"></script>
-    <script src="https://freshfrogs.github.io/assets/js/collection_abi.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
     <script>
@@ -569,7 +577,7 @@
         const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
         const f0 = new F0();    // Connect to Factoria
         const CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet) 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // Rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
-        const COLLECTION = collection = new web3.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
+        const COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
         const NETWORK = "main";   // Which Network?
 
         // Rarities
@@ -715,7 +723,7 @@
                 loadAttribute(trait_type, value, frog.name)
                 newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
                 if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
-                  else { newAttribute.innerHTML = value.slice(0, 10) + '...' + ' <b><i class="trait">'+trait_rarity+'%</i></b>'; }
+                  else { newAttribute.innerHTML = value + ' <b><i class="trait">'+trait_rarity+'%</i></b>'; }
                 newAttribute.className = value;
                 space = document.createElement('br')
                 document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
@@ -739,7 +747,7 @@
           // Assign Variables (Fetch from Connect)
           // CONNECTED USER'S WALLET ADDRESS; AND INVITES
           userAcc = await web3.currentProvider.selectedAddress;
-          addressCut = userAcc.substring(0, 5)+".."+userAcc.slice(-4);
+          addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
           userInviteList = await f0.myInvites();
           userInviteKeys = Object.keys(userInviteList);
 
@@ -782,7 +790,7 @@
         document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
         document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
         //document.getElementById("setInvite").removeAttribute("href")                                          // Removes set invite link
-        consoleOutput("<div id='mintingText'>Please connect an Ethereum wallet... <b><i>"+addressCut+" ✔️</b></i>"+"<br><b>FROG #"+nextIdC+"</b> available to mint... Limit: <b>"+mintLimit+" Frogs</b> per Wallet")
+        consoleOutput("<div id='mintingText'>Please connect an Ethereum wallet... <b><i>"+addressCut+" ✓</b></i>"+"<br><b>FROG #"+nextIdC+"</b> available to mint... Limit: <b>"+mintLimit+" Frogs</b> per Wallet")
 
         consoleOutput('<br><hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs.github.io/the-pad</b> ↗️</a>');
         // Recent Mints
@@ -790,7 +798,7 @@
         // MINT -- Send the transaction to mint!
         document.querySelector("#mintTransact").addEventListener("click", async (e) => {
           if (mint === 0) { // || nextIdC >= 3021
-            consoleOutput("<div class='mintingTextWhite'><b>Mint Paused!</b>"+"<b><a class='pointer' target='_blank' href='https://twitter.com/FreshFrogs_NFT'>Follow @FreshFrogs_NFT for updates!</b></a></div>")
+            consoleOutput("<div class='mintingTextRed'><b>Mint Open 04/22/22 8:00 PM (UTC)</b>"+"<b><u><a class='pointer' target='_blank' href='https://discord.gg/xWMFWgpvd3'>Join Discord!</b></u></a></div>")
             return; // BREAK!
 
           } else { // SEND MINT TX!
@@ -884,14 +892,12 @@
           let thisInvite = userInviteKeys[i]
           if (thisInvite === "0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d") { // Main: 0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d / Rinkeby: 0x98469878d3ea48d71e828da43d41d9ffcc8b974d712d3fee969274e52b180275
             // NF7UOS / C7AR Bypass
-            if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || userAcc === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) { // 0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25
+            if (userAcc === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase() || userAcc === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase()) {
               // Unlimited Free Mints
               userInvite = "0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4";
               //consoleOutput("<div> Invite code applied... Valid for <b>"+mintLimit+" FROG(s) @ 0.00 ΞETH</b></div>"+"<br>")
-              console.log('Invite Code: '+userInvite)
               break;
             } else {
-              console.log('Invite Code: '+userInvite)
               break;
             }
           }
@@ -900,7 +906,6 @@
         mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
         mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
         document.getElementById("mintTotal").innerHTML = "<strong>"+(mintPrice)+" ΞETH</strong>plus gas"
-        console.log('Invite Code: '+userInvite)
         //consoleOutput("<div class='mintingTextGreen'> Invite code applied... Valid for <strong>"+frogMintMax+" FROG(s) @ 0.00 ΞETH</strong></div>")
       }
 
@@ -959,7 +964,7 @@
           <div id="mintingTray">
             <ul class="downloads2">
               <li><a id="mintTransact" href="https://freshfrogs.github.io/" class="pointer"><strong>LINK WALLET</strong></a></li>
-              <li><a id="mintTotal"><strong>0.01 ΞETH</strong>Plus gas</a></li>
+              <li><a id="mintTotal"><strong>0 ΞETH</strong>Plus gas</a></li>
               <li><a class="pointer"><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</a></li>
             </ul>
             <div class="bigContainer">
@@ -985,7 +990,6 @@
             <hr class="hr2">Exclusive content for FROG holders!<a class="pointer" href="https://freshfrogs.github.io/the-pad">🍀 <b>freshfrogs/the-pad</b> ↗️</a>
           </div>
           <div id="pre" class="consoleOutput"></div>
-          <br>
           <div id="thePad" class="thePad"></div>
           <br>
           <div class="divTimeline">
@@ -1006,7 +1010,7 @@
               </headline>
             </div>
             <div class="pTimeline">
-              <p>Unbelievably, over 200,000 acres of rainforest are burned every day. That is over 150 acres lost every minute of every day, and 78 million acres are lost every year! A portion of every re-sale will be donated to <a style="display: inline !important;" class="pointer" href="https://rainforestfoundation.org/" target="_blank">The Rainforest Foundation</a></p>
+              <p>Unbelievably, over 200,000 acres of rainforest are burned every day. That is over 150 acres lost every minute of every day, and 78 million acres are lost every year! A portion of every sale will be donated to <a style="display: inline !important;" class="pointer" href="https://rainforestfoundation.org/" target="_blank">The Rainforest Foundation</a></p>
             </div>
             <div class="pTimeline">
               <h3 class="headerDiv">Frog Token Combinations!</h3><br>
