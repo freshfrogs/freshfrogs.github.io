@@ -731,46 +731,52 @@
         });
 
         
-        // Get recent mints
+      // Get recent mints
 
-        fetch('https://api.opensea.io/api/v2/chain/ethereum/contract/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b/nfts?limit=3', options)
-        .then(res => res.json())
-        .then(res => {
+      fetch(
+        "https://api.opensea.io/api/v2/chain/ethereum/contract/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b/nfts?limit=3",
+        options
+      )
+        .then((res) => res.json())
+        .then((res) => {
+          // ✅ V2 returns { nfts: [...] } (not { assets: [...] })
+          const assets = res?.nfts || [];
 
-            var { assets } = res
-            
-            var percent_width = 92 / 7 + '%'
+          document.getElementById("recent_sales").innerHTML = "";
 
-            document.getElementById('recent_sales').innerHTML = '';
+          assets.forEach((frog) => {
+            // V2 fields
+            const name = frog?.name || (frog?.identifier != null ? `#${frog.identifier}` : "Unknown");
+            const image_url = frog?.image_url || frog?.image || "";
+            const permalink =
+              frog?.opensea_url ||
+              (frog?.identifier != null
+                ? `https://opensea.io/assets/ethereum/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b/${frog.identifier}`
+                : "#");
 
-            assets.forEach((frog) => {
+            recent_sale = document.createElement("a");
+            recent_sale.className = "recent_sale";
+            recent_sale.style.width = 128 + 64 + "px";
+            recent_sale.href = permalink;
 
-              //var { asset: { image_url, name, permalink, token_metadata }, payment_token: { decimals }, total_price } = sale;
-              var { name, token_metadata, permalink, traits, image_url } = frog
+            recent_sale.innerHTML =
+              '<div id="' +
+              name +
+              '" class="trait_display"><img class="frog_img" src="' +
+              image_url +
+              '"></div>' +
+              '<i class="label_name">FreshFrogsNFT</i>' +
+              '<strong class="frog_name">' +
+              name +
+              "</strong> ";
 
-              //var sale_price = total_price / Math.pow(10, decimals);
-
-              //console.log('Sale found...'+sale.asset.name+' : '+sale_price);
-
-              recent_sale = document.createElement('a');
-              recent_sale.className = 'recent_sale';
-              recent_sale.style.width = 128+64+'px';
-              recent_sale.href = permalink;
-              recent_sale.innerHTML = 
-                  '<div id="'+name+'" class="trait_display"><img class="frog_img" src='+image_url+'></div>' +
-                  '<i class="label_name">FreshFrogsNFT</i>' +
-                  '<strong class="frog_name">'+name+'</strong> ';
-              document.getElementById('recent_sales').appendChild(recent_sale);    
-
-            })
-
+            document.getElementById("recent_sales").appendChild(recent_sale);
+          });
         })
-        .catch(e => {
-
-            console.log('Error: Could not get recent sales from Opensea...');
-            console.error('Error : ' + e.message)
-
-        })
+        .catch((e) => {
+          console.log("Error: Could not get recent sales from Opensea...");
+          console.error("Error : " + e.message);
+        });
 
         // Attempt to Connect
 
