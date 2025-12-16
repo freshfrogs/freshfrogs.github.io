@@ -679,7 +679,7 @@
           .then((res) => res.json())
           .then((res) => {
             //console.log(res)
-            var { assets } = res
+            var { nfts } = res
             var nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
             // Messages Sent to Terminal
             document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
