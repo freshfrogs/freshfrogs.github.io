@@ -699,21 +699,11 @@
               loadFreshFrog(thisToken);
               openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
               document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b>'+'</a>';
-              
-              fetch(token_metadata)
-              .then((metadata) => metadata.json())
-              .then((metadata) => {
-                // Loop Attributes
-                for (var i = 0; i < metadata.attributes.length; i++){
-                  //console.log(metadata.attributes[i]);
 
-                  // Trait_Type : Value
-                  var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-                  let trait_type = attribute.trait_type
-                  let value = attribute.value
-                  let trait_rarity = roundToTwo((attributesTotal[value]/nextIdC))
-
-                  // Build Fresh Frogs Attributes
+              let metadata = await (fetch(SOURCE_PATH+'/frog/json/'+token_id+'.json')).json();
+              for (let i = 0; i < metadata.attributes.length; i++) {
+                  var attribute = metadata.attributes[i].value;
+                  var trait_type = metadata.attributes[i].trait_type;
                   loadAttribute(trait_type, value, frog.name)
                   newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
                   newAttribute.innerHTML = value + ' <b><i class="trait">'+trait_rarity+'%</i></b>';
@@ -721,8 +711,7 @@
                   space = document.createElement('br')
                   document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
                   document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
-                }
-              })
+              }
             })
           }) // End OpenSea API
 
