@@ -396,7 +396,7 @@
 
         // Pull Collection data from OpenSea
 
-        const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
+        const options = {method: 'GET', headers: {'X-API-KEY': '48ffee972fc245fa965ecfe902b02ab4'}};
 
         fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
         .then(collection => collection.json())
