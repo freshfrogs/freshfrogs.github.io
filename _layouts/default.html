@@ -680,12 +680,12 @@
           .then((res) => {
             //console.log(res)
             var { nfts } = res
-            var nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
+            var nextIdC = parseInt(nfts[0].name.replace('Frog #', '')) + 1;
             // Messages Sent to Terminal
             document.getElementById("supply").innerHTML = "FROG # "+nextIdC+" / 4,040" // Supply
             document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
 
-            assets.forEach((frog) => { // For Each FROG
+            nfts.forEach((frog) => { // For Each FROG
               var { name, permalink } = frog
               let thisToken = frog.name.replace('Frog #', '');
 
