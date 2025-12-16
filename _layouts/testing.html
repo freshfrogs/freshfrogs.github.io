@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<style>
+    .recent_sale {
+      text-align: center;
+      vertical-align: center;
+      margin: 4px;
+      border-radius: 5px;
+      border: solid 0px lightgrey;
+      overflow: hidden;
+      transition: box-shadow .2s;
+      height: 100% !important;
+      padding-top: 0px !important;
+      background-color: white;
+      width: 128px !important;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .recent_sales {
+      text-align: center !important;
+      display: inline-flex;
+      flex-wrap: wrap;
+      image-rendering: pixelated;
+      margin-bottom: 16px;
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .frog_name {
+        text-align: center;
+        font-weight: bold;
+        padding: 5%;
+        padding-top: 0%;
+        margin-left: 2.5%;
+    }
+    .frog_price {
+        text-align: center;
+        font-weight: bold;
+        padding: 5%;
+        padding-top: 0%;
+        margin-right: 2.5%;
+    }
+    .frog_img {
+        width: 256px;
+        border-radius: 5px;
+    }
+    .label_name {
+        text-align: center;
+        margin-left: 2.5%;
+        padding: 5%;
+        padding-left: 0%;
+        padding-right: 0%;
+        padding-bottom: 0%;
+        color: gray;
+    }
+    .label_price {
+        text-align: center;
+        margin-right: 2.5%;
+        padding: 5%;
+        padding-bottom: 0%;
+        color: gray;
+    }
+
+  html{
+    font-family: Poppins, sans-serif;
+    line-height: 1.5;
+    font-size: 14px;
+    background-image: url("/assets/background.png");
+  }
+  #myProgress {
+    width: 50%;
+    background: #7cc1ff;
+    margin-top: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid white;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  #myBar {
+    width: 1%;
+    height: 18px;
+    background-color: white;
+    border-radius: 1px;
+  }
+
+  .wrapper {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .bodyb {
+    background-color: transparent;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 8px;
+    margin-top: 5%;
+  }
+  .top {
+    margin: 0% !important;
+    image-rendering: pixelated;
+    text-align: center;
+  }
+  .smallContainer{
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: transparent;
+    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    width: 128px;
+  }
+  .smallContainer2 {
+    border-radius: 0px;
+    overflow: hidden;
+    background-color: transparent;
+    width: 128px;
+    padding: 0px !important;
+    height: 128px !important;
+    display: inline-block !important;
+    position: relative;
+    image-rendering: pixelated;
+  }
+  .frogContainer {
+    border-radius: 200px;
+    overflow: hidden;
+    width: 256px;
+    padding-top: 0px !important;
+    height: 256px !important;
+    display: inline-block !important;
+    position: relative;
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    image-rendering: pixelated;
+    transition: .2s;
+  }
+  .smallContainer3 {
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: transparent;
+    width: 128px;
+    padding-top: 0px !important;
+    height: 128px !important;
+    display: inline-block !important;
+    position: relative;
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    image-rendering: pixelated;
+    transition: .2s;
+  }
+  .bigContainer {
+    border-radius: 5px;
+    border: 0px solid #e0e0e0;
+    overflow: hidden;
+    background-color: rgba(122, 122, 122, 0.20);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    width: 256px;
+  }
+  .headLine{
+    color: transparent;
+    image-rendering: auto;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2%;
+    margin-top: auto;
+    vertical-align: top;
+  }
+  .headLine2 {
+    margin-left: auto;
+    margin-right: auto;
+    image-rendering: auto !important;
+    margin-bottom: 2%;
+  }
+  .headLineImg {
+    float: none;
+    image-rendering: auto;
+    height: 32px;
+    vertical-align: top;
+    border-radius: 100%;
+    padding: 0px;
+    transition: transform .2s;
+    margin-left: 3%;
+    margin-right: 3%;
+    margin-bottom: 3%;
+    margin-top: 3%;
+  }
+  .headLineImg:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
+  }
+  .h1 {
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    image-rendering: pixelated;
+    padding: 0%;
+    font-size: xx-large;
+  }
+  .supply{
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    color: #333;
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+    padding: 5px;
+    background: #f4f4f4;
+    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    border-bottom: 0px solid #e0e0e0;
+    border-bottom-left-radius: 0%;
+    border-bottom-right-radius: 0%;
+    width: 270px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2%;
+    padding: 0px;
+  }
+  ul.downloads2 {
+    list-style: none;
+    height: 40px;
+    padding: 0;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid white;
+    width: 270px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2%;
+    line-height: 1;
+    text-align: center;
+    vertical-align: middle;
+  }
+  section {
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-size: auto;
+    color: #333 !important;
+    background-color: white;
+    text-align: center;
+    border-radius: 7px;
+    padding: 0px !important;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  header {
+    overflow: hidden;
+
+    background-color: #7cc1ff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 14px !important;
+    width: auto;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-size: auto !important;
+    margin-bottom: 16px !important;
+    color: #333;
+  }
+  .desc {
+    position: relative;
+    background-color: inherit;
+    height: 0%;
+    width: 100%;
+    bottom: 32px;
+    margin-bottom: 0px;
+  }
+  .downloads {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 14px;
+    image-rendering: pixelated;
+  }
+  .downloads a{
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-size: inherit !important;
+    color: inherit !important;
+  }
+  .pre h1{
+    margin-top: 8px;
+  }
+  .container {
+    height: 256px;
+    width: auto;
+    margin-bottom: auto;
+    margin-top: auto;
+    background-color: transparent;
+
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+
+    display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+
+    display: box;
+    box-orient: horizontal;
+    box-pack: center;
+    box-align: center;
+  }
+  .imgWrapper {
+    -webkit-box-flex: 13;
+    -moz-box-flex: 1;
+    box-flex: 1;
+  }
+  .frogImg {
+    transition: transform .2s;
+    height: auto;
+    width: auto;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+  }
+  .frogImg2:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
+  }
+  .frogImg2 {
+    transition: transform .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    border-radius: 5px;
+  }
+  .frogImg3 {
+    transition: transform .2s;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    height: auto;
+    width: auto;
+  }
+  .smallContainer3:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+    box-shadow: none;
+    border: none;
+  }
+  .pointer {
+    transition: transform .2s;
+    cursor: pointer;
+  }
+  .pointer:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+  }
+  .pre {
+    border-radius: 2%;
+    text-align: center;
+    padding: 0px;
+    margin-bottom: 0px;
+    width: 100%;
+    height: 100%;
+    box-shadow: none;
+  }
+  .frogType {
+    transition: transform .2s;
+    width: 128px;
+    display: block;
+    image-rendering: pixelated;
+    box-shadow: none;
+    border: none;
+    position: absolute;
+  }
+  .hr2{
+    width: 128px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1%;
+  }
+  .h2 {
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-weight: 750;
+    text-align: center;
+    padding: 0%;
+    font-size: large;
+    font: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    margin-top: 8px;
+    margin-bottom: 0px;
+    line-height: 1.25;
+  }
+  .frogType2 {
+    border-radius: 5px;
+    border: 0px solid #e0e0e0;
+    overflow: hidden;
+    background-color: transparent;
+    width: 128px;
+    padding-top: 0px !important;
+    height: 100% !important;
+    display: inline-block !important;
+  }
+  .learnMoreFM {
+    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    background: #f4f4f4;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    padding: 5px;
+  }
+  .myProgress {
+    width: 50%;
+    background: #f4f4f4;
+    margin-top: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #324d64;
+    border-radius: 5px;
+    height: 18px;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    vertical-align: middle;
+  }
+  .mintingTextGreen {
+    background-color: #99ffc5;
+    border-radius: 5px;
+    border: 0px solid white;
+    padding: 4px;
+    color: #333 !important;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+  }
+  .mintingTextWhite2 {
+    background-color: transparent;
+    border: 0px solid lightgrey;
+    padding: 0px;
+    color: #333 !important;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: -20px;
+  }
+  .mintingTextWhite {
+    background-color: white;
+    border-radius: 5px;
+    border-top-left-radius: 0%;
+    border-top-right-radius: 0%;
+    border: 1px solid white;
+    padding: 16px;
+    color: #333 !important;
+  }
+  .mintingTextRed {
+    background-color: #ff99b6;
+    border-radius: 5px;
+    border: 0px solid white;
+    padding: 4px;
+    color: #333 !important;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+  }
+  .thePad {
+    border-radius: 5px;
+    padding: 4px;
+    background-color: transparent;
+  }
+  .headerDiv {
+    padding: 4px;
+    border-radius: 5px;
+    color: white !important;
+    margin: 0px !important;
+  }
+  .frogPanel {
+    display: inline-block !important;
+    image-rendering: pixelated;
+    text-align: center;
+    border-radius: 5px;
+    padding: 0px !important;
+    margin: 8px;
+    background-color: white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
+    overflow: hidden;
+    border: 0px solid white;
+  }
+  .attributeList {
+    border: 1px solid white;
+    border-radius: 5px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    padding: 0px !important;
+    padding-bottom: 4px !important;
+    overflow: hidden;
+    background-color: white;
+    color: #333;
+    width: 100%;
+    margin: 0px !important;
+  }
+  .trait {
+    border-radius: 2px;
+    background: white;
+    color: rgba(126, 183, 128, 1);
+    font-size: x-small;
+    padding: 1px;
+  }
+  .divTimeline {
+    width: 300px;
+    margin: auto;
+  }
+  .pTimeline {
+    border-top: 2px dashed;
+    border-color: white !important;
+    margin:0; padding: 30px;
+  }
+  .pTimeline:nth-child(even) {
+    border-left: 2px dashed;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    margin-right: 30px; 
+    padding-right: 0;
+  }
+  .pTimeline:nth-child(odd) {
+    border-right: 2px dashed;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    margin-left: 30px; 
+    padding-left: 0;
+  }
+  .pTimeline:first-child {
+    border-top: 0;
+    border-top-right-radius:0;
+    border-top-left-radius:0;
+  }
+  .pTimeline:last-child {
+    border-bottom-right-radius:0;
+    border-bottom-left-radius:0;
+  }
+  #growTray {
+    -moz-transition: height .5s;
+    -ms-transition: height .5s;
+    -o-transition: height .5s;
+    -webkit-transition: height .5s;
+    transition: height .5s;
+    height: 0;
+  }
+  #growTerminal {
+    -moz-transition: height .5s;
+    -ms-transition: height .5s;
+    -o-transition: height .5s;
+    -webkit-transition: height .5s;
+    transition: height .5s;
+    height: 0;
+  }
+  .containerMint {
+    width: auto;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    background-color: transparent;
+
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+
+    display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+
+    display: box;
+    box-orient: horizontal;
+    box-pack: center;
+    box-align: center;
+  }
+  .imgWrapperMint {
+    -webkit-box-flex: 13;
+    -moz-box-flex: 1;
+    box-flex: 1;
+  }
+  .frogImgMint {
+    transition: transform .2s;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    border-radius: 0px;
+  }
+  .frogImgMint:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
+  }
+  .consoleOutput {
+    border-radius: 5px;
+    padding: 0px;
+    background: transparent;
+    color: white;
+  }
+  svg {
+    width: 50%;
+    image-rendering: pixelated !important;
+  }
+  #banner_image {
+    width: 100%;
+    padding: 0% !important;
+    margin: 0% !important;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    image-rendering: auto !important;
+  }
+  .headLineImg3 {
+    image-rendering: crisp-edges;
+    height: 32px;
+    border-radius: 100%;
+    padding: 0px;
+    transition: transform .2s;
+    box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
+    display: inline-flex !important;
+  }
+  .netStatus {
+    color: #333;
+    border: 0px solid white;
+    border-radius: 5px;
+  }
+  .timelineImg {
+    image-rendering: pixelated;
+    margin: auto;
+    border-radius: 5px;
+    display: block;
+    width: 256px;
+    border-bottom-left-radius: 0%;
+    border-bottom-right-radius: 0%;
+  }
+  .otherDiv {
+    border: 0px solid white;
+    border-radius: 5px;
+    box-shadow: 0px 0px 6px 6px rgba(122, 122, 122, 0.20);
+  }
+  .frogImg3 {
+    transition: transform .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 1024px !important;
+    height: 1024px !important;
+    border-radius: 5px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    max-width: 400% !important;
+  }
+</style>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <link rel="icon" href="./assets/logo.png">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+    <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
+    <script>
+      // <-- [Google Analytics]
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-6PB0WKB4SH');
+      // -- >
+      // Assign Global Variables
+
+      var frogCount;
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Connect Wallet / Load Minting Terminal
+        //connectWallet();
+        // Connect Ethereum Wallet
+
+        const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
+        const f0 = new F0();    // Connect to Factoria
+        const CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";    // Contract Address (Ethereum Mainnet) 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // Rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
+        const COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
+        const NETWORK = "main";   // Which Network?
+
+        // Rarities
+        // Attribute Rarities
+        var attributesTotal = {
+          'goldChain' : 0,
+          'goldDollarChain' : 0,
+          'silverChain' : 0,
+          'silverEthChain' : 0,
+          'circleGlasses' : 0,
+          'circleNightVision' : 0,
+          'circleShadesPurple' : 0,
+          'circleShadesRed' : 0,
+          'shades' : 0,
+          'shadesPurple' : 0,
+          'shadesThreeD' : 0,
+          'shadesWhite' : 0,
+          'blueDartFrog' : 0,
+          'blueTreeFrog' : 0,
+          'brownTreeFrog' : 0,
+          'cyanTreeFrog' : 0,
+          'goldenDartFrog' : 0,
+          'goldenTreeFrog' : 0,
+          'grayTreeFrog' : 0,
+          'greenTreeFrog' : 0,
+          'lightBrownTreeFrog' : 0,
+          'natural' : 0,
+          'orangeTreeFrog' : 0,
+          'pinkTreeFrog' : 0,
+          'purpleTreeFrog' : 0,
+          'redEyedTreeFrog' : 0,
+          'splendidLeafFrog' : 0,
+          'stawberryDartFrog' : 0,
+          'tomatoFrog' : 0,
+          'treeFrog(1)' : 0,
+          'treeFrog(2)' : 0,
+          'treeFrog(2)' : 0,
+          'treeFrog(4)' : 0,
+          'treeFrog(5)' : 0,
+          'treeFrog(6)' : 0,
+          'treeFrog(7)' : 0,
+          'treeFrog(8)' : 0,
+          'unknown' : 0,
+          'baseballCapBlue' : 0,
+          'baseballCapRed' : 0,
+          'baseballCapWhite' : 0,
+          'cowboyHatBlack' : 0,
+          'cowboyHatBrown' : 0,
+          'cowboyHatTan' : 0,
+          'cowboyHatWhite' : 0,
+          'crown' : 0,
+          'stockingCap' : 0,
+          'topHatBlue' : 0,
+          'topHatRed' : 0,
+          'topHatYellow' : 0,
+          'witchBlack' : 0,
+          'witchBrown' : 0,
+          'witchStraw' : 0,
+          'bandannaBlue' : 0,
+          'bandannaRed' : 0,
+          'mask' : 0,
+          'smoking' : 0,
+          'smokingCigar' : 0,
+          'smokingPipe' : 0,
+          'tongue' : 0,
+          'tongueFly' : 0,
+          'tongueSpider' : 0,
+          'tongueSpiderRed' : 0,
+          'closedEyes' : 0,
+          'croaking' : 0,
+          'inversedEyes' : 0,
+          'peace' : 0,
+          'thirdEye' : 0,
+          'blue(2)' : 0,
+          'blue' : 0,
+          'brown' : 0,
+          'cyan' : 0,
+          'darkGreen' : 0,
+          'green' : 0,
+          'orange(2)' : 0,
+          'orange' : 0,
+          'pink' : 0,
+          'purple(2)' : 0,
+          'purple' : 0,
+          'red(2)' : 0,
+          'red' : 0,
+          'sand' : 0,
+          'white(2)' : 0,
+          'white' : 0,
+          'yellow(2)' : 0,
+          'yellow' : 0
+        } // Start at 0
+
+        // CONST Website Variables
+        var frogCount = 1;
+
+        // Load OpenSea API :)
+
+        const options = {
+          method: 'GET',
+          headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+        };
+
+        fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
+        .then(collection => collection.json())
+        .then(collection => {
+
+          var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
+
+          traits_list = traits;
+
+          document.getElementById('banner_image').setAttribute('src', banner_image_url)
+          document.getElementById('name').innerHTML = name
+          document.getElementById('count').innerHTML = (count/1000).toFixed(2) + 'k'
+          document.getElementById('num_owners').innerHTML = num_owners
+          document.getElementById('floor_price').innerHTML = 'Ξ'+floor_price
+          document.getElementById('total_volume').innerHTML = 'Ξ'+total_volume.toFixed(2)
+          //document.getElementById('description').innerHTML = description
+          //document.getElementById('created_date').innerHTML = 'Created ' + created_date
+
+        })
+        .catch(e => {
+
+            console.log('Error: Could not talk to Opensea!');
+            console.error('Error : ' + e.message)
+      
+        });
+
+
+        try {   // Connect Wallet
+
+          //consoleOutput('<strong></strong><br>Connecting...<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+
+          await f0.init({
+            web3: web3,
+            contract: CONTRACT_ADDRESS,
+            network: NETWORK
+          })
+
+          // Assign Variables (Fetch from Connect)
+          // CONNECTED USER'S WALLET ADDRESS; AND INVITES
+          userAddress = await web3.currentProvider.selectedAddress;
+          addressCut = userAddress.substring(0, 5)+".."+userAddress.slice(-4);
+          userInviteList = await f0.myInvites();
+          userInviteKeys = Object.keys(userInviteList);
+
+          // CONTRACT NAME, SYMBOL, NEXT ID;
+          name = await f0.api.name().call();
+          symbol = await f0.api.symbol().call();
+          nextId = await f0.api.nextId().call();
+          nextIdC = parseInt(nextId);
+
+          //document.getElementById('connected').innerHTML = 'Connect Wallet ✔️'
+
+          userInvite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+          ownedFrogs = await collection.methods.balanceOf(userAddress).call();
+          
+          console.log('Wallet Connected! '+userAddress);
+          console.log('Contract Connected! '+name+' | '+symbol);
+
+          // Clear Status
+
+          //document.getElementById('netStatus').innerHTML = '<br><h2 style="color: white !important;"><b>freshfrogs.io</b></h2><div id="pre" class="consoleOutput"></div>';
+          
+          // Messages Sent to Terminal (Again)
+          //document.getElementById("supply").innerHTML = "Fresh Frog #"+nextIdC+" / 4040" // Supply
+          document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.io/frog/"+nextIdC+".png");
+
+          // ----------------------------->
+
+          mint = 1; // <--- Mint On or Off? 1 / 0
+
+          // <-----------------------------
+          //document.getElementById('mintingText').innerHTML = "<strong>Minting ("+frogCount+") FROG Tokens...</strong>"+"<br>\nPlease sign the transaction and wait...<br>\nDo not leave or refresh the page!"
+          //document.getElementById('mintingText').className = "mintingTextWhite"
+          // Done! Ready to mint!
+        } catch (e) { // Failed; Send Error Code!
+          //consoleOutput("<br>"+"<div class='mintingTextRed'><strong>Error Linking Wallet: <br>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
+          consoleOutput(e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+          return;
+        }
+        getInvites(); // Check and Confirm Invite Keys
+        document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+        document.getElementById("mintTransact").removeAttribute("href")                                       // Removes mint button link
+        // Get Owned Frogs
+
+        fetch('https://api.opensea.io/api/v1/assets?owner='+userAddress+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=50&include_orders=false', options)
+        .then((res) => res.json())
+        .then((res) => {
+          loaded = 0;
+          var { assets } = res
+          assets.forEach((frog) => {
+
+            var { name, token_metadata, permalink, traits, external_link, token_id } = frog
+
+            recent_sale = document.createElement('a');
+            recent_sale.className = 'recent_sale';
+            recent_sale.style.width = 128+64+'px';
+            recent_sale.href = permalink;
+            recent_sale.innerHTML = 
+                '<div id="'+name+'" class="trait_display"><img class="frog_img" src='+external_link+'></div>' +
+                '<i class="label_name">FreshFrogsNFT</i>' +
+                '<strong class="frog_name">'+name+'</strong> ';
+            document.getElementById('recent_sales').appendChild(recent_sale);
+
+            fetch(token_metadata)
+            .then((metadata) => metadata.json())
+            .then((metadata) => {
+              // Loop Attributes
+              for (var i = 0; i < metadata.attributes.length; i++){
+                //console.log(metadata.attributes[i]);
+
+                // Trait_Type : Value
+                var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                let trait_type = attribute.trait_type
+                let value = attribute.value
+
+                // Build Fresh Frogs Attributes
+                //load_trait(trait_type, value, name);
+                console.log(trait_type+' : '+value);
+                
+              }
+            })
+
+          })
+
+          // Finish Loading Bar
+          consoleOutput('<br>'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAddress)+' ]</acc><br>'+'[ '+ownedFrogs+' ] Frogs belong to this wallet!<br>'+'<strong class="pointer" onclick="load_ownedFrogs_manual()"><u>Check via IPFS</u> 🔃</strong>'+'<p></p>')
+
+        })
+        .catch(e => {
+
+          console.log(e.message);
+          console.log('Error: Could not get Collection data from Opensea.');
+          consoleOutput('<br>'+'<strong>Connected!</strong> Could not talk to OpenSea! <br>Loading Frogs from IPFS... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br>')
+      
+        });
+
+        document.querySelector("#mintTransact").addEventListener("click", async (e) => {
+          if (mint === 0) { // || nextIdC >= 3021
+            //consoleOutput("<strong></strong>"+"<b><a class='pointer' target='_blank' href='https://twitter.com/FreshFrogs_NFT'>Follow @FreshFrogs_NFT for updates!</b></a></div>")
+            consoleOutput('Mint is currently closed!<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+            return; // BREAK!
+
+          } else { // SEND MINT TX!
+
+            try { // Attempt to Send! '<strong>Minting ('+frogCount+'') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'
+              //document.getElementById('mintingText').innerHTML = '<br>'+'<strong>Minting ('+frogCount+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br><p></p>'
+              consoleOutput('<strong>Minting ('+frogCount+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
+              document.getElementById('pre').className = 'mintingTextWhite'
+              
+              let tokens = await f0.mint(userInvite, frogCount) // AWAIT RESPONSE!
+
+            } catch (e) { // Something went wrong!
+              //consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><b>''</b>"+e.message+"<b>''</b><a href='https://discord.gg/xWMFWgpvd3' target='_blank' class='pointer'><b><u>Discord #Support</u></b></a></div>");
+              consoleOutput(e.message+'<a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
+              document.getElementById('pre').className = 'mintingTextWhite'
+              return; // BREAK!
+            }
+            // MINT SENT NO PROBLEMS!
+            //document.getElementById('mintingText').innerHTML = "<br><div class='mintingText'><h3 class='h3'>Congratulations!</h3> <b>"+frogCount+" FROG(s) </b>have successfully been minted! <a class='pointer' href='https://freshfrogs.io/the-pad'><b>View 'FROG' Tokens</a></b></div><br>"
+            consoleOutput('<h3 class="h3">Congratulations!</h3> <b>'+frogCount+' FROG(s)</b> have successfully been minted! <a class="pointer" href="https://freshfrogs.io/the-pad"><b>View "FROG" Tokens</a></b></div><br>')
+            document.getElementById('pre').className = "mintingTextGreen"
+            return; // BREAK!
+          }
+        })
+        // Remove FROG from minting tray
+        document.querySelector("#removeFrog").addEventListener("click", async (e) => {
+          if (frogCount >= 7) {
+            var select = document.getElementById("frogContainer");
+            select.removeChild(select.lastChild);
+            frogCount = frogCount - 1
+          } else if (frogCount >= 4) {
+            var select = document.getElementById("frogContainer2");
+            select.removeChild(select.lastChild);
+            frogCount = frogCount - 1
+          } else if (frogCount >= 2) {
+            var select = document.getElementById("frogContainer3");
+            select.removeChild(select.lastChild);
+            frogCount = frogCount - 1
+          }
+          if (frogCount <= 1) {
+            mintList = nextIdC
+          } else {
+            mintList = nextIdC+" - "+((nextIdC-1)+frogCount)
+          }
+          document.getElementById("mintTotal").innerHTML = "<strong>Ξ"+(frogCount*mintPrice)+"</strong>+ gas"
+          document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
+          document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+          //document.getElementById("supply").innerHTML = "FROG(s) # "+mintList // Supply
+        })
+        // ADD FROG to minting tray
+        document.querySelector("#addFrog").addEventListener("click", async (e) => {
+          if (frogCount !== 9) {
+            if (frogCount <= 2) {
+              newFrog = document.createElement("div")
+              newFrog.className = "imgWrapperMint"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              document.getElementById("frogContainer3").appendChild(newFrog)
+              frogCount = frogCount + 1
+            } else if (frogCount <= 5) {
+              newFrog = document.createElement("div")
+              newFrog.className = "imgWrapperMint"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              document.getElementById("frogContainer2").appendChild(newFrog)
+              frogCount = frogCount + 1
+            } else if (frogCount <= 8) {
+              newFrog = document.createElement("div")
+              newFrog.className = "imgWrapperMint"
+              newFrog.innerHTML = "<img class='frogImgMint' src='https://freshfrogs.io/frog/"+(nextIdC+frogCount)+".png'/>"
+              document.getElementById("frogContainer").appendChild(newFrog)
+              frogCount = frogCount + 1
+            }
+            
+            if (frogCount <= 1) {
+              mintList = nextIdC
+            } else {
+              mintList = nextIdC+" - "+((nextIdC-1)+frogCount)
+            }
+            document.getElementById("mintTotal").innerHTML = "<strong>Ξ"+(frogCount*mintPrice)+"</strong>+ gas"
+            document.getElementById("frogQuant").innerHTML = "  "+frogCount+"  "
+            document.getElementById("mintTransact").innerHTML = "<strong>☛MINT</strong><u>"+frogCount+" FROG(s)</u>"
+            //document.getElementById("supply").innerHTML = "FROG(s) # "+mintList // Supply
+          }
+        })
+      })
+      function roundToTwo(number) { // Round Numbers
+        let result = Math.round((number + Number.EPSILON) * 100)
+        if (result < 1) { return '<1' } else { return result }
+      }
+      async function applyInvite() {
+        userInvite = userInviteCode
+        mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
+        mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
+        document.getElementById("mintTotal").innerHTML = "<strong>Ξ"+(mintPrice)+"</strong>+ gas"
+        consoleOutput('<b>Connected!</b> <acc style="color: white !important;">[ '+truncateAddress(userAddress)+' ]</acc><br>'+'Frog ( '+nextIdC+' / 4040 )'+' is now available to mint!<br>Maximum of <u>'+(mintLimit-ownedFrogs)+'</u> Frogs per wallet! [@ '+mintPrice+' ΞETH]<br>'+'<p></p>')
+      }
+      // Get User's Invite Codes
+      async function getInvites() {
+
+        // Fetch Public Invite 0x000
+        mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
+        mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
+        document.getElementById("mintTotal").innerHTML = "<strong>Ξ"+(mintPrice)+"</strong>+ gas"
+
+        // Public Invite Message
+        inviteMessage = 'Frog ( #'+nextIdC+' / 4040)'+' is now available to mint!<br>Maximum of <u>'+mintLimit+'</u> Frogs per wallet!<br>'+'<p></p>'
+        console.log("Getting Invites...")
+        for (var i = 0; i < 5; i++) { // Loop Five Times; Check First Five Invites
+          let thisInvite = userInviteKeys[i]
+          if (thisInvite === "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064") { // 0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359
+            // NF7UOS / C7AR Bypass
+            if (userAddress === "0x97648BB89f2C5335fDeCE9edeEBB8d88FA3D0A38".toLowerCase()  || userAddress === "0xCeed98bF7F53f87E6bA701B8FD9d426A2D28b359_0".toLowerCase() || userAddress === "0xF01e067d442f4254cd7c89A5D42d90ad554616E8".toLowerCase() || userAddress === "0x8Fe45D16694C0C780f4c3aAa6fCa2DDB6E252B25".toLowerCase()) {
+              // Unlimited Free Mints
+              userInvite = "0x27e18d050c101c6caf9693055d8be1f71d62e8639a2f3b84c75403a667f3e064";
+              mintPrice = JSON.stringify(userInviteList[userInvite].condition.converted.eth, userInvite, 1)
+              mintLimit = JSON.stringify(userInviteList[userInvite].condition.converted.limit, userInvite, 1)
+              document.getElementById("mintTotal").innerHTML = "<strong>Ξ"+(mintPrice)+"</strong>+ gas"
+              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Maximum of <u>'+(mintLimit-ownedFrogs)+'</u> Frogs per wallet!<br>'+'<p></p>'
+              break;
+            } 
+          } else if (thisInvite === "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b") {
+            if (ownedFrogs <= 9) {
+
+              userInviteCode = "0x307715518f6f5415ef52982008043b9b481ab5d5c2e44dde262dbfc379e0863b"
+
+              invLimit = JSON.stringify(userInviteList[userInviteCode].condition.converted.limit, userInvite, 1)
+              invPrice = JSON.stringify(userInviteList[userInviteCode].condition.converted.eth, userInvite, 1)
+
+              inviteMessage = 'Frog #'+nextIdC+' is now available to mint!<br>Invite found! Valid for <u>'+(invLimit-ownedFrogs)+'</u> Frogs @ '+invPrice+' ΞETH<a class="pointer" id="applyInvite" onclick="applyInvite()"><strong><u>Apply Invite</u></strong></a>'
+              break;
+            } else { console.log('Too many Frogs owned for invite.. Public invite applied') }
+          }
+        }
+        consoleOutput('<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(userAddress)+' ]</acc><br>'+inviteMessage)
+      }
+
+      // Output to minting terminal
+      function consoleOutput(output) {
+        document.getElementById("pre").innerHTML = output
+      }
+      function truncateAddress(address) {
+        if (!address) {
+          return "";
+        }
+        return `${address.substr(0, 5)}...${address.substr(
+          address.length - 5,
+          address.length
+        )}`;
+      }
+      // Random Number
+      function randomNumber(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+      // Load Fresh Frog
+      function load_token(token) {
+
+        openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+token
+
+        newFrog = document.createElement("div")
+        newFrog.id = token
+        newFrog.className = 'frogPanel'
+        newFrog.innerHTML = '<a style="margin-bottom" 0px !important;  display: inline !important;" class="smallContainer2 pointer2" id="Frog #'+token+'"><img class="frogImg3" src="https://freshfrogs.io/frog/'+token+'.png"/></a>'+'<p class="attributeList" id="Frog #'+token+'Desc"></p>'
+        document.getElementById("thePad").appendChild(newFrog)
+
+        document.getElementById('Frog #'+token+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>Frog #'+token+'</u></b> ↗️'+'</a>';
+
+      }
+      // Load attribute
+      function load_trait(trait, attribute, where) {
+        newAttribute = document.createElement("img")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        if (where == 'frogContainer4') {
+          newAttribute.className = "frogImg4" //shadesAnimation
+        } else {
+          newAttribute.className = "frogImg2" //shadesAnimation
+        }
+        
+        newAttribute.style.cursor = "pointer"
+        if (attribute === "smoking" || attribute === "smokingPipe" || attribute === "smokingCigar") { 
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+"2.gif"
+        } else if (attribute === "morphAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
+        } else if (attribute === "shadesAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+        } else if (attribute.includes("croaking2")) {
+          console.log('! '+trait+' / '+attribute)
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
+        } else {
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
+        }
+        newAttribute.alt = attribute
+        document.getElementById(where).appendChild(newAttribute)
+      }
+      // -- END FUNCTIONS ------------------------------------------------------------------------------------------------------------------------------
+    </script>
+  </head>
+  <body class="bodyb">
+    <div class="wrapper">
+      <header>
+        <div class="downloads pre">
+          <div id="mintingTray">
+            <ul class="downloads2">
+              <li><a id="mintTransact" href="https://freshfrogs.io/" class="pointer"><p>Connect Wallet!</p></a></li>
+              <li><a id="mintTotal"><strong>Ξ0.01</strong>+ gas</a></li>
+              <li><a class="pointer"><strong><b id="removeFrog" class="pointer">−</b><frogQuant id="frogQuant">  1  </frogQuant><b id="addFrog" class="pointer">+</b></strong>Quantity</a></li>
+            </ul>
+            <div class="bigContainer">
+              <div id="frogContainer" class="containerMint"></div>
+              <div id="frogContainer2" class="containerMint"></div>
+              <div id="frogContainer3" class="containerMint">
+                <div class="imgWrapperMint"><img id="previewImg" class="frogImgMint" src="https://freshfrogs.io/assets/frogs/preview2.gif"/></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <section>
+        <div class="downloads pre">
+          <div id="netStatus" class="netStatus">
+            <img id="banner_image" src="../assets/frogs/backfrogs.png" style="border-radius: 5px; height: auto !important; width: 100% !important; margin-bottom: 14px; transform: scale(1.01);">
+            <a style="display: inline-flex !important;" href="https://opensea.io/collection/fresh-frogs" target="_blank"><h1 class="collection-name" id="name">FreshFrogsNFT</h1><img class="headLineImg" src="../assets/opensea.png"></a><p style="display: inline-block !important;">items: <b id="count">3577</b> | owners: <b id="num_owners">540</b> | floor price: <b id="floor_price">-- Ξ</b> | total volume: <b id="total_volume">0.38 Ξ</b></p>
+            {{ content }}
+            <div style="margin-left: auto; margin-right: auto; text-align: center;">
+              <div id="recent_sales" class="recent_sales"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+  </body>
+</html>
