@@ -700,7 +700,7 @@
 
         const options = {
           method: 'GET',
-          headers: {Accept: 'application/json', 'X-API-KEY': '48ffee972fc245fa965ecfe902b02ab4'}
+          headers: {accept: '*/*', 'x-api-key': '48ffee972fc245fa965ecfe902b02ab4'}
         };
 
         // Collection Data
@@ -732,8 +732,8 @@
 
         
         // Get recent mints
-      
-        fetch('https://api.opensea.io/api/v2/chain/ethereum/contract/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b/nfts&limit=3&include_orders=false', options)
+
+        fetch('https://api.opensea.io/api/v2/chain/ethereum/contract/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b/nfts?limit=3', options)
         .then(res => res.json())
         .then(res => {
 
