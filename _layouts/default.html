@@ -841,11 +841,11 @@
 
             const nftResp = await getNftByTokenId(thisToken);
             const nft = nftResp?.nft ?? nftResp;
-            const token_metadata = normalizeIpfsUrl(nft?.metadata_url ?? nft?.metadata_uri ?? nft?.metadata);
+            //const token_metadata = normalizeIpfsUrl(nft?.metadata_url ?? nft?.metadata_uri ?? nft?.metadata);
 
             if (!token_metadata) continue;
 
-            const metadata = await fetch(token_metadata).then(r => r.json());
+            const metadata = await fetch(`https://freshfrogs.github.io/frog/json/${thisToken}.json`).then(r => r.json());
 
             for (var i = 0; i < metadata.attributes.length; i++) {
               var attribute = metadata.attributes[i]; // attribute.trait_type / attribute.value
