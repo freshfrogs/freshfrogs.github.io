@@ -845,7 +845,12 @@
 
             if (!token_metadata) continue;
 
-            const metadata = await fetch(`https://freshfrogs.github.io/frog/json/${thisToken}.json`).then(r => r.json());
+            const metaUrl = `https://freshfrogs.github.io/frog/json/${thisToken}.json`;
+
+            const metaRes = await fetch(metaUrl);
+            if (!metaRes.ok) throw new Error(`Metadata ${metaRes.status} for token ${thisToken}`);
+
+            const metadata = await metaRes.json();
 
             for (var i = 0; i < metadata.attributes.length; i++) {
               var attribute = metadata.attributes[i]; // attribute.trait_type / attribute.value
