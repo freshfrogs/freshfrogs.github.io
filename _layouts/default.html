@@ -740,64 +740,139 @@
       
         }); // End data pull / first paid Frog 3,236 */
         
-        fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=3&include_orders=false', options)
-        .then((res) => res.json())
-        .then((res) => {
-          //console.log(res)
-          var { assets } = res
-          var nextIdC = parseInt(assets[0].name.replace('Frog #', '')) + 1;
-          // Messages Sent to Terminal
-          document.getElementById("supply").innerHTML = nextIdC+" / 4040 Total Supply" // Supply
-          document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/"+nextIdC+".png");
+        
+        // --- OpenSea API v2 (replaces deprecated /api/v1/* endpoints) ---
+        const OPENSEA_API_BASE = 'https://api.opensea.io/api/v2';
+        const OPENSEA_CHAIN = 'ethereum';
+        const OPENSEA_COLLECTION_SLUG = 'fresh-frogs';
 
-          assets.forEach((frog) => { // For Each FROG
-            var { name, token_metadata, permalink, traits } = frog
+        function normalizeIpfsUrl(url) {
+          if (!url) return url;
+          if (url.startsWith('ipfs://')) return 'https://ipfs.io/ipfs/' + url.slice('ipfs://'.length);
+          return url;
+        }
 
-            // Attribute Rarities
-            //console.log('Loading... '+name);
-            for (var i = 0; i < traits.length; i++) {
-              attributesTotal[traits[i].value] = traits[i].trait_count
+        async function openseaGetJson(url) {
+          const res = await fetch(url, options);
+          if (!res.ok) {
+            const body = await res.text().catch(() => '');
+            throw new Error(`OpenSea ${res.status} ${res.statusText}${body ? ' - ' + body : ''}`);
+          }
+          return res.json();
+        }
+
+        async function loadCollectionTraitCounts() {
+          // v2 traits endpoint returns per-trait counts. We only need counts to compute % rarity later.
+          const data = await openseaGetJson(`${OPENSEA_API_BASE}/traits/${OPENSEA_COLLECTION_SLUG}`);
+
+          // Handle a few possible response shapes without changing the rest of the rarity logic.
+          const categories = data?.categories ?? data?.traits ?? data;
+
+          const applyCount = (valueKey, countVal) => {
+            if (valueKey == null) return;
+            const n = Number(countVal);
+            if (!Number.isFinite(n)) return;
+            attributesTotal[valueKey] = n;
+          };
+
+          const walkValuesObject = (valuesObj) => {
+            if (!valuesObj || typeof valuesObj !== 'object') return;
+            for (const [valueKey, v] of Object.entries(valuesObj)) {
+              if (typeof v === 'number') applyCount(valueKey, v);
+              else if (v && typeof v === 'object') {
+                // common: { count: 123, ... }
+                if ('count' in v) applyCount(valueKey, v.count);
+              }
             }
-            //console.log('Next ID: '+nextIdC)
-            let thisToken = frog.name.replace('Frog #', '');
+          };
+
+          if (Array.isArray(categories)) {
+            for (const cat of categories) {
+              walkValuesObject(cat?.traits ?? cat?.values ?? cat);
+            }
+          } else if (categories && typeof categories === 'object') {
+            for (const cat of Object.values(categories)) {
+              walkValuesObject(cat?.traits ?? cat?.values ?? cat);
+            }
+          }
+        }
+
+        async function getRecentMintTokenIds(limit = 3) {
+          // Use events instead of deprecated /api/v1/assets ordering.
+          const url = `${OPENSEA_API_BASE}/events/collection/${OPENSEA_COLLECTION_SLUG}?event_type=mint&limit=${limit}`;
+          const data = await openseaGetJson(url);
+          const events = data?.asset_events ?? data?.events ?? [];
+          return events
+            .map(e => e?.nft?.identifier)
+            .filter(id => id != null && id !== '');
+        }
+
+        async function getNftByTokenId(tokenId) {
+          const url = `${OPENSEA_API_BASE}/chain/${OPENSEA_CHAIN}/contract/${CONTRACT_ADDRESS}/nfts/${tokenId}`;
+          return openseaGetJson(url);
+        }
+
+        (async () => {
+          // 1) Load trait counts for rarity % display
+          await loadCollectionTraitCounts();
+
+          // 2) Pull most recent mints (token IDs)
+          const tokenIds = await getRecentMintTokenIds(3);
+          if (!tokenIds.length) return;
+
+          // "Next ID" display uses newest minted token + 1 (same behavior as before)
+          var nextIdC = parseInt(tokenIds[0], 10) + 1;
+
+          document.getElementById("supply").innerHTML = nextIdC + " / 4040 Total Supply"; // Supply
+          document.getElementById("previewImg").setAttribute("src", "https://freshfrogs.github.io/frog/" + nextIdC + ".png");
+
+          // 3) For each recent mint, fetch its metadata_url, then render attributes the same way
+          for (const thisToken of tokenIds) {
+            // Keep name format identical to the old code because IDs & DOM element IDs depend on it.
+            const frogName = 'Frog #' + thisToken;
 
             loadFreshFrog(thisToken);
-            openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
-            document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a class="pointer" href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b> ↗️'+'</a>';
-            
-            fetch(token_metadata)
-            .then((metadata) => metadata.json())
-            .then((metadata) => {
-              // Loop Attributes
-              for (var i = 0; i < metadata.attributes.length; i++){
-                //console.log(metadata.attributes[i]);
+            openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/' + thisToken;
+            document.getElementById('Frog #' + thisToken + 'Desc').innerHTML =
+              '<a class="pointer" href="' + openSeaLink + '" target="_blank" style="image-rendering: auto !important; display: inline !important;">' +
+              '<b><u>' + frogName + '</u></b> ↗️' +
+              '</a>';
 
-                // Trait_Type : Value
-                var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
-                let trait_type = attribute.trait_type
-                let value = attribute.value
-                let trait_rarity = ((attributesTotal[value]/nextIdC)*100).toFixed(0);
+            const nftResp = await getNftByTokenId(thisToken);
+            const nft = nftResp?.nft ?? nftResp;
+            const token_metadata = normalizeIpfsUrl(nft?.metadata_url ?? nft?.metadata_uri ?? nft?.metadata);
 
-                if (trait_rarity < 1) {
-                  trait_rarity = '<1';
-                }
+            if (!token_metadata) continue;
 
-                // Build Fresh Frogs Attributes
-                loadAttribute(trait_type, value, frog.name)
-                newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
-                if (trait_type == 'Trait') { newAttribute.innerHTML = value + ' trait <b><i class="trait">'+trait_rarity+'%</i></b>'; } 
-                  else { newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">'+trait_rarity+'%</i></b>'; }
-                newAttribute.className = value;
-                space = document.createElement('br')
-                document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
-                document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+            const metadata = await fetch(token_metadata).then(r => r.json());
+
+            for (var i = 0; i < metadata.attributes.length; i++) {
+              var attribute = metadata.attributes[i]; // attribute.trait_type / attribute.value
+              let trait_type = attribute.trait_type;
+              let value = attribute.value;
+              let trait_rarity = ((attributesTotal[value] / nextIdC) * 100).toFixed(0);
+
+              if (trait_rarity < 1) {
+                trait_rarity = '<1';
               }
-            })
-          })
-        }) // End OpenSea API
-        .catch((e) => {
-          console.log('Could not talk to OpenSea! '+e.message)
-        })
+
+              // Build Fresh Frogs Attributes (unchanged)
+              loadAttribute(trait_type, value, frogName);
+              newAttribute = document.createElement('text');
+              if (trait_type == 'Trait') {
+                newAttribute.innerHTML = value + ' trait <b><i class="trait">' + trait_rarity + '%</i></b>';
+              } else {
+                newAttribute.innerHTML = value.slice(0, 13) + ' ' + '<b><i class="trait">' + trait_rarity + '%</i></b>';
+              }
+              newAttribute.className = value;
+              space = document.createElement('br');
+              document.getElementById('Frog #' + thisToken + 'Desc').appendChild(space);
+              document.getElementById('Frog #' + thisToken + 'Desc').appendChild(newAttribute);
+            }
+          }
+        })().catch((e) => {
+          console.log('Could not talk to OpenSea! ' + (e && e.message ? e.message : e));
+        });
 
 
         try {   // Connect Wallet
