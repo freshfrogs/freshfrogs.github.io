@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>freshfrogs.github.io</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="layout-4">
+  <!-- Random trait-built frogs background -->
+  <div id="frog-bg"></div>
+  <div class="page">
+    <!-- HEADER -->
+    <header class="site-header">
+      <nav class="nav">
+        <!-- ✅ Top-left Connect Wallet (hidden automatically after connect) -->
+
+        <a href="/" data-view="collection">Collection</a>
+        <a href="/rarity/" data-view="rarity">Rarity</a>
+        <a href="/pond/" data-view="pond">Pond</a>
+
+        <!-- Keep Morph link in HTML; JS hides it until connected -->
+        <a href="/morph/" data-view="morph">Morph</a>
+
+        <!-- ✅ Shop on OpenSea
+        <a href="https://opensea.io/collection/fresh-frogs"
+          target="_blank" rel="noopener noreferrer">
+          OpenSea
+        </a> -->
+
+        <!-- Wallet address link, shown after connect -->
+        <a href="#" id="header-connect-wallet-btn">Connect</a>
+        <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
+      </nav>
+    </header>
+
+    <!-- HERO (copied 1:1) -->
+    <section class="hero">
+      <div class="hero-main">
+        <div class="hero-media">
+          <img src="/frog/16.png" class="fly" />
+          <img src="/frog/3753.png" class="fly" />
+          <img src="/frog/467.png" class="fly" />
+          <img src="/frog/594.png" class="fly" />
+        </div>
+        <h1 class="hero-title">freshfrogs.github.io</h1>
+        <p class="hero-subtitle">
+          A collection of 4,040 randomly generated frogs on the Ethereum
+          blockchain, that are each unique with thousands of different
+          combinations!
+          Stake and earn rewards, level up, unlock custom trait animations and
+          more! All secondary sales are entitled to a <b>5%</b> royalty.
+        </p>
+      </div>
+    </section>
+
+    <!-- MAIN -->
+    <main class="dashboard-main">
+      <section
+        class="panel dashboard-section"
+        id="morph-panel"
+        style="background: transparent; box-shadow: none; padding: 0;"
+      >
+        <h2>Morph Lab</h2>
+        <p class="dashboard-note">
+          Preview Frog Morphing<br>
+          Combine two frogs and save them via this site
+        </p>
+        <p class="dashboard-note" id="morph-status">
+        </p>
+
+        <!-- PRE-GENERATED MORPH FROGCARD -->
+        <div id="morph-card-slot" style="margin-top:16px;">
+          <div class="recent_sale_card" style="margin:0 auto;">
+
+            <div class="recent_sale_header">
+              <div class="sale_card_title">Morphed Preview</div>
+            </div>
+
+            <!-- layered preview goes here -->
+            <div id="morph-preview" class="frog_img_cont"></div>
+
+            <!-- name bottom-left, slash format -->
+            <div
+              class="frog_name"
+              id="morph-name"
+              style="margin: 6px 8px 2px; text-align:left;"
+            >
+              Morphed Preview #— / #—
+            </div>
+
+            <!-- metadata list injected here -->
+            <div class="recent_sale_properties" id="morph-traits"></div>
+
+            <!-- ✅ Buttons moved to bottom of card -->
+            <div style="display:flex; gap:8px; padding:8px; justify-content:flex-end;">
+              <button id="morph-save-btn" class="btn secondary" type="button" style="width: 100%;">Morph</button>
+            </div>
+
+          </div>
+        </div>
+
+        <section
+          class="panel dashboard-section"
+          id="morphed-owned-panel"
+          style="background: transparent; box-shadow: none; padding: 0; margin-top: 24px;"
+        >
+          <h2>Your Morphed Frogs</h2>
+          <p class="dashboard-note" id="morphed-frogs-status">
+            Connect your wallet to load your morphed frogs.
+          </p>
+
+          <div id="morphed-frogs-grid" class="nft-grid"></div>
+        </section>
+
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <span class="footer-links" style="color: white;">
+        <a href="#">freshfrogs.github.io</a>
+      </span>
+    </footer>
+  </div>
+
+  <!-- Web3 -->
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+  <!-- ABIs + legacy helpers -->
+  <script src="../assets/collection_abi.js"></script>
+  <script src="../assets/controller_abi.js"></script>
+  <script src="../assets/ethereum-dapp.js"></script>
+
+  <!-- Rarity rankings -->
+  <script src="../assets/rarityrankings.js"></script>
+
+  <!-- Main site logic -->
+  <script src="../assets/site.js"></script>
+  <script src="../assets/scatter-frogs.js"></script>
+
+  <!-- Morph logic -->
+  <script src="../assets/morph.js"></script>
+</body>
+</html>

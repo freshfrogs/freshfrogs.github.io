@@ -1,0 +1,31 @@
+{
+  "name": "Toad #781",
+  "description": "Toadz (TOAD) is a Fresh Frogs derivative of 2,222 randomly generated pixel art Toadz on the Ethereum blockchain! 5% Sales Royalty. Learn more at https://toadz.freshfrogs.io",
+  "external_url": "https://toadz.freshfrogs.io/toad/781.png",
+  "image": "ipfs://replaceBaseURI/781.png",
+  "dna": "0dbe757c091be4077d2c4f11beb6e8588b51b922",
+  "edition": 781,
+  "date": 1674045656981,
+  "attributes": [
+    {
+      "trait_type": "Toad",
+      "value": "americanToad"
+    },
+    {
+      "trait_type": "Trait",
+      "value": "green(2)"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "silverChain"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "cowboyHatTan"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "bandannaRed"
+    }
+  ]
+}

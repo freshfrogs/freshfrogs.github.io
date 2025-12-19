@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>freshfrogs.github.io</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../style.css" />
+
+  <!-- Frog background canvas styles -->
+  <style>
+    #frog-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: #bfe8ff; /* light blue */
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+  </style>
+</head>
+<body class="layout-4">
+  <!-- Random trait-built frogs background -->
+  <canvas id="frog-bg"></canvas>
+
+  <div class="page">
+    <!-- HEADER -->
+    <header class="site-header">
+      <nav class="nav">
+        <a href="/" data-view="collection">Collection</a>
+        <a href="/rarity/" data-view="rarity">Rarity</a>
+        <a href="/pond/" data-view="pond">Pond</a>
+        <a href="/morph/" data-view="morph">Morph</a>
+
+        <a href="#" id="header-connect-wallet-btn">Connect</a>
+        <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
+      </nav>
+    </header>
+
+    <!-- DASHBOARD HERO -->
+    <section class="hero">
+      <div class="hero-main">
+        <div class="hero-media">
+          <img src="https://freshfrogs.github.io/frog/16.png" class="fly" />
+          <img src="https://freshfrogs.github.io/frog/3753.png" class="fly" />
+          <img src="https://freshfrogs.github.io/frog/467.png" class="fly" />
+          <img src="https://freshfrogs.github.io/frog/594.png" class="fly" />
+        </div>
+        <h1 class="hero-title">freshfrogs.github.io</h1>
+        <p class="hero-subtitle">
+          A collection of 4,040 randomly generated frogs on the Ethereum
+          blockchain, that are each unique with thousands of different
+          combinations!
+          Stake and earn rewards, level up, unlock custom trait animations and
+          more! All secondary sales are entitled to a <b>5%</b> royalty.
+        </p>
+      </div>
+    </section>
+
+    <!-- MAIN DASHBOARD LAYOUT -->
+    <main class="dashboard-main">
+      <!-- Recent Activity (sales / mints) -->
+      <section
+        class="panel dashboard-section"
+        id="recent-activity-panel"
+        style="background: transparent; box-shadow: none; padding: 0;"
+      >
+        <h2>Recent Activity</h2>
+        <p class="dashboard-note" id="recent-sales-status">
+          Loading recent sales...
+        </p>
+
+        <div class="recent_sales" id="recent-sales"></div>
+
+        <button id="load-more-activity" class="btn secondary" type="button">
+          Load More
+        </button>
+      </section>
+
+      <!-- Rarity Rankings -->
+      <section
+        class="panel dashboard-section"
+        id="rarity-panel"
+        style="display:none; background: transparent; box-shadow: none; padding: 0;"
+      >
+        <h2>Rarity Rankings</h2>
+        <p class="dashboard-note" id="rarity-status">
+          Top ranked Frogs across the collection (lower rank = rarer).
+        </p>
+
+        <div id="rarity-grid" class="recent_sales"></div>
+
+        <button id="load-more-rarity" class="btn secondary" type="button">
+          Load More
+        </button>
+      </section>
+
+      <!-- Pond -->
+      <section
+        class="panel dashboard-section"
+        id="pond-panel"
+        style="display:none; background: transparent; box-shadow: none; padding: 0;"
+      >
+        <h2>The Pond</h2>
+        <p class="dashboard-note" id="pond-status">
+          All Frogs currently staked by the community.
+        </p>
+
+        <div id="pond-grid" class="recent_sales"></div>
+
+        <button id="load-more-pond" class="btn secondary" type="button">
+          Load More
+        </button>
+
+        <h3>Recent Morphs</h3>
+        <p class="dashboard-note" id="recent-morphs-status">
+          Loading recent morphs...
+        </p>
+
+        <div id="recent-morphs-grid" class="recent_sales"></div>
+      </section>
+
+      <!-- Owned Frogs -->
+      <section
+        class="panel dashboard-section"
+        id="owned-panel"
+        style="display:none; background: transparent; box-shadow: none; padding: 0;"
+      >
+        <h2>Owned Frogs</h2>
+        <p class="dashboard-note" id="owned-frogs-status">
+          These are Frogs currently held in your wallet.
+        </p>
+
+        <div id="owned-frogs-grid" class="nft-grid"></div>
+      </section>
+
+      <!-- Staked Frogs -->
+      <section
+        class="panel dashboard-section"
+        id="staked-panel"
+        style="display:none; background: transparent; box-shadow: none; padding: 0;"
+      >
+        <h2>Staked Frogs</h2>
+        <p class="dashboard-note" id="staked-frogs-status">
+          These Frogs are staked in the FreshFrogs controller.
+        </p>
+
+        <div id="staked-frogs-grid" class="nft-grid"></div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <span class="footer-links" style="color: white;">
+        <a href="#">freshfrogs.github.io</a>
+      </span>
+    </footer>
+  </div>
+
+  <!-- Web3 for wallet / staking functions -->
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+  <!-- ABIs + legacy staking helpers -->
+  <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
+  <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
+  <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
+
+  <!-- Rarity rankings (must load before site.js) -->
+  <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+
+  <!-- Frog background logic (wrapped to avoid globals) -->
+  <script>
+    (function () {
+      const FROG_SIZE = 64;
+      const MAX_TOKEN_ID = 4040;
+      const META_BASE = "/frog/json/";
+      const META_EXT = ".json";
+      const BUILD_BASE = "/frog/build_files";
+
+      const canvas = document.getElementById("frog-bg");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d", { alpha: false });
+
+      function randInt(min, maxInclusive) {
+        return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
+      }
+
+      function pickRandomTokenIds(count) {
+        const set = new Set();
+        while (set.size < count) {
+          set.add(randInt(1, MAX_TOKEN_ID));
+        }
+        return Array.from(set);
+      }
+
+      function getSkyColor() {
+        return "#bfe8ff";
+      }
+
+      function loadImage(url) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.decoding = "async";
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("Failed to load " + url));
+          img.src = url;
+        });
+      }
+
+      async function fetchMetadata(tokenId) {
+        const url = META_BASE + tokenId + META_EXT;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Metadata fetch failed for " + tokenId);
+        return res.json();
+      }
+
+      function buildLayerUrl(traitType, value) {
+        return `${BUILD_BASE}/${traitType}/${value}.png`;
+      }
+
+      async function buildFrogSpriteFromMetadata(meta) {
+        const off = document.createElement("canvas");
+        off.width = FROG_SIZE;
+        off.height = FROG_SIZE;
+        const octx = off.getContext("2d");
+        octx.imageSmoothingEnabled = false;
+
+        if (!Array.isArray(meta.attributes)) return off;
+
+        for (const attr of meta.attributes) {
+          if (!attr.trait_type || typeof attr.value === "undefined") continue;
+          const url = buildLayerUrl(attr.trait_type, attr.value);
+          try {
+            const img = await loadImage(url);
+            octx.drawImage(img, 0, 0, FROG_SIZE, FROG_SIZE);
+          } catch (err) {
+            // ignore non-visual traits
+          }
+        }
+        return off;
+      }
+
+      function computeFrogPositions() {
+        const W = window.innerWidth;
+        const H = window.innerHeight;
+
+        const area = W * H;
+        const maxFrogs = 150;
+        const approxPerFrogArea = (FROG_SIZE * FROG_SIZE) * 5;
+        let targetCount = Math.floor(area / approxPerFrogArea);
+        targetCount = Math.max(20, Math.min(maxFrogs, targetCount));
+
+        const positions = [];
+        const MIN_DIST = 56;
+        const margin = 16;
+
+        let safety = targetCount * 50;
+        while (positions.length < targetCount && safety-- > 0) {
+          const x = margin + Math.random() * (W - margin * 2 - FROG_SIZE);
+          const y = margin + Math.random() * (H - margin * 2 - FROG_SIZE);
+          const cx = x + FROG_SIZE / 2;
+          const cy = y + FROG_SIZE / 2;
+
+          let ok = true;
+          for (const p of positions) {
+            const pcx = p.x + FROG_SIZE / 2;
+            const pcy = p.y + FROG_SIZE / 2;
+            const dx = cx - pcx;
+            const dy = cy - pcy;
+            if (dx * dx + dy * dy < MIN_DIST * MIN_DIST) {
+              ok = false;
+              break;
+            }
+          }
+          if (ok) positions.push({ x, y });
+        }
+        return positions;
+      }
+
+      async function drawScene() {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.floor(window.innerWidth * dpr);
+        canvas.height = Math.floor(window.innerHeight * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const sky = getSkyColor();
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+        ctx.imageSmoothingEnabled = false;
+
+        const positions = computeFrogPositions();
+        const tokenIds = pickRandomTokenIds(positions.length);
+
+        await Promise.all(tokenIds.map(async (tokenId, i) => {
+          const pos = positions[i];
+          try {
+            const meta = await fetchMetadata(tokenId);
+            const frogSprite = await buildFrogSpriteFromMetadata(meta);
+            ctx.drawImage(
+              frogSprite,
+              Math.floor(pos.x),
+              Math.floor(pos.y),
+              FROG_SIZE,
+              FROG_SIZE
+            );
+          } catch (err) {
+            // ignore failures
+          }
+        }));
+      }
+
+      function handleResize() {
+        drawScene();
+      }
+
+      window.addEventListener("resize", handleResize);
+      window.addEventListener("load", drawScene);
+    })();
+  </script>
+
+  <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
+  <script src="https://freshfrogs.github.io/assets/site.js"></script>
+</body>
+</html>
