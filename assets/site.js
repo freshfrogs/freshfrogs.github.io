@@ -2577,3 +2577,150 @@ function ffRomanToArabic(roman) {
     return await window.ffTotalSpent({ maxMs: 1, maxSalePages: 0, maxMintPages: 0, maxReceipts: 0 });
   };
 })();
+/* =========================================================
+  PATCH: Use OpenSea Collection Stats "total volume" (authoritative)
+  to match OpenSea UI (e.g., Fresh Frogs total volume 0.45 ETH).
+  Leaves mint+gas logic intact.
+
+  Requires:
+    - FF_OPENSEA_API_KEY
+    - FF_OPENSEA_COLLECTION_SLUG
+========================================================= */
+(function () {
+  const STATS_CACHE_KEY = "FF_OS_STATS_CACHE_V1";
+  const STATS_TTL_MS = 60_000; // 1 min cache
+  const LS_KEY_V3 = "FF_TOTAL_SPENT_V3";
+
+  const OPENSEA_API_BASE = "https://api.opensea.io/api/v2";
+
+  function safeParseVolumeEth(obj) {
+    // We handle likely shapes across versions.
+    // Return a string decimal (e.g. "0.45") or null if not found.
+    const candidates = [
+      obj?.total_volume,
+      obj?.stats?.total_volume,
+      obj?.total?.volume,
+      obj?.total?.total_volume,
+      obj?.volume,
+      obj?.stats?.volume,
+    ];
+
+    for (const c of candidates) {
+      if (typeof c === "number" && Number.isFinite(c)) return String(c);
+      if (typeof c === "string" && c.trim() && !isNaN(Number(c))) return c.trim();
+    }
+    return null;
+  }
+
+  function parseEthDecimalToWeiStr(ethStr) {
+    // Avoid float math; parse "0.45" -> wei string.
+    const s = String(ethStr).trim();
+    if (!s) return "0";
+    const neg = s.startsWith("-");
+    const t = neg ? s.slice(1) : s;
+
+    const [wholeRaw, fracRaw = ""] = t.split(".");
+    const whole = wholeRaw.replace(/\D/g, "") || "0";
+    const frac = fracRaw.replace(/\D/g, "").slice(0, 18).padEnd(18, "0");
+
+    const wei = BigInt(whole) * (10n ** 18n) + BigInt(frac || "0");
+    return (neg ? -wei : wei).toString();
+  }
+
+  async function getOpenSeaStatsTotalVolumeWei({ slug, osKey }) {
+    // Cache first
+    try {
+      const raw = localStorage.getItem(STATS_CACHE_KEY);
+      if (raw) {
+        const cached = JSON.parse(raw);
+        if (cached?.t && (Date.now() - cached.t) < STATS_TTL_MS && typeof cached.volWei === "string") {
+          return cached.volWei;
+        }
+      }
+    } catch {}
+
+    const url = `${OPENSEA_API_BASE}/collections/${encodeURIComponent(slug)}/stats`;
+    const res = await fetch(url, {
+      headers: { accept: "application/json", "X-API-KEY": osKey }
+    });
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      throw new Error(`OpenSea stats HTTP ${res.status}: ${txt.slice(0, 200)}`);
+    }
+    const json = await res.json();
+
+    const volEthStr = safeParseVolumeEth(json);
+    if (!volEthStr) throw new Error("Could not locate total volume field in OpenSea stats response.");
+
+    const volWei = parseEthDecimalToWeiStr(volEthStr);
+
+    try {
+      localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({ t: Date.now(), volWei }));
+    } catch {}
+
+    return volWei;
+  }
+
+  function loadV3State() {
+    try {
+      const raw = localStorage.getItem(LS_KEY_V3);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function saveV3State(s) {
+    try { localStorage.setItem(LS_KEY_V3, JSON.stringify(s)); } catch {}
+  }
+
+  function safeBigInt(x) {
+    try { return BigInt(String(x)); } catch { return 0n; }
+  }
+
+  function formatETH(wei, maxDp = 6) {
+    const neg = wei < 0n;
+    let x = neg ? -wei : wei;
+    const base = 10n ** 18n;
+    const whole = x / base;
+    let frac = (x % base).toString().padStart(18, "0").slice(0, maxDp);
+    frac = frac.replace(/0+$/, "");
+    const out = frac ? `${whole}.${frac}` : `${whole}`;
+    return neg ? `-${out}` : out;
+  }
+
+  // Wrap ffTotalSpent() so it uses OpenSea stats volume if it's higher than event-derived volume.
+  const orig = window.ffTotalSpent;
+  if (typeof orig !== "function") return;
+
+  window.ffTotalSpent = async function ffTotalSpentPatched(opts = {}) {
+    const ethStr = await orig(opts); // runs one chunk / or final read
+
+    // Pull globals
+    const slug = opts.slug || (typeof FF_OPENSEA_COLLECTION_SLUG !== "undefined" ? FF_OPENSEA_COLLECTION_SLUG : null);
+    const osKey = opts.osApiKey || (typeof FF_OPENSEA_API_KEY !== "undefined" ? FF_OPENSEA_API_KEY : null);
+    if (!slug || !osKey) return ethStr;
+
+    // Update totals using authoritative OpenSea stats volume
+    const statsWeiStr = await getOpenSeaStatsTotalVolumeWei({ slug, osKey });
+    const s = loadV3State();
+    if (!s) return ethStr;
+
+    const salesWei = safeBigInt(s.salesEthWei || "0");
+    const statsWei = safeBigInt(statsWeiStr || "0");
+
+    // Use the larger of (event-summed ETH-like sales, OpenSea stats total volume)
+    const salesUsedWei = statsWei > salesWei ? statsWei : salesWei;
+
+    const mintWei = safeBigInt(s.mintEthWei || "0");
+    const gasWei = safeBigInt(s.gasWei || "0");
+
+    // We do NOT mark salesDone=true here because we still need sale tx hashes for gas counting.
+    // But we will store the stats volume so it’s visible/debuggable.
+    s.salesStatsEthWei = statsWeiStr;
+    saveV3State(s);
+
+    const totalWei = salesUsedWei + mintWei + gasWei;
+    return formatETH(totalWei, 6);
+  };
+})();
