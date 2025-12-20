@@ -2500,3 +2500,80 @@ function ffRomanToArabic(roman) {
     }
   };
 })();
+/* =========================================================
+  FF Total Spent — ONE COMMAND (runs until DONE, returns ONE number)
+
+  Usage:
+    await ffTotalSpentAllTime()
+
+  Emergency stop:
+    ffTotalSpentAbortAllTime()
+
+  Notes:
+  - No console spam.
+  - Uses your existing ffTotalSpent() + ffTotalSpentDone() + localStorage progress.
+  - Retries on transient HTTP/RPC errors with backoff.
+========================================================= */
+(function () {
+  window.ffTotalSpentAbortAllTime = function () {
+    window.__FF_TOTAL_SPENT_ALLTIME_ABORT = true;
+  };
+
+  window.ffTotalSpentAllTime = async function ffTotalSpentAllTime(opts = {}) {
+    // Abort flag reset each run
+    window.__FF_TOTAL_SPENT_ALLTIME_ABORT = false;
+
+    // These defaults are deliberately conservative (safe for browser).
+    // You can increase maxReceiptsPerStep if you want it faster.
+    const stepOpts = {
+      // ffTotalSpent caps
+      maxMs: Number(opts.maxMsPerStep ?? 8000),           // each internal chunk max runtime
+      maxSalePages: Number(opts.maxSalePagesPerStep ?? 1),
+      maxMintPages: Number(opts.maxMintPagesPerStep ?? 1),
+      maxReceipts: Number(opts.maxReceiptsPerStep ?? 15), // total receipt lookups per chunk
+      includeGas: opts.includeGas !== false,              // default true
+
+      // allow passing overrides (slug/osApiKey/contract/rpcUrl) if needed
+      slug: opts.slug,
+      osApiKey: opts.osApiKey,
+      contract: opts.contract,
+      rpcUrl: opts.rpcUrl,
+    };
+
+    const delayMs = Number(opts.delayMs ?? 150); // small pause between chunks to avoid hammering APIs
+    const maxRetries = Number(opts.maxRetries ?? 8);
+
+    if (typeof window.ffTotalSpent !== "function" || typeof window.ffTotalSpentDone !== "function") {
+      throw new Error("ffTotalSpent / ffTotalSpentDone not found. Paste the V3 code first.");
+    }
+
+    let retries = 0;
+
+    while (!window.ffTotalSpentDone()) {
+      if (window.__FF_TOTAL_SPENT_ALLTIME_ABORT) {
+        throw new Error("Aborted by ffTotalSpentAbortAllTime()");
+      }
+
+      try {
+        // Run one safe chunk. It returns a number string; we ignore until the end.
+        await window.ffTotalSpent(stepOpts);
+        retries = 0; // reset after a successful chunk
+      } catch (e) {
+        retries++;
+        if (retries > maxRetries) {
+          // Keep the error short (your ffTotalSpent already shortens errors)
+          throw e;
+        }
+        // Exponential backoff (no console spam)
+        const backoff = Math.min(8000, 250 * (2 ** (retries - 1)));
+        await new Promise((r) => setTimeout(r, backoff));
+      }
+
+      // tiny pause to yield control + reduce rate-limit risk
+      if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
+    }
+
+    // One final call returns the final ONE number instantly (no more work to do)
+    return await window.ffTotalSpent({ maxMs: 1, maxSalePages: 0, maxMintPages: 0, maxReceipts: 0 });
+  };
+})();
