@@ -2585,3 +2585,77 @@ function ffRomanToArabic(roman) {
     }
   };
 })();
+/* =========================================================
+  FF Grand Total — PROGRESS + STATUS PATCH (no spam)
+  Adds:
+    - ffGrandTotalStatus()
+    - progress option: await ffGrandTotalSpent({ progress:true })
+========================================================= */
+(function () {
+  // Status viewer (reads saved progress)
+  window.ffGrandTotalStatus = function () {
+    try {
+      const raw = localStorage.getItem("FF_GRAND_TOTAL_V2");
+      if (!raw) return { ok: false, msg: "No saved state yet." };
+      const s = JSON.parse(raw);
+      if (!s) return { ok: false, msg: "State unreadable." };
+
+      return {
+        ok: true,
+        salesDone: !!s.salesDone,
+        mintsDone: !!s.mintsDone,
+        salesNext: s.salesNext || null,
+        mintPageKey: s.mintPageKey || null,
+        secondaryVolWei_set: !!s.secondaryVolWei,
+        saleSeenCount: (s.saleSeen || []).length,
+        mintSeenCount: (s.mintSeen || []).length,
+        saleGasWei: s.saleGasWei,
+        mintValueWei: s.mintValueWei,
+        mintGasWei: s.mintGasWei,
+        updatedAt: s.updatedAt
+      };
+    } catch (e) {
+      return { ok: false, msg: e?.message || String(e) };
+    }
+  };
+
+  // Wrap ffGrandTotalSpent with heartbeat progress logging (throttled + capped)
+  const orig = window.ffGrandTotalSpent;
+  if (typeof orig !== "function") return;
+
+  window.ffGrandTotalSpent = async function (opts = {}) {
+    const progress = !!opts.progress;
+
+    // One line every 5s, max 30 lines total
+    const intervalMs = Number(opts.progressEveryMs ?? 5000);
+    const maxLines = Number(opts.maxProgressLines ?? 30);
+
+    let lines = 0;
+    let timer = null;
+
+    if (progress) {
+      timer = setInterval(() => {
+        try {
+          if (lines >= maxLines) return;
+          lines++;
+
+          const st = window.ffGrandTotalStatus();
+          if (!st.ok) {
+            console.log(`[FF] progress: (no state yet)`);
+            return;
+          }
+          console.log(
+            `[FF] progress: salesDone=${st.salesDone} mintsDone=${st.mintsDone} ` +
+            `saleSeen=${st.saleSeenCount} mintSeen=${st.mintSeenCount}`
+          );
+        } catch {}
+      }, intervalMs);
+    }
+
+    try {
+      return await orig(opts);
+    } finally {
+      if (timer) clearInterval(timer);
+    }
+  };
+})();
