@@ -2104,654 +2104,35 @@ function ffRomanToArabic(roman) {
   return total || null;
 }
 
-
 /* =========================================================
-  FF Total Spent — SIMPLE + SAFE (ONE NUMBER)
-
-  What it counts (all-time, resumable):
-    - OpenSea SALES value (ETH+WETH only for the “one number”)
-    - Mint tx.value (ETH paid on mint)
-    - Gas for those txs (sale txs + mint txs)
-
-  What you run:
-    await ffTotalSpent()
-
-  It returns ONE string number (ETH) and stores progress in localStorage.
-  Run it again until ffTotalSpentDone() is true.
-
-  Safety:
-    - hard time cap per call
-    - hard caps on pages and receipts per call
-    - zero log spam
-
-========================================================= */
-(function () {
-  const LS_KEY = "FF_TOTAL_SPENT_V3";
-  const OPENSEA_API_BASE = "https://api.opensea.io/api/v2";
-  const ZERO = "0x0000000000000000000000000000000000000000";
-  const WETH = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-
-  const lower = (s) => (s ? String(s).toLowerCase() : "");
-  const sleep0 = () => new Promise((r) => setTimeout(r, 0));
-
-  function safeBigInt(x) {
-    try {
-      if (x === null || x === undefined) return 0n;
-      if (typeof x === "bigint") return x;
-      if (typeof x === "number") return BigInt(Math.trunc(x));
-      return BigInt(String(x));
-    } catch {
-      return 0n;
-    }
-  }
-
-  function formatETH(wei, maxDp = 6) {
-    const neg = wei < 0n;
-    let x = neg ? -wei : wei;
-    const base = 10n ** 18n;
-    const whole = x / base;
-    let frac = (x % base).toString().padStart(18, "0").slice(0, maxDp);
-    frac = frac.replace(/0+$/, "");
-    const out = frac ? `${whole}.${frac}` : `${whole}`;
-    return neg ? `-${out}` : out;
-  }
-
-  function shortErr(e) {
-    const msg = (e && (e.message || String(e))) ? (e.message || String(e)) : "Unknown error";
-    return msg.length > 280 ? msg.slice(0, 280) + "…" : msg;
-  }
-
-  function loadState() {
-    try {
-      const raw = localStorage.getItem(LS_KEY);
-      if (!raw) return null;
-      const s = JSON.parse(raw);
-      if (!s || s.v !== 3) return null;
-      return s;
-    } catch {
-      return null;
-    }
-  }
-
-  function saveState(s) {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch {}
-  }
-
-  function defaultState() {
-    return {
-      v: 3,
-      updatedAt: Date.now(),
-
-      // OpenSea sales pagination cursor
-      salesNext: null,
-      salesDone: false,
-
-      // Alchemy mint transfers pagination key
-      mintsPageKey: null,
-      mintsDone: false,
-
-      // Rolling dedupe (tx hashes) to avoid double counting across pages
-      seenSales: [],
-      seenMints: [],
-      seenMax: 4000,
-
-      // Totals (wei)
-      salesEthWei: "0",   // ETH+WETH only
-      mintEthWei: "0",
-      gasWei: "0",
-
-      // Counters
-      salesTxCount: 0,
-      mintTxCount: 0,
-    };
-  }
-
-  function pushSeen(arr, hash, max) {
-    arr.push(hash);
-    if (arr.length > max) arr.splice(0, arr.length - max);
-  }
-
-  async function fetchJson(url, headers) {
-    const res = await fetch(url, { headers });
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      throw new Error(`HTTP ${res.status}: ${txt.slice(0, 300)}`);
-    }
-    return res.json();
-  }
-
-  // OpenSea events by collection (REST)
-  async function osSalesPage({ slug, apiKey, next, limit }) {
-    const u = new URL(`${OPENSEA_API_BASE}/events/collection/${encodeURIComponent(slug)}`);
-    u.searchParams.set("limit", String(limit));
-    u.searchParams.set("event_type", "sale"); // REST uses "sale" (your 400 proved item_sold is invalid)
-    if (next) u.searchParams.set("next", next);
-
-    return fetchJson(u.toString(), {
-      "accept": "application/json",
-      "X-API-KEY": apiKey,
-    });
-  }
-
-  function extractEvents(resp) {
-    if (!resp) return [];
-    if (Array.isArray(resp.events)) return resp.events;
-    if (Array.isArray(resp.asset_events)) return resp.asset_events;
-    if (Array.isArray(resp.data)) return resp.data;
-    return [];
-  }
-
-  function extractNext(resp) {
-    return resp?.next || resp?.next_cursor || resp?.nextCursor || null;
-  }
-
-  function txHashFromEvent(evt) {
-    return (
-      evt?.transaction?.hash ||
-      evt?.payload?.transaction?.hash ||
-      evt?.transaction_hash ||
-      evt?.tx_hash ||
-      evt?.txHash ||
-      null
-    );
-  }
-
-  // Returns ETH-like (ETH + WETH) sale value for ONE SALE EVENT
-  // Priority:
-  //  1) Seaport consideration currency items (if present)
-  //  2) sale_price-like fields (fallback)
-  function saleValueEthLikeWei(evt) {
-    // (1) Seaport consideration (best when present)
-    const params =
-      evt?.protocol_data?.parameters ||
-      evt?.payload?.protocol_data?.parameters ||
-      evt?.payload?.payload?.protocol_data?.parameters ||
-      null;
-
-    const cons = params?.consideration;
-    if (Array.isArray(cons) && cons.length) {
-      let sum = 0n;
-      for (const item of cons) {
-        const itemType = item?.itemType;
-        const isCurrency = itemType === 0 || itemType === 1 || itemType === "0" || itemType === "1";
-        if (!isCurrency) continue;
-
-        const token = lower(item?.token || "");
-        const isEth = !token || token === ZERO;
-        const isWeth = token === WETH;
-        if (!isEth && !isWeth) continue;
-
-        const amount = item?.endAmount ?? item?.startAmount ?? item?.amount ?? "0";
-        sum += safeBigInt(amount);
-      }
-      if (sum > 0n) return sum;
-    }
-
-    // (2) Fallbacks (shape varies)
-    // Try common fields that represent the paid amount in wei
-    const candidates = [
-      evt?.sale_price,
-      evt?.payment?.quantity,
-      evt?.payload?.payload?.sale_price,
-    ];
-    for (const c of candidates) {
-      const v = safeBigInt(c);
-      if (v > 0n) return v;
-    }
-
-    return 0n;
-  }
-
-  async function rpc(rpcUrl, method, params) {
-    const body = JSON.stringify({ jsonrpc: "2.0", id: Math.floor(Math.random() * 1e9), method, params });
-    const res = await fetch(rpcUrl, { method: "POST", headers: { "content-type": "application/json" }, body });
-    const json = await res.json().catch(() => null);
-    if (!res.ok || !json) throw new Error(`RPC HTTP ${res.status}`);
-    if (json.error) throw new Error(json.error.message || "RPC error");
-    return json.result;
-  }
-
-  async function getGasWei(rpcUrl, txHash) {
-    const rcpt = await rpc(rpcUrl, "eth_getTransactionReceipt", [txHash]);
-    const gasUsed = safeBigInt(rcpt?.gasUsed || "0x0");
-    const effGasPrice = safeBigInt(rcpt?.effectiveGasPrice || rcpt?.gasPrice || "0x0");
-    return gasUsed * effGasPrice;
-  }
-
-  async function getTxValueWei(rpcUrl, txHash) {
-    const tx = await rpc(rpcUrl, "eth_getTransactionByHash", [txHash]);
-    return safeBigInt(tx?.value || "0x0");
-  }
-
-  // Alchemy enhanced method (works if your FF_ALCHEMY_CORE_BASE is an Alchemy endpoint)
-  async function alchemyMintTxHashesPage(rpcUrl, contract, pageKey) {
-    const params = {
-      fromBlock: "0x0",
-      toBlock: "latest",
-      fromAddress: ZERO,
-      contractAddresses: [contract],
-      category: ["erc721", "erc1155"],
-      withMetadata: false,
-      maxCount: "0x3e8", // 1000
-    };
-    if (pageKey) params.pageKey = pageKey;
-
-    const res = await rpc(rpcUrl, "alchemy_getAssetTransfers", [params]);
-    const transfers = res?.transfers || [];
-    const hashes = [];
-    for (const t of transfers) {
-      const h = t?.hash || t?.txHash || t?.transactionHash;
-      if (h) hashes.push(h);
-    }
-    return { hashes, nextPageKey: res?.pageKey || null, count: transfers.length };
-  }
-
-  function globalsOrThrow(opts) {
-    const slug = opts.slug || (typeof FF_OPENSEA_COLLECTION_SLUG !== "undefined" ? FF_OPENSEA_COLLECTION_SLUG : null);
-    const osKey = opts.osApiKey || (typeof FF_OPENSEA_API_KEY !== "undefined" ? FF_OPENSEA_API_KEY : null);
-    const contract = opts.contract || (typeof FF_COLLECTION_ADDRESS !== "undefined" ? FF_COLLECTION_ADDRESS : null);
-    const rpcUrl = opts.rpcUrl || (typeof FF_ALCHEMY_CORE_BASE !== "undefined" ? FF_ALCHEMY_CORE_BASE : null);
-
-    if (!slug) throw new Error("Missing FF_OPENSEA_COLLECTION_SLUG");
-    if (!osKey) throw new Error("Missing FF_OPENSEA_API_KEY");
-    if (!contract) throw new Error("Missing FF_COLLECTION_ADDRESS");
-    if (!rpcUrl) throw new Error("Missing FF_ALCHEMY_CORE_BASE (rpcUrl required for mint+gas)");
-    return { slug, osKey, contract, rpcUrl };
-  }
-
-  // ---- Public API
-
-  window.ffTotalSpentReset = async function () {
-    localStorage.removeItem(LS_KEY);
-    return true;
-  };
-
-  window.ffTotalSpentDone = function () {
-    const s = loadState() || defaultState();
-    return !!(s.salesDone && s.mintsDone);
-  };
-
-  // Returns ONE number string (ETH-like total) and stores progress.
-  window.ffTotalSpent = async function ffTotalSpent(opts = {}) {
-    // SAFETY DEFAULTS (can’t melt your tab)
-    const maxMs = Number(opts.maxMs ?? 8000);              // hard time cap per call
-    const maxSalePages = Number(opts.maxSalePages ?? 1);   // 1 page per call
-    const maxMintPages = Number(opts.maxMintPages ?? 1);   // 1 page per call
-    const maxReceipts = Number(opts.maxReceipts ?? 12);    // total receipt/value lookups per call
-    const includeGas = opts.includeGas !== false;          // default true
-
-    const started = Date.now();
-    const g = globalsOrThrow(opts);
-    let s = loadState() || defaultState();
-
-    const salesSeen = new Set(s.seenSales);
-    const mintsSeen = new Set(s.seenMints);
-
-    let receiptsUsed = 0;
-
-    try {
-      // ---- SALES (OpenSea REST)
-      if (!s.salesDone) {
-        for (let p = 0; p < maxSalePages; p++) {
-          if (Date.now() - started > maxMs) break;
-
-          const resp = await osSalesPage({ slug: g.slug, apiKey: g.osKey, next: s.salesNext, limit: 50 });
-          const events = extractEvents(resp);
-          const next = extractNext(resp);
-
-          // Dedup per page
-          const pageTx = new Set();
-
-          for (const evt of events) {
-            if (Date.now() - started > maxMs) break;
-
-            const h = txHashFromEvent(evt);
-            if (!h) continue;
-            if (pageTx.has(h)) continue;
-            if (salesSeen.has(h)) continue;
-
-            const valWei = saleValueEthLikeWei(evt);
-            if (valWei > 0n) {
-              s.salesEthWei = (safeBigInt(s.salesEthWei) + valWei).toString();
-              s.salesTxCount += 1;
-            }
-
-            if (includeGas && receiptsUsed < maxReceipts) {
-              const gasWei = await getGasWei(g.rpcUrl, h);
-              s.gasWei = (safeBigInt(s.gasWei) + gasWei).toString();
-              receiptsUsed++;
-            }
-
-            salesSeen.add(h);
-            pushSeen(s.seenSales, h, s.seenMax);
-
-            pageTx.add(h);
-            if (s.salesTxCount % 5 === 0) await sleep0();
-          }
-
-          s.salesNext = next;
-          if (!next || events.length === 0) s.salesDone = true;
-
-          s.updatedAt = Date.now();
-          saveState(s);
-
-          if (includeGas && receiptsUsed >= maxReceipts) break;
-        }
-      }
-
-      // ---- MINTS (Alchemy enhanced transfers from ZERO)
-      if (!s.mintsDone && (Date.now() - started) <= maxMs && receiptsUsed < maxReceipts) {
-        for (let p = 0; p < maxMintPages; p++) {
-          if (Date.now() - started > maxMs) break;
-
-          const { hashes, nextPageKey, count } = await alchemyMintTxHashesPage(g.rpcUrl, g.contract, s.mintsPageKey);
-
-          if ((!hashes.length && !nextPageKey) || count === 0) {
-            s.mintsDone = true;
-            break;
-          }
-
-          // Dedup within page
-          const pageSet = new Set();
-          for (const h of hashes) {
-            if (Date.now() - started > maxMs) break;
-            if (receiptsUsed >= maxReceipts) break;
-            if (!h || pageSet.has(h)) continue;
-            pageSet.add(h);
-
-            if (mintsSeen.has(h)) continue;
-
-            // Mint value = tx.value
-            const valueWei = await getTxValueWei(g.rpcUrl, h);
-            s.mintEthWei = (safeBigInt(s.mintEthWei) + valueWei).toString();
-
-            if (includeGas && receiptsUsed < maxReceipts) {
-              const gasWei = await getGasWei(g.rpcUrl, h);
-              s.gasWei = (safeBigInt(s.gasWei) + gasWei).toString();
-              receiptsUsed++;
-            }
-
-            s.mintTxCount += 1;
-            mintsSeen.add(h);
-            pushSeen(s.seenMints, h, s.seenMax);
-
-            if (s.mintTxCount % 5 === 0) await sleep0();
-          }
-
-          s.mintsPageKey = nextPageKey;
-          if (!nextPageKey) s.mintsDone = true;
-
-          s.updatedAt = Date.now();
-          saveState(s);
-
-          if (receiptsUsed >= maxReceipts) break;
-        }
-      }
-
-      // ---- Return ONE number
-      const totalWei = safeBigInt(s.salesEthWei) + safeBigInt(s.mintEthWei) + safeBigInt(s.gasWei);
-      return formatETH(totalWei, 6);
-    } catch (e) {
-      // short error only (no huge dumps)
-      throw new Error(shortErr(e));
-    } finally {
-      s.updatedAt = Date.now();
-      saveState(s);
-    }
-  };
-})();
-/* =========================================================
-  FF Total Spent — ONE COMMAND (runs until DONE, returns ONE number)
-
-  Usage:
-    await ffTotalSpentAllTime()
-
-  Emergency stop:
-    ffTotalSpentAbortAllTime()
-
-  Notes:
-  - No console spam.
-  - Uses your existing ffTotalSpent() + ffTotalSpentDone() + localStorage progress.
-  - Retries on transient HTTP/RPC errors with backoff.
-========================================================= */
-(function () {
-  window.ffTotalSpentAbortAllTime = function () {
-    window.__FF_TOTAL_SPENT_ALLTIME_ABORT = true;
-  };
-
-  window.ffTotalSpentAllTime = async function ffTotalSpentAllTime(opts = {}) {
-    // Abort flag reset each run
-    window.__FF_TOTAL_SPENT_ALLTIME_ABORT = false;
-
-    // These defaults are deliberately conservative (safe for browser).
-    // You can increase maxReceiptsPerStep if you want it faster.
-    const stepOpts = {
-      // ffTotalSpent caps
-      maxMs: Number(opts.maxMsPerStep ?? 8000),           // each internal chunk max runtime
-      maxSalePages: Number(opts.maxSalePagesPerStep ?? 1),
-      maxMintPages: Number(opts.maxMintPagesPerStep ?? 1),
-      maxReceipts: Number(opts.maxReceiptsPerStep ?? 15), // total receipt lookups per chunk
-      includeGas: opts.includeGas !== false,              // default true
-
-      // allow passing overrides (slug/osApiKey/contract/rpcUrl) if needed
-      slug: opts.slug,
-      osApiKey: opts.osApiKey,
-      contract: opts.contract,
-      rpcUrl: opts.rpcUrl,
-    };
-
-    const delayMs = Number(opts.delayMs ?? 150); // small pause between chunks to avoid hammering APIs
-    const maxRetries = Number(opts.maxRetries ?? 8);
-
-    if (typeof window.ffTotalSpent !== "function" || typeof window.ffTotalSpentDone !== "function") {
-      throw new Error("ffTotalSpent / ffTotalSpentDone not found. Paste the V3 code first.");
-    }
-
-    let retries = 0;
-
-    while (!window.ffTotalSpentDone()) {
-      if (window.__FF_TOTAL_SPENT_ALLTIME_ABORT) {
-        throw new Error("Aborted by ffTotalSpentAbortAllTime()");
-      }
-
-      try {
-        // Run one safe chunk. It returns a number string; we ignore until the end.
-        await window.ffTotalSpent(stepOpts);
-        retries = 0; // reset after a successful chunk
-      } catch (e) {
-        retries++;
-        if (retries > maxRetries) {
-          // Keep the error short (your ffTotalSpent already shortens errors)
-          throw e;
-        }
-        // Exponential backoff (no console spam)
-        const backoff = Math.min(8000, 250 * (2 ** (retries - 1)));
-        await new Promise((r) => setTimeout(r, backoff));
-      }
-
-      // tiny pause to yield control + reduce rate-limit risk
-      if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
-    }
-
-    // One final call returns the final ONE number instantly (no more work to do)
-    return await window.ffTotalSpent({ maxMs: 1, maxSalePages: 0, maxMintPages: 0, maxReceipts: 0 });
-  };
-})();
-/* =========================================================
-  PATCH: Use OpenSea Collection Stats "total volume" (authoritative)
-  to match OpenSea UI (e.g., Fresh Frogs total volume 0.45 ETH).
-  Leaves mint+gas logic intact.
-
-  Requires:
-    - FF_OPENSEA_API_KEY
+  FF GRAND TOTAL SPENT (ETH) — paste this at the very bottom of site.js
+
+  What it totals (SUCCESSFUL tx only):
+    1) Secondary volume (ETH) from OpenSea collection stats (matches the 0.45 number on the page)
+    2) Secondary gas (ETH): OpenSea sale events -> tx receipts -> gasUsed * effectiveGasPrice
+    3) Mint volume (ETH): sum(tx.value) for mint txs (transfers from ZERO)
+    4) Mint gas (ETH): receipts for those mint txs
+
+  Requires these globals to already exist:
     - FF_OPENSEA_COLLECTION_SLUG
-========================================================= */
-(function () {
-  const STATS_CACHE_KEY = "FF_OS_STATS_CACHE_V1";
-  const STATS_TTL_MS = 60_000; // 1 min cache
-  const LS_KEY_V3 = "FF_TOTAL_SPENT_V3";
+    - FF_OPENSEA_API_KEY
+    - FF_COLLECTION_ADDRESS
+    - FF_ALCHEMY_CORE_BASE   (Alchemy HTTPS RPC URL recommended)
 
-  const OPENSEA_API_BASE = "https://api.opensea.io/api/v2";
-
-  function safeParseVolumeEth(obj) {
-    // We handle likely shapes across versions.
-    // Return a string decimal (e.g. "0.45") or null if not found.
-    const candidates = [
-      obj?.total_volume,
-      obj?.stats?.total_volume,
-      obj?.total?.volume,
-      obj?.total?.total_volume,
-      obj?.volume,
-      obj?.stats?.volume,
-    ];
-
-    for (const c of candidates) {
-      if (typeof c === "number" && Number.isFinite(c)) return String(c);
-      if (typeof c === "string" && c.trim() && !isNaN(Number(c))) return c.trim();
-    }
-    return null;
-  }
-
-  function parseEthDecimalToWeiStr(ethStr) {
-    // Avoid float math; parse "0.45" -> wei string.
-    const s = String(ethStr).trim();
-    if (!s) return "0";
-    const neg = s.startsWith("-");
-    const t = neg ? s.slice(1) : s;
-
-    const [wholeRaw, fracRaw = ""] = t.split(".");
-    const whole = wholeRaw.replace(/\D/g, "") || "0";
-    const frac = fracRaw.replace(/\D/g, "").slice(0, 18).padEnd(18, "0");
-
-    const wei = BigInt(whole) * (10n ** 18n) + BigInt(frac || "0");
-    return (neg ? -wei : wei).toString();
-  }
-
-  async function getOpenSeaStatsTotalVolumeWei({ slug, osKey }) {
-    // Cache first
-    try {
-      const raw = localStorage.getItem(STATS_CACHE_KEY);
-      if (raw) {
-        const cached = JSON.parse(raw);
-        if (cached?.t && (Date.now() - cached.t) < STATS_TTL_MS && typeof cached.volWei === "string") {
-          return cached.volWei;
-        }
-      }
-    } catch {}
-
-    const url = `${OPENSEA_API_BASE}/collections/${encodeURIComponent(slug)}/stats`;
-    const res = await fetch(url, {
-      headers: { accept: "application/json", "X-API-KEY": osKey }
-    });
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      throw new Error(`OpenSea stats HTTP ${res.status}: ${txt.slice(0, 200)}`);
-    }
-    const json = await res.json();
-
-    const volEthStr = safeParseVolumeEth(json);
-    if (!volEthStr) throw new Error("Could not locate total volume field in OpenSea stats response.");
-
-    const volWei = parseEthDecimalToWeiStr(volEthStr);
-
-    try {
-      localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({ t: Date.now(), volWei }));
-    } catch {}
-
-    return volWei;
-  }
-
-  function loadV3State() {
-    try {
-      const raw = localStorage.getItem(LS_KEY_V3);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  }
-
-  function saveV3State(s) {
-    try { localStorage.setItem(LS_KEY_V3, JSON.stringify(s)); } catch {}
-  }
-
-  function safeBigInt(x) {
-    try { return BigInt(String(x)); } catch { return 0n; }
-  }
-
-  function formatETH(wei, maxDp = 6) {
-    const neg = wei < 0n;
-    let x = neg ? -wei : wei;
-    const base = 10n ** 18n;
-    const whole = x / base;
-    let frac = (x % base).toString().padStart(18, "0").slice(0, maxDp);
-    frac = frac.replace(/0+$/, "");
-    const out = frac ? `${whole}.${frac}` : `${whole}`;
-    return neg ? `-${out}` : out;
-  }
-
-  // Wrap ffTotalSpent() so it uses OpenSea stats volume if it's higher than event-derived volume.
-  const orig = window.ffTotalSpent;
-  if (typeof orig !== "function") return;
-
-  window.ffTotalSpent = async function ffTotalSpentPatched(opts = {}) {
-    const ethStr = await orig(opts); // runs one chunk / or final read
-
-    // Pull globals
-    const slug = opts.slug || (typeof FF_OPENSEA_COLLECTION_SLUG !== "undefined" ? FF_OPENSEA_COLLECTION_SLUG : null);
-    const osKey = opts.osApiKey || (typeof FF_OPENSEA_API_KEY !== "undefined" ? FF_OPENSEA_API_KEY : null);
-    if (!slug || !osKey) return ethStr;
-
-    // Update totals using authoritative OpenSea stats volume
-    const statsWeiStr = await getOpenSeaStatsTotalVolumeWei({ slug, osKey });
-    const s = loadV3State();
-    if (!s) return ethStr;
-
-    const salesWei = safeBigInt(s.salesEthWei || "0");
-    const statsWei = safeBigInt(statsWeiStr || "0");
-
-    // Use the larger of (event-summed ETH-like sales, OpenSea stats total volume)
-    const salesUsedWei = statsWei > salesWei ? statsWei : salesWei;
-
-    const mintWei = safeBigInt(s.mintEthWei || "0");
-    const gasWei = safeBigInt(s.gasWei || "0");
-
-    // We do NOT mark salesDone=true here because we still need sale tx hashes for gas counting.
-    // But we will store the stats volume so it’s visible/debuggable.
-    s.salesStatsEthWei = statsWeiStr;
-    saveV3State(s);
-
-    const totalWei = salesUsedWei + mintWei + gasWei;
-    return formatETH(totalWei, 6);
-  };
-})();
-/* =========================================================
-  FF Grand Total Spent (OpenSea secondary + mints + all gas)
-  ONE command: await ffGrandTotalSpent()
-
-  Uses:
-    - OpenSea collection stats (authoritative secondary volume)
-    - OpenSea sale events (tx hashes only) -> Alchemy receipts for gas
-    - Alchemy mint transfers (from ZERO) -> per-block tx list + per-block receipts
-      to sum mint tx.value and mint gas efficiently.
-
-  Output:
-    Returns an object and prints ONE readable summary line.
-
-  Abort:
-    ffGrandTotalAbort()
-
-  Notes:
-    - Secondary "total volume" from OpenSea is in ETH units (includes WETH-equivalent volume).
+  Console:
+    await ffGrandTotalReset()     // optional
+    await ffGrandTotalSpent()     // returns breakdown + prints ONE line
+    ffGrandTotalAbort()           // emergency stop
 ========================================================= */
 (function () {
   const OS_BASE = "https://api.opensea.io/api/v2";
   const ZERO = "0x0000000000000000000000000000000000000000";
-  const STATE_KEY = "FF_GRAND_TOTAL_STATE_V1";
+  const LS_KEY = "FF_GRAND_TOTAL_V2";
 
-  // --- helpers
-  const lower = (s) => (s ? String(s).toLowerCase() : "");
+  // ----- tiny helpers
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-  const sleep0 = () => new Promise((r) => setTimeout(r, 0));
+  const yieldUI = () => new Promise((r) => setTimeout(r, 0));
+  const lower = (s) => (s ? String(s).toLowerCase() : "");
 
   function bi(x) {
     try {
@@ -2768,7 +2149,6 @@ function ffRomanToArabic(roman) {
     try {
       if (!h) return 0n;
       if (typeof h !== "string") return bi(h);
-      // hex string like "0x..."
       return h.startsWith("0x") ? BigInt(h) : BigInt(h);
     } catch {
       return 0n;
@@ -2788,6 +2168,7 @@ function ffRomanToArabic(roman) {
 
   function parseEthToWeiStr(ethStr) {
     const s = String(ethStr).trim();
+    if (!s) return "0";
     const neg = s.startsWith("-");
     const t = neg ? s.slice(1) : s;
     const [w, f = ""] = t.split(".");
@@ -2798,16 +2179,16 @@ function ffRomanToArabic(roman) {
   }
 
   function shortErr(e) {
-    const msg = (e && (e.message || String(e))) ? (e.message || String(e)) : "Unknown error";
+    const msg = e && (e.message || String(e)) ? (e.message || String(e)) : "Unknown error";
     return msg.length > 260 ? msg.slice(0, 260) + "…" : msg;
   }
 
   function loadState() {
     try {
-      const raw = localStorage.getItem(STATE_KEY);
+      const raw = localStorage.getItem(LS_KEY);
       if (!raw) return null;
       const s = JSON.parse(raw);
-      if (!s || s.v !== 1) return null;
+      if (!s || s.v !== 2) return null;
       return s;
     } catch {
       return null;
@@ -2815,34 +2196,36 @@ function ffRomanToArabic(roman) {
   }
 
   function saveState(s) {
-    try { localStorage.setItem(STATE_KEY, JSON.stringify(s)); } catch {}
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(s));
+    } catch {}
   }
 
   function defaultState() {
     return {
-      v: 1,
+      v: 2,
       updatedAt: Date.now(),
 
-      // Secondary gas crawl
+      // OpenSea stats volume (wei string)
+      secondaryVolWei: null,
+
+      // Secondary gas crawl (OpenSea sale events -> receipts)
       salesNext: null,
       salesDone: false,
       saleGasWei: "0",
-      saleTxSeen: [],
+      saleSeen: [],
 
-      // Mint crawl
+      // Mint crawl (transfers from ZERO -> group by block -> value+gas)
       mintPageKey: null,
       mintsDone: false,
       mintValueWei: "0",
       mintGasWei: "0",
-      mintTxSeen: [],
-
-      // Cached OpenSea stats volume
-      secondaryVolumeWei: null,
+      mintSeen: [],
     };
   }
 
-  function pushSeen(arr, x, max = 8000) {
-    arr.push(x);
+  function pushSeen(arr, val, max = 8000) {
+    arr.push(val);
     if (arr.length > max) arr.splice(0, arr.length - max);
   }
 
@@ -2853,10 +2236,10 @@ function ffRomanToArabic(roman) {
         const res = await fetch(url, { headers });
         if (!res.ok) {
           const txt = await res.text().catch(() => "");
-          // Retry on rate limits / transient
-          if ((res.status === 429 || res.status >= 500) && attempt < retry) {
+          const shouldRetry = res.status === 429 || res.status >= 500;
+          if (shouldRetry && attempt < retry) {
             attempt++;
-            await sleep(Math.min(8000, 350 * (2 ** (attempt - 1))));
+            await sleep(Math.min(8000, 350 * 2 ** (attempt - 1)));
             continue;
           }
           throw new Error(`HTTP ${res.status}: ${txt.slice(0, 220)}`);
@@ -2865,7 +2248,7 @@ function ffRomanToArabic(roman) {
       } catch (e) {
         if (attempt >= retry) throw e;
         attempt++;
-        await sleep(Math.min(8000, 350 * (2 ** (attempt - 1))));
+        await sleep(Math.min(8000, 350 * 2 ** (attempt - 1)));
       }
     }
   }
@@ -2874,17 +2257,25 @@ function ffRomanToArabic(roman) {
     let attempt = 0;
     while (true) {
       try {
-        const body = JSON.stringify({ jsonrpc: "2.0", id: Math.floor(Math.random() * 1e9), method, params });
+        const body = JSON.stringify({
+          jsonrpc: "2.0",
+          id: Math.floor(Math.random() * 1e9),
+          method,
+          params,
+        });
+
         const res = await fetch(rpcUrl, {
           method: "POST",
           headers: { "content-type": "application/json" },
           body,
         });
+
         const json = await res.json().catch(() => null);
         if (!res.ok || !json) {
-          if ((res.status === 429 || res.status >= 500) && attempt < retry) {
+          const shouldRetry = res.status === 429 || res.status >= 500;
+          if (shouldRetry && attempt < retry) {
             attempt++;
-            await sleep(Math.min(8000, 350 * (2 ** (attempt - 1))));
+            await sleep(Math.min(8000, 350 * 2 ** (attempt - 1)));
             continue;
           }
           throw new Error(`RPC HTTP ${res.status}`);
@@ -2893,7 +2284,7 @@ function ffRomanToArabic(roman) {
           const msg = json.error.message || "RPC error";
           if (attempt < retry) {
             attempt++;
-            await sleep(Math.min(8000, 350 * (2 ** (attempt - 1))));
+            await sleep(Math.min(8000, 350 * 2 ** (attempt - 1)));
             continue;
           }
           throw new Error(msg);
@@ -2902,30 +2293,31 @@ function ffRomanToArabic(roman) {
       } catch (e) {
         if (attempt >= retry) throw e;
         attempt++;
-        await sleep(Math.min(8000, 350 * (2 ** (attempt - 1))));
+        await sleep(Math.min(8000, 350 * 2 ** (attempt - 1)));
       }
     }
   }
 
-  // --- OpenSea: stats volume (authoritative secondary volume) :contentReference[oaicite:3]{index=3}
+  // ----- OpenSea: secondary stats volume
   async function getSecondaryVolumeWei({ slug, osKey }) {
     const url = `${OS_BASE}/collections/${encodeURIComponent(slug)}/stats`;
     const data = await fetchJson(url, { accept: "application/json", "X-API-KEY": osKey });
 
-    // Robust field hunt
+    // field hunt (OpenSea has changed shapes over time)
     const v =
       data?.total_volume ??
       data?.stats?.total_volume ??
       data?.total?.volume ??
+      data?.total?.total_volume ??
       data?.volume ??
+      data?.stats?.volume ??
       null;
 
-    if (v == null) throw new Error("OpenSea stats: total_volume not found");
-    // total_volume is a decimal ETH number in docs/examples (store as wei string)
+    if (v == null) throw new Error("OpenSea stats: total volume field not found.");
     return parseEthToWeiStr(v);
   }
 
-  // --- OpenSea: sale events paging (tx hashes only) :contentReference[oaicite:4]{index=4}
+  // ----- OpenSea: sale events paging (tx hashes only)
   async function getSaleEventsPage({ slug, osKey, next }) {
     const u = new URL(`${OS_BASE}/events/collection/${encodeURIComponent(slug)}`);
     u.searchParams.set("event_type", "sale");
@@ -2933,7 +2325,12 @@ function ffRomanToArabic(roman) {
     if (next) u.searchParams.set("next", next);
 
     const data = await fetchJson(u.toString(), { accept: "application/json", "X-API-KEY": osKey });
-    const events = data?.events || data?.asset_events || data?.collection_events || data?.data || [];
+    const events =
+      data?.events ||
+      data?.asset_events ||
+      data?.collection_events ||
+      data?.data ||
+      [];
     const cursor = data?.next || data?.next_cursor || data?.nextCursor || null;
     return { events: Array.isArray(events) ? events : [], next: cursor };
   }
@@ -2949,7 +2346,7 @@ function ffRomanToArabic(roman) {
     );
   }
 
-  // --- Gas from receipt
+  // ----- Gas from receipt (successful only)
   function gasFromReceipt(rcpt) {
     const status = rcpt?.status;
     if (status && status !== "0x1" && status !== 1 && status !== "1") return 0n; // ignore failed
@@ -2958,7 +2355,7 @@ function ffRomanToArabic(roman) {
     return gasUsed * eff;
   }
 
-  // --- Mint transfers via Alchemy enhanced transfers API :contentReference[oaicite:5]{index=5}
+  // ----- Mint transfers (Alchemy enhanced)
   async function getMintTransfersPage({ rpcUrl, contract, pageKey }) {
     const params = {
       fromBlock: "0x0",
@@ -2977,27 +2374,46 @@ function ffRomanToArabic(roman) {
     return { transfers, next };
   }
 
-  // --- Block-level optimization for mint value+gas:
-  // alchemy_getTransactionReceipts gives all receipts in a block :contentReference[oaicite:6]{index=6}
-  async function getBlockReceiptsByNumber(rpcUrl, blockNumberHex) {
-    const res = await rpc(rpcUrl, "alchemy_getTransactionReceipts", [{ blockNumber: blockNumberHex }]);
-    // shapes vary: sometimes {receipts:[...]} sometimes [...]
-    const receipts = Array.isArray(res) ? res : (res?.receipts || []);
-    return Array.isArray(receipts) ? receipts : [];
-  }
-
-  async function getBlockTxsByNumber(rpcUrl, blockNumberHex) {
-    // full tx objects so we can read tx.value
-    const block = await rpc(rpcUrl, "eth_getBlockByNumber", [blockNumberHex, true]);
+  async function getBlockTxs(rpcUrl, blockHex) {
+    const block = await rpc(rpcUrl, "eth_getBlockByNumber", [blockHex, true]);
     const txs = block?.transactions || [];
     return Array.isArray(txs) ? txs : [];
   }
 
-  // --- Public controls
-  window.ffGrandTotalAbort = () => { window.__FF_GRAND_ABORT = true; };
-  window.ffGrandTotalReset = async () => { localStorage.removeItem(STATE_KEY); return true; };
+  // Preferred: Alchemy block receipts (fast); fallback: per-tx receipts
+  async function getBlockReceipts(rpcUrl, blockHex, neededHashesLower, concurrency = 4) {
+    try {
+      const res = await rpc(rpcUrl, "alchemy_getTransactionReceipts", [{ blockNumber: blockHex }]);
+      const receipts = Array.isArray(res) ? res : (res?.receipts || []);
+      if (Array.isArray(receipts) && receipts.length) return receipts;
+      // If it returns empty, fall through to fallback
+    } catch {
+      // fall through
+    }
 
-  // ONE command
+    // Fallback (slower, but works on non-Alchemy RPCs)
+    const hashes = Array.from(neededHashesLower);
+    const out = [];
+    let i = 0;
+    async function worker() {
+      while (i < hashes.length) {
+        const idx = i++;
+        const h = hashes[idx];
+        const rcpt = await rpc(rpcUrl, "eth_getTransactionReceipt", [h]);
+        out.push(rcpt);
+        await yieldUI();
+      }
+    }
+    const n = Math.max(1, Math.min(concurrency, hashes.length));
+    await Promise.all(Array.from({ length: n }, worker));
+    return out;
+  }
+
+  // ----- Public API
+  window.ffGrandTotalAbort = () => { window.__FF_GRAND_ABORT = true; };
+  window.ffGrandTotalReset = async () => { localStorage.removeItem(LS_KEY); return true; };
+
+  // ONE command (runs all-time, resumable, prints ONE line)
   window.ffGrandTotalSpent = async function ffGrandTotalSpent(opts = {}) {
     window.__FF_GRAND_ABORT = false;
 
@@ -3006,37 +2422,39 @@ function ffRomanToArabic(roman) {
     const contract = opts.contract || (typeof FF_COLLECTION_ADDRESS !== "undefined" ? FF_COLLECTION_ADDRESS : null);
     const rpcUrl = opts.rpcUrl || (typeof FF_ALCHEMY_CORE_BASE !== "undefined" ? FF_ALCHEMY_CORE_BASE : null);
 
-    if (!slug) throw new Error("Missing OpenSea slug");
-    if (!osKey) throw new Error("Missing OpenSea API key");
-    if (!contract) throw new Error("Missing contract address");
-    if (!rpcUrl) throw new Error("Missing Alchemy RPC url");
+    if (!slug) throw new Error("Missing FF_OPENSEA_COLLECTION_SLUG");
+    if (!osKey) throw new Error("Missing FF_OPENSEA_API_KEY");
+    if (!contract) throw new Error("Missing FF_COLLECTION_ADDRESS");
+    if (!rpcUrl) throw new Error("Missing FF_ALCHEMY_CORE_BASE (RPC URL)");
 
-    // mild throttle between pages/blocks
+    // Safety/throttles
     const pageDelayMs = Number(opts.pageDelayMs ?? 120);
+    const concurrency = Number(opts.concurrency ?? 4);
+    const maxTotalMs = Number(opts.maxTotalMs ?? 15 * 60 * 1000); // 15 min hard cap
+    const started = Date.now();
 
-    // state (resumable even though this function runs all the way)
     const s = loadState() || defaultState();
-    const saleSeen = new Set(s.saleTxSeen || []);
-    const mintSeen = new Set(s.mintTxSeen || []);
+    const saleSeen = new Set((s.saleSeen || []).map(lower));
+    const mintSeen = new Set((s.mintSeen || []).map(lower));
 
     try {
       // 1) Secondary volume (authoritative)
-      if (!s.secondaryVolumeWei) {
-        s.secondaryVolumeWei = await getSecondaryVolumeWei({ slug, osKey });
+      if (!s.secondaryVolWei) {
+        s.secondaryVolWei = await getSecondaryVolumeWei({ slug, osKey });
         s.updatedAt = Date.now();
         saveState(s);
       }
 
-      // 2) Secondary gas: crawl OpenSea sale events and sum gas for unique sale tx hashes
+      // 2) Secondary gas: crawl OpenSea sale events -> receipts
       while (!s.salesDone) {
         if (window.__FF_GRAND_ABORT) throw new Error("Aborted");
+        if (Date.now() - started > maxTotalMs) throw new Error("Time cap reached. Run again to continue (state saved).");
 
         const { events, next } = await getSaleEventsPage({ slug, osKey, next: s.salesNext });
 
-        // collect unique tx hashes from this page
-        const pageHashes = [];
+        // unique tx hashes on this page
         const pageSet = new Set();
-
+        const hashes = [];
         for (const e of events) {
           const h = txHashFromSaleEvent(e);
           if (!h) continue;
@@ -3044,20 +2462,24 @@ function ffRomanToArabic(roman) {
           if (pageSet.has(hl)) continue;
           pageSet.add(hl);
           if (saleSeen.has(hl)) continue;
-          pageHashes.push(hl);
+          hashes.push(hl);
         }
 
-        // receipts for those hashes (likely small total volume)
-        for (const h of pageHashes) {
-          if (window.__FF_GRAND_ABORT) throw new Error("Aborted");
-          const rcpt = await rpc(rpcUrl, "eth_getTransactionReceipt", [h]);
-          const gasWei = gasFromReceipt(rcpt);
-          s.saleGasWei = (bi(s.saleGasWei) + gasWei).toString();
-          saleSeen.add(h);
-          pushSeen(s.saleTxSeen, h);
-          // yield
-          await sleep0();
+        // fetch receipts with limited concurrency
+        let idx = 0;
+        async function worker() {
+          while (idx < hashes.length) {
+            if (window.__FF_GRAND_ABORT) throw new Error("Aborted");
+            const i = idx++;
+            const h = hashes[i];
+            const rcpt = await rpc(rpcUrl, "eth_getTransactionReceipt", [h]);
+            s.saleGasWei = (bi(s.saleGasWei) + gasFromReceipt(rcpt)).toString();
+            saleSeen.add(h);
+            pushSeen(s.saleSeen, h);
+            await yieldUI();
+          }
         }
+        await Promise.all(Array.from({ length: Math.max(1, Math.min(concurrency, hashes.length)) }, worker));
 
         s.salesNext = next;
         if (!next || events.length === 0) s.salesDone = true;
@@ -3068,60 +2490,58 @@ function ffRomanToArabic(roman) {
         if (pageDelayMs) await sleep(pageDelayMs);
       }
 
-      // 3) Mints: crawl mint transfers page-by-page, process per block for value+gas
+      // 3) Mints: crawl transfers from ZERO, group by block, then sum tx.value + receipts gas
       while (!s.mintsDone) {
         if (window.__FF_GRAND_ABORT) throw new Error("Aborted");
+        if (Date.now() - started > maxTotalMs) throw new Error("Time cap reached. Run again to continue (state saved).");
 
         const { transfers, next } = await getMintTransfersPage({ rpcUrl, contract, pageKey: s.mintPageKey });
 
-        // Group tx hashes by blockNum for this page
-        const byBlock = new Map(); // blockNumHex -> Set(txHash)
+        // group new mint tx hashes by block number
+        const byBlock = new Map(); // blockHex -> Set(txHashLower)
         for (const t of transfers) {
           const h = lower(t?.hash || t?.txHash || t?.transactionHash || "");
-          const b = t?.blockNum;
+          const b = t?.blockNum; // hex string
           if (!h || !b) continue;
           if (mintSeen.has(h)) continue;
           if (!byBlock.has(b)) byBlock.set(b, new Set());
           byBlock.get(b).add(h);
         }
 
-        // Process each block: one request for tx list, one for receipts
-        for (const [blockNumHex, hashSet] of byBlock.entries()) {
+        for (const [blockHex, needSet] of byBlock.entries()) {
           if (window.__FF_GRAND_ABORT) throw new Error("Aborted");
+          if (Date.now() - started > maxTotalMs) throw new Error("Time cap reached. Run again to continue (state saved).");
 
           const [txs, receipts] = await Promise.all([
-            getBlockTxsByNumber(rpcUrl, blockNumHex),
-            getBlockReceiptsByNumber(rpcUrl, blockNumHex),
+            getBlockTxs(rpcUrl, blockHex),
+            getBlockReceipts(rpcUrl, blockHex, needSet, concurrency),
           ]);
 
-          const want = hashSet;
-
-          // Sum mint tx.value from block tx objects
+          // sum mint value from txs
           for (const tx of txs) {
             const h = lower(tx?.hash || "");
-            if (!h || !want.has(h)) continue;
+            if (!h || !needSet.has(h)) continue;
             s.mintValueWei = (bi(s.mintValueWei) + biHex(tx?.value || "0x0")).toString();
           }
 
-          // Sum mint gas from receipts
+          // sum mint gas from receipts (successful only)
           for (const rcpt of receipts) {
             const h = lower(rcpt?.transactionHash || rcpt?.hash || "");
-            if (!h || !want.has(h)) continue;
-            const gasWei = gasFromReceipt(rcpt);
-            s.mintGasWei = (bi(s.mintGasWei) + gasWei).toString();
+            if (!h || !needSet.has(h)) continue;
+            s.mintGasWei = (bi(s.mintGasWei) + gasFromReceipt(rcpt)).toString();
           }
 
           // mark seen
-          for (const h of want) {
+          for (const h of needSet) {
             mintSeen.add(h);
-            pushSeen(s.mintTxSeen, h);
+            pushSeen(s.mintSeen, h);
           }
 
           s.updatedAt = Date.now();
           saveState(s);
 
           if (pageDelayMs) await sleep(pageDelayMs);
-          await sleep0();
+          await yieldUI();
         }
 
         s.mintPageKey = next;
@@ -3133,12 +2553,11 @@ function ffRomanToArabic(roman) {
         if (pageDelayMs) await sleep(pageDelayMs);
       }
 
-      // Final totals
-      const secondaryVolWei = bi(s.secondaryVolumeWei);
+      // final breakdown
+      const secondaryVolWei = bi(s.secondaryVolWei);
       const secondaryGasWei = bi(s.saleGasWei);
       const mintVolWei = bi(s.mintValueWei);
       const mintGasWei = bi(s.mintGasWei);
-
       const grandWei = secondaryVolWei + secondaryGasWei + mintVolWei + mintGasWei;
 
       const out = {
@@ -3147,11 +2566,12 @@ function ffRomanToArabic(roman) {
         mintVolumeEth: fmtEth(mintVolWei),
         mintGasEth: fmtEth(mintGasWei),
         grandTotalEth: fmtEth(grandWei),
+        done: s.salesDone && s.mintsDone,
       };
 
-      // ONE readable console line
+      // ONE readable line (only)
       console.log(
-        `FF TOTAL SPENT (ETH) = ${out.grandTotalEth} | ` +
+        `FF GRAND TOTAL SPENT (ETH) = ${out.grandTotalEth} | ` +
         `secondaryVol=${out.secondaryVolumeEth} + secondaryGas=${out.secondaryGasEth} + ` +
         `mintVol=${out.mintVolumeEth} + mintGas=${out.mintGasEth}`
       );
@@ -3159,6 +2579,9 @@ function ffRomanToArabic(roman) {
       return out;
     } catch (e) {
       throw new Error(shortErr(e));
+    } finally {
+      s.updatedAt = Date.now();
+      saveState(s);
     }
   };
 })();
