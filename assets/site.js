@@ -980,7 +980,7 @@ async function fetchRecentSalesOpenSea(limit = 24) {
             amountNum >= 1
               ? amountNum.toFixed(3).replace(/\.?0+$/, '')
               : amountNum.toFixed(4).replace(/\.?0+$/, '');
-          priceText = `${rounded} ${symbol}`;
+          priceText = `${rounded}Ξ ${symbol}`;
         }
       }
     } catch {}
