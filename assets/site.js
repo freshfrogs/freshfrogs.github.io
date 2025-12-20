@@ -2106,34 +2106,38 @@ function ffRomanToArabic(roman) {
 
 
 /* =========================================================
-   FreshFrogs – Total Spent (all-time)
-   - OpenSea-only secondary sales VALUE (sum of Seaport consideration)
-   - Mint VALUE via on-chain tx.value (Alchemy RPC)
-   - Gas for both via tx receipts (Alchemy RPC)
+   FreshFrogs – TOTAL SPENT (SAFE / RESUMABLE / BROWSER-FRIENDLY)
+   - Does NOT spam console.
+   - Runs in small time chunks and stores progress in localStorage.
+   - OpenSea-only sales value: sums Seaport consideration per SALE TX.
+   - Mint value: sums tx.value for mint txs (requires RPC for tx lookup).
+   - Gas: optional (requires RPC).
 
-   Usage (console):
-     await ffComputeTotalSpentAllTime({ onProgress: console.log });
+   Console:
+     await ffTotalSpentStep({ minutes: 0.25 })  // 15s chunk, value-only until rpcUrl provided
+     await ffTotalSpentReset()                  // wipes saved progress
 
-   Notes:
-   - Sales are deduped by tx hash (bundles won’t double count).
-   - “OpenSea-only” sales filter checks for OpenSea fee recipient
-     0x0000a26b00c1F0DF003000390027140000fAa719 in consideration. :contentReference[oaicite:1]{index=1}
+   IMPORTANT:
+   - This will still take time “all time”, but it will NOT freeze your tab.
 ========================================================= */
 (function () {
   const OPENSEA_API_BASE = "https://api.opensea.io/api/v2";
-  const MAINNET_WETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2".toLowerCase();
+  const ZERO = "0x0000000000000000000000000000000000000000";
 
-  // OpenSea fee recipient seen in Seaport consideration examples :contentReference[oaicite:2]{index=2}
+  // OpenSea Seaport fee recipient (used to filter OpenSea fills)
   const OPENSEA_FEE_RECIPIENT = "0x0000a26b00c1F0DF003000390027140000fAa719".toLowerCase();
 
-  const _lower = (s) => (s || "").toLowerCase();
+  const LS_KEY = "FF_TOTAL_SPENT_STATE_V1";
 
-  function _safeBigInt(x) {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  const lower = (s) => (s || "").toLowerCase();
+
+  function safeBigInt(x) {
     try {
       if (x === null || x === undefined) return 0n;
       if (typeof x === "bigint") return x;
       if (typeof x === "number") return BigInt(Math.trunc(x));
-      // handle hex or decimal strings
       const str = String(x);
       return BigInt(str);
     } catch {
@@ -2141,91 +2145,96 @@ function ffRomanToArabic(roman) {
     }
   }
 
-  function _formatUnits(wei, decimals = 18, maxDp = 6) {
+  function formatUnits(wei, decimals = 18, maxDp = 6) {
     const neg = wei < 0n;
     let x = neg ? -wei : wei;
-
     const base = 10n ** BigInt(decimals);
     const whole = x / base;
     let frac = (x % base).toString().padStart(decimals, "0");
-
-    // trim to maxDp
     if (maxDp >= 0 && maxDp < decimals) frac = frac.slice(0, maxDp);
-    // trim trailing zeros
     frac = frac.replace(/0+$/, "");
-
     const out = frac ? `${whole.toString()}.${frac}` : whole.toString();
     return neg ? `-${out}` : out;
   }
 
-  function _createLimiter(concurrency) {
-    let active = 0;
-    const q = [];
-    const next = () => {
-      if (active >= concurrency) return;
-      const job = q.shift();
-      if (!job) return;
-      active++;
-      job()
-        .catch(() => {})
-        .finally(() => {
-          active--;
-          next();
-        });
-    };
-
-    return (fn) =>
-      new Promise((resolve, reject) => {
-        q.push(async () => {
-          try {
-            const res = await fn();
-            resolve(res);
-          } catch (e) {
-            reject(e);
-          }
-        });
-        next();
-      });
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return null;
+      const s = JSON.parse(raw);
+      if (!s || s.v !== 1) return null;
+      return s;
+    } catch {
+      return null;
+    }
   }
 
-  async function _fetchJson(url, { headers } = {}) {
+  function saveState(s) {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(s));
+    } catch {}
+  }
+
+  function defaultState() {
+    return {
+      v: 1,
+      updatedAt: Date.now(),
+
+      // Progress cursors
+      salesNext: null,     // OpenSea events cursor
+      mintsPageKey: null,  // Alchemy asset transfers pageKey (only used if rpcUrl is Alchemy)
+
+      // Dedup within progress: we rely on cursor continuation so we don’t need to store huge tx sets
+      // Totals (wei)
+      salesValueWei: "0",
+      salesGasWei: "0",
+      mintValueWei: "0",
+      mintGasWei: "0",
+
+      // Counts
+      salesTxCount: 0,
+      mintTxCount: 0,
+
+      // Notes
+      doneSales: false,
+      doneMints: false,
+    };
+  }
+
+  async function fetchJson(url, headers) {
     const res = await fetch(url, { headers });
     if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      throw new Error(`HTTP ${res.status} for ${url}: ${txt.slice(0, 200)}`);
+      // Don’t dump giant responses to console; keep error short
+      const text = await res.text().catch(() => "");
+      throw new Error(`HTTP ${res.status}: ${text.slice(0, 300)}`);
     }
     return res.json();
   }
 
-  async function _osListCollectionEvents({ slug, apiKey, eventType, next, limit = 50 }) {
+  async function osListCollectionEvents({ slug, apiKey, eventType, next, limit }) {
     const u = new URL(`${OPENSEA_API_BASE}/events/collection/${encodeURIComponent(slug)}`);
     if (eventType) u.searchParams.set("event_type", eventType);
     if (limit) u.searchParams.set("limit", String(limit));
-    if (next) u.searchParams.set("next", next); // docs indicate `next` token pagination :contentReference[oaicite:3]{index=3}
-
-    return _fetchJson(u.toString(), {
-      headers: {
-        "Accept": "application/json",
-        "X-API-KEY": apiKey, // required auth header :contentReference[oaicite:4]{index=4}
-      },
+    if (next) u.searchParams.set("next", next);
+    return fetchJson(u.toString(), {
+      "Accept": "application/json",
+      "X-API-KEY": apiKey,
     });
   }
 
-  function _extractEvents(resp) {
+  function extractEvents(resp) {
     if (!resp) return [];
     if (Array.isArray(resp.asset_events)) return resp.asset_events;
     if (Array.isArray(resp.events)) return resp.events;
     if (Array.isArray(resp.data)) return resp.data;
-    // some shapes nest
-    if (resp.asset_events && Array.isArray(resp.asset_events)) return resp.asset_events;
     return [];
   }
 
-  function _extractNext(resp) {
+  function extractNext(resp) {
     return resp?.next || resp?.next_cursor || resp?.nextCursor || null;
   }
 
-  function _extractTxHash(evt) {
+  function extractTxHash(evt) {
     return (
       evt?.transaction?.hash ||
       evt?.payload?.transaction?.hash ||
@@ -2236,354 +2245,274 @@ function ffRomanToArabic(roman) {
     );
   }
 
-  function _extractProtocolParams(evt) {
-    // try a few common shapes
+  function extractProtocolParams(evt) {
     return (
       evt?.protocol_data?.parameters ||
-      evt?.protocol_data?.payload?.protocol_data?.parameters ||
       evt?.payload?.protocol_data?.parameters ||
       evt?.payload?.payload?.protocol_data?.parameters ||
       null
     );
   }
 
-  function _sumConsideration(params) {
+  // Sum ONLY currency-like Seaport consideration items; also detect OpenSea fee recipient.
+  function sumConsideration(params) {
     const cons = params?.consideration;
-    if (!Array.isArray(cons)) return { byToken: new Map(), hasOpenSeaFee: false };
+    if (!Array.isArray(cons)) return { sumWei: 0n, hasOpenSeaFee: false };
 
     let hasOpenSeaFee = false;
-    const byToken = new Map(); // tokenKey -> wei
+    let sumWei = 0n;
 
     for (const item of cons) {
-      const itemType = item?.itemType; // 0=ETH, 1=ERC20 (typical Seaport), etc.
-      const tokenAddr = _lower(item?.token || "");
-      const recipient = _lower(item?.recipient || "");
-
+      const recipient = lower(item?.recipient || "");
       if (recipient === OPENSEA_FEE_RECIPIENT) hasOpenSeaFee = true;
 
-      // Only count currency-like items
-      if (!(itemType === 0 || itemType === 1 || itemType === "0" || itemType === "1")) continue;
+      const itemType = item?.itemType;
+      const isCurrency = itemType === 0 || itemType === 1 || itemType === "0" || itemType === "1";
+      if (!isCurrency) continue;
 
-      const amount =
-        item?.endAmount ?? item?.startAmount ?? item?.amount ?? item?.currentAmount ?? "0";
-
-      const wei = _safeBigInt(amount);
-      if (wei <= 0n) continue;
-
-      let key = "ETH";
-      if (tokenAddr && tokenAddr !== "0x0000000000000000000000000000000000000000") {
-        key = tokenAddr === MAINNET_WETH ? "WETH" : tokenAddr;
-      }
-
-      byToken.set(key, (byToken.get(key) || 0n) + wei);
+      const amount = item?.endAmount ?? item?.startAmount ?? item?.amount ?? "0";
+      sumWei += safeBigInt(amount);
     }
 
-    return { byToken, hasOpenSeaFee };
+    return { sumWei, hasOpenSeaFee };
   }
 
-  async function _rpc(rpcUrl, method, params) {
+  async function rpc(rpcUrl, method, params) {
     const body = JSON.stringify({
       jsonrpc: "2.0",
       id: Math.floor(Math.random() * 1e9),
       method,
       params,
     });
-
-    const res = await fetch(rpcUrl, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body,
-    });
-
+    const res = await fetch(rpcUrl, { method: "POST", headers: { "content-type": "application/json" }, body });
     const json = await res.json().catch(() => null);
-    if (!res.ok || !json) throw new Error(`RPC HTTP error (${res.status})`);
-    if (json.error) throw new Error(`RPC ${method} error: ${json.error.message || "unknown"}`);
+    if (!res.ok || !json) throw new Error(`RPC HTTP ${res.status}`);
+    if (json.error) throw new Error(json.error.message || "RPC error");
     return json.result;
   }
 
-  async function _getTxAndReceipt(rpcUrl, txHash) {
+  async function getTxValueAndGas(rpcUrl, txHash) {
     const [tx, rcpt] = await Promise.all([
-      _rpc(rpcUrl, "eth_getTransactionByHash", [txHash]),
-      _rpc(rpcUrl, "eth_getTransactionReceipt", [txHash]),
+      rpc(rpcUrl, "eth_getTransactionByHash", [txHash]),
+      rpc(rpcUrl, "eth_getTransactionReceipt", [txHash]),
     ]);
-
-    const valueWei = _safeBigInt(tx?.value || "0x0");
-    const gasUsed = _safeBigInt(rcpt?.gasUsed || "0x0");
-    const effGasPrice = _safeBigInt(rcpt?.effectiveGasPrice || rcpt?.gasPrice || "0x0");
+    const valueWei = safeBigInt(tx?.value || "0x0");
+    const gasUsed = safeBigInt(rcpt?.gasUsed || "0x0");
+    const effGasPrice = safeBigInt(rcpt?.effectiveGasPrice || rcpt?.gasPrice || "0x0");
     const gasWei = gasUsed * effGasPrice;
-
     return { valueWei, gasWei };
   }
 
-  async function _alchemyGetMintTxHashesAllTime(rpcUrl, contract, onProgress) {
-    // Uses Alchemy enhanced RPC method on the same URL (Alchemy v2 endpoint)
-    // We use ERC721 + fromAddress=ZERO_ADDRESS to catch mints.
-    // This avoids scanning logs manually.
-    const out = new Set();
-    let pageKey = undefined;
-    let page = 0;
-
-    while (true) {
-      page++;
-      const params = {
-        fromBlock: "0x0",
-        toBlock: "latest",
-        fromAddress: ZERO_ADDRESS,
-        contractAddresses: [contract],
-        category: ["erc721", "erc1155"],
-        excludeZeroValue: false,
-        withMetadata: false,
-        maxCount: "0x3e8", // 1000
-      };
-      if (pageKey) params.pageKey = pageKey;
-
-      const res = await _rpc(rpcUrl, "alchemy_getAssetTransfers", [params]);
-      const transfers = res?.transfers || [];
-      for (const t of transfers) {
-        const h = t?.hash || t?.txHash || t?.transactionHash;
-        if (h) out.add(h);
-      }
-
-      pageKey = res?.pageKey;
-      onProgress?.({ stage: "mints:list", page, transfers: transfers.length, txs: out.size });
-
-      if (!pageKey) break;
+  // Requires Alchemy enhanced RPC (same URL); if you’re not on Alchemy, this won’t work.
+  async function alchemyGetMintTxHashesPage(rpcUrl, contract, pageKey) {
+    const params = {
+      fromBlock: "0x0",
+      toBlock: "latest",
+      fromAddress: ZERO,
+      contractAddresses: [contract],
+      category: ["erc721", "erc1155"],
+      withMetadata: false,
+      maxCount: "0x3e8", // 1000
+    };
+    if (pageKey) params.pageKey = pageKey;
+    const res = await rpc(rpcUrl, "alchemy_getAssetTransfers", [params]);
+    const transfers = res?.transfers || [];
+    const hashes = [];
+    for (const t of transfers) {
+      const h = t?.hash || t?.txHash || t?.transactionHash;
+      if (h) hashes.push(h);
     }
-
-    return [...out];
+    return { hashes, nextPageKey: res?.pageKey || null, count: transfers.length };
   }
 
-  // Main exported function
-  window.ffComputeTotalSpentAllTime = async function ffComputeTotalSpentAllTime(opts = {}) {
-    const slug = opts.slug || (typeof FF_OPENSEA_COLLECTION_SLUG !== "undefined" ? FF_OPENSEA_COLLECTION_SLUG : null);
+  // Throttled status (1 line, no giant objects)
+  function statusLine(s) {
+    const salesVal = formatUnits(safeBigInt(s.salesValueWei));
+    const mintVal = formatUnits(safeBigInt(s.mintValueWei));
+    const salesGas = formatUnits(safeBigInt(s.salesGasWei));
+    const mintGas = formatUnits(safeBigInt(s.mintGasWei));
+    const total = formatUnits(
+      safeBigInt(s.salesValueWei) + safeBigInt(s.mintValueWei) + safeBigInt(s.salesGasWei) + safeBigInt(s.mintGasWei)
+    );
+    return `SalesTx=${s.salesTxCount} (value ${salesVal} ETH, gas ${salesGas} ETH) | ` +
+           `MintTx=${s.mintTxCount} (value ${mintVal} ETH, gas ${mintGas} ETH) | ` +
+           `TOTAL ${total} ETH`;
+  }
+
+  // Exported: wipe progress
+  window.ffTotalSpentReset = async function () {
+    localStorage.removeItem(LS_KEY);
+    console.info("[FF] total-spent state reset.");
+  };
+
+  // Exported: chunked runner
+  window.ffTotalSpentStep = async function ffTotalSpentStep(opts = {}) {
+    // Pull your existing globals if they exist
+    const slug = opts.slug || (typeof FF_OPENSEA_COLLECTION_SLUG !== "undefined" ? FF_OPENSEA_COLLECTION_SLUG : "fresh-frogs");
     const osApiKey = opts.osApiKey || (typeof FF_OPENSEA_API_KEY !== "undefined" ? FF_OPENSEA_API_KEY : null);
     const contract = opts.contract || (typeof FF_COLLECTION_ADDRESS !== "undefined" ? FF_COLLECTION_ADDRESS : null);
 
-    // If you want to swap providers later, pass opts.rpcUrl.
-    // By default we’ll use your existing Alchemy core base (already in your file).
-    const rpcUrl =
-      opts.rpcUrl ||
-      (typeof FF_ALCHEMY_CORE_BASE !== "undefined" ? FF_ALCHEMY_CORE_BASE : null);
+    const rpcUrl = opts.rpcUrl || null; // user will provide later
+    const includeGas = !!opts.includeGas; // default false until rpcUrl provided
+    const minutes = Number(opts.minutes ?? 0.25); // default 15 sec
+    const timeBudgetMs = Math.max(2000, Math.floor(minutes * 60 * 1000));
 
-    const includeSales = opts.includeSales !== false;
-    const includeMints = opts.includeMints !== false;
-    const includeGas = opts.includeGas !== false;
-    const concurrency = Math.max(1, Number(opts.concurrency || 3));
-    const onProgress = typeof opts.onProgress === "function" ? opts.onProgress : null;
-
-    if (!slug) throw new Error("Missing OpenSea collection slug");
     if (!osApiKey) throw new Error("Missing OpenSea API key");
     if (!contract) throw new Error("Missing contract address");
-    if (includeGas && !rpcUrl) throw new Error("Missing rpcUrl for gas/tx lookups");
+    if (includeGas && !rpcUrl) throw new Error("includeGas=true requires rpcUrl");
 
     const limit = 50;
+    const started = Date.now();
+    let s = loadState() || defaultState();
 
-    // Try a few event_type strings (OpenSea docs mention filtering by event types but don’t list all in plain HTML)
-    const saleEventTypeCandidates = opts.saleEventTypeCandidates || ["item_sold", "sale", "successful"];
+    // Minimal console output (no spam)
+    const log = opts.log !== false;
+    const logEveryMs = Math.max(1000, Number(opts.logEveryMs || 2500));
+    let lastLog = 0;
 
-    const limiter = _createLimiter(concurrency);
+    // Use a cancellation flag
+    window.ffTotalSpentAbort = false;
 
-    const totals = {
-      sales: {
-        txCount: 0,
-        valueByTokenWei: {}, // tokenKey -> string(wei)
-        gasWei: "0",
-      },
-      mints: {
-        txCount: 0,
-        valueWei: "0",
-        gasWei: "0",
-      },
-      combined: {
-        ethLikeValueWei: "0", // ETH + WETH value (wei)
-        ethLikeGasWei: "0",
-        ethLikeTotalWei: "0",
-        note: "",
-      },
-      debug: {
-        salesEventsSeen: 0,
-        salesTxDeduped: 0,
-        mintTxDeduped: 0,
-      },
-    };
+    // 1) SALES chunk
+    if (!s.doneSales) {
+      // Event type: item_sold is the usual; if it errors, user can override with opts.saleEventType
+      const eventType = opts.saleEventType || "item_sold";
 
-    const addToObjWei = (obj, key, addWei) => {
-      const cur = _safeBigInt(obj[key] || "0");
-      obj[key] = (cur + addWei).toString();
-    };
+      // We dedupe sales per tx within a single chunk only;
+      // cursor continuation prevents reprocessing across chunks.
+      const seenTx = new Set();
+      while (Date.now() - started < timeBudgetMs) {
+        if (window.ffTotalSpentAbort) break;
 
-    // -------------------------
-    // 1) SALES (OpenSea only)
-    // -------------------------
-    const saleTxHashes = new Set();
-    const saleValueByToken = new Map(); // tokenKey -> BigInt
-
-    if (includeSales) {
-      let workingEventType = null;
-
-      // Find an event_type that doesn’t error
-      for (const candidate of saleEventTypeCandidates) {
-        try {
-          const test = await _osListCollectionEvents({ slug, apiKey: osApiKey, eventType: candidate, next: null, limit });
-          _extractEvents(test); // just ensure parse
-          workingEventType = candidate;
-          break;
-        } catch (e) {
-          // try next candidate
-        }
-      }
-      if (!workingEventType) {
-        throw new Error(`Could not find a working OpenSea sale event_type. Tried: ${saleEventTypeCandidates.join(", ")}`);
-      }
-
-      onProgress?.({ stage: "sales:eventType", eventType: workingEventType });
-
-      let next = null;
-      let page = 0;
-
-      while (true) {
-        page++;
-        const resp = await _osListCollectionEvents({
+        const resp = await osListCollectionEvents({
           slug,
           apiKey: osApiKey,
-          eventType: workingEventType,
-          next,
+          eventType,
+          next: s.salesNext,
           limit,
         });
 
-        const events = _extractEvents(resp);
-        totals.debug.salesEventsSeen += events.length;
+        const events = extractEvents(resp);
+        const next = extractNext(resp);
 
-        // Process events: dedupe by tx hash, sum Seaport consideration.
+        // process
         for (const evt of events) {
-          const txHash = _extractTxHash(evt);
-          if (!txHash) continue;
+          const txHash = extractTxHash(evt);
+          if (!txHash || seenTx.has(txHash)) continue;
 
-          if (saleTxHashes.has(txHash)) continue;
+          const params = extractProtocolParams(evt);
+          const { sumWei, hasOpenSeaFee } = sumConsideration(params);
 
-          const params = _extractProtocolParams(evt);
-          const { byToken, hasOpenSeaFee } = _sumConsideration(params);
-
-          // “OpenSea-only” filter: require OpenSea fee recipient in consideration. :contentReference[oaicite:5]{index=5}
+          // OpenSea-only filter
           if (!hasOpenSeaFee) continue;
 
-          saleTxHashes.add(txHash);
-          totals.debug.salesTxDeduped = saleTxHashes.size;
+          seenTx.add(txHash);
 
-          for (const [tokenKey, wei] of byToken.entries()) {
-            saleValueByToken.set(tokenKey, (saleValueByToken.get(tokenKey) || 0n) + wei);
+          // Add value
+          const curVal = safeBigInt(s.salesValueWei);
+          s.salesValueWei = (curVal + sumWei).toString();
+          s.salesTxCount += 1;
+
+          // Optional gas
+          if (includeGas && rpcUrl) {
+            const { gasWei } = await getTxValueAndGas(rpcUrl, txHash);
+            const curGas = safeBigInt(s.salesGasWei);
+            s.salesGasWei = (curGas + gasWei).toString();
           }
+
+          // Yield so UI stays responsive
+          if (s.salesTxCount % 10 === 0) await sleep(0);
         }
 
-        next = _extractNext(resp);
-        onProgress?.({
-          stage: "sales:list",
-          page,
-          events: events.length,
-          dedupedTx: saleTxHashes.size,
-          next: !!next,
-        });
+        s.salesNext = next;
+        s.updatedAt = Date.now();
+        saveState(s);
 
-        if (!next || events.length === 0) break;
+        // Throttled log
+        if (log && Date.now() - lastLog > logEveryMs) {
+          console.info("[FF] total-spent:", statusLine(s));
+          lastLog = Date.now();
+        }
+
+        if (!next || events.length === 0) {
+          s.doneSales = true;
+          s.updatedAt = Date.now();
+          saveState(s);
+          break;
+        }
       }
     }
 
-    // -------------------------
-    // 2) MINTS (on-chain)
-    // -------------------------
-    const mintTxHashes = includeMints ? await _alchemyGetMintTxHashesAllTime(rpcUrl, contract, onProgress) : [];
-    const mintTxSet = new Set(mintTxHashes);
-    totals.debug.mintTxDeduped = mintTxSet.size;
+    // 2) MINTS chunk (requires Alchemy enhanced RPC if you want automatic mint listing)
+    // If rpcUrl not provided yet, we skip mint value/gas because we can’t look up tx.value.
+    if (rpcUrl && !s.doneMints) {
+      // chunk: fetch a page of mint tx hashes, then resolve tx.value (+ gas if requested)
+      while (Date.now() - started < timeBudgetMs) {
+        if (window.ffTotalSpentAbort) break;
 
-    // -------------------------
-    // 3) TX VALUES + GAS (on-chain)
-    // -------------------------
-    let salesGas = 0n;
+        const { hashes, nextPageKey, count } = await alchemyGetMintTxHashesPage(rpcUrl, contract, s.mintsPageKey);
 
-    if (includeSales) {
-      // Set sales valueByToken in output
-      for (const [tokenKey, wei] of saleValueByToken.entries()) {
-        totals.sales.valueByTokenWei[tokenKey] = wei.toString();
-      }
-      totals.sales.txCount = saleTxHashes.size;
+        // If no transfers returned and no next key => done
+        if ((!hashes.length && !nextPageKey) || count === 0) {
+          s.doneMints = true;
+          s.updatedAt = Date.now();
+          saveState(s);
+          break;
+        }
 
-      if (includeGas) {
-        const txs = [...saleTxHashes];
-        let done = 0;
+        // Resolve tx.value/gas one-by-one (slow but safe for browser)
+        for (const h of hashes) {
+          if (Date.now() - started >= timeBudgetMs) break;
+          if (window.ffTotalSpentAbort) break;
 
-        await Promise.all(
-          txs.map((h) =>
-            limiter(async () => {
-              const { gasWei } = await _getTxAndReceipt(rpcUrl, h);
-              salesGas += gasWei;
-              done++;
-              if (done % 25 === 0) onProgress?.({ stage: "sales:gas", done, total: txs.length });
-            })
-          )
-        );
-        totals.sales.gasWei = salesGas.toString();
-      }
-    }
+          const { valueWei, gasWei } = await getTxValueAndGas(rpcUrl, h);
 
-    let mintValue = 0n;
-    let mintGas = 0n;
+          s.mintValueWei = (safeBigInt(s.mintValueWei) + valueWei).toString();
+          if (includeGas) s.mintGasWei = (safeBigInt(s.mintGasWei) + gasWei).toString();
+          s.mintTxCount += 1;
 
-    if (includeMints) {
-      totals.mints.txCount = mintTxSet.size;
+          if (s.mintTxCount % 10 === 0) await sleep(0);
+        }
 
-      if (mintTxSet.size && (includeGas || true)) {
-        const txs = [...mintTxSet];
-        let done = 0;
+        s.mintsPageKey = nextPageKey;
+        s.updatedAt = Date.now();
+        saveState(s);
 
-        await Promise.all(
-          txs.map((h) =>
-            limiter(async () => {
-              const { valueWei, gasWei } = await _getTxAndReceipt(rpcUrl, h);
-              mintValue += valueWei;
-              if (includeGas) mintGas += gasWei;
-              done++;
-              if (done % 25 === 0) onProgress?.({ stage: "mints:tx", done, total: txs.length });
-            })
-          )
-        );
+        if (log && Date.now() - lastLog > logEveryMs) {
+          console.info("[FF] total-spent:", statusLine(s));
+          lastLog = Date.now();
+        }
 
-        totals.mints.valueWei = mintValue.toString();
-        totals.mints.gasWei = mintGas.toString();
+        if (!nextPageKey) {
+          s.doneMints = true;
+          s.updatedAt = Date.now();
+          saveState(s);
+          break;
+        }
       }
     }
 
-    // -------------------------
-    // 4) ETH-equivalent combined totals (only for ETH/WETH)
-    // -------------------------
-    const salesEth = (saleValueByToken.get("ETH") || 0n) + (saleValueByToken.get("WETH") || 0n);
-    const combinedValueEthLike = salesEth + mintValue;
-    const combinedGasEthLike = salesGas + mintGas;
+    // Final single-line output
+    if (log) console.info("[FF] total-spent DONE/STEP:", statusLine(s));
 
-    totals.combined.ethLikeValueWei = combinedValueEthLike.toString();
-    totals.combined.ethLikeGasWei = combinedGasEthLike.toString();
-    totals.combined.ethLikeTotalWei = (combinedValueEthLike + combinedGasEthLike).toString();
+    const result = {
+      state: s,
+      human: {
+        salesValueEth: formatUnits(safeBigInt(s.salesValueWei)),
+        salesGasEth: formatUnits(safeBigInt(s.salesGasWei)),
+        mintValueEth: formatUnits(safeBigInt(s.mintValueWei)),
+        mintGasEth: formatUnits(safeBigInt(s.mintGasWei)),
+        totalEth: formatUnits(
+          safeBigInt(s.salesValueWei) + safeBigInt(s.mintValueWei) + safeBigInt(s.salesGasWei) + safeBigInt(s.mintGasWei)
+        ),
+      },
+      done: { sales: s.doneSales, mints: s.doneMints },
+      note:
+        !rpcUrl
+          ? "Mint value/gas requires rpcUrl. Sales value is accumulating from OpenSea now; gas is skipped unless includeGas=true with rpcUrl."
+          : "Running with rpcUrl; mint value (+ gas if includeGas=true) is accumulating.",
+    };
 
-    // If there are non-ETH tokens in sales, we can’t express a single ETH total without pricing conversions.
-    const nonEthTokens = [...saleValueByToken.keys()].filter((k) => k !== "ETH" && k !== "WETH");
-    if (nonEthTokens.length) {
-      totals.combined.note =
-        `Sales include non-ETH currencies (${nonEthTokens.slice(0, 5).join(", ")}${nonEthTokens.length > 5 ? "..." : ""}). ` +
-        `combined.ethLikeTotalWei includes only ETH+WETH sales + mint ETH value + gas.`;
-    }
-
-    // Convenience human-readable fields
-    totals.sales.valueByTokenEth = {};
-    for (const [k, v] of Object.entries(totals.sales.valueByTokenWei)) {
-      totals.sales.valueByTokenEth[k] = _formatUnits(_safeBigInt(v), 18, 6);
-    }
-    totals.sales.gasEth = _formatUnits(_safeBigInt(totals.sales.gasWei), 18, 6);
-    totals.mints.valueEth = _formatUnits(_safeBigInt(totals.mints.valueWei), 18, 6);
-    totals.mints.gasEth = _formatUnits(_safeBigInt(totals.mints.gasWei), 18, 6);
-    totals.combined.ethLikeValueEth = _formatUnits(_safeBigInt(totals.combined.ethLikeValueWei), 18, 6);
-    totals.combined.ethLikeGasEth = _formatUnits(_safeBigInt(totals.combined.ethLikeGasWei), 18, 6);
-    totals.combined.ethLikeTotalEth = _formatUnits(_safeBigInt(totals.combined.ethLikeTotalWei), 18, 6);
-
-    onProgress?.({ stage: "done", totals });
-    return totals;
+    return result;
   };
 })();
