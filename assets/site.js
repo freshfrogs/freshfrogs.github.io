@@ -2724,3 +2724,441 @@ function ffRomanToArabic(roman) {
     return formatETH(totalWei, 6);
   };
 })();
+/* =========================================================
+  FF Grand Total Spent (OpenSea secondary + mints + all gas)
+  ONE command: await ffGrandTotalSpent()
+
+  Uses:
+    - OpenSea collection stats (authoritative secondary volume)
+    - OpenSea sale events (tx hashes only) -> Alchemy receipts for gas
+    - Alchemy mint transfers (from ZERO) -> per-block tx list + per-block receipts
+      to sum mint tx.value and mint gas efficiently.
+
+  Output:
+    Returns an object and prints ONE readable summary line.
+
+  Abort:
+    ffGrandTotalAbort()
+
+  Notes:
+    - Secondary "total volume" from OpenSea is in ETH units (includes WETH-equivalent volume).
+========================================================= */
+(function () {
+  const OS_BASE = "https://api.opensea.io/api/v2";
+  const ZERO = "0x0000000000000000000000000000000000000000";
+  const STATE_KEY = "FF_GRAND_TOTAL_STATE_V1";
+
+  // --- helpers
+  const lower = (s) => (s ? String(s).toLowerCase() : "");
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const sleep0 = () => new Promise((r) => setTimeout(r, 0));
+
+  function bi(x) {
+    try {
+      if (x == null) return 0n;
+      if (typeof x === "bigint") return x;
+      if (typeof x === "number") return BigInt(Math.trunc(x));
+      return BigInt(String(x));
+    } catch {
+      return 0n;
+    }
+  }
+
+  function biHex(h) {
+    try {
+      if (!h) return 0n;
+      if (typeof h !== "string") return bi(h);
+      // hex string like "0x..."
+      return h.startsWith("0x") ? BigInt(h) : BigInt(h);
+    } catch {
+      return 0n;
+    }
+  }
+
+  function fmtEth(wei, dp = 6) {
+    const neg = wei < 0n;
+    let x = neg ? -wei : wei;
+    const base = 10n ** 18n;
+    const whole = x / base;
+    let frac = (x % base).toString().padStart(18, "0").slice(0, dp);
+    frac = frac.replace(/0+$/, "");
+    const out = frac ? `${whole}.${frac}` : `${whole}`;
+    return neg ? `-${out}` : out;
+  }
+
+  function parseEthToWeiStr(ethStr) {
+    const s = String(ethStr).trim();
+    const neg = s.startsWith("-");
+    const t = neg ? s.slice(1) : s;
+    const [w, f = ""] = t.split(".");
+    const whole = (w || "0").replace(/[^\d]/g, "") || "0";
+    const frac = f.replace(/[^\d]/g, "").slice(0, 18).padEnd(18, "0");
+    const wei = BigInt(whole) * 10n ** 18n + BigInt(frac || "0");
+    return (neg ? -wei : wei).toString();
+  }
+
+  function shortErr(e) {
+    const msg = (e && (e.message || String(e))) ? (e.message || String(e)) : "Unknown error";
+    return msg.length > 260 ? msg.slice(0, 260) + "…" : msg;
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STATE_KEY);
+      if (!raw) return null;
+      const s = JSON.parse(raw);
+      if (!s || s.v !== 1) return null;
+      return s;
+    } catch {
+      return null;
+    }
+  }
+
+  function saveState(s) {
+    try { localStorage.setItem(STATE_KEY, JSON.stringify(s)); } catch {}
+  }
+
+  function defaultState() {
+    return {
+      v: 1,
+      updatedAt: Date.now(),
+
+      // Secondary gas crawl
+      salesNext: null,
+      salesDone: false,
+      saleGasWei: "0",
+      saleTxSeen: [],
+
+      // Mint crawl
+      mintPageKey: null,
+      mintsDone: false,
+      mintValueWei: "0",
+      mintGasWei: "0",
+      mintTxSeen: [],
+
+      // Cached OpenSea stats volume
+      secondaryVolumeWei: null,
+    };
+  }
+
+  function pushSeen(arr, x, max = 8000) {
+    arr.push(x);
+    if (arr.length > max) arr.splice(0, arr.length - max);
+  }
+
+  async function fetchJson(url, headers, retry = 6) {
+    let attempt = 0;
+    while (true) {
+      try {
+        const res = await fetch(url, { headers });
+        if (!res.ok) {
+          const txt = await res.text().catch(() => "");
+          // Retry on rate limits / transient
+          if ((res.status === 429 || res.status >= 500) && attempt < retry) {
+            attempt++;
+            await sleep(Math.min(8000, 350 * (2 ** (attempt - 1))));
+            continue;
+          }
+          throw new Error(`HTTP ${res.status}: ${txt.slice(0, 220)}`);
+        }
+        return await res.json();
+      } catch (e) {
+        if (attempt >= retry) throw e;
+        attempt++;
+        await sleep(Math.min(8000, 350 * (2 ** (attempt - 1))));
+      }
+    }
+  }
+
+  async function rpc(rpcUrl, method, params, retry = 6) {
+    let attempt = 0;
+    while (true) {
+      try {
+        const body = JSON.stringify({ jsonrpc: "2.0", id: Math.floor(Math.random() * 1e9), method, params });
+        const res = await fetch(rpcUrl, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body,
+        });
+        const json = await res.json().catch(() => null);
+        if (!res.ok || !json) {
+          if ((res.status === 429 || res.status >= 500) && attempt < retry) {
+            attempt++;
+            await sleep(Math.min(8000, 350 * (2 ** (attempt - 1))));
+            continue;
+          }
+          throw new Error(`RPC HTTP ${res.status}`);
+        }
+        if (json.error) {
+          const msg = json.error.message || "RPC error";
+          if (attempt < retry) {
+            attempt++;
+            await sleep(Math.min(8000, 350 * (2 ** (attempt - 1))));
+            continue;
+          }
+          throw new Error(msg);
+        }
+        return json.result;
+      } catch (e) {
+        if (attempt >= retry) throw e;
+        attempt++;
+        await sleep(Math.min(8000, 350 * (2 ** (attempt - 1))));
+      }
+    }
+  }
+
+  // --- OpenSea: stats volume (authoritative secondary volume) :contentReference[oaicite:3]{index=3}
+  async function getSecondaryVolumeWei({ slug, osKey }) {
+    const url = `${OS_BASE}/collections/${encodeURIComponent(slug)}/stats`;
+    const data = await fetchJson(url, { accept: "application/json", "X-API-KEY": osKey });
+
+    // Robust field hunt
+    const v =
+      data?.total_volume ??
+      data?.stats?.total_volume ??
+      data?.total?.volume ??
+      data?.volume ??
+      null;
+
+    if (v == null) throw new Error("OpenSea stats: total_volume not found");
+    // total_volume is a decimal ETH number in docs/examples (store as wei string)
+    return parseEthToWeiStr(v);
+  }
+
+  // --- OpenSea: sale events paging (tx hashes only) :contentReference[oaicite:4]{index=4}
+  async function getSaleEventsPage({ slug, osKey, next }) {
+    const u = new URL(`${OS_BASE}/events/collection/${encodeURIComponent(slug)}`);
+    u.searchParams.set("event_type", "sale");
+    u.searchParams.set("limit", "50");
+    if (next) u.searchParams.set("next", next);
+
+    const data = await fetchJson(u.toString(), { accept: "application/json", "X-API-KEY": osKey });
+    const events = data?.events || data?.asset_events || data?.collection_events || data?.data || [];
+    const cursor = data?.next || data?.next_cursor || data?.nextCursor || null;
+    return { events: Array.isArray(events) ? events : [], next: cursor };
+  }
+
+  function txHashFromSaleEvent(e) {
+    return (
+      e?.transaction?.hash ||
+      e?.payload?.transaction?.hash ||
+      e?.transaction_hash ||
+      e?.tx_hash ||
+      e?.txHash ||
+      null
+    );
+  }
+
+  // --- Gas from receipt
+  function gasFromReceipt(rcpt) {
+    const status = rcpt?.status;
+    if (status && status !== "0x1" && status !== 1 && status !== "1") return 0n; // ignore failed
+    const gasUsed = biHex(rcpt?.gasUsed || "0x0");
+    const eff = biHex(rcpt?.effectiveGasPrice || rcpt?.gasPrice || "0x0");
+    return gasUsed * eff;
+  }
+
+  // --- Mint transfers via Alchemy enhanced transfers API :contentReference[oaicite:5]{index=5}
+  async function getMintTransfersPage({ rpcUrl, contract, pageKey }) {
+    const params = {
+      fromBlock: "0x0",
+      toBlock: "latest",
+      fromAddress: ZERO,
+      contractAddresses: [contract],
+      category: ["erc721", "erc1155"],
+      withMetadata: false,
+      maxCount: "0x3e8", // 1000
+    };
+    if (pageKey) params.pageKey = pageKey;
+
+    const res = await rpc(rpcUrl, "alchemy_getAssetTransfers", [params]);
+    const transfers = res?.transfers || [];
+    const next = res?.pageKey || null;
+    return { transfers, next };
+  }
+
+  // --- Block-level optimization for mint value+gas:
+  // alchemy_getTransactionReceipts gives all receipts in a block :contentReference[oaicite:6]{index=6}
+  async function getBlockReceiptsByNumber(rpcUrl, blockNumberHex) {
+    const res = await rpc(rpcUrl, "alchemy_getTransactionReceipts", [{ blockNumber: blockNumberHex }]);
+    // shapes vary: sometimes {receipts:[...]} sometimes [...]
+    const receipts = Array.isArray(res) ? res : (res?.receipts || []);
+    return Array.isArray(receipts) ? receipts : [];
+  }
+
+  async function getBlockTxsByNumber(rpcUrl, blockNumberHex) {
+    // full tx objects so we can read tx.value
+    const block = await rpc(rpcUrl, "eth_getBlockByNumber", [blockNumberHex, true]);
+    const txs = block?.transactions || [];
+    return Array.isArray(txs) ? txs : [];
+  }
+
+  // --- Public controls
+  window.ffGrandTotalAbort = () => { window.__FF_GRAND_ABORT = true; };
+  window.ffGrandTotalReset = async () => { localStorage.removeItem(STATE_KEY); return true; };
+
+  // ONE command
+  window.ffGrandTotalSpent = async function ffGrandTotalSpent(opts = {}) {
+    window.__FF_GRAND_ABORT = false;
+
+    const slug = opts.slug || (typeof FF_OPENSEA_COLLECTION_SLUG !== "undefined" ? FF_OPENSEA_COLLECTION_SLUG : null);
+    const osKey = opts.osApiKey || (typeof FF_OPENSEA_API_KEY !== "undefined" ? FF_OPENSEA_API_KEY : null);
+    const contract = opts.contract || (typeof FF_COLLECTION_ADDRESS !== "undefined" ? FF_COLLECTION_ADDRESS : null);
+    const rpcUrl = opts.rpcUrl || (typeof FF_ALCHEMY_CORE_BASE !== "undefined" ? FF_ALCHEMY_CORE_BASE : null);
+
+    if (!slug) throw new Error("Missing OpenSea slug");
+    if (!osKey) throw new Error("Missing OpenSea API key");
+    if (!contract) throw new Error("Missing contract address");
+    if (!rpcUrl) throw new Error("Missing Alchemy RPC url");
+
+    // mild throttle between pages/blocks
+    const pageDelayMs = Number(opts.pageDelayMs ?? 120);
+
+    // state (resumable even though this function runs all the way)
+    const s = loadState() || defaultState();
+    const saleSeen = new Set(s.saleTxSeen || []);
+    const mintSeen = new Set(s.mintTxSeen || []);
+
+    try {
+      // 1) Secondary volume (authoritative)
+      if (!s.secondaryVolumeWei) {
+        s.secondaryVolumeWei = await getSecondaryVolumeWei({ slug, osKey });
+        s.updatedAt = Date.now();
+        saveState(s);
+      }
+
+      // 2) Secondary gas: crawl OpenSea sale events and sum gas for unique sale tx hashes
+      while (!s.salesDone) {
+        if (window.__FF_GRAND_ABORT) throw new Error("Aborted");
+
+        const { events, next } = await getSaleEventsPage({ slug, osKey, next: s.salesNext });
+
+        // collect unique tx hashes from this page
+        const pageHashes = [];
+        const pageSet = new Set();
+
+        for (const e of events) {
+          const h = txHashFromSaleEvent(e);
+          if (!h) continue;
+          const hl = lower(h);
+          if (pageSet.has(hl)) continue;
+          pageSet.add(hl);
+          if (saleSeen.has(hl)) continue;
+          pageHashes.push(hl);
+        }
+
+        // receipts for those hashes (likely small total volume)
+        for (const h of pageHashes) {
+          if (window.__FF_GRAND_ABORT) throw new Error("Aborted");
+          const rcpt = await rpc(rpcUrl, "eth_getTransactionReceipt", [h]);
+          const gasWei = gasFromReceipt(rcpt);
+          s.saleGasWei = (bi(s.saleGasWei) + gasWei).toString();
+          saleSeen.add(h);
+          pushSeen(s.saleTxSeen, h);
+          // yield
+          await sleep0();
+        }
+
+        s.salesNext = next;
+        if (!next || events.length === 0) s.salesDone = true;
+
+        s.updatedAt = Date.now();
+        saveState(s);
+
+        if (pageDelayMs) await sleep(pageDelayMs);
+      }
+
+      // 3) Mints: crawl mint transfers page-by-page, process per block for value+gas
+      while (!s.mintsDone) {
+        if (window.__FF_GRAND_ABORT) throw new Error("Aborted");
+
+        const { transfers, next } = await getMintTransfersPage({ rpcUrl, contract, pageKey: s.mintPageKey });
+
+        // Group tx hashes by blockNum for this page
+        const byBlock = new Map(); // blockNumHex -> Set(txHash)
+        for (const t of transfers) {
+          const h = lower(t?.hash || t?.txHash || t?.transactionHash || "");
+          const b = t?.blockNum;
+          if (!h || !b) continue;
+          if (mintSeen.has(h)) continue;
+          if (!byBlock.has(b)) byBlock.set(b, new Set());
+          byBlock.get(b).add(h);
+        }
+
+        // Process each block: one request for tx list, one for receipts
+        for (const [blockNumHex, hashSet] of byBlock.entries()) {
+          if (window.__FF_GRAND_ABORT) throw new Error("Aborted");
+
+          const [txs, receipts] = await Promise.all([
+            getBlockTxsByNumber(rpcUrl, blockNumHex),
+            getBlockReceiptsByNumber(rpcUrl, blockNumHex),
+          ]);
+
+          const want = hashSet;
+
+          // Sum mint tx.value from block tx objects
+          for (const tx of txs) {
+            const h = lower(tx?.hash || "");
+            if (!h || !want.has(h)) continue;
+            s.mintValueWei = (bi(s.mintValueWei) + biHex(tx?.value || "0x0")).toString();
+          }
+
+          // Sum mint gas from receipts
+          for (const rcpt of receipts) {
+            const h = lower(rcpt?.transactionHash || rcpt?.hash || "");
+            if (!h || !want.has(h)) continue;
+            const gasWei = gasFromReceipt(rcpt);
+            s.mintGasWei = (bi(s.mintGasWei) + gasWei).toString();
+          }
+
+          // mark seen
+          for (const h of want) {
+            mintSeen.add(h);
+            pushSeen(s.mintTxSeen, h);
+          }
+
+          s.updatedAt = Date.now();
+          saveState(s);
+
+          if (pageDelayMs) await sleep(pageDelayMs);
+          await sleep0();
+        }
+
+        s.mintPageKey = next;
+        if (!next) s.mintsDone = true;
+
+        s.updatedAt = Date.now();
+        saveState(s);
+
+        if (pageDelayMs) await sleep(pageDelayMs);
+      }
+
+      // Final totals
+      const secondaryVolWei = bi(s.secondaryVolumeWei);
+      const secondaryGasWei = bi(s.saleGasWei);
+      const mintVolWei = bi(s.mintValueWei);
+      const mintGasWei = bi(s.mintGasWei);
+
+      const grandWei = secondaryVolWei + secondaryGasWei + mintVolWei + mintGasWei;
+
+      const out = {
+        secondaryVolumeEth: fmtEth(secondaryVolWei),
+        secondaryGasEth: fmtEth(secondaryGasWei),
+        mintVolumeEth: fmtEth(mintVolWei),
+        mintGasEth: fmtEth(mintGasWei),
+        grandTotalEth: fmtEth(grandWei),
+      };
+
+      // ONE readable console line
+      console.log(
+        `FF TOTAL SPENT (ETH) = ${out.grandTotalEth} | ` +
+        `secondaryVol=${out.secondaryVolumeEth} + secondaryGas=${out.secondaryGasEth} + ` +
+        `mintVol=${out.mintVolumeEth} + mintGas=${out.mintGasEth}`
+      );
+
+      return out;
+    } catch (e) {
+      throw new Error(shortErr(e));
+    }
+  };
+})();
