@@ -2659,3 +2659,14 @@ function ffRomanToArabic(roman) {
     }
   };
 })();
+
+/*
+{
+    "secondaryVolumeEth": "0.45179",
+    "secondaryGasEth": "0",
+    "mintVolumeEth": "2.04",
+    "mintGasEth": "4.398195",
+    "grandTotalEth": "6.889985",
+    "done": true
+}
+*/
