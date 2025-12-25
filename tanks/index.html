@@ -309,7 +309,7 @@
         <div class="brand">
           <span style="font-size:18px;">🪖</span>
           <span>Tankers</span>
-          <span class="badge">prototype</span>
+          <span class="badge">phase 2</span>
         </div>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
           <button class="btn hidden" id="btnRestart">Restart</button>
@@ -323,8 +323,8 @@
       <div id="setup" class="setup">
         <h2>Start Game</h2>
         <p>
-          Deploy into a 4x4 grid. After deploying, your tanks automatically <b>advance</b> based on Mobility, then both sides shoot.
-          Range = <b>Accuracy</b>. Abilities are shown but not active yet.
+          Phase 2: Deploy → Move → Shoot.
+          Tanks can shoot forward in same or adjacent columns. Attacks are classified as <b>Frontal / Side / Flanked</b>.
         </p>
         <div class="setupRow">
           <div class="setupCol">
@@ -386,7 +386,7 @@
             <div class="kv"><span>Selected</span><b id="selLabel">None</b></div>
             <div class="log" id="log"></div>
             <div class="note">
-              v1 mechanics: deploy → <b>move</b> → shoot → draw. (No manual movement yet.)
+              Angle rules: <b>Side</b> = armor −1, <b>Flanked</b> = armor −2.
             </div>
           </div>
         </div>
@@ -398,10 +398,9 @@
     // --------- Config ----------
     const DATA_URL = "tanks.json";
     const HAND_SIZE = 5;
-    const COPIES_PER_CARD = 2; // deck size = cards * copies
+    const COPIES_PER_CARD = 2;
 
-    // Movement rules (v1):
-    // mob 1 => 0 tiles, mob 2-3 => 1 tile, mob 4-5 => 2 tiles
+    // Movement rules (v1)
     function moveTilesForMobility(mob){
       const m = Number(mob ?? 0);
       if (m <= 1) return 0;
@@ -409,17 +408,21 @@
       return 1;
     }
 
+    // Angle armor reductions (phase 2)
+    function armorPenaltyForAngle(angle){
+      if (angle === "side") return 1;
+      if (angle === "flanked") return 2;
+      return 0;
+    }
+
     // --------- State ----------
     let data = null;
-    let factions = []; // {faction, cards}
+    let factions = [];
     let player = null;
     let ai = null;
-
-    // board: rows 0..3 top->bottom, cols 0..3 left->right
-    // cell = null or unit { uid, side:'player'|'ai', card, hp }
-    let board = null;
-    let selectedHandIndex = null; // player's hand selection
-    let phase = "setup"; // setup|player|ai|end
+    let board = null; // [4][4] top->bottom, left->right
+    let selectedHandIndex = null;
+    let phase = "setup";
     let UID = 0;
 
     // --------- DOM ----------
@@ -501,7 +504,6 @@
       return n;
     }
 
-    // Drop into closest slot to side
     function findDropRow(side, col){
       if (side === "player"){
         for (let r=3;r>=0;r--){
@@ -521,28 +523,23 @@
       if (row === null) return false;
 
       const card = who.hand.splice(handIndex, 1)[0];
-      const unit = {
+      board[row][col] = {
         uid: ++UID,
         side,
         card,
         hp: card.stats.hp
       };
-      board[row][col] = unit;
       log(`${titleCase(side)} deploys ${card.name} in column ${col+1}.`);
       return true;
     }
 
-    // --------- Movement (v1) ----------
-    // Auto-advance all units of a side toward the enemy.
+    // --------- Movement ----------
     function resolveMovement(side){
       const moved = new Set();
       const dir = (side === "player") ? -1 : +1;
 
-      // Iterate front-to-back (so front units move first)
-      const rowOrder = (side === "player")
-        ? [0,1,2,3]
-        : [3,2,1,0];
-
+      // front-to-back
+      const rowOrder = (side === "player") ? [0,1,2,3] : [3,2,1,0];
       let any = false;
 
       for (const r of rowOrder){
@@ -563,7 +560,6 @@
             if (nr < 0 || nr > 3) break;
             if (board[nr][c]) break;
 
-            // move
             board[nr][c] = u;
             board[curR][c] = null;
             curR = nr;
@@ -580,35 +576,106 @@
       if (!any) log(`${titleCase(side)} movement: no advances.`, true);
     }
 
-    // --------- Combat ----------
-    // Tanks shoot closest enemy in same column within range = accuracy.
+    // --------- Angle + Damage ----------
+    function getFrontDirForSide(side){
+      // direction of "front" for that side (from their perspective)
+      return side === "player" ? -1 : +1;
+    }
+
+    // Determine angle from TARGET's perspective given attacker/target positions.
+    function classifyAngle(attackerPos, targetPos, targetSide){
+      const dr = attackerPos.r - targetPos.r;
+      const dc = attackerPos.c - targetPos.c;
+      const frontDir = getFrontDirForSide(targetSide); // -1 player faces up, +1 ai faces down
+
+      // If attacker is in front of target (same front direction), it's frontal/side.
+      const inFront = (frontDir === -1) ? (dr < 0) : (dr > 0);
+      const behind = (frontDir === -1) ? (dr > 0) : (dr < 0);
+
+      if (behind) return "flanked";
+      if (dc !== 0) return "side"; // front-left or front-right
+      return "frontal";
+    }
+
+    function unitHasText(unit, needle){
+      const n = String(needle).toLowerCase();
+      return (unit.card.abilities || []).some(a => {
+        const hay = `${a.name || ""} ${a.text || ""}`.toLowerCase();
+        return hay.includes(n);
+      });
+    }
+
+    function extraDamageFromAngleVuln(targetUnit, angle){
+      if (angle === "side" || angle === "flanked"){
+        // matches your M12 text ("Receive +1 damage from Flanked and Side attacks")
+        if (unitHasText(targetUnit, "receive +1 damage from flanked") || unitHasText(targetUnit, "receive +1 damage from flanked and side")){
+          return 1;
+        }
+        if (unitHasText(targetUnit, "lumbering giant") && unitHasText(targetUnit, "receive +1 damage")) {
+          return 1;
+        }
+      }
+      return 0;
+    }
+
+    function computeDamage(attackerUnit, targetUnit, angle){
+      const firepower = Number(attackerUnit.card.stats.firepower ?? 1);
+      const armor = Number(targetUnit.card.stats.armor ?? 0);
+
+      const effArmor = Math.max(0, armor - armorPenaltyForAngle(angle));
+      let dmg = Math.max(1, firepower - Math.floor(effArmor / 2));
+      dmg += extraDamageFromAngleVuln(targetUnit, angle);
+      return Math.max(1, dmg);
+    }
+
+    // --------- Combat (phase 2 targeting) ----------
+    // A unit shoots forward within range (Accuracy), checking:
+    // 1) same column, then 2) adjacent columns, at each distance step.
+    function findTargetForAttacker(attacker, pos){
+      const dir = attacker.side === "player" ? -1 : +1;
+      const range = Math.max(1, Number(attacker.card.stats.accuracy ?? 1));
+
+      for (let step = 1; step <= range; step++){
+        const rr = pos.r + dir*step;
+        if (rr < 0 || rr > 3) break;
+
+        // priority: same column, then left/right
+        const colsToCheck = [pos.c, pos.c-1, pos.c+1];
+        for (const cc of colsToCheck){
+          if (cc < 0 || cc > 3) continue;
+          const maybe = board[rr][cc];
+          if (maybe && maybe.side !== attacker.side){
+            return { unit: maybe, pos: { r: rr, c: cc } };
+          }
+        }
+      }
+
+      return null;
+    }
+
     function resolveCombat(){
       const events = [];
 
+      // snapshot positions
       for (let r=0;r<4;r++){
         for (let c=0;c<4;c++){
           const attacker = board[r][c];
           if (!attacker) continue;
 
-          const dir = attacker.side === "player" ? -1 : +1;
-          const range = Math.max(1, attacker.card.stats.accuracy ?? 1);
+          const targetHit = findTargetForAttacker(attacker, {r,c});
+          if (!targetHit) continue;
 
-          let target = null;
-          let tr=null;
+          const angle = classifyAngle({r,c}, targetHit.pos, targetHit.unit.side);
+          const dmg = computeDamage(attacker, targetHit.unit, angle);
 
-          for (let step=1; step<=range; step++){
-            const rr = r + dir*step;
-            if (rr < 0 || rr > 3) break;
-            const maybe = board[rr][c];
-            if (maybe && maybe.side !== attacker.side){
-              target = maybe; tr = rr;
-              break;
-            }
-          }
-          if (!target) continue;
-
-          const dmg = Math.max(1, (attacker.card.stats.firepower ?? 1) - Math.floor((target.card.stats.armor ?? 0)/2));
-          events.push({ toR:tr, toC:c, dmg, attacker, target });
+          events.push({
+            attacker,
+            attackerPos: {r,c},
+            target: targetHit.unit,
+            targetPos: targetHit.pos,
+            angle,
+            dmg
+          });
         }
       }
 
@@ -619,18 +686,20 @@
 
       // Apply simultaneously
       for (const e of events){
-        const cur = board[e.toR][e.toC];
-        if (!cur || cur.side !== e.target.side) continue;
+        const cur = board[e.targetPos.r][e.targetPos.c];
+        if (!cur || cur.uid !== e.target.uid) continue;
         cur.hp -= e.dmg;
       }
 
-      // Log and cleanup
+      // Log
       for (const e of events){
         const sideA = e.attacker.side === "player" ? "You" : "AI";
         const sideT = e.target.side === "player" ? "You" : "AI";
-        log(`${sideA} ${e.attacker.card.name} hits ${sideT} ${e.target.card.name} for ${e.dmg}.`);
+        const tag = e.angle.toUpperCase();
+        log(`${sideA} ${e.attacker.card.name} hits ${sideT} ${e.target.card.name} for ${e.dmg} (${tag}).`);
       }
 
+      // Cleanup dead
       for (let r=0;r<4;r++){
         for (let c=0;c<4;c++){
           const u = board[r][c];
@@ -648,18 +717,9 @@
       const pHas = pUnits > 0 || player.hand.length > 0 || player.deck.length > 0;
       const aHas = aUnits > 0 || ai.hand.length > 0 || ai.deck.length > 0;
 
-      if (!pHas && !aHas){
-        endGame("Draw — both sides ran out.");
-        return true;
-      }
-      if (!aHas){
-        endGame("You win!");
-        return true;
-      }
-      if (!pHas){
-        endGame("AI wins!");
-        return true;
-      }
+      if (!pHas && !aHas){ endGame("Draw — both sides ran out."); return true; }
+      if (!aHas){ endGame("You win!"); return true; }
+      if (!pHas){ endGame("AI wins!"); return true; }
       return false;
     }
 
@@ -668,17 +728,11 @@
       statusText.textContent = msg;
       turnText.textContent = "Game over.";
       btnRestart.classList.remove("hidden");
-      setColumnButtonsEnabled(false);
       log(msg);
       renderAll();
     }
 
     // --------- Rendering ----------
-    function setColumnButtonsEnabled(enabled){
-      const btns = [...colBtnsEl.querySelectorAll("button")];
-      for (const b of btns) b.disabled = !enabled;
-    }
-
     function renderColumns(){
       colBtnsEl.innerHTML = "";
       for (let col=0; col<4; col++){
@@ -713,7 +767,7 @@
 
             const move = document.createElement("div");
             move.className = "moveTag";
-            move.textContent = `MOB ${u.card.stats.mobility}`;
+            move.textContent = `MOB ${u.card.stats.mobility} • ACC ${u.card.stats.accuracy}`;
 
             cell.appendChild(img);
             cell.appendChild(hp);
@@ -761,10 +815,10 @@
 
     function renderTurnText(){
       if (phase === "player"){
-        turnText.textContent = "Your turn: select a card, then deploy to a column. (Then: move → shoot)";
+        turnText.textContent = "Your turn: select a card, deploy → move → shoot → draw.";
         statusText.textContent = "";
       } else if (phase === "ai"){
-        turnText.textContent = "AI turn… (deploy → move → shoot)";
+        turnText.textContent = "AI turn… deploy → move → shoot → draw.";
         statusText.textContent = "";
       }
     }
@@ -796,7 +850,6 @@
       selectedHandIndex = null;
       selLabel.textContent = "None";
 
-      // NEW: move phase (player only), then combat, then draw
       resolveMovement("player");
       resolveCombat();
       drawToHand(player);
@@ -826,7 +879,6 @@
         log("AI cannot deploy.", true);
       }
 
-      // NEW: move phase (ai only), then combat, then draw
       resolveMovement("ai");
       resolveCombat();
       drawToHand(ai);
@@ -886,7 +938,7 @@
 
       logEl.innerHTML = "";
       log(`Game start: You = ${titleCase(pf)} vs AI = ${titleCase(af)}.`);
-      log("Turn order: deploy → move → shoot → draw.", true);
+      log("Phase 2 active: forward + adjacent shots; frontal/side/flanked angles.", true);
 
       elSetup.classList.add("hidden");
       elGame.classList.remove("hidden");
@@ -915,7 +967,6 @@
         if (!res.ok) throw new Error(`Failed to load tanks.json (${res.status})`);
         data = await res.json();
         factions = data.factions || [];
-
         populateSetupSelectors();
       }catch(err){
         alert(err.message + "\n\nIf you opened this as file://, use a local server (python3 -m http.server).");
