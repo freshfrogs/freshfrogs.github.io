@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tankers — Card Viewer</title>
+  <style>
+    :root{
+      --bg:#0c0f14;
+      --panel:#121826;
+      --panel2:#0f1420;
+      --text:#e7edf7;
+      --muted:#9bb0cc;
+      --line:rgba(255,255,255,.10);
+      --accent:#f7c34a;
+      --danger:#ff5b5b;
+      --shadow: 0 14px 40px rgba(0,0,0,.45);
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 700px at 15% 0%, rgba(247,195,74,.12), transparent 55%),
+                  radial-gradient(1000px 600px at 90% 20%, rgba(80,180,255,.10), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    header{
+      position:sticky;
+      top:0;
+      z-index:10;
+      backdrop-filter: blur(10px);
+      background: rgba(12,15,20,.65);
+      border-bottom:1px solid var(--line);
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:18px 16px;}
+    .top{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.4px;
+    }
+    .badge{
+      font-size:12px;
+      color:#111;
+      background: var(--accent);
+      padding:4px 8px;
+      border-radius:999px;
+      font-weight:800;
+    }
+    .controls{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .tabs{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    button.tab{
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      color:var(--text);
+      padding:8px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:700;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    button.tab:hover{transform: translateY(-1px); border-color: rgba(247,195,74,.45);}
+    button.tab.active{
+      border-color: rgba(247,195,74,.7);
+      box-shadow: 0 0 0 3px rgba(247,195,74,.15);
+    }
+    .search{
+      position:relative;
+      min-width: 240px;
+      flex: 1;
+      max-width: 360px;
+    }
+    .search input{
+      width:100%;
+      padding:10px 12px 10px 36px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color:var(--text);
+      outline:none;
+    }
+    .search input:focus{
+      border-color: rgba(247,195,74,.7);
+      box-shadow: 0 0 0 3px rgba(247,195,74,.12);
+    }
+    .search .icon{
+      position:absolute; left:12px; top:50%;
+      transform: translateY(-50%);
+      opacity:.75;
+      font-size:14px;
+    }
+    main .wrap{padding-top:16px}
+    .meta{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      margin: 6px 0 14px;
+      flex-wrap:wrap;
+    }
+    .meta h2{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.3px;
+    }
+    .meta .sub{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap:14px;
+    }
+    @media (max-width:1050px){ .grid{grid-template-columns: repeat(3, 1fr);} }
+    @media (max-width:780px){ .grid{grid-template-columns: repeat(2, 1fr);} }
+    @media (max-width:460px){ .grid{grid-template-columns: 1fr;} }
+
+    .card{
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow: 0 10px 26px rgba(0,0,0,.25);
+      overflow:hidden;
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease;
+      display:flex;
+      flex-direction:column;
+      min-height: 320px;
+    }
+    .card:hover{transform: translateY(-2px); border-color: rgba(247,195,74,.40);}
+    .thumb{
+      position:relative;
+      background: rgba(0,0,0,.18);
+      border-bottom:1px solid var(--line);
+      aspect-ratio: 3/4;
+      overflow:hidden;
+    }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .thumb .fallback{
+      position:absolute; inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      color: rgba(255,255,255,.65);
+      font-weight:800;
+      letter-spacing:.4px;
+    }
+    .info{
+      padding:10px 10px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      flex:1;
+    }
+    .nameRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+    }
+    .name{
+      font-weight:900;
+      letter-spacing:.3px;
+      line-height:1.1;
+    }
+    .id{
+      color:var(--muted);
+      font-size:11px;
+      opacity:.9;
+      white-space:nowrap;
+    }
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap:6px;
+      padding:8px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background: rgba(0,0,0,.18);
+    }
+    .stat{
+      text-align:center;
+      font-size:11px;
+      color:var(--muted);
+    }
+    .stat b{
+      display:block;
+      color:var(--text);
+      font-size:14px;
+      margin-top:2px;
+    }
+    .abilities{
+      margin:0;
+      padding-left: 16px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.25;
+    }
+    .abilities li{
+      margin: 4px 0;
+    }
+
+    /* Modal */
+    .modalBackdrop{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.65);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:999;
+    }
+    .modal{
+      width:min(980px, 100%);
+      background: linear-gradient(180deg, rgba(18,24,38,.98), rgba(15,20,32,.98));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modalTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:12px 14px;
+      border-bottom:1px solid var(--line);
+      gap:10px;
+    }
+    .modalTop .title{
+      font-weight:900;
+      letter-spacing:.4px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .closeBtn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:800;
+    }
+    .modalBody{
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap:0;
+    }
+    @media (max-width:900px){ .modalBody{grid-template-columns: 1fr;} }
+    .modalImg{
+      border-right:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+    }
+    @media (max-width:900px){ .modalImg{border-right:none; border-bottom:1px solid var(--line);} }
+    .modalImg img{
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:cover;
+      aspect-ratio: 3/4;
+    }
+    .modalPanel{
+      padding:14px;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-bottom:12px;
+    }
+    .pill{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .hp{
+      color:#111;
+      background: rgba(255,91,91,.95);
+      border:none;
+      font-weight:900;
+    }
+    .abilityBox{
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      border-radius: 14px;
+      padding:10px 12px;
+      margin-top:10px;
+    }
+    .abilityBox h3{
+      margin:0 0 8px 0;
+      font-size:14px;
+      letter-spacing:.3px;
+    }
+    .abilityItem{
+      padding:8px 0;
+      border-top:1px dashed rgba(255,255,255,.10);
+    }
+    .abilityItem:first-of-type{border-top:none;}
+    .abilityItem .an{
+      font-weight:900;
+      color: var(--accent);
+      letter-spacing:.2px;
+    }
+    .abilityItem .at{
+      color: var(--text);
+      opacity:.92;
+      margin-top:4px;
+      font-size:13px;
+      line-height:1.25;
+    }
+
+    .footNote{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .error{
+      border:1px solid rgba(255,91,91,.35);
+      background: rgba(255,91,91,.10);
+      padding:12px;
+      border-radius: 14px;
+      color: rgba(255,255,255,.9);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="top">
+        <div class="brand">
+          <span style="font-size:18px;">🪖</span>
+          <span>Tankers Card Viewer</span>
+          <span class="badge">v0</span>
+        </div>
+
+        <div class="controls">
+          <div class="tabs" id="tabs"></div>
+          <div class="search">
+            <span class="icon">🔎</span>
+            <input id="search" type="text" placeholder="Search tanks / abilities..." autocomplete="off" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="meta">
+        <div>
+          <h2 id="heading">Loading…</h2>
+          <div class="sub" id="sub">Make sure <code>tanks.json</code> is next to this file.</div>
+        </div>
+        <div class="sub" id="count"></div>
+      </div>
+
+      <div id="error" class="error" style="display:none;"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div class="modalBackdrop" id="backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modalTop">
+        <div class="title" id="modalTitle">Card</div>
+        <button class="closeBtn" id="closeBtn">Close</button>
+      </div>
+      <div class="modalBody">
+        <div class="modalImg"><img id="modalImg" alt=""></div>
+        <div class="modalPanel">
+          <div class="row" id="modalPills"></div>
+          <div class="stats" id="modalStats"></div>
+          <div class="abilityBox">
+            <h3>Abilities</h3>
+            <div id="modalAbilities"></div>
+          </div>
+          <div class="footNote" id="modalPath"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const iconLabels = [
+      ["firepower","💥 FP"],
+      ["armor","🛡️ ARM"],
+      ["mobility","🛞 MOB"],
+      ["accuracy","🎯 ACC"],
+      ["utility","🧰 UTIL"],
+      ["hp","❤️ HP"]
+    ];
+
+    let DATA = null;
+    let activeFaction = null;
+
+    function normalizeFactionName(f) {
+      if (!f) return "";
+      return String(f).trim().toLowerCase();
+    }
+
+    function titleCase(s){
+      return s.replace(/(^|\s|_)([a-z])/g, (_,a,b)=> (a==="_"? " " : a) + b.toUpperCase()).replace(/\s+/g," ").trim();
+    }
+
+    function getFactionBlockByName(name){
+      if (!DATA) return null;
+      const n = normalizeFactionName(name);
+      return (DATA.factions || []).find(x => normalizeFactionName(x.faction) === n) || null;
+    }
+
+    function buildTabs(){
+      const tabs = $("tabs");
+      tabs.innerHTML = "";
+
+      const factions = (DATA?.factions || []).map(f => normalizeFactionName(f.faction));
+      // Default to germany if present, else first
+      if (!activeFaction) activeFaction = factions.includes("germany") ? "germany" : (factions[0] || null);
+
+      for (const f of (DATA?.factions || [])) {
+        const name = normalizeFactionName(f.faction);
+        const btn = document.createElement("button");
+        btn.className = "tab" + (name === activeFaction ? " active" : "");
+        btn.textContent = titleCase(name);
+        btn.onclick = () => {
+          activeFaction = name;
+          // update active classes
+          [...tabs.querySelectorAll("button.tab")].forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          render();
+        };
+        tabs.appendChild(btn);
+      }
+    }
+
+    function cardMatchesQuery(card, q){
+      if (!q) return true;
+      const hay = [
+        card.name,
+        card.id,
+        card.faction,
+        ...(card.abilities || []).map(a => a.name + " " + a.text)
+      ].join(" ").toLowerCase();
+      return hay.includes(q);
+    }
+
+    function render(){
+      const grid = $("grid");
+      grid.innerHTML = "";
+
+      const fBlock = getFactionBlockByName(activeFaction);
+      const cards = (fBlock?.cards || []).map(c => ({...c, faction: fBlock.faction}));
+
+      const q = $("search").value.trim().toLowerCase();
+      const filtered = cards.filter(c => cardMatchesQuery(c, q));
+
+      $("heading").textContent = titleCase(activeFaction || "cards");
+      $("sub").textContent = "Click a card for details.";
+      $("count").textContent = `${filtered.length} / ${cards.length} shown`;
+
+      for (const card of filtered) {
+        const el = document.createElement("div");
+        el.className = "card";
+        el.innerHTML = `
+          <div class="thumb">
+            <img alt="${escapeHtml(card.name)}" src="${escapeAttr(card.image)}">
+            <div class="fallback">Missing image</div>
+          </div>
+          <div class="info">
+            <div class="nameRow">
+              <div class="name">${escapeHtml(card.name)}</div>
+              <div class="id">${escapeHtml(card.id)}</div>
+            </div>
+            <div class="stats">
+              ${statCell("FP", card.stats?.firepower)}
+              ${statCell("ARM", card.stats?.armor)}
+              ${statCell("MOB", card.stats?.mobility)}
+              ${statCell("ACC", card.stats?.accuracy)}
+              ${statCell("UTIL", card.stats?.utility)}
+              ${statCell("HP", card.stats?.hp)}
+            </div>
+            <ul class="abilities">
+              ${(card.abilities || []).slice(0,3).map(a => `<li><b>${escapeHtml(a.name)}:</b> ${escapeHtml(a.text)}</li>`).join("")}
+            </ul>
+          </div>
+        `;
+
+        const img = el.querySelector("img");
+        const fb = el.querySelector(".fallback");
+        img.addEventListener("error", () => { fb.style.display="flex"; img.style.display="none"; });
+
+        el.onclick = () => openModal(card);
+        grid.appendChild(el);
+      }
+    }
+
+    function statCell(label, val){
+      const v = (val === 0 || val) ? String(val) : "—";
+      return `<div class="stat">${label}<b>${v}</b></div>`;
+    }
+
+    function openModal(card){
+      $("modalTitle").textContent = `${card.name} (${titleCase(card.faction)})`;
+      $("modalImg").src = card.image;
+      $("modalImg").alt = card.name;
+
+      // pills
+      const pills = $("modalPills");
+      pills.innerHTML = `
+        <span class="pill">${escapeHtml(card.id)}</span>
+        <span class="pill">${escapeHtml(titleCase(card.faction))}</span>
+        <span class="pill hp">HP ${escapeHtml(String(card.stats?.hp ?? "—"))}</span>
+      `;
+
+      // stats grid (without HP as a separate pill? keep all stats anyway)
+      const ms = $("modalStats");
+      ms.innerHTML = iconLabels.map(([k, label]) => {
+        const v = (card.stats && (card.stats[k] === 0 || card.stats[k])) ? card.stats[k] : "—";
+        return `<div class="stat">${label}<b>${escapeHtml(String(v))}</b></div>`;
+      }).join("");
+
+      // abilities
+      const ma = $("modalAbilities");
+      ma.innerHTML = (card.abilities || []).map(a => `
+        <div class="abilityItem">
+          <div class="an">${escapeHtml(a.name)}</div>
+          <div class="at">${escapeHtml(a.text)}</div>
+        </div>
+      `).join("") || `<div class="abilityItem"><div class="at">No abilities.</div></div>`;
+
+      $("modalPath").innerHTML = `Image: <code>${escapeHtml(card.image)}</code>`;
+      showModal(true);
+    }
+
+    function showModal(on){
+      const b = $("backdrop");
+      b.style.display = on ? "flex" : "none";
+      b.setAttribute("aria-hidden", on ? "false" : "true");
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
+    }
+    function escapeAttr(s){ return escapeHtml(s); }
+
+    // Events
+    $("closeBtn").addEventListener("click", () => showModal(false));
+    $("backdrop").addEventListener("click", (e) => { if (e.target === $("backdrop")) showModal(false); });
+    window.addEventListener("keydown", (e) => { if (e.key === "Escape") showModal(false); });
+
+    $("search").addEventListener("input", () => render());
+
+    async function init(){
+      try{
+        const res = await fetch("tanks.json", { cache: "no-store" });
+        if (!res.ok) throw new Error(`Failed to load tanks.json (${res.status})`);
+        DATA = await res.json();
+
+        if (!DATA || !Array.isArray(DATA.factions)) {
+          throw new Error("tanks.json format expected: { \"factions\": [ { faction, cards: [] }, ... ] }");
+        }
+
+        // Only show Germany + Allies for now (if present)
+        DATA.factions = DATA.factions.filter(f => ["germany","allies"].includes(normalizeFactionName(f.faction)));
+
+        buildTabs();
+        render();
+      }catch(err){
+        $("error").style.display = "block";
+        $("error").textContent =
+          err.message +
+          "  |  If you opened this as file://, fetch may be blocked. Use a local server or GitHub Pages.";
+        $("heading").textContent = "Error";
+        $("sub").textContent = "";
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
