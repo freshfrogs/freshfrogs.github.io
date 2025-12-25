@@ -3,351 +3,863 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tankers — Card Viewer</title>
+  <title>Tankers — Prototype</title>
   <style>
     :root{
-      --bg:#0f1115; --panel:#151923; --panel2:#1b2130;
-      --text:#e8ecf1; --muted:#aab3c2; --accent:#ffd36a;
-      --border:rgba(255,255,255,.08);
+      --bg:#0c0f14;
+      --panel:#121826;
+      --panel2:#0f1420;
+      --text:#e7edf7;
+      --muted:#9bb0cc;
+      --line:rgba(255,255,255,.10);
+      --accent:#f7c34a;
+      --good:#62ff9b;
+      --bad:#ff5b5b;
+      --shadow: 0 14px 40px rgba(0,0,0,.45);
+      --radius:14px;
     }
     *{box-sizing:border-box}
     body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:radial-gradient(1200px 600px at 20% -10%, rgba(255,211,106,.15), transparent 60%),
-                 radial-gradient(900px 500px at 90% 10%, rgba(120,160,255,.12), transparent 55%),
-                 var(--bg);
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 700px at 15% 0%, rgba(247,195,74,.12), transparent 55%),
+                  radial-gradient(1000px 600px at 90% 20%, rgba(80,180,255,.10), transparent 55%),
+                  var(--bg);
       color:var(--text);
     }
     header{
-      position:sticky; top:0; z-index:5;
+      position:sticky; top:0; z-index:10;
       backdrop-filter: blur(10px);
-      background:rgba(15,17,21,.75);
-      border-bottom:1px solid var(--border);
+      background: rgba(12,15,20,.70);
+      border-bottom:1px solid var(--line);
     }
-    .wrap{max-width:1200px; margin:0 auto; padding:16px}
-    .row{display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between}
-    h1{margin:0; font-size:18px; letter-spacing:.3px}
-    .controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    select,input{
-      background:var(--panel); color:var(--text);
-      border:1px solid var(--border); border-radius:10px;
-      padding:10px 12px; font-size:14px; outline:none;
-    }
-    input{min-width:260px}
-    button{
-      background:linear-gradient(180deg, rgba(255,211,106,.25), rgba(255,211,106,.05));
+    .wrap{max-width:1200px;margin:0 auto;padding:16px;}
+    .top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.4px;}
+    .badge{font-size:12px;color:#111;background:var(--accent);padding:4px 8px;border-radius:999px;font-weight:900;}
+    .btn{
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
       color:var(--text);
-      border:1px solid rgba(255,211,106,.35);
-      border-radius:10px; padding:10px 12px; cursor:pointer;
+      padding:9px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:800;
     }
-    button:hover{filter:brightness(1.08)}
-    main{max-width:1200px; margin:0 auto; padding:18px 16px 40px}
-    .grid{
+    .btn:hover{border-color: rgba(247,195,74,.45)}
+    select{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:12px;
+      font-weight:800;
+      outline:none;
+    }
+
+    main .wrap{padding-top:14px}
+    .layout{
       display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      grid-template-columns: 1fr 320px;
       gap:14px;
     }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-      border:1px solid var(--border);
-      border-radius:14px;
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr;}
+    }
+
+    /* Setup screen */
+    .setup{
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      padding:14px;
+    }
+    .setup h2{margin:0 0 8px 0;font-size:18px;}
+    .setup p{margin:0 0 14px 0;color:var(--muted);font-size:13px;line-height:1.3;}
+    .setupRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .setupRow label{color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    .setupCol{display:flex;flex-direction:column;gap:6px;min-width:220px}
+    .setup .btn{padding:10px 14px}
+
+    /* Battlefield */
+    .board{
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
       overflow:hidden;
+    }
+    .boardTop{
+      padding:12px 12px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .boardTop .title{
+      font-weight:900;
+      letter-spacing:.3px;
+    }
+    .boardTop .sub{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    /* Column buttons */
+    .colBtns{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+      padding:10px 12px 0;
+    }
+    .colBtn{
+      padding:10px 8px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      color:var(--text);
+      font-weight:900;
       cursor:pointer;
       transition: transform .08s ease, border-color .08s ease;
     }
-    .card:hover{transform:translateY(-2px); border-color:rgba(255,211,106,.25)}
-    .thumb{
-      aspect-ratio: 2/3;
-      background:var(--panel2);
-      display:flex; align-items:center; justify-content:center;
-    }
-    .thumb img{
-      width:100%; height:100%; object-fit:cover; display:block;
-    }
-    .meta{padding:10px 12px}
-    .name{font-weight:700; font-size:14px; margin:0 0 4px}
-    .sub{margin:0; color:var(--muted); font-size:12px}
+    .colBtn:hover{transform: translateY(-1px); border-color: rgba(247,195,74,.45);}
+    .colBtn:disabled{opacity:.4; cursor:not-allowed; transform:none;}
 
-    /* Modal */
-    .modal{
-      position:fixed; inset:0; display:none; z-index:20;
-      background:rgba(0,0,0,.65);
-      align-items:center; justify-content:center;
-      padding:18px;
-    }
-    .modal.open{display:flex}
-    .sheet{
-      width:min(980px, 100%);
-      background:rgba(21,25,35,.98);
-      border:1px solid var(--border);
-      border-radius:16px;
-      overflow:hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,.5);
-    }
-    .sheetTop{
-      display:flex; gap:16px; padding:14px 14px 12px;
-      align-items:flex-start; justify-content:space-between;
-      border-bottom:1px solid var(--border);
-    }
-    .sheetTitle{display:flex; flex-direction:column; gap:2px}
-    .sheetTitle strong{font-size:16px}
-    .sheetTitle span{color:var(--muted); font-size:12px}
-    .close{
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.04);
-      border-radius:10px;
-      padding:8px 10px;
-      cursor:pointer;
-      color:var(--text);
-    }
-    .sheetBody{
+    .grid{
       display:grid;
-      grid-template-columns: 360px 1fr;
-      gap:0;
-    }
-    @media (max-width: 820px){
-      .sheetBody{grid-template-columns:1fr}
-    }
-    .sheetImg{
-      background:var(--panel2);
-      display:flex; align-items:center; justify-content:center;
-      padding:12px;
-      border-right:1px solid var(--border);
-    }
-    @media (max-width: 820px){
-      .sheetImg{border-right:none; border-bottom:1px solid var(--border)}
-    }
-    .sheetImg img{
-      width:100%;
-      max-width:340px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      background:#0b0d12;
-    }
-    .sheetInfo{padding:14px}
-    .stats{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap:10px;
-      margin-bottom:12px;
+      padding:12px;
     }
-    .stat{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:10px 10px;
+    .cell{
+      aspect-ratio: 3/4;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
-    .stat .k{color:var(--muted); font-size:11px}
-    .stat .v{font-size:18px; font-weight:800; margin-top:2px}
-    .sectionTitle{
-      margin:10px 0 8px;
+    .cell.empty::after{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(400px 240px at 50% 20%, rgba(255,255,255,.06), transparent 55%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .unitImg{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      filter: saturate(1.05);
+      transform: scale(1.01);
+    }
+    .hpTag{
+      position:absolute;
+      left:8px; top:8px;
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:999px;
+      padding:4px 8px;
       font-size:12px;
-      color:var(--accent);
-      letter-spacing:.12em;
+      font-weight:900;
+      display:flex;
+      gap:6px;
+      align-items:center;
+    }
+    .hpTag .dot{
+      width:8px;height:8px;border-radius:999px;background: var(--good);
+      box-shadow: 0 0 0 3px rgba(98,255,155,.12);
+    }
+    .hpTag.ai .dot{background: var(--bad); box-shadow: 0 0 0 3px rgba(255,91,91,.12);}
+    .sideMark{
+      position:absolute;
+      right:8px; top:8px;
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:999px;
+      padding:4px 8px;
+      font-size:11px;
+      color:var(--muted);
+      font-weight:900;
+      letter-spacing:.08em;
       text-transform:uppercase;
     }
-    .abil{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:10px 12px;
-      margin-bottom:10px;
+
+    /* Hands */
+    .hands{
+      border-top:1px solid var(--line);
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
     }
-    .abil strong{display:block; margin-bottom:4px}
-    .abil p{margin:0; color:var(--muted); line-height:1.35}
-    .footerNote{color:var(--muted); font-size:12px; margin-top:8px}
+    .handTitle{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .handRow{
+      display:grid;
+      grid-template-columns: repeat(5, minmax(0,1fr));
+      gap:10px;
+    }
+    @media (max-width:700px){ .handRow{grid-template-columns: repeat(4, 1fr);} }
+    @media (max-width:520px){ .handRow{grid-template-columns: repeat(3, 1fr);} }
+
+    .handCard{
+      border:1px solid var(--line);
+      border-radius:14px;
+      overflow:hidden;
+      background: rgba(0,0,0,.18);
+      cursor:pointer;
+      position:relative;
+      aspect-ratio: 2/3;
+      transition: transform .08s ease, border-color .08s ease;
+    }
+    .handCard:hover{transform: translateY(-2px); border-color: rgba(247,195,74,.45);}
+    .handCard.selected{
+      border-color: rgba(247,195,74,.85);
+      box-shadow: 0 0 0 3px rgba(247,195,74,.16);
+    }
+    .handCard img{width:100%;height:100%;object-fit:cover;display:block}
+    .handCard .mini{
+      position:absolute;
+      left:8px; bottom:8px;
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:999px;
+      padding:4px 8px;
+      font-size:12px;
+      font-weight:900;
+    }
+
+    /* Sidebar */
+    .side{
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height: 520px;
+    }
+    .sideTop{
+      padding:12px 12px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+    }
+    .sideTop .title{font-weight:900;letter-spacing:.3px;}
+    .sideTop .sub{color:var(--muted);font-size:12px;}
+    .panel{padding:12px; display:flex; flex-direction:column; gap:10px;}
+    .kv{
+      display:flex; justify-content:space-between; gap:10px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      border-radius:12px;
+      padding:10px 10px;
+      font-size:13px;
+    }
+    .kv span{color:var(--muted);font-weight:800}
+    .kv b{font-weight:900}
+    .log{
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      border-radius:12px;
+      padding:10px;
+      height: 280px;
+      overflow:auto;
+      font-size:12px;
+      line-height:1.35;
+      color: rgba(231,237,247,.92);
+    }
+    .log .muted{color: var(--muted)}
+    .note{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .hidden{display:none!important}
   </style>
 </head>
 <body>
   <header>
     <div class="wrap">
-      <div class="row">
-        <h1>Tankers — Card Viewer</h1>
-        <div class="controls">
-          <select id="factionSelect">
-            <option value="all">All factions</option>
-          </select>
-          <input id="search" type="text" placeholder="Search tank name…" />
-          <button id="shuffleBtn" type="button">Shuffle</button>
+      <div class="top">
+        <div class="brand">
+          <span style="font-size:18px;">🪖</span>
+          <span>Tankers</span>
+          <span class="badge">prototype</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button class="btn hidden" id="btnRestart">Restart</button>
         </div>
       </div>
     </div>
   </header>
 
   <main>
-    <div id="grid" class="grid"></div>
-  </main>
-
-  <!-- Modal -->
-  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="sheet">
-      <div class="sheetTop">
-        <div class="sheetTitle">
-          <strong id="mName">Tank</strong>
-          <span id="mFaction">Faction</span>
+    <div class="wrap">
+      <div id="setup" class="setup">
+        <h2>Start Game</h2>
+        <p>
+          Pick your faction (Germany or Allies). You’ll deploy tanks into a 4x4 grid. Tanks shoot the closest enemy in the same column
+          up to <b>range = Accuracy</b>. Abilities are shown but not active yet.
+        </p>
+        <div class="setupRow">
+          <div class="setupCol">
+            <label for="playerFaction">Your faction</label>
+            <select id="playerFaction"></select>
+          </div>
+          <div class="setupCol">
+            <label for="aiFaction">Opponent faction</label>
+            <select id="aiFaction"></select>
+          </div>
+          <div class="setupCol" style="min-width:auto;">
+            <label>&nbsp;</label>
+            <button class="btn" id="btnStart">Start</button>
+          </div>
         </div>
-        <button class="close" id="closeBtn" type="button">Close</button>
+        <div class="note" style="margin-top:10px;">
+          If images don’t load, run a local server (recommended): <code>python3 -m http.server 8080</code> then open <code>http://localhost:8080/tankers.html</code>.
+        </div>
       </div>
 
-      <div class="sheetBody">
-        <div class="sheetImg">
-          <img id="mImg" alt="Tank card" />
+      <div id="game" class="layout hidden">
+        <div class="board">
+          <div class="boardTop">
+            <div>
+              <div class="title">Battlefield (4x4)</div>
+              <div class="sub" id="turnText">—</div>
+            </div>
+            <div class="sub" id="statusText">—</div>
+          </div>
+
+          <div class="colBtns" id="colBtns"></div>
+          <div class="grid" id="grid"></div>
+
+          <div class="hands">
+            <div class="handTitle">
+              <div>Opponent hand</div>
+              <div id="aiCount" class="muted"></div>
+            </div>
+            <div class="handRow" id="aiHand"></div>
+
+            <div class="handTitle" style="margin-top:6px;">
+              <div>Your hand (click a card, then click a column)</div>
+              <div id="playerCount" class="muted"></div>
+            </div>
+            <div class="handRow" id="playerHand"></div>
+          </div>
         </div>
-        <div class="sheetInfo">
-          <div class="sectionTitle">Stats</div>
-          <div class="stats" id="mStats"></div>
 
-          <div class="sectionTitle">Abilities</div>
-          <div id="mAbilities"></div>
-
-          <div class="footerNote">Tip: click outside the modal (or press Esc) to close.</div>
+        <div class="side">
+          <div class="sideTop">
+            <div>
+              <div class="title">Match Info</div>
+              <div class="sub">Combat log + counts</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="kv"><span>You</span><b id="youLabel">—</b></div>
+            <div class="kv"><span>Opponent</span><b id="aiLabel">—</b></div>
+            <div class="kv"><span>Selected</span><b id="selLabel">None</b></div>
+            <div class="log" id="log"></div>
+            <div class="note">
+              v0 mechanics: deploy → shoot → draw. No movement yet. Abilities not wired yet.
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <script>
+    // --------- Config ----------
     const DATA_URL = "tanks.json";
+    const HAND_SIZE = 5;
+    const COPIES_PER_CARD = 2; // deck size = cards * copies
 
-    const factionSelect = document.getElementById("factionSelect");
-    const searchInput = document.getElementById("search");
-    const grid = document.getElementById("grid");
-    const shuffleBtn = document.getElementById("shuffleBtn");
+    // --------- State ----------
+    let data = null;
+    let factions = []; // {faction, cards}
+    let player = null;
+    let ai = null;
 
-    const modal = document.getElementById("modal");
-    const closeBtn = document.getElementById("closeBtn");
-    const mName = document.getElementById("mName");
-    const mFaction = document.getElementById("mFaction");
-    const mImg = document.getElementById("mImg");
-    const mStats = document.getElementById("mStats");
-    const mAbilities = document.getElementById("mAbilities");
+    // board: rows 0..3 top->bottom, cols 0..3 left->right
+    // cell = null or unit { side:'player'|'ai', card, hp }
+    let board = null;
+    let selectedHandIndex = null; // player's hand selection
+    let phase = "setup"; // setup|player|ai|end
 
-    let allCards = [];      // flattened
-    let factions = [];      // raw
-    let currentOrder = [];  // for shuffle
+    // --------- DOM ----------
+    const elSetup = document.getElementById("setup");
+    const elGame = document.getElementById("game");
+    const playerFactionSel = document.getElementById("playerFaction");
+    const aiFactionSel = document.getElementById("aiFaction");
+    const btnStart = document.getElementById("btnStart");
+    const btnRestart = document.getElementById("btnRestart");
 
-    function titleCase(s){
-      return (s || "").replace(/[_-]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+    const turnText = document.getElementById("turnText");
+    const statusText = document.getElementById("statusText");
+    const youLabel = document.getElementById("youLabel");
+    const aiLabel = document.getElementById("aiLabel");
+    const selLabel = document.getElementById("selLabel");
+
+    const gridEl = document.getElementById("grid");
+    const colBtnsEl = document.getElementById("colBtns");
+    const logEl = document.getElementById("log");
+
+    const playerHandEl = document.getElementById("playerHand");
+    const aiHandEl = document.getElementById("aiHand");
+    const playerCountEl = document.getElementById("playerCount");
+    const aiCountEl = document.getElementById("aiCount");
+
+    // --------- Helpers ----------
+    const titleCase = (s) => (s || "").replace(/[_-]/g," ").replace(/\b\w/g, c => c.toUpperCase()).trim();
+
+    function log(line, muted=false){
+      const div = document.createElement("div");
+      div.innerHTML = muted ? `<span class="muted">${escapeHtml(line)}</span>` : escapeHtml(line);
+      logEl.appendChild(div);
+      logEl.scrollTop = logEl.scrollHeight;
     }
 
-    function flatten(data){
-      factions = data.factions || [];
-      const flat = [];
-      for (const f of factions){
-        const fname = f.faction;
-        for (const c of (f.cards || [])){
-          flat.push({ ...c, faction: fname });
+    function escapeHtml(s){
+      return String(s ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
+    }
+
+    function shuffle(arr){
+      const a = [...arr];
+      for (let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+
+    function deepCopy(obj){
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function makeDeck(cards){
+      const deck = [];
+      for (const c of cards){
+        for (let i=0;i<COPIES_PER_CARD;i++){
+          deck.push(deepCopy(c));
         }
       }
-      return flat;
+      return shuffle(deck);
     }
 
-    function populateFactionDropdown(){
-      const opts = ["all", ...factions.map(f => f.faction)];
-      // wipe existing (keep first)
-      while (factionSelect.options.length > 1) factionSelect.remove(1);
-      for (const f of factions){
-        const opt = document.createElement("option");
-        opt.value = f.faction;
-        opt.textContent = titleCase(f.faction);
-        factionSelect.appendChild(opt);
+    function drawToHand(sideObj){
+      while (sideObj.hand.length < HAND_SIZE && sideObj.deck.length){
+        sideObj.hand.push(sideObj.deck.pop());
       }
     }
 
-    function matchesFilters(card){
-      const f = factionSelect.value;
-      const q = searchInput.value.trim().toLowerCase();
-      const factionOk = (f === "all") || (card.faction === f);
-      const searchOk = !q || card.name.toLowerCase().includes(q);
-      return factionOk && searchOk;
+    function countBoardUnits(side){
+      let n=0;
+      for (let r=0;r<4;r++){
+        for (let c=0;c<4;c++){
+          const u = board[r][c];
+          if (u && u.side === side) n++;
+        }
+      }
+      return n;
     }
 
-    function render(){
-      const filtered = currentOrder.filter(matchesFilters);
-      grid.innerHTML = "";
-      for (const card of filtered){
-        const el = document.createElement("div");
-        el.className = "card";
-        el.innerHTML = `
-          <div class="thumb"><img src="${card.image}" alt="${card.name}"></div>
-          <div class="meta">
-            <p class="name">${card.name}</p>
-            <p class="sub">${titleCase(card.faction)}</p>
-          </div>
-        `;
-        el.addEventListener("click", () => openModal(card));
-        grid.appendChild(el);
+    // Drop into closest slot to side
+    function findDropRow(side, col){
+      if (side === "player"){
+        for (let r=3;r>=0;r--){
+          if (!board[r][col]) return r;
+        }
+      } else {
+        for (let r=0;r<4;r++){
+          if (!board[r][col]) return r;
+        }
+      }
+      return null;
+    }
+
+    function placeCardFromHand(side, handIndex, col){
+      const who = (side === "player") ? player : ai;
+      const row = findDropRow(side, col);
+      if (row === null) return false;
+
+      const card = who.hand.splice(handIndex, 1)[0];
+      const unit = {
+        side,
+        card,
+        hp: card.stats.hp
+      };
+      board[row][col] = unit;
+      log(`${titleCase(side)} deploys ${card.name} in column ${col+1}.`);
+      return true;
+    }
+
+    // --------- Combat ----------
+    // Tanks shoot closest enemy in same column within range = accuracy.
+    // Player shoots upward (toward row 0). AI shoots downward (toward row 3).
+    function resolveCombat(){
+      const events = [];
+
+      for (let r=0;r<4;r++){
+        for (let c=0;c<4;c++){
+          const attacker = board[r][c];
+          if (!attacker) continue;
+
+          const dir = attacker.side === "player" ? -1 : +1;
+          const range = Math.max(1, attacker.card.stats.accuracy ?? 1);
+
+          // scan outward to find first enemy within range
+          let target = null;
+          let tr=null;
+          for (let step=1; step<=range; step++){
+            const rr = r + dir*step;
+            if (rr < 0 || rr > 3) break;
+            const maybe = board[rr][c];
+            if (maybe && maybe.side !== attacker.side){
+              target = maybe; tr = rr;
+              break;
+            }
+          }
+          if (!target) continue;
+
+          const dmg = Math.max(1, (attacker.card.stats.firepower ?? 1) - Math.floor((target.card.stats.armor ?? 0)/2));
+          events.push({ fromR:r, fromC:c, toR:tr, toC:c, dmg, attacker, target });
+        }
+      }
+
+      if (!events.length){
+        log("No shots fired.", true);
+        return;
+      }
+
+      // Apply simultaneously
+      for (const e of events){
+        // target might already be dead by earlier apply; still apply to that cell if still there
+        const cur = board[e.toR][e.toC];
+        if (!cur || cur.side !== e.target.side) continue;
+        cur.hp -= e.dmg;
+      }
+
+      // Log and cleanup
+      for (const e of events){
+        const cur = board[e.toR][e.toC];
+        const atkName = e.attacker.card.name;
+        const tgtName = e.target.card.name;
+        const sideA = e.attacker.side === "player" ? "You" : "AI";
+        const sideT = e.target.side === "player" ? "You" : "AI";
+        log(`${sideA} ${atkName} hits ${sideT} ${tgtName} for ${e.dmg}.`);
+      }
+
+      // Remove dead
+      for (let r=0;r<4;r++){
+        for (let c=0;c<4;c++){
+          const u = board[r][c];
+          if (u && u.hp <= 0){
+            log(`${titleCase(u.side)} ${u.card.name} is destroyed!`);
+            board[r][c] = null;
+          }
+        }
       }
     }
 
-    function openModal(card){
-      mName.textContent = card.name;
-      mFaction.textContent = titleCase(card.faction);
-      mImg.src = card.image;
+    function checkEnd(){
+      const pUnits = countBoardUnits("player");
+      const aUnits = countBoardUnits("ai");
+      const pHas = pUnits > 0 || player.hand.length > 0 || player.deck.length > 0;
+      const aHas = aUnits > 0 || ai.hand.length > 0 || ai.deck.length > 0;
 
-      const s = card.stats || {};
-      const statOrder = [
-        ["firepower","Firepower"],
-        ["armor","Armor"],
-        ["mobility","Mobility"],
-        ["accuracy","Accuracy"],
-        ["utility","Utility"],
-        ["hp","HP"],
-      ];
-      mStats.innerHTML = statOrder.map(([k,label]) => `
-        <div class="stat">
-          <div class="k">${label}</div>
-          <div class="v">${(s[k] ?? "—")}</div>
-        </div>
-      `).join("");
-
-      const ab = card.abilities || [];
-      mAbilities.innerHTML = ab.map(a => `
-        <div class="abil">
-          <strong>${a.name || "Ability"}</strong>
-          <p>${a.text || ""}</p>
-        </div>
-      `).join("") || `<div class="abil"><p>No abilities listed.</p></div>`;
-
-      modal.classList.add("open");
-      modal.setAttribute("aria-hidden","false");
-    }
-
-    function closeModal(){
-      modal.classList.remove("open");
-      modal.setAttribute("aria-hidden","true");
-    }
-
-    function shuffle(array){
-      for (let i = array.length - 1; i > 0; i--){
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+      if (!pHas && !aHas){
+        endGame("Draw — both sides ran out.");
+        return true;
       }
-      return array;
+      if (!aHas){
+        endGame("You win!");
+        return true;
+      }
+      if (!pHas){
+        endGame("AI wins!");
+        return true;
+      }
+      return false;
     }
 
-    factionSelect.addEventListener("change", render);
-    searchInput.addEventListener("input", render);
-    shuffleBtn.addEventListener("click", () => {
-      currentOrder = shuffle([...allCards]);
-      render();
-    });
+    function endGame(msg){
+      phase = "end";
+      statusText.textContent = msg;
+      turnText.textContent = "Game over.";
+      btnRestart.classList.remove("hidden");
+      setColumnButtonsEnabled(false);
+      log(msg);
+      renderAll();
+    }
 
-    closeBtn.addEventListener("click", closeModal);
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) closeModal();
-    });
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeModal();
-    });
+    // --------- Rendering ----------
+    function setColumnButtonsEnabled(enabled){
+      const btns = [...colBtnsEl.querySelectorAll("button")];
+      for (const b of btns) b.disabled = !enabled;
+    }
+
+    function renderColumns(){
+      colBtnsEl.innerHTML = "";
+      for (let col=0; col<4; col++){
+        const b = document.createElement("button");
+        b.className = "colBtn";
+        b.textContent = `Deploy ${col+1}`;
+        b.onclick = () => onPlayerChooseColumn(col);
+        colBtnsEl.appendChild(b);
+      }
+    }
+
+    function renderGrid(){
+      gridEl.innerHTML = "";
+      for (let r=0;r<4;r++){
+        for (let c=0;c<4;c++){
+          const cell = document.createElement("div");
+          cell.className = "cell" + (board[r][c] ? "" : " empty");
+          const u = board[r][c];
+          if (u){
+            const img = document.createElement("img");
+            img.className = "unitImg";
+            img.src = u.card.image;
+            img.alt = u.card.name;
+
+            const hp = document.createElement("div");
+            hp.className = "hpTag" + (u.side === "ai" ? " ai" : "");
+            hp.innerHTML = `<span class="dot"></span><span>${u.hp}</span>`;
+
+            const side = document.createElement("div");
+            side.className = "sideMark";
+            side.textContent = u.side === "player" ? "YOU" : "AI";
+
+            cell.appendChild(img);
+            cell.appendChild(hp);
+            cell.appendChild(side);
+          }
+          gridEl.appendChild(cell);
+        }
+      }
+    }
+
+    function renderHand(side){
+      const who = side === "player" ? player : ai;
+      const root = side === "player" ? playerHandEl : aiHandEl;
+      root.innerHTML = "";
+
+      for (let i=0;i<who.hand.length;i++){
+        const card = who.hand[i];
+        const div = document.createElement("div");
+        div.className = "handCard" + (side==="player" && selectedHandIndex === i ? " selected" : "");
+        // AI hand face-down for now
+        if (side === "ai"){
+          div.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.7);font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.22);">
+            Card
+          </div>`;
+        } else {
+          div.innerHTML = `
+            <img src="${card.image}" alt="${escapeHtml(card.name)}">
+            <div class="mini">HP ${card.stats.hp}</div>
+          `;
+          div.onclick = () => {
+            if (phase !== "player") return;
+            selectedHandIndex = (selectedHandIndex === i) ? null : i;
+            selLabel.textContent = selectedHandIndex === null ? "None" : player.hand[selectedHandIndex]?.name || "None";
+            renderAll();
+          };
+        }
+        root.appendChild(div);
+      }
+    }
+
+    function renderCounts(){
+      playerCountEl.textContent = `Deck ${player.deck.length} • Hand ${player.hand.length} • Board ${countBoardUnits("player")}`;
+      aiCountEl.textContent = `Deck ${ai.deck.length} • Hand ${ai.hand.length} • Board ${countBoardUnits("ai")}`;
+      youLabel.textContent = titleCase(player.faction);
+      aiLabel.textContent = titleCase(ai.faction);
+    }
+
+    function renderTurnText(){
+      if (phase === "player"){
+        turnText.textContent = "Your turn: select a card, then deploy to a column.";
+        statusText.textContent = "";
+      } else if (phase === "ai"){
+        turnText.textContent = "AI turn…";
+        statusText.textContent = "";
+      }
+    }
+
+    function renderAll(){
+      renderColumns();
+      renderGrid();
+      renderHand("ai");
+      renderHand("player");
+      renderCounts();
+      renderTurnText();
+
+      // enable/disable deploy buttons based on phase + selection
+      const enable = phase === "player" && selectedHandIndex !== null;
+      const btns = [...colBtnsEl.querySelectorAll("button")];
+      for (let col=0; col<4; col++){
+        const drop = findDropRow("player", col);
+        btns[col].disabled = !(enable && drop !== null);
+      }
+    }
+
+    // --------- Turns ----------
+    function onPlayerChooseColumn(col){
+      if (phase !== "player") return;
+      if (selectedHandIndex === null) return;
+
+      const ok = placeCardFromHand("player", selectedHandIndex, col);
+      if (!ok) return;
+
+      selectedHandIndex = null;
+      selLabel.textContent = "None";
+
+      // combat + draw
+      resolveCombat();
+      drawToHand(player);
+
+      renderAll();
+      if (checkEnd()) return;
+
+      // AI turn
+      phase = "ai";
+      renderAll();
+      window.setTimeout(aiTurn, 450);
+    }
+
+    function aiTurn(){
+      if (phase !== "ai") return;
+
+      // pick random playable column + random card
+      // (simple: try up to 20 attempts)
+      let played = false;
+      for (let tries=0; tries<20 && !played; tries++){
+        if (!ai.hand.length) break;
+        const handIndex = Math.floor(Math.random() * ai.hand.length);
+        const col = Math.floor(Math.random() * 4);
+        const drop = findDropRow("ai", col);
+        if (drop === null) continue;
+        played = placeCardFromHand("ai", handIndex, col);
+      }
+
+      if (!played){
+        log("AI cannot deploy.", true);
+      }
+
+      resolveCombat();
+      drawToHand(ai);
+
+      renderAll();
+      if (checkEnd()) return;
+
+      phase = "player";
+      renderAll();
+    }
+
+    // --------- Setup ----------
+    function populateSetupSelectors(){
+      const available = factions
+        .map(f => f.faction)
+        .filter(f => ["germany","allies"].includes(String(f).toLowerCase()));
+
+      playerFactionSel.innerHTML = "";
+      aiFactionSel.innerHTML = "";
+
+      for (const f of available){
+        const opt1 = document.createElement("option");
+        opt1.value = f;
+        opt1.textContent = titleCase(f);
+        playerFactionSel.appendChild(opt1);
+
+        const opt2 = document.createElement("option");
+        opt2.value = f;
+        opt2.textContent = titleCase(f);
+        aiFactionSel.appendChild(opt2);
+      }
+
+      // default: player=germany, ai=allies if available
+      if (available.includes("germany")) playerFactionSel.value = "germany";
+      if (available.includes("allies")) aiFactionSel.value = "allies";
+      if (playerFactionSel.value === aiFactionSel.value && available.length > 1){
+        aiFactionSel.value = available.find(x => x !== playerFactionSel.value);
+      }
+    }
+
+    function startGame(){
+      const pf = playerFactionSel.value;
+      const af = aiFactionSel.value;
+
+      const pBlock = factions.find(f => f.faction === pf);
+      const aBlock = factions.find(f => f.faction === af);
+
+      player = { side:"player", faction: pf, deck: makeDeck(pBlock.cards), hand: [] };
+      ai = { side:"ai", faction: af, deck: makeDeck(aBlock.cards), hand: [] };
+
+      drawToHand(player);
+      drawToHand(ai);
+
+      board = Array.from({length:4}, () => Array.from({length:4}, () => null));
+      selectedHandIndex = null;
+      phase = "player";
+
+      logEl.innerHTML = "";
+      log(`Game start: You = ${titleCase(pf)} vs AI = ${titleCase(af)}.`);
+      log("Select a card, then click a column to deploy.", true);
+
+      elSetup.classList.add("hidden");
+      elGame.classList.remove("hidden");
+      btnRestart.classList.remove("hidden");
+
+      renderAll();
+    }
+
+    function resetToSetup(){
+      phase = "setup";
+      elGame.classList.add("hidden");
+      elSetup.classList.remove("hidden");
+      btnRestart.classList.add("hidden");
+      selectedHandIndex = null;
+      selLabel.textContent = "None";
+      logEl.innerHTML = "";
+    }
+
+    // --------- Init ----------
+    btnStart.addEventListener("click", startGame);
+    btnRestart.addEventListener("click", () => { resetToSetup(); });
 
     (async function init(){
-      const res = await fetch(DATA_URL);
-      const data = await res.json();
-      allCards = flatten(data);
-      currentOrder = [...allCards];
-      populateFactionDropdown();
-      render();
+      try{
+        const res = await fetch(DATA_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error(`Failed to load tanks.json (${res.status})`);
+        data = await res.json();
+        factions = data.factions || [];
+
+        populateSetupSelectors();
+      }catch(err){
+        alert(err.message + "\n\nIf you opened this as file://, use a local server (python3 -m http.server).");
+      }
     })();
   </script>
 </body>
