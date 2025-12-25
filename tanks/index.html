@@ -67,7 +67,6 @@
       .layout{grid-template-columns:1fr;}
     }
 
-    /* Setup screen */
     .setup{
       border:1px solid var(--line);
       border-radius: var(--radius);
@@ -81,7 +80,6 @@
     .setupCol{display:flex;flex-direction:column;gap:6px;min-width:220px}
     .setup .btn{padding:10px 14px}
 
-    /* Battlefield */
     .board{
       border:1px solid var(--line);
       border-radius: var(--radius);
@@ -106,7 +104,6 @@
       font-size:12px;
     }
 
-    /* Column buttons */
     .colBtns{
       display:grid;
       grid-template-columns: repeat(4, 1fr);
@@ -189,8 +186,18 @@
       letter-spacing:.08em;
       text-transform:uppercase;
     }
+    .moveTag{
+      position:absolute;
+      left:8px; bottom:8px;
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:999px;
+      padding:4px 8px;
+      font-size:11px;
+      color:var(--muted);
+      font-weight:900;
+    }
 
-    /* Hands */
     .hands{
       border-top:1px solid var(--line);
       padding:12px;
@@ -244,7 +251,6 @@
       font-weight:900;
     }
 
-    /* Sidebar */
     .side{
       border:1px solid var(--line);
       border-radius: var(--radius);
@@ -317,8 +323,8 @@
       <div id="setup" class="setup">
         <h2>Start Game</h2>
         <p>
-          Pick your faction (Germany or Allies). You’ll deploy tanks into a 4x4 grid. Tanks shoot the closest enemy in the same column
-          up to <b>range = Accuracy</b>. Abilities are shown but not active yet.
+          Deploy into a 4x4 grid. After deploying, your tanks automatically <b>advance</b> based on Mobility, then both sides shoot.
+          Range = <b>Accuracy</b>. Abilities are shown but not active yet.
         </p>
         <div class="setupRow">
           <div class="setupCol">
@@ -335,7 +341,7 @@
           </div>
         </div>
         <div class="note" style="margin-top:10px;">
-          If images don’t load, run a local server (recommended): <code>python3 -m http.server 8080</code> then open <code>http://localhost:8080/tankers.html</code>.
+          If images don’t load, run: <code>python3 -m http.server 8080</code> then open <code>http://localhost:8080/tankers.html</code>.
         </div>
       </div>
 
@@ -380,7 +386,7 @@
             <div class="kv"><span>Selected</span><b id="selLabel">None</b></div>
             <div class="log" id="log"></div>
             <div class="note">
-              v0 mechanics: deploy → shoot → draw. No movement yet. Abilities not wired yet.
+              v1 mechanics: deploy → <b>move</b> → shoot → draw. (No manual movement yet.)
             </div>
           </div>
         </div>
@@ -394,6 +400,15 @@
     const HAND_SIZE = 5;
     const COPIES_PER_CARD = 2; // deck size = cards * copies
 
+    // Movement rules (v1):
+    // mob 1 => 0 tiles, mob 2-3 => 1 tile, mob 4-5 => 2 tiles
+    function moveTilesForMobility(mob){
+      const m = Number(mob ?? 0);
+      if (m <= 1) return 0;
+      if (m >= 4) return 2;
+      return 1;
+    }
+
     // --------- State ----------
     let data = null;
     let factions = []; // {faction, cards}
@@ -401,10 +416,11 @@
     let ai = null;
 
     // board: rows 0..3 top->bottom, cols 0..3 left->right
-    // cell = null or unit { side:'player'|'ai', card, hp }
+    // cell = null or unit { uid, side:'player'|'ai', card, hp }
     let board = null;
     let selectedHandIndex = null; // player's hand selection
     let phase = "setup"; // setup|player|ai|end
+    let UID = 0;
 
     // --------- DOM ----------
     const elSetup = document.getElementById("setup");
@@ -506,6 +522,7 @@
 
       const card = who.hand.splice(handIndex, 1)[0];
       const unit = {
+        uid: ++UID,
         side,
         card,
         hp: card.stats.hp
@@ -515,9 +532,56 @@
       return true;
     }
 
+    // --------- Movement (v1) ----------
+    // Auto-advance all units of a side toward the enemy.
+    function resolveMovement(side){
+      const moved = new Set();
+      const dir = (side === "player") ? -1 : +1;
+
+      // Iterate front-to-back (so front units move first)
+      const rowOrder = (side === "player")
+        ? [0,1,2,3]
+        : [3,2,1,0];
+
+      let any = false;
+
+      for (const r of rowOrder){
+        for (let c=0;c<4;c++){
+          const u = board[r][c];
+          if (!u || u.side !== side) continue;
+          if (moved.has(u.uid)) continue;
+          moved.add(u.uid);
+
+          const steps = moveTilesForMobility(u.card.stats.mobility);
+          if (steps <= 0) continue;
+
+          let curR = r;
+          let did = 0;
+
+          for (let s=0; s<steps; s++){
+            const nr = curR + dir;
+            if (nr < 0 || nr > 3) break;
+            if (board[nr][c]) break;
+
+            // move
+            board[nr][c] = u;
+            board[curR][c] = null;
+            curR = nr;
+            did++;
+          }
+
+          if (did > 0){
+            any = true;
+            log(`${titleCase(side)} ${u.card.name} advances ${did} tile${did===1?"":"s"}.`, true);
+          }
+        }
+      }
+
+      if (!any) log(`${titleCase(side)} movement: no advances.`, true);
+    }
+
     // --------- Combat ----------
     // Tanks shoot closest enemy in same column within range = accuracy.
-    // Player shoots upward (toward row 0). AI shoots downward (toward row 3).
     function resolveCombat(){
       const events = [];
 
@@ -529,9 +593,9 @@
           const dir = attacker.side === "player" ? -1 : +1;
           const range = Math.max(1, attacker.card.stats.accuracy ?? 1);
 
-          // scan outward to find first enemy within range
           let target = null;
           let tr=null;
+
           for (let step=1; step<=range; step++){
             const rr = r + dir*step;
             if (rr < 0 || rr > 3) break;
@@ -544,7 +608,7 @@
           if (!target) continue;
 
           const dmg = Math.max(1, (attacker.card.stats.firepower ?? 1) - Math.floor((target.card.stats.armor ?? 0)/2));
-          events.push({ fromR:r, fromC:c, toR:tr, toC:c, dmg, attacker, target });
+          events.push({ toR:tr, toC:c, dmg, attacker, target });
         }
       }
 
@@ -555,7 +619,6 @@
 
       // Apply simultaneously
       for (const e of events){
-        // target might already be dead by earlier apply; still apply to that cell if still there
         const cur = board[e.toR][e.toC];
         if (!cur || cur.side !== e.target.side) continue;
         cur.hp -= e.dmg;
@@ -563,15 +626,11 @@
 
       // Log and cleanup
       for (const e of events){
-        const cur = board[e.toR][e.toC];
-        const atkName = e.attacker.card.name;
-        const tgtName = e.target.card.name;
         const sideA = e.attacker.side === "player" ? "You" : "AI";
         const sideT = e.target.side === "player" ? "You" : "AI";
-        log(`${sideA} ${atkName} hits ${sideT} ${tgtName} for ${e.dmg}.`);
+        log(`${sideA} ${e.attacker.card.name} hits ${sideT} ${e.target.card.name} for ${e.dmg}.`);
       }
 
-      // Remove dead
       for (let r=0;r<4;r++){
         for (let c=0;c<4;c++){
           const u = board[r][c];
@@ -652,9 +711,14 @@
             side.className = "sideMark";
             side.textContent = u.side === "player" ? "YOU" : "AI";
 
+            const move = document.createElement("div");
+            move.className = "moveTag";
+            move.textContent = `MOB ${u.card.stats.mobility}`;
+
             cell.appendChild(img);
             cell.appendChild(hp);
             cell.appendChild(side);
+            cell.appendChild(move);
           }
           gridEl.appendChild(cell);
         }
@@ -670,15 +734,12 @@
         const card = who.hand[i];
         const div = document.createElement("div");
         div.className = "handCard" + (side==="player" && selectedHandIndex === i ? " selected" : "");
-        // AI hand face-down for now
         if (side === "ai"){
-          div.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.7);font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.22);">
-            Card
-          </div>`;
+          div.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.7);font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.22);">Card</div>`;
         } else {
           div.innerHTML = `
             <img src="${card.image}" alt="${escapeHtml(card.name)}">
-            <div class="mini">HP ${card.stats.hp}</div>
+            <div class="mini">HP ${card.stats.hp} • MOB ${card.stats.mobility}</div>
           `;
           div.onclick = () => {
             if (phase !== "player") return;
@@ -700,10 +761,10 @@
 
     function renderTurnText(){
       if (phase === "player"){
-        turnText.textContent = "Your turn: select a card, then deploy to a column.";
+        turnText.textContent = "Your turn: select a card, then deploy to a column. (Then: move → shoot)";
         statusText.textContent = "";
       } else if (phase === "ai"){
-        turnText.textContent = "AI turn…";
+        turnText.textContent = "AI turn… (deploy → move → shoot)";
         statusText.textContent = "";
       }
     }
@@ -716,7 +777,6 @@
       renderCounts();
       renderTurnText();
 
-      // enable/disable deploy buttons based on phase + selection
       const enable = phase === "player" && selectedHandIndex !== null;
       const btns = [...colBtnsEl.querySelectorAll("button")];
       for (let col=0; col<4; col++){
@@ -736,14 +796,14 @@
       selectedHandIndex = null;
       selLabel.textContent = "None";
 
-      // combat + draw
+      // NEW: move phase (player only), then combat, then draw
+      resolveMovement("player");
       resolveCombat();
       drawToHand(player);
 
       renderAll();
       if (checkEnd()) return;
 
-      // AI turn
       phase = "ai";
       renderAll();
       window.setTimeout(aiTurn, 450);
@@ -752,8 +812,6 @@
     function aiTurn(){
       if (phase !== "ai") return;
 
-      // pick random playable column + random card
-      // (simple: try up to 20 attempts)
       let played = false;
       for (let tries=0; tries<20 && !played; tries++){
         if (!ai.hand.length) break;
@@ -768,6 +826,8 @@
         log("AI cannot deploy.", true);
       }
 
+      // NEW: move phase (ai only), then combat, then draw
+      resolveMovement("ai");
       resolveCombat();
       drawToHand(ai);
 
@@ -799,7 +859,6 @@
         aiFactionSel.appendChild(opt2);
       }
 
-      // default: player=germany, ai=allies if available
       if (available.includes("germany")) playerFactionSel.value = "germany";
       if (available.includes("allies")) aiFactionSel.value = "allies";
       if (playerFactionSel.value === aiFactionSel.value && available.length > 1){
@@ -823,10 +882,11 @@
       board = Array.from({length:4}, () => Array.from({length:4}, () => null));
       selectedHandIndex = null;
       phase = "player";
+      UID = 0;
 
       logEl.innerHTML = "";
       log(`Game start: You = ${titleCase(pf)} vs AI = ${titleCase(af)}.`);
-      log("Select a card, then click a column to deploy.", true);
+      log("Turn order: deploy → move → shoot → draw.", true);
 
       elSetup.classList.add("hidden");
       elGame.classList.remove("hidden");
