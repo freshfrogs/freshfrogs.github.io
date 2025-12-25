@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tankers — Inscryption-style</title>
+  <title>Tankers — Inscryption Lanes</title>
   <style>
     :root{
       --bg:#0c0f14;
@@ -319,7 +319,7 @@
       <div class="brand">
         <span style="font-size:18px;">🪖</span>
         <span>Tankers</span>
-        <span class="badge">Inscryption-style</span>
+        <span class="badge">Lanes + Face-down + Direct Hits</span>
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <button class="btn hidden" id="btnRestart">Restart</button>
@@ -334,8 +334,8 @@
       <h2>Start Game</h2>
       <p>
         Each round you get points equal to the round number (1, 2, 3...). Deploy cost = <b>Tier</b> from <code>tanks.json</code>.
-        Cards are played <b>face-down</b>, then on the owner's next turn they <b>advance 1 row</b> and become <b>revealed</b>.
-        Attacks happen automatically at the <b>end</b> of the active player's turn.
+        Cards are played <b>face-down to the opponent</b>, then on the owner's <b>next</b> turn they <b>flip active</b>.
+        End of turn: active tanks auto-shoot down their lane. If no enemy tank blocks the lane → <b>direct hit</b> to the opponent.
       </p>
       <div class="setupRow">
         <div class="setupCol">
@@ -360,7 +360,7 @@
       <div class="board">
         <div class="boardTop">
           <div>
-            <div class="title">Battlefield (4x4)</div>
+            <div class="title">Battlefield (4 lanes)</div>
             <div class="sub" id="turnText">—</div>
           </div>
           <div class="sub" id="statusText">—</div>
@@ -370,13 +370,13 @@
 
         <div class="hands">
           <div class="handTitle">
-            <div>Your hand (click a card, then click a column to play)</div>
+            <div>Your hand (select a card → click a column to play)</div>
             <div id="playerCount" class="muted"></div>
           </div>
           <div class="handRow" id="playerHand"></div>
 
           <div class="handTitle">
-            <div>Opponent info (hand hidden)</div>
+            <div>Opponent hand (hidden)</div>
             <div id="aiCount" class="muted"></div>
           </div>
         </div>
@@ -397,12 +397,16 @@
         <div class="panel">
           <div class="kv"><span>You</span><b id="youLabel">—</b></div>
           <div class="kv"><span>Opponent</span><b id="aiLabel">—</b></div>
+
+          <div class="kv"><span>Your Base HP</span><b id="pBase">—</b></div>
+          <div class="kv"><span>Enemy Base HP</span><b id="aBase">—</b></div>
+
           <div class="kv"><span>Selected card</span><b id="selLabel">None</b></div>
 
           <div class="note">
-            <b>Play:</b> select a hand card → click any tile in a column to play there (drops to your back row in that column).<br>
-            <b>Reveal:</b> next time that tank gets a turn, it advances 1 row and flips face-up.<br>
-            <b>Auto-attack:</b> end of turn, revealed tanks attack the first enemy in the same column within <b>Accuracy</b> range.
+            <b>Face-down rule:</b> A played tank is inactive until it flips on its owner’s next turn.<br>
+            <b>Lane shots:</b> Active tanks shoot the nearest enemy in the same column within <b>Accuracy</b> range.
+            If there are <b>no enemy tanks anywhere</b> in that lane → direct hit to base.
           </div>
 
           <div class="log" id="log"></div>
@@ -418,19 +422,26 @@
   const HAND_SIZE = 5;
   const COPIES_PER_CARD = 2;
 
+  const BASE_HP_START = 20;
+
   // ================== STATE ==================
   let factions = [];
   let player = null;
   let ai = null;
 
   // board rows 0..3 top->bottom, cols 0..3 left->right
-  // cell null or unit { uid, side, card, hp, revealed, justDeployedRound }
+  // cell null or unit { uid, side, card, hp, active, deployedTurn }
   let board = null;
   let UID = 0;
 
   let round = 1;
   let activeSide = "player"; // "player" | "ai"
   let ap = 0;
+
+  let turnNumber = 0; // increments each beginTurn()
+
+  let playerBaseHP = BASE_HP_START;
+  let aiBaseHP = BASE_HP_START;
 
   let selectedHandIndex = null;
 
@@ -456,6 +467,8 @@
   const selLabel = document.getElementById("selLabel");
   const sideSub = document.getElementById("sideSub");
   const apText = document.getElementById("apText");
+  const pBaseEl = document.getElementById("pBase");
+  const aBaseEl = document.getElementById("aBase");
 
   const btnEndTurn = document.getElementById("btnEndTurn");
 
@@ -509,7 +522,7 @@
     return n;
   }
 
-  // ================== TIER / COST (FROM JSON) ==================
+  // ================== TIER / COST ==================
   function clampTier(t){
     if (!Number.isFinite(t)) return 1;
     return Math.max(1, Math.min(9, t));
@@ -525,10 +538,10 @@
   }
 
   function costToDeploy(card){
-    return deriveTier(card); // Tier = cost
+    return deriveTier(card);
   }
 
-  // ================== DEPLOY (face-down) ==================
+  // ================== DEPLOY (face-down/inactive) ==================
   function findDropRow(side, col){
     if (side === "player"){
       for (let r=3;r>=0;r--) if (!board[r][col]) return r;
@@ -541,7 +554,7 @@
   function deployFromHand(side, handIndex, col){
     const who = side === "player" ? player : ai;
     const row = findDropRow(side, col);
-    if (row === null) return { ok:false, reason:"Column full." };
+    if (row === null) return { ok:false, reason:"Lane full." };
 
     const card = who.hand[handIndex];
     const cost = costToDeploy(card);
@@ -555,67 +568,33 @@
       side,
       card: played,
       hp: Number(played.stats.hp ?? 1),
-      revealed: false,              // face-down initially
-      justDeployedRound: round      // flip/move next owner turn
+      active: false,        // flips on owner's next turn
+      deployedTurn: turnNumber
     };
 
-    log(`${titleCase(side)} plays a card face-down in column ${col+1} (cost ${cost}).`);
+    log(`${titleCase(side)} plays a card face-down in lane ${col+1} (cost ${cost}).`);
     return { ok:true };
   }
 
-  // ================== AUTO ADVANCE + REVEAL ==================
-  function advanceAndReveal(side){
-    // Owner's next turn: units attempt to move 1 tile forward if empty; then reveal
-    // Player moves UP (r-1). AI moves DOWN (r+1).
-    const dir = (side === "player") ? -1 : +1;
+  // ================== FLIP ON OWNER'S NEXT TURN ==================
+  function flipNewUnits(side){
+    let flips = 0;
+    for (let r=0;r<4;r++) for (let c=0;c<4;c++){
+      const u = board[r][c];
+      if (!u || u.side !== side) continue;
+      if (u.active) continue;
 
-    // Move order matters to avoid leapfrogging. Move front-to-back in movement direction.
-    const rows = side === "player" ? [0,1,2,3] : [3,2,1,0];
-
-    let movedCount = 0;
-    let revealedCount = 0;
-
-    for (const r of rows){
-      for (let c=0;c<4;c++){
-        const u = board[r][c];
-        if (!u || u.side !== side) continue;
-
-        // If it was just deployed on a previous owner turn, it becomes eligible to reveal now
-        const shouldRevealThisTurn = (u.justDeployedRound < round) || (u.justDeployedRound === round && side !== activeSide);
-        // We'll reveal on owner's turn start regardless (but only if it's been on board at least 1 full turn)
-        const eligibleToFlip = (u.justDeployedRound < round);
-
-        // Attempt advance
-        const nr = r + dir;
-        if (nr >= 0 && nr <= 3 && !board[nr][c]){
-          board[nr][c] = u;
-          board[r][c] = null;
-          movedCount++;
-        }
-
-        // Reveal if eligible (owner's next turn)
-        // We reveal at the start of owner's turn if it was played on a prior round OR prior turn in same round.
-        // Simple rule: if it existed before this turn started (i.e. justDeployedRound < round OR it was played earlier this round by owner).
-        // For a clean “next turn” feel: reveal if it was played on any earlier turn (tracked via justDeployedRound < round OR marked lastTurnSide).
-        // We’ll do strict: reveal if it was played on a previous turn (we’ll track via justDeployedRound < round OR u.revealed already).
-        if (!u.revealed){
-          // Strict next-owner-turn reveal:
-          // if it was deployed earlier (any time before this exact turn start), flip now.
-          // We treat "deployedRound < round" as definitely earlier; for same round, it flips next turn as well (handled by side turn sequencing below).
-          if (eligibleToFlip){
-            u.revealed = true;
-            revealedCount++;
-          }
-        }
+      // strict: must have been deployed on a previous turn (not this same turn)
+      if (u.deployedTurn < turnNumber){
+        u.active = true;
+        flips++;
       }
     }
-
-    if (movedCount) log(`${titleCase(side)} advance: ${movedCount} unit(s) moved forward.`, true);
-    if (revealedCount) log(`${titleCase(side)} reveal: ${revealedCount} unit(s) flipped face-up.`, true);
+    if (flips) log(`${titleCase(side)} flips ${flips} unit(s) active.`, true);
   }
 
-  // ================== AUTO ATTACK (end of turn) ==================
-  function firstTargetInColumn(attackerPos){
+  // ================== AUTO ATTACK (END OF TURN) ==================
+  function findNearestEnemyInLane(attackerPos){
     const attacker = board[attackerPos.r][attackerPos.c];
     if (!attacker) return null;
 
@@ -631,82 +610,110 @@
     return null;
   }
 
-  function computeDamage(attackerUnit, targetUnit){
-    // Simple frontal math. You can tweak later.
+  function laneHasAnyEnemy(attackerSide, col){
+    for (let r=0;r<4;r++){
+      const u = board[r][col];
+      if (u && u.side !== attackerSide) return true;
+    }
+    return false;
+  }
+
+  function computeDamageToUnit(attackerUnit, targetUnit){
     const firepower = Number(attackerUnit.card.stats.firepower ?? 1);
     const armor = Number(targetUnit.card.stats.armor ?? 0);
-    const dmg = Math.max(1, firepower - Math.floor(armor / 2));
-    return dmg;
+    return Math.max(1, firepower - Math.floor(armor / 2));
+  }
+
+  function computeDirectDamage(attackerUnit){
+    // direct damage = firepower (simple, tweak later)
+    return Math.max(1, Number(attackerUnit.card.stats.firepower ?? 1));
   }
 
   function autoAttack(side){
-    // Only revealed units attack (feels like “flipped / active”).
-    // Resolve from front line outward so it feels consistent.
+    // resolve front-to-back in direction (so it feels consistent)
     const rows = side === "player" ? [0,1,2,3] : [3,2,1,0];
-    let attacks = 0;
+    let didAnything = false;
 
     for (const r of rows){
       for (let c=0;c<4;c++){
         const u = board[r][c];
         if (!u || u.side !== side) continue;
-        if (!u.revealed) continue;
+        if (!u.active) continue; // only flipped units can shoot
 
-        const targetPos = firstTargetInColumn({r,c});
-        if (!targetPos) continue;
+        const targetPos = findNearestEnemyInLane({r,c});
+        if (targetPos){
+          const t = board[targetPos.r][targetPos.c];
+          if (!t) continue;
 
-        const target = board[targetPos.r][targetPos.c];
-        if (!target) continue;
+          const dmg = computeDamageToUnit(u, t);
+          t.hp -= dmg;
+          didAnything = true;
 
-        const dmg = computeDamage(u, target);
-        target.hp -= dmg;
-        attacks++;
+          const aName = (side === "player") ? "You" : "AI";
+          const tName = (t.side === "player") ? "You" : "AI";
+          log(`${aName} ${u.card.name} shoots lane ${c+1} → ${tName} unit for ${dmg}.`);
 
-        const sideA = side === "player" ? "You" : "AI";
-        const sideT = target.side === "player" ? "You" : "AI";
+          if (t.hp <= 0){
+            log(`${tName} unit in lane ${c+1} is destroyed!`);
+            board[targetPos.r][targetPos.c] = null;
+          }
+        } else {
+          // no enemy in range: if lane has NO enemy tanks at all, direct hit base
+          if (!laneHasAnyEnemy(side, c)){
+            const direct = computeDirectDamage(u);
+            didAnything = true;
 
-        log(`${sideA} ${u.card.name} fires down lane ${c+1} for ${dmg} damage → ${sideT} (${target.revealed ? target.card.name : "Face-down unit"})`);
-
-        if (target.hp <= 0){
-          log(`${sideT} unit in lane ${c+1} is destroyed!`);
-          board[targetPos.r][targetPos.c] = null;
+            if (side === "player"){
+              aiBaseHP -= direct;
+              log(`You ${u.card.name} fires lane ${c+1} → DIRECT HIT for ${direct}! (Enemy base ${aiBaseHP})`);
+            } else {
+              playerBaseHP -= direct;
+              log(`AI ${u.card.name} fires lane ${c+1} → DIRECT HIT for ${direct}! (Your base ${playerBaseHP})`);
+            }
+          } else {
+            // blocked somewhere down-lane, but out of range → no shot
+            log(`${titleCase(side)} ${u.card.name} can’t reach a target in lane ${c+1}.`, true);
+          }
         }
+
+        if (playerBaseHP <= 0 || aiBaseHP <= 0) return; // stop immediately if someone dies
       }
     }
 
-    if (!attacks) log(`${titleCase(side)} auto-attack: no shots fired.`, true);
+    if (!didAnything) log(`${titleCase(side)}: no attacks.`, true);
   }
 
   // ================== TURN FLOW ==================
   function beginTurn(side){
     activeSide = side;
+    turnNumber += 1;
 
-    // round points (shared rule)
-    ap = round;
+    ap = round; // points = round number
 
-    // draw at start of turn (Inscryption-ish)
+    // draw at start of turn
     const who = (side === "player") ? player : ai;
     drawToHand(who);
 
-    // advance + reveal at start of owner's turn
-    advanceAndReveal(side);
+    // flip inactive units from earlier turns
+    flipNewUnits(side);
 
     selectedHandIndex = null;
     selLabel.textContent = "None";
 
     renderAll();
-    log(`— Round ${round}: ${side === "player" ? "Your" : "AI"} turn (${ap} points).`, true);
+    log(`— Round ${round}: ${side === "player" ? "Your" : "AI"} turn (${ap} point${ap===1?"":"s"}).`, true);
   }
 
   function endTurn(){
     if (checkEnd()) return;
 
-    // end of turn auto-attacks
+    // end of turn: auto attack
     autoAttack(activeSide);
     renderAll();
 
     if (checkEnd()) return;
 
-    // swap turn
+    // next side
     if (activeSide === "player"){
       beginTurn("ai");
       window.setTimeout(aiTurn, 450);
@@ -717,15 +724,8 @@
   }
 
   function checkEnd(){
-    const pUnits = countBoardUnits("player");
-    const aUnits = countBoardUnits("ai");
-
-    const pHas = pUnits > 0 || player.hand.length > 0 || player.deck.length > 0;
-    const aHas = aUnits > 0 || ai.hand.length > 0 || ai.deck.length > 0;
-
-    if (!pHas && !aHas){ gameOver("Draw — both sides ran out."); return true; }
-    if (!aHas){ gameOver("You win!"); return true; }
-    if (!pHas){ gameOver("AI wins!"); return true; }
+    if (aiBaseHP <= 0){ gameOver("You win — enemy base destroyed!"); return true; }
+    if (playerBaseHP <= 0){ gameOver("You lose — your base was destroyed!"); return true; }
     return false;
   }
 
@@ -742,8 +742,8 @@
   function aiTurn(){
     if (activeSide !== "ai") return;
 
-    // Deploy as much as possible, cheapest-first
-    let safety = 50;
+    // deploy cheapest-first while possible
+    let safety = 60;
     while (ap > 0 && ai.hand.length > 0 && safety-- > 0){
       const affordable = ai.hand
         .map((card, idx) => ({card, idx, cost: costToDeploy(card)}))
@@ -812,9 +812,10 @@
         cell.onclick = () => onClickCell(r,c);
 
         if (u){
-          // Show player units face-up always.
-          // Show AI units face-down until revealed.
-          const showFaceUp = (u.side === "player") ? true : !!u.revealed;
+          const ownerSeesFaceUp = (u.side === "player"); // you see your own cards immediately
+          const opponentSeesFaceUp = u.active;           // enemy sees it only after flip
+
+          const showFaceUp = ownerSeesFaceUp || opponentSeesFaceUp;
 
           if (showFaceUp){
             const img = document.createElement("img");
@@ -832,7 +833,7 @@
             const acc = Number(u.card.stats.accuracy ?? 0);
             const bottom = document.createElement("div");
             bottom.className = "tagBottom";
-            bottom.textContent = `T${tier} • ACC ${acc}`;
+            bottom.textContent = u.active ? `ACTIVE • T${tier} • ACC ${acc}` : `FACE-DOWN • T${tier}`;
             cell.appendChild(bottom);
           } else {
             const back = document.createElement("div");
@@ -840,10 +841,9 @@
             back.textContent = "UNKNOWN";
             cell.appendChild(back);
 
-            // hide HP and stats while face-down
             const bottom = document.createElement("div");
             bottom.className = "tagBottom";
-            bottom.textContent = `Face-down`;
+            bottom.textContent = `FACE-DOWN`;
             cell.appendChild(bottom);
           }
 
@@ -885,10 +885,13 @@
 
   function renderCounts(){
     playerCountEl.textContent = `Deck ${player.deck.length} • Hand ${player.hand.length} • Board ${countBoardUnits("player")}`;
-    aiCountEl.textContent = `Deck ${ai.deck.length} • Hand ${ai.hand.length} • Board ${countBoardUnits("ai")}`;
+    aiCountEl.textContent = `Deck ${ai.deck.length} • Hand ${ai.hand.length} • Board ${countBoardUnits("ai")} (hidden)`;
 
     youLabel.textContent = titleCase(player.faction);
     aiLabel.textContent = titleCase(ai.faction);
+
+    pBaseEl.textContent = String(playerBaseHP);
+    aBaseEl.textContent = String(aiBaseHP);
   }
 
   function renderTop(){
@@ -900,7 +903,7 @@
       : `Round ${round} • AI turn`;
 
     turnText.textContent = activeSide === "player"
-      ? `Round ${round}: You have ${ap} point(s). Play cards, then End Turn (auto-attack happens).`
+      ? `Round ${round}: You have ${ap} point(s). Play cards (face-down), then End Turn (auto-attacks fire).`
       : `Round ${round}: AI is playing…`;
 
     statusText.textContent = "";
@@ -932,7 +935,6 @@
       aiFactionSel.appendChild(opt2);
     }
 
-    // default to germany vs allies if present
     if (available.includes("germany")) playerFactionSel.value = "germany";
     if (available.includes("allies")) aiFactionSel.value = "allies";
     if (playerFactionSel.value === aiFactionSel.value && available.length > 1){
@@ -957,11 +959,15 @@
 
     board = Array.from({length:4}, () => Array.from({length:4}, () => null));
     UID = 0;
-    round = 1;
-    logEl.innerHTML = "";
 
+    round = 1;
+    turnNumber = 0;
+    playerBaseHP = BASE_HP_START;
+    aiBaseHP = BASE_HP_START;
+
+    logEl.innerHTML = "";
     log(`Game start: You = ${titleCase(pf)} vs AI = ${titleCase(af)}.`);
-    log(`Face-down plays → next owner turn advances 1 row and flips face-up. Auto-attacks at end of turn.`, true);
+    log(`Played cards are inactive until they flip on their owner’s next turn. Auto-attacks at end of turn. Direct hit if lane is clear.`, true);
 
     elSetup.classList.add("hidden");
     elGame.classList.remove("hidden");
