@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tankers — Action Points (Tier Costs)</title>
+  <title>Tankers — Inscryption-style</title>
   <style>
     :root{
       --bg:#0c0f14;
@@ -55,15 +55,12 @@
       outline:none;
     }
 
-    main .wrap{padding-top:14px}
     .layout{
       display:grid;
       grid-template-columns: 1fr 340px;
       gap:14px;
     }
-    @media (max-width: 980px){
-      .layout{grid-template-columns:1fr;}
-    }
+    @media (max-width: 980px){ .layout{grid-template-columns:1fr;} }
 
     .setup{
       border:1px solid var(--line);
@@ -74,8 +71,8 @@
     .setup h2{margin:0 0 8px 0;font-size:18px;}
     .setup p{margin:0 0 14px 0;color:var(--muted);font-size:13px;line-height:1.35;}
     .setupRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .setupRow label{color:var(--muted);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
     .setupCol{display:flex;flex-direction:column;gap:6px;min-width:220px}
+    .setupCol label{color:var(--muted);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
 
     .board{
       border:1px solid var(--line);
@@ -122,16 +119,30 @@
       pointer-events:none;
     }
     .cell.hilite{border-color: rgba(247,195,74,.85); box-shadow: 0 0 0 3px rgba(247,195,74,.14);}
-    .cell.target{border-color: rgba(255,91,91,.85); box-shadow: 0 0 0 3px rgba(255,91,91,.14);}
-    .cell.move{border-color: rgba(98,255,155,.85); box-shadow: 0 0 0 3px rgba(98,255,155,.12);}
 
     .unitImg{
       width:100%;
       height:100%;
       object-fit:cover;
       display:block;
-      filter: saturate(1.05);
-      transform: scale(1.01);
+      pointer-events:none;
+    }
+    .cardBack{
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:
+        radial-gradient(900px 500px at 30% 20%, rgba(247,195,74,.18), transparent 60%),
+        radial-gradient(700px 420px at 80% 70%, rgba(80,180,255,.14), transparent 60%),
+        rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      color: rgba(231,237,247,.75);
+      font-weight:1000;
+      letter-spacing:.18em;
+      text-transform:uppercase;
       pointer-events:none;
     }
     .hpTag{
@@ -185,7 +196,7 @@
       padding:12px;
       display:flex;
       flex-direction:column;
-      gap:12px;
+      gap:10px;
     }
     .handTitle{
       display:flex;
@@ -284,51 +295,21 @@
     .kv span{color:var(--muted);font-weight:900}
     .kv b{font-weight:900}
 
-    .actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      padding:10px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      border-radius:12px;
-    }
-    .actionBtn{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      color:var(--text);
-      padding:8px 10px;
-      border-radius:12px;
-      cursor:pointer;
-      font-weight:900;
-      font-size:12px;
-    }
-    .actionBtn:hover{border-color: rgba(247,195,74,.45)}
-    .actionBtn.active{
-      border-color: rgba(247,195,74,.85);
-      box-shadow: 0 0 0 3px rgba(247,195,74,.12);
-    }
-    .actionBtn:disabled{opacity:.45; cursor:not-allowed}
-
     .log{
       border:1px solid var(--line);
       background: rgba(0,0,0,.18);
       border-radius:12px;
       padding:10px;
-      height: 280px;
+      height: 330px;
       overflow:auto;
       font-size:12px;
       line-height:1.35;
       color: rgba(231,237,247,.92);
     }
     .log .muted{color: var(--muted)}
-    .note{
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.35;
-    }
-
+    .note{color:var(--muted);font-size:12px;line-height:1.35;}
     .hidden{display:none!important}
+    code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
   </style>
 </head>
 <body>
@@ -338,7 +319,7 @@
       <div class="brand">
         <span style="font-size:18px;">🪖</span>
         <span>Tankers</span>
-        <span class="badge">AP + Tier Costs</span>
+        <span class="badge">Inscryption-style</span>
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <button class="btn hidden" id="btnRestart">Restart</button>
@@ -353,7 +334,8 @@
       <h2>Start Game</h2>
       <p>
         Each round you get points equal to the round number (1, 2, 3...). Deploy cost = <b>Tier</b> from <code>tanks.json</code>.
-        Move costs 1 per tile. Attack costs 2.
+        Cards are played <b>face-down</b>, then on the owner's next turn they <b>advance 1 row</b> and become <b>revealed</b>.
+        Attacks happen automatically at the <b>end</b> of the active player's turn.
       </p>
       <div class="setupRow">
         <div class="setupCol">
@@ -388,16 +370,15 @@
 
         <div class="hands">
           <div class="handTitle">
-            <div>Opponent hand</div>
-            <div id="aiCount" class="muted"></div>
-          </div>
-          <div class="handRow" id="aiHand"></div>
-
-          <div class="handTitle" style="margin-top:6px;">
-            <div>Your hand (Tier = cost)</div>
+            <div>Your hand (click a card, then click a column to play)</div>
             <div id="playerCount" class="muted"></div>
           </div>
           <div class="handRow" id="playerHand"></div>
+
+          <div class="handTitle">
+            <div>Opponent info (hand hidden)</div>
+            <div id="aiCount" class="muted"></div>
+          </div>
         </div>
       </div>
 
@@ -416,20 +397,15 @@
         <div class="panel">
           <div class="kv"><span>You</span><b id="youLabel">—</b></div>
           <div class="kv"><span>Opponent</span><b id="aiLabel">—</b></div>
-          <div class="kv"><span>Selection</span><b id="selLabel">None</b></div>
+          <div class="kv"><span>Selected card</span><b id="selLabel">None</b></div>
 
-          <div class="actions">
-            <button class="actionBtn" id="actDeploy">Deploy (Tier)</button>
-            <button class="actionBtn" id="actMove">Move (1)</button>
-            <button class="actionBtn" id="actAttack">Attack (2)</button>
-            <button class="actionBtn" id="actClear">Clear</button>
+          <div class="note">
+            <b>Play:</b> select a hand card → click any tile in a column to play there (drops to your back row in that column).<br>
+            <b>Reveal:</b> next time that tank gets a turn, it advances 1 row and flips face-up.<br>
+            <b>Auto-attack:</b> end of turn, revealed tanks attack the first enemy in the same column within <b>Accuracy</b> range.
           </div>
 
           <div class="log" id="log"></div>
-
-          <div class="note">
-            Angle rules: <b>Side</b> = armor −1, <b>Flanked</b> = armor −2.
-          </div>
         </div>
       </div>
     </div>
@@ -442,16 +418,13 @@
   const HAND_SIZE = 5;
   const COPIES_PER_CARD = 2;
 
-  const COST_MOVE = 1;
-  const COST_ATTACK = 2;
-
   // ================== STATE ==================
   let factions = [];
   let player = null;
   let ai = null;
 
   // board rows 0..3 top->bottom, cols 0..3 left->right
-  // cell null or unit { uid, side, card, hp, movedThisTurn }
+  // cell null or unit { uid, side, card, hp, revealed, justDeployedRound }
   let board = null;
   let UID = 0;
 
@@ -459,10 +432,7 @@
   let activeSide = "player"; // "player" | "ai"
   let ap = 0;
 
-  // selection
-  let selectedHandIndex = null; // for deploy
-  let selectedUnit = null;      // {r,c}
-  let mode = "deploy";          // "deploy" | "move" | "attack"
+  let selectedHandIndex = null;
 
   // ================== DOM ==================
   const elSetup = document.getElementById("setup");
@@ -478,7 +448,6 @@
   const statusText = document.getElementById("statusText");
 
   const playerHandEl = document.getElementById("playerHand");
-  const aiHandEl = document.getElementById("aiHand");
   const playerCountEl = document.getElementById("playerCount");
   const aiCountEl = document.getElementById("aiCount");
 
@@ -489,11 +458,6 @@
   const apText = document.getElementById("apText");
 
   const btnEndTurn = document.getElementById("btnEndTurn");
-
-  const actDeploy = document.getElementById("actDeploy");
-  const actMove = document.getElementById("actMove");
-  const actAttack = document.getElementById("actAttack");
-  const actClear = document.getElementById("actClear");
 
   // ================== HELPERS ==================
   const titleCase = (s) => (s || "").replace(/[_-]/g," ").replace(/\b\w/g, c => c.toUpperCase()).trim();
@@ -548,7 +512,7 @@
   // ================== TIER / COST (FROM JSON) ==================
   function clampTier(t){
     if (!Number.isFinite(t)) return 1;
-    return Math.max(1, Math.min(9, t)); // allow >5 later if you want
+    return Math.max(1, Math.min(9, t));
   }
 
   function deriveTier(card){
@@ -564,103 +528,7 @@
     return deriveTier(card); // Tier = cost
   }
 
-  // ================== ANGLES / DAMAGE ==================
-  function armorPenaltyForAngle(angle){
-    if (angle === "side") return 1;
-    if (angle === "flanked") return 2;
-    return 0;
-  }
-
-  function getFrontDirForSide(side){
-    return side === "player" ? -1 : +1;
-  }
-
-  function classifyAngle(attackerPos, targetPos, targetSide){
-    const dr = attackerPos.r - targetPos.r;
-    const dc = attackerPos.c - targetPos.c;
-    const frontDir = getFrontDirForSide(targetSide);
-
-    const behind = (frontDir === -1) ? (dr > 0) : (dr < 0);
-    if (behind) return "flanked";
-    if (dc !== 0) return "side";
-    return "frontal";
-  }
-
-  function unitHasText(unit, needle){
-    const n = String(needle).toLowerCase();
-    return (unit.card.abilities || []).some(a => {
-      const hay = `${a.name || ""} ${a.text || ""}`.toLowerCase();
-      return hay.includes(n);
-    });
-  }
-
-  function extraDamageFromAngleVuln(targetUnit, angle){
-    if (angle === "side" || angle === "flanked"){
-      if (unitHasText(targetUnit, "receive +1 damage from flanked") ||
-          unitHasText(targetUnit, "receive +1 damage from flanked and side") ||
-          unitHasText(targetUnit, "lumbering giant")){
-        return 1;
-      }
-    }
-    return 0;
-  }
-
-  function computeDamage(attackerUnit, targetUnit, angle){
-    const firepower = Number(attackerUnit.card.stats.firepower ?? 1);
-    const armor = Number(targetUnit.card.stats.armor ?? 0);
-    const effArmor = Math.max(0, armor - armorPenaltyForAngle(angle));
-
-    let dmg = Math.max(1, firepower - Math.floor(effArmor / 2));
-    dmg += extraDamageFromAngleVuln(targetUnit, angle);
-    return Math.max(1, dmg);
-  }
-
-  // ================== TARGETING ==================
-  // Forward within Accuracy range; check same column then adjacent columns.
-  function getAttackableTargets(attackerPos){
-    const attacker = board[attackerPos.r][attackerPos.c];
-    if (!attacker) return [];
-    const dir = attacker.side === "player" ? -1 : +1;
-    const range = Math.max(1, Number(attacker.card.stats.accuracy ?? 1));
-
-    const targets = [];
-    for (let step=1; step<=range; step++){
-      const rr = attackerPos.r + dir*step;
-      if (rr < 0 || rr > 3) break;
-
-      const colsToCheck = [attackerPos.c, attackerPos.c-1, attackerPos.c+1];
-      for (const cc of colsToCheck){
-        if (cc < 0 || cc > 3) continue;
-        const maybe = board[rr][cc];
-        if (maybe && maybe.side !== attacker.side){
-          targets.push({ r: rr, c: cc });
-        }
-      }
-    }
-    return targets;
-  }
-
-  function getMoveDestinations(unitPos){
-    const u = board[unitPos.r][unitPos.c];
-    if (!u) return [];
-    if (u.side !== activeSide) return [];
-    if (u.movedThisTurn >= Number(u.card.stats.mobility ?? 0)) return [];
-    if (ap < COST_MOVE) return [];
-
-    const dests = [];
-    const dirs = [
-      {dr:-1,dc:0},{dr:+1,dc:0},{dr:0,dc:-1},{dr:0,dc:+1},
-    ];
-    for (const d of dirs){
-      const rr = unitPos.r + d.dr;
-      const cc = unitPos.c + d.dc;
-      if (rr < 0 || rr > 3 || cc < 0 || cc > 3) continue;
-      if (!board[rr][cc]) dests.push({r:rr,c:cc});
-    }
-    return dests;
-  }
-
-  // ================== DEPLOY ==================
+  // ================== DEPLOY (face-down) ==================
   function findDropRow(side, col){
     if (side === "player"){
       for (let r=3;r>=0;r--) if (!board[r][col]) return r;
@@ -668,10 +536,6 @@
       for (let r=0;r<4;r++) if (!board[r][col]) return r;
     }
     return null;
-  }
-
-  function canDeployToColumn(side, col){
-    return findDropRow(side, col) !== null;
   }
 
   function deployFromHand(side, handIndex, col){
@@ -691,92 +555,158 @@
       side,
       card: played,
       hp: Number(played.stats.hp ?? 1),
-      movedThisTurn: 0
+      revealed: false,              // face-down initially
+      justDeployedRound: round      // flip/move next owner turn
     };
 
-    log(`${titleCase(side)} deploys ${played.name} (Tier ${deriveTier(played)}) in column ${col+1}.`);
+    log(`${titleCase(side)} plays a card face-down in column ${col+1} (cost ${cost}).`);
     return { ok:true };
   }
 
-  // ================== ACTIONS ==================
-  function clearSelection(){
-    selectedHandIndex = null;
-    selectedUnit = null;
-    selLabel.textContent = "None";
-  }
+  // ================== AUTO ADVANCE + REVEAL ==================
+  function advanceAndReveal(side){
+    // Owner's next turn: units attempt to move 1 tile forward if empty; then reveal
+    // Player moves UP (r-1). AI moves DOWN (r+1).
+    const dir = (side === "player") ? -1 : +1;
 
-  function spend(cost){
-    ap = Math.max(0, ap - cost);
-  }
+    // Move order matters to avoid leapfrogging. Move front-to-back in movement direction.
+    const rows = side === "player" ? [0,1,2,3] : [3,2,1,0];
 
-  function doMove(fromPos, toPos){
-    const u = board[fromPos.r][fromPos.c];
-    if (!u) return false;
-    if (u.side !== activeSide) return false;
-    if (ap < COST_MOVE) return false;
-    if (u.movedThisTurn >= Number(u.card.stats.mobility ?? 0)) return false;
-    if (board[toPos.r][toPos.c]) return false;
+    let movedCount = 0;
+    let revealedCount = 0;
 
-    board[toPos.r][toPos.c] = u;
-    board[fromPos.r][fromPos.c] = null;
+    for (const r of rows){
+      for (let c=0;c<4;c++){
+        const u = board[r][c];
+        if (!u || u.side !== side) continue;
 
-    u.movedThisTurn += 1;
-    spend(COST_MOVE);
-    log(`${titleCase(activeSide)} ${u.card.name} moves (cost ${COST_MOVE}).`, true);
-    return true;
-  }
+        // If it was just deployed on a previous owner turn, it becomes eligible to reveal now
+        const shouldRevealThisTurn = (u.justDeployedRound < round) || (u.justDeployedRound === round && side !== activeSide);
+        // We'll reveal on owner's turn start regardless (but only if it's been on board at least 1 full turn)
+        const eligibleToFlip = (u.justDeployedRound < round);
 
-  function doAttack(attackerPos, targetPos){
-    const attacker = board[attackerPos.r][attackerPos.c];
-    const target = board[targetPos.r][targetPos.c];
-    if (!attacker || !target) return false;
-    if (attacker.side !== activeSide) return false;
-    if (target.side === activeSide) return false;
-    if (ap < COST_ATTACK) return false;
+        // Attempt advance
+        const nr = r + dir;
+        if (nr >= 0 && nr <= 3 && !board[nr][c]){
+          board[nr][c] = u;
+          board[r][c] = null;
+          movedCount++;
+        }
 
-    const legal = getAttackableTargets(attackerPos).some(p => p.r===targetPos.r && p.c===targetPos.c);
-    if (!legal) return false;
-
-    const angle = classifyAngle(attackerPos, targetPos, target.side);
-    const dmg = computeDamage(attacker, target, angle);
-
-    spend(COST_ATTACK);
-    target.hp -= dmg;
-
-    const sideA = attacker.side === "player" ? "You" : "AI";
-    const sideT = target.side === "player" ? "You" : "AI";
-    log(`${sideA} ${attacker.card.name} hits ${sideT} ${target.card.name} for ${dmg} (${angle.toUpperCase()}) — (cost ${COST_ATTACK}).`);
-
-    if (target.hp <= 0){
-      log(`${titleCase(target.side)} ${target.card.name} is destroyed!`);
-      board[targetPos.r][targetPos.c] = null;
+        // Reveal if eligible (owner's next turn)
+        // We reveal at the start of owner's turn if it was played on a prior round OR prior turn in same round.
+        // Simple rule: if it existed before this turn started (i.e. justDeployedRound < round OR it was played earlier this round by owner).
+        // For a clean “next turn” feel: reveal if it was played on any earlier turn (tracked via justDeployedRound < round OR marked lastTurnSide).
+        // We’ll do strict: reveal if it was played on a previous turn (we’ll track via justDeployedRound < round OR u.revealed already).
+        if (!u.revealed){
+          // Strict next-owner-turn reveal:
+          // if it was deployed earlier (any time before this exact turn start), flip now.
+          // We treat "deployedRound < round" as definitely earlier; for same round, it flips next turn as well (handled by side turn sequencing below).
+          if (eligibleToFlip){
+            u.revealed = true;
+            revealedCount++;
+          }
+        }
+      }
     }
-    return true;
+
+    if (movedCount) log(`${titleCase(side)} advance: ${movedCount} unit(s) moved forward.`, true);
+    if (revealedCount) log(`${titleCase(side)} reveal: ${revealedCount} unit(s) flipped face-up.`, true);
+  }
+
+  // ================== AUTO ATTACK (end of turn) ==================
+  function firstTargetInColumn(attackerPos){
+    const attacker = board[attackerPos.r][attackerPos.c];
+    if (!attacker) return null;
+
+    const dir = attacker.side === "player" ? -1 : +1;
+    const range = Math.max(1, Number(attacker.card.stats.accuracy ?? 1));
+
+    for (let step=1; step<=range; step++){
+      const rr = attackerPos.r + dir*step;
+      if (rr < 0 || rr > 3) break;
+      const t = board[rr][attackerPos.c];
+      if (t && t.side !== attacker.side) return { r: rr, c: attackerPos.c };
+    }
+    return null;
+  }
+
+  function computeDamage(attackerUnit, targetUnit){
+    // Simple frontal math. You can tweak later.
+    const firepower = Number(attackerUnit.card.stats.firepower ?? 1);
+    const armor = Number(targetUnit.card.stats.armor ?? 0);
+    const dmg = Math.max(1, firepower - Math.floor(armor / 2));
+    return dmg;
+  }
+
+  function autoAttack(side){
+    // Only revealed units attack (feels like “flipped / active”).
+    // Resolve from front line outward so it feels consistent.
+    const rows = side === "player" ? [0,1,2,3] : [3,2,1,0];
+    let attacks = 0;
+
+    for (const r of rows){
+      for (let c=0;c<4;c++){
+        const u = board[r][c];
+        if (!u || u.side !== side) continue;
+        if (!u.revealed) continue;
+
+        const targetPos = firstTargetInColumn({r,c});
+        if (!targetPos) continue;
+
+        const target = board[targetPos.r][targetPos.c];
+        if (!target) continue;
+
+        const dmg = computeDamage(u, target);
+        target.hp -= dmg;
+        attacks++;
+
+        const sideA = side === "player" ? "You" : "AI";
+        const sideT = target.side === "player" ? "You" : "AI";
+
+        log(`${sideA} ${u.card.name} fires down lane ${c+1} for ${dmg} damage → ${sideT} (${target.revealed ? target.card.name : "Face-down unit"})`);
+
+        if (target.hp <= 0){
+          log(`${sideT} unit in lane ${c+1} is destroyed!`);
+          board[targetPos.r][targetPos.c] = null;
+        }
+      }
+    }
+
+    if (!attacks) log(`${titleCase(side)} auto-attack: no shots fired.`, true);
   }
 
   // ================== TURN FLOW ==================
   function beginTurn(side){
     activeSide = side;
+
+    // round points (shared rule)
     ap = round;
 
-    for (let r=0;r<4;r++) for (let c=0;c<4;c++){
-      const u = board[r][c];
-      if (u && u.side === side) u.movedThisTurn = 0;
-    }
+    // draw at start of turn (Inscryption-ish)
+    const who = (side === "player") ? player : ai;
+    drawToHand(who);
 
-    clearSelection();
-    mode = "deploy";
+    // advance + reveal at start of owner's turn
+    advanceAndReveal(side);
+
+    selectedHandIndex = null;
+    selLabel.textContent = "None";
+
     renderAll();
-
     log(`— Round ${round}: ${side === "player" ? "Your" : "AI"} turn (${ap} points).`, true);
   }
 
   function endTurn(){
-    if (activeSide === "player") drawToHand(player);
-    else drawToHand(ai);
+    if (checkEnd()) return;
+
+    // end of turn auto-attacks
+    autoAttack(activeSide);
+    renderAll();
 
     if (checkEnd()) return;
 
+    // swap turn
     if (activeSide === "player"){
       beginTurn("ai");
       window.setTimeout(aiTurn, 450);
@@ -804,7 +734,6 @@
     turnText.textContent = "Game over.";
     btnRestart.classList.remove("hidden");
     btnEndTurn.disabled = true;
-    actDeploy.disabled = actMove.disabled = actAttack.disabled = true;
     log(msg);
     renderAll();
   }
@@ -813,7 +742,7 @@
   function aiTurn(){
     if (activeSide !== "ai") return;
 
-    // 1) Deploy as many as possible, cheapest-first
+    // Deploy as much as possible, cheapest-first
     let safety = 50;
     while (ap > 0 && ai.hand.length > 0 && safety-- > 0){
       const affordable = ai.hand
@@ -825,82 +754,22 @@
 
       const choice = affordable[0];
       const cols = shuffle([0,1,2,3]);
+
       let placed = false;
       for (const col of cols){
-        if (!canDeployToColumn("ai", col)) continue;
+        const row = findDropRow("ai", col);
+        if (row === null) continue;
         const res = deployFromHand("ai", choice.idx, col);
         if (res.ok){ placed = true; break; }
       }
       if (!placed) break;
     }
 
-    // 2) Attack while possible (cost 2)
-    let attacked = true;
-    let attackSafety = 60;
-    while (ap >= COST_ATTACK && attacked && attackSafety-- > 0){
-      attacked = false;
-
-      outer:
-      for (let r=0;r<4;r++){
-        for (let c=0;c<4;c++){
-          const u = board[r][c];
-          if (!u || u.side !== "ai") continue;
-          const targets = getAttackableTargets({r,c});
-          if (!targets.length) continue;
-
-          // prefer lowest HP target
-          targets.sort((p1,p2)=>{
-            const t1 = board[p1.r][p1.c]; const t2 = board[p2.r][p2.c];
-            return (t1?.hp ?? 999) - (t2?.hp ?? 999);
-          });
-
-          if (doAttack({r,c}, targets[0])){
-            attacked = true;
-            break outer;
-          }
-        }
-      }
-    }
-
-    // 3) Spend remaining points moving forward (down) if space
-    let moveSafety = 60;
-    while (ap >= COST_MOVE && moveSafety-- > 0){
-      let moved = false;
-
-      for (let r=3; r>=0 && !moved; r--){
-        for (let c=0; c<4 && !moved; c++){
-          const u = board[r][c];
-          if (!u || u.side !== "ai") continue;
-          if (u.movedThisTurn >= Number(u.card.stats.mobility ?? 0)) continue;
-
-          const forward = { r: r+1, c };
-          if (forward.r <= 3 && !board[forward.r][forward.c]){
-            moved = doMove({r,c}, forward);
-          }
-        }
-      }
-
-      if (!moved) break;
-    }
-
     renderAll();
     endTurn();
   }
 
-  // ================== UI / INPUT ==================
-  function setMode(newMode){
-    mode = newMode;
-    actDeploy.classList.toggle("active", mode==="deploy");
-    actMove.classList.toggle("active", mode==="move");
-    actAttack.classList.toggle("active", mode==="attack");
-    renderAll();
-  }
-
-  actDeploy.onclick = () => setMode("deploy");
-  actMove.onclick = () => setMode("move");
-  actAttack.onclick = () => setMode("attack");
-  actClear.onclick = () => { clearSelection(); renderAll(); };
-
+  // ================== INPUT ==================
   btnEndTurn.onclick = () => {
     if (activeSide !== "player") return;
     endTurn();
@@ -908,124 +777,80 @@
 
   function onClickCell(r,c){
     if (activeSide !== "player") return;
-    const cellUnit = board[r][c];
+    if (selectedHandIndex === null) return;
 
-    // DEPLOY: select hand card then click any tile in desired column
-    if (mode === "deploy"){
-      if (selectedHandIndex === null) return;
+    const card = player.hand[selectedHandIndex];
+    const cost = costToDeploy(card);
 
-      const col = c;
-      const card = player.hand[selectedHandIndex];
-      const cost = costToDeploy(card);
-
-      if (ap < cost){
-        log(`Not enough points to deploy ${card.name} (need ${cost}).`, true);
-        return;
-      }
-      const row = findDropRow("player", col);
-      if (row === null){
-        log(`Column ${col+1} is full.`, true);
-        return;
-      }
-
-      const res = deployFromHand("player", selectedHandIndex, col);
-      if (res.ok){
-        selectedHandIndex = null;
-        selLabel.textContent = selectedUnit ? unitLabel(selectedUnit) : "None";
-        renderAll();
-      }
+    if (ap < cost){
+      log(`Not enough points to play ${card.name} (need ${cost}).`, true);
       return;
     }
 
-    // selecting your unit
-    if (cellUnit && cellUnit.side === "player"){
-      selectedUnit = {r,c};
+    const row = findDropRow("player", c);
+    if (row === null){
+      log(`Lane ${c+1} is full.`, true);
+      return;
+    }
+
+    const res = deployFromHand("player", selectedHandIndex, c);
+    if (res.ok){
       selectedHandIndex = null;
-      selLabel.textContent = unitLabel(selectedUnit);
+      selLabel.textContent = "None";
       renderAll();
-      return;
     }
-
-    // MOVE: click green destination
-    if (mode === "move" && selectedUnit){
-      const dests = getMoveDestinations(selectedUnit);
-      const legal = dests.some(p => p.r===r && p.c===c);
-      if (!legal) return;
-
-      const ok = doMove(selectedUnit, {r,c});
-      if (ok){
-        selectedUnit = {r,c};
-        selLabel.textContent = unitLabel(selectedUnit);
-        renderAll();
-      }
-      return;
-    }
-
-    // ATTACK: click red enemy target
-    if (mode === "attack" && selectedUnit){
-      if (!cellUnit || cellUnit.side !== "ai") return;
-      const targets = getAttackableTargets(selectedUnit);
-      const legal = targets.some(p => p.r===r && p.c===c);
-      if (!legal) return;
-
-      const ok = doAttack(selectedUnit, {r,c});
-      if (ok) renderAll();
-      return;
-    }
-  }
-
-  function unitLabel(pos){
-    const u = board[pos.r][pos.c];
-    if (!u) return "None";
-    return `${u.card.name} (HP ${u.hp})`;
   }
 
   // ================== RENDER ==================
   function renderGrid(){
     gridEl.innerHTML = "";
-
-    const moveDests = (activeSide==="player" && mode==="move" && selectedUnit) ? getMoveDestinations(selectedUnit) : [];
-    const atkTargets = (activeSide==="player" && mode==="attack" && selectedUnit) ? getAttackableTargets(selectedUnit) : [];
-
     for (let r=0;r<4;r++){
       for (let c=0;c<4;c++){
         const u = board[r][c];
         const cell = document.createElement("div");
         cell.className = "cell" + (u ? "" : " empty");
-
-        if (selectedUnit && selectedUnit.r===r && selectedUnit.c===c) cell.classList.add("hilite");
-        if (moveDests.some(p=>p.r===r && p.c===c)) cell.classList.add("move");
-        if (atkTargets.some(p=>p.r===r && p.c===c)) cell.classList.add("target");
-
         cell.onclick = () => onClickCell(r,c);
 
         if (u){
-          const img = document.createElement("img");
-          img.className = "unitImg";
-          img.src = u.card.image;
-          img.alt = u.card.name;
+          // Show player units face-up always.
+          // Show AI units face-down until revealed.
+          const showFaceUp = (u.side === "player") ? true : !!u.revealed;
 
-          const hp = document.createElement("div");
-          hp.className = "hpTag" + (u.side==="ai" ? " ai" : "");
-          hp.innerHTML = `<span class="dot"></span><span>${u.hp}</span>`;
+          if (showFaceUp){
+            const img = document.createElement("img");
+            img.className = "unitImg";
+            img.src = u.card.image;
+            img.alt = u.card.name;
+            cell.appendChild(img);
+
+            const hp = document.createElement("div");
+            hp.className = "hpTag" + (u.side==="ai" ? " ai" : "");
+            hp.innerHTML = `<span class="dot"></span><span>${u.hp}</span>`;
+            cell.appendChild(hp);
+
+            const tier = deriveTier(u.card);
+            const acc = Number(u.card.stats.accuracy ?? 0);
+            const bottom = document.createElement("div");
+            bottom.className = "tagBottom";
+            bottom.textContent = `T${tier} • ACC ${acc}`;
+            cell.appendChild(bottom);
+          } else {
+            const back = document.createElement("div");
+            back.className = "cardBack";
+            back.textContent = "UNKNOWN";
+            cell.appendChild(back);
+
+            // hide HP and stats while face-down
+            const bottom = document.createElement("div");
+            bottom.className = "tagBottom";
+            bottom.textContent = `Face-down`;
+            cell.appendChild(bottom);
+          }
 
           const side = document.createElement("div");
           side.className = "sideMark";
           side.textContent = (u.side==="player") ? "YOU" : "AI";
-
-          const tier = deriveTier(u.card);
-          const mob = Number(u.card.stats.mobility ?? 0);
-          const acc = Number(u.card.stats.accuracy ?? 0);
-          const moved = u.movedThisTurn ?? 0;
-
-          const bottom = document.createElement("div");
-          bottom.className = "tagBottom";
-          bottom.textContent = `T${tier} • MOB ${mob} (${moved}/${mob}) • ACC ${acc}`;
-
-          cell.appendChild(img);
-          cell.appendChild(hp);
           cell.appendChild(side);
-          cell.appendChild(bottom);
         }
 
         gridEl.appendChild(cell);
@@ -1034,16 +859,6 @@
   }
 
   function renderHand(){
-    // AI hand face down
-    aiHandEl.innerHTML = "";
-    for (let i=0;i<ai.hand.length;i++){
-      const div = document.createElement("div");
-      div.className = "handCard";
-      div.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.7);font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.22);">Card</div>`;
-      aiHandEl.appendChild(div);
-    }
-
-    // Player hand face up with tier/cost
     playerHandEl.innerHTML = "";
     for (let i=0;i<player.hand.length;i++){
       const card = player.hand[i];
@@ -1058,8 +873,6 @@
       `;
       div.onclick = () => {
         if (activeSide !== "player") return;
-        setMode("deploy");
-        selectedUnit = null;
         selectedHandIndex = (selectedHandIndex === i) ? null : i;
         selLabel.textContent = selectedHandIndex===null
           ? "None"
@@ -1073,6 +886,7 @@
   function renderCounts(){
     playerCountEl.textContent = `Deck ${player.deck.length} • Hand ${player.hand.length} • Board ${countBoardUnits("player")}`;
     aiCountEl.textContent = `Deck ${ai.deck.length} • Hand ${ai.hand.length} • Board ${countBoardUnits("ai")}`;
+
     youLabel.textContent = titleCase(player.faction);
     aiLabel.textContent = titleCase(ai.faction);
   }
@@ -1086,21 +900,10 @@
       : `Round ${round} • AI turn`;
 
     turnText.textContent = activeSide === "player"
-      ? `Round ${round}: You have ${ap} point(s). Deploy (Tier cost), Move (1), Attack (2), then End Turn.`
-      : `Round ${round}: AI playing…`;
+      ? `Round ${round}: You have ${ap} point(s). Play cards, then End Turn (auto-attack happens).`
+      : `Round ${round}: AI is playing…`;
 
     statusText.textContent = "";
-  }
-
-  function renderActions(){
-    const isP = (activeSide === "player");
-    actDeploy.disabled = !isP;
-    actMove.disabled = !isP || !selectedUnit || ap < COST_MOVE;
-    actAttack.disabled = !isP || !selectedUnit || ap < COST_ATTACK;
-
-    actDeploy.classList.toggle("active", mode==="deploy");
-    actMove.classList.toggle("active", mode==="move");
-    actAttack.classList.toggle("active", mode==="attack");
   }
 
   function renderAll(){
@@ -1108,7 +911,6 @@
     renderGrid();
     renderHand();
     renderCounts();
-    renderActions();
   }
 
   // ================== SETUP ==================
@@ -1151,23 +953,19 @@
     }
 
     player = { side:"player", faction: pf, deck: makeDeck(pBlock.cards), hand: [] };
-    ai = { side:"ai", faction: af, deck: makeDeck(aBlock.cards), hand: [] };
-
-    drawToHand(player);
-    drawToHand(ai);
+    ai     = { side:"ai",     faction: af, deck: makeDeck(aBlock.cards), hand: [] };
 
     board = Array.from({length:4}, () => Array.from({length:4}, () => null));
     UID = 0;
-
     round = 1;
     logEl.innerHTML = "";
+
     log(`Game start: You = ${titleCase(pf)} vs AI = ${titleCase(af)}.`);
-    log(`Rules: Round N gives N points. Deploy costs Tier (from JSON). Move=1, Attack=2.`, true);
+    log(`Face-down plays → next owner turn advances 1 row and flips face-up. Auto-attacks at end of turn.`, true);
 
     elSetup.classList.add("hidden");
     elGame.classList.remove("hidden");
     btnRestart.classList.remove("hidden");
-    btnEndTurn.disabled = false;
 
     beginTurn("player");
   }
