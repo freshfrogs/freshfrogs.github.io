@@ -3,19 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tankers — Prototype</title>
+  <title>Tankers — Action Points Prototype</title>
   <style>
     :root{
       --bg:#0c0f14;
-      --panel:#121826;
-      --panel2:#0f1420;
       --text:#e7edf7;
       --muted:#9bb0cc;
       --line:rgba(255,255,255,.10);
       --accent:#f7c34a;
       --good:#62ff9b;
       --bad:#ff5b5b;
-      --shadow: 0 14px 40px rgba(0,0,0,.45);
       --radius:14px;
     }
     *{box-sizing:border-box}
@@ -44,9 +41,10 @@
       padding:9px 12px;
       border-radius:12px;
       cursor:pointer;
-      font-weight:800;
+      font-weight:900;
     }
     .btn:hover{border-color: rgba(247,195,74,.45)}
+    .btn:disabled{opacity:.45; cursor:not-allowed}
     select{
       border:1px solid var(--line);
       background: rgba(255,255,255,.05);
@@ -60,7 +58,7 @@
     main .wrap{padding-top:14px}
     .layout{
       display:grid;
-      grid-template-columns: 1fr 320px;
+      grid-template-columns: 1fr 340px;
       gap:14px;
     }
     @media (max-width: 980px){
@@ -74,11 +72,10 @@
       padding:14px;
     }
     .setup h2{margin:0 0 8px 0;font-size:18px;}
-    .setup p{margin:0 0 14px 0;color:var(--muted);font-size:13px;line-height:1.3;}
+    .setup p{margin:0 0 14px 0;color:var(--muted);font-size:13px;line-height:1.35;}
     .setupRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .setupRow label{color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    .setupRow label{color:var(--muted);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
     .setupCol{display:flex;flex-direction:column;gap:6px;min-width:220px}
-    .setup .btn{padding:10px 14px}
 
     .board{
       border:1px solid var(--line);
@@ -95,33 +92,8 @@
       gap:10px;
       flex-wrap:wrap;
     }
-    .boardTop .title{
-      font-weight:900;
-      letter-spacing:.3px;
-    }
-    .boardTop .sub{
-      color:var(--muted);
-      font-size:12px;
-    }
-
-    .colBtns{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap:10px;
-      padding:10px 12px 0;
-    }
-    .colBtn{
-      padding:10px 8px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      color:var(--text);
-      font-weight:900;
-      cursor:pointer;
-      transition: transform .08s ease, border-color .08s ease;
-    }
-    .colBtn:hover{transform: translateY(-1px); border-color: rgba(247,195,74,.45);}
-    .colBtn:disabled{opacity:.4; cursor:not-allowed; transform:none;}
+    .boardTop .title{font-weight:900;letter-spacing:.3px;}
+    .boardTop .sub{color:var(--muted);font-size:12px;line-height:1.2;}
 
     .grid{
       display:grid;
@@ -139,6 +111,8 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      cursor:pointer;
+      user-select:none;
     }
     .cell.empty::after{
       content:"";
@@ -147,6 +121,10 @@
       opacity:.9;
       pointer-events:none;
     }
+    .cell.hilite{border-color: rgba(247,195,74,.85); box-shadow: 0 0 0 3px rgba(247,195,74,.14);}
+    .cell.target{border-color: rgba(255,91,91,.85); box-shadow: 0 0 0 3px rgba(255,91,91,.14);}
+    .cell.move{border-color: rgba(98,255,155,.85); box-shadow: 0 0 0 3px rgba(98,255,155,.12);}
+
     .unitImg{
       width:100%;
       height:100%;
@@ -154,6 +132,7 @@
       display:block;
       filter: saturate(1.05);
       transform: scale(1.01);
+      pointer-events:none;
     }
     .hpTag{
       position:absolute;
@@ -167,6 +146,7 @@
       display:flex;
       gap:6px;
       align-items:center;
+      pointer-events:none;
     }
     .hpTag .dot{
       width:8px;height:8px;border-radius:999px;background: var(--good);
@@ -185,8 +165,9 @@
       font-weight:900;
       letter-spacing:.08em;
       text-transform:uppercase;
+      pointer-events:none;
     }
-    .moveTag{
+    .tagBottom{
       position:absolute;
       left:8px; bottom:8px;
       background: rgba(0,0,0,.55);
@@ -196,6 +177,7 @@
       font-size:11px;
       color:var(--muted);
       font-weight:900;
+      pointer-events:none;
     }
 
     .hands{
@@ -239,7 +221,7 @@
       border-color: rgba(247,195,74,.85);
       box-shadow: 0 0 0 3px rgba(247,195,74,.16);
     }
-    .handCard img{width:100%;height:100%;object-fit:cover;display:block}
+    .handCard img{width:100%;height:100%;object-fit:cover;display:block; pointer-events:none;}
     .handCard .mini{
       position:absolute;
       left:8px; bottom:8px;
@@ -249,6 +231,24 @@
       padding:4px 8px;
       font-size:12px;
       font-weight:900;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      font-weight:900;
+      font-size:12px;
+    }
+    .pill .dot{
+      width:8px;height:8px;border-radius:999px;background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(247,195,74,.12);
     }
 
     .side{
@@ -258,7 +258,7 @@
       overflow:hidden;
       display:flex;
       flex-direction:column;
-      min-height: 520px;
+      min-height: 560px;
     }
     .sideTop{
       padding:12px 12px 10px;
@@ -267,6 +267,7 @@
       justify-content:space-between;
       align-items:flex-end;
       gap:10px;
+      flex-wrap:wrap;
     }
     .sideTop .title{font-weight:900;letter-spacing:.3px;}
     .sideTop .sub{color:var(--muted);font-size:12px;}
@@ -279,8 +280,34 @@
       padding:10px 10px;
       font-size:13px;
     }
-    .kv span{color:var(--muted);font-weight:800}
+    .kv span{color:var(--muted);font-weight:900}
     .kv b{font-weight:900}
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      padding:10px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      border-radius:12px;
+    }
+    .actionBtn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:900;
+      font-size:12px;
+    }
+    .actionBtn:hover{border-color: rgba(247,195,74,.45)}
+    .actionBtn.active{
+      border-color: rgba(247,195,74,.85);
+      box-shadow: 0 0 0 3px rgba(247,195,74,.12);
+    }
+    .actionBtn:disabled{opacity:.45; cursor:not-allowed}
     .log{
       border:1px solid var(--line);
       background: rgba(0,0,0,.18);
@@ -303,675 +330,903 @@
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <div class="top">
-        <div class="brand">
-          <span style="font-size:18px;">🪖</span>
-          <span>Tankers</span>
-          <span class="badge">phase 2</span>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <span style="font-size:18px;">🪖</span>
+        <span>Tankers</span>
+        <span class="badge">Action Points</span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button class="btn hidden" id="btnRestart">Restart</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div id="setup" class="setup">
+      <h2>Start Game</h2>
+      <p>
+        Option 2 (AP): Each round your points = round number (1,2,3...). Deploy cost = tank Tier (Tier 1 costs 1, Tier 2 costs 2...).
+        Move costs 1 per tile. Attack costs 2.
+      </p>
+      <div class="setupRow">
+        <div class="setupCol">
+          <label for="playerFaction">Your faction</label>
+          <select id="playerFaction"></select>
         </div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <button class="btn hidden" id="btnRestart">Restart</button>
+        <div class="setupCol">
+          <label for="aiFaction">Opponent faction</label>
+          <select id="aiFaction"></select>
+        </div>
+        <div class="setupCol" style="min-width:auto;">
+          <label>&nbsp;</label>
+          <button class="btn" id="btnStart">Start</button>
+        </div>
+      </div>
+      <div class="note" style="margin-top:10px;">
+        If images don’t load, run: <code>python3 -m http.server 8080</code> then open <code>http://localhost:8080/tankers.html</code>.
+      </div>
+    </div>
+
+    <div id="game" class="layout hidden">
+      <div class="board">
+        <div class="boardTop">
+          <div>
+            <div class="title">Battlefield (4x4)</div>
+            <div class="sub" id="turnText">—</div>
+          </div>
+          <div class="sub" id="statusText">—</div>
+        </div>
+
+        <div class="grid" id="grid"></div>
+
+        <div class="hands">
+          <div class="handTitle">
+            <div>Opponent hand</div>
+            <div id="aiCount" class="muted"></div>
+          </div>
+          <div class="handRow" id="aiHand"></div>
+
+          <div class="handTitle" style="margin-top:6px;">
+            <div>Your hand (deploy costs tier points)</div>
+            <div id="playerCount" class="muted"></div>
+          </div>
+          <div class="handRow" id="playerHand"></div>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="sideTop">
+          <div>
+            <div class="title">Turn</div>
+            <div class="sub" id="sideSub">—</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <span class="pill"><span class="dot"></span><span>Points:</span><b id="apText">0</b></span>
+            <button class="btn" id="btnEndTurn">End Turn</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="kv"><span>You</span><b id="youLabel">—</b></div>
+          <div class="kv"><span>Opponent</span><b id="aiLabel">—</b></div>
+          <div class="kv"><span>Selection</span><b id="selLabel">None</b></div>
+
+          <div class="actions" id="actionBar">
+            <button class="actionBtn" id="actDeploy">Deploy (Tier)</button>
+            <button class="actionBtn" id="actMove">Move (1)</button>
+            <button class="actionBtn" id="actAttack">Attack (2)</button>
+            <button class="actionBtn" id="actClear">Clear</button>
+          </div>
+
+          <div class="log" id="log"></div>
+
+          <div class="note">
+            Angle rules: <b>Side</b> = armor −1, <b>Flanked</b> = armor −2. Damage is calculated per attack.
+          </div>
         </div>
       </div>
     </div>
-  </header>
+  </div>
+</main>
 
-  <main>
-    <div class="wrap">
-      <div id="setup" class="setup">
-        <h2>Start Game</h2>
-        <p>
-          Phase 2: Deploy → Move → Shoot.
-          Tanks can shoot forward in same or adjacent columns. Attacks are classified as <b>Frontal / Side / Flanked</b>.
-        </p>
-        <div class="setupRow">
-          <div class="setupCol">
-            <label for="playerFaction">Your faction</label>
-            <select id="playerFaction"></select>
-          </div>
-          <div class="setupCol">
-            <label for="aiFaction">Opponent faction</label>
-            <select id="aiFaction"></select>
-          </div>
-          <div class="setupCol" style="min-width:auto;">
-            <label>&nbsp;</label>
-            <button class="btn" id="btnStart">Start</button>
-          </div>
-        </div>
-        <div class="note" style="margin-top:10px;">
-          If images don’t load, run: <code>python3 -m http.server 8080</code> then open <code>http://localhost:8080/tankers.html</code>.
-        </div>
-      </div>
+<script>
+  // ================== CONFIG ==================
+  const DATA_URL = "tanks.json";
+  const HAND_SIZE = 5;
+  const COPIES_PER_CARD = 2;
 
-      <div id="game" class="layout hidden">
-        <div class="board">
-          <div class="boardTop">
-            <div>
-              <div class="title">Battlefield (4x4)</div>
-              <div class="sub" id="turnText">—</div>
-            </div>
-            <div class="sub" id="statusText">—</div>
-          </div>
+  const COST_MOVE = 1;
+  const COST_ATTACK = 2;
 
-          <div class="colBtns" id="colBtns"></div>
-          <div class="grid" id="grid"></div>
+  // ================== STATE ==================
+  let factions = [];
+  let player = null;
+  let ai = null;
 
-          <div class="hands">
-            <div class="handTitle">
-              <div>Opponent hand</div>
-              <div id="aiCount" class="muted"></div>
-            </div>
-            <div class="handRow" id="aiHand"></div>
+  // board rows 0..3 top->bottom, cols 0..3 left->right
+  // cell null or unit { uid, side, card, hp, movedThisTurn }
+  let board = null;
+  let UID = 0;
 
-            <div class="handTitle" style="margin-top:6px;">
-              <div>Your hand (click a card, then click a column)</div>
-              <div id="playerCount" class="muted"></div>
-            </div>
-            <div class="handRow" id="playerHand"></div>
-          </div>
-        </div>
+  let round = 1;            // your described "round one = 1 point"
+  let activeSide = "player"; // "player" or "ai"
+  let ap = 0;               // points remaining for active side
 
-        <div class="side">
-          <div class="sideTop">
-            <div>
-              <div class="title">Match Info</div>
-              <div class="sub">Combat log + counts</div>
-            </div>
-          </div>
-          <div class="panel">
-            <div class="kv"><span>You</span><b id="youLabel">—</b></div>
-            <div class="kv"><span>Opponent</span><b id="aiLabel">—</b></div>
-            <div class="kv"><span>Selected</span><b id="selLabel">None</b></div>
-            <div class="log" id="log"></div>
-            <div class="note">
-              Angle rules: <b>Side</b> = armor −1, <b>Flanked</b> = armor −2.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
+  // selection
+  let selectedHandIndex = null; // for deploy
+  let selectedUnit = null;      // {r,c}
+  let mode = "deploy";          // "deploy" | "move" | "attack"
 
-  <script>
-    // --------- Config ----------
-    const DATA_URL = "tanks.json";
-    const HAND_SIZE = 5;
-    const COPIES_PER_CARD = 2;
+  // ================== DOM ==================
+  const elSetup = document.getElementById("setup");
+  const elGame = document.getElementById("game");
+  const playerFactionSel = document.getElementById("playerFaction");
+  const aiFactionSel = document.getElementById("aiFaction");
+  const btnStart = document.getElementById("btnStart");
+  const btnRestart = document.getElementById("btnRestart");
 
-    // Movement rules (v1)
-    function moveTilesForMobility(mob){
-      const m = Number(mob ?? 0);
-      if (m <= 1) return 0;
-      if (m >= 4) return 2;
-      return 1;
+  const gridEl = document.getElementById("grid");
+  const logEl = document.getElementById("log");
+  const turnText = document.getElementById("turnText");
+  const statusText = document.getElementById("statusText");
+
+  const playerHandEl = document.getElementById("playerHand");
+  const aiHandEl = document.getElementById("aiHand");
+  const playerCountEl = document.getElementById("playerCount");
+  const aiCountEl = document.getElementById("aiCount");
+
+  const youLabel = document.getElementById("youLabel");
+  const aiLabel = document.getElementById("aiLabel");
+  const selLabel = document.getElementById("selLabel");
+  const sideSub = document.getElementById("sideSub");
+  const apText = document.getElementById("apText");
+
+  const btnEndTurn = document.getElementById("btnEndTurn");
+
+  const actDeploy = document.getElementById("actDeploy");
+  const actMove = document.getElementById("actMove");
+  const actAttack = document.getElementById("actAttack");
+  const actClear = document.getElementById("actClear");
+
+  // ================== HELPERS ==================
+  const titleCase = (s) => (s || "").replace(/[_-]/g," ").replace(/\b\w/g, c => c.toUpperCase()).trim();
+
+  function escapeHtml(s){
+    return String(s ?? "").replace(/[&<>"']/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[c]));
+  }
+
+  function log(line, muted=false){
+    const div = document.createElement("div");
+    div.innerHTML = muted ? `<span class="muted">${escapeHtml(line)}</span>` : escapeHtml(line);
+    logEl.appendChild(div);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function shuffle(arr){
+    const a = [...arr];
+    for (let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
     }
+    return a;
+  }
 
-    // Angle armor reductions (phase 2)
-    function armorPenaltyForAngle(angle){
-      if (angle === "side") return 1;
-      if (angle === "flanked") return 2;
-      return 0;
+  function deepCopy(obj){ return JSON.parse(JSON.stringify(obj)); }
+
+  function makeDeck(cards){
+    const deck = [];
+    for (const c of cards){
+      for (let i=0;i<COPIES_PER_CARD;i++) deck.push(deepCopy(c));
     }
+    return shuffle(deck);
+  }
 
-    // --------- State ----------
-    let data = null;
-    let factions = [];
-    let player = null;
-    let ai = null;
-    let board = null; // [4][4] top->bottom, left->right
-    let selectedHandIndex = null;
-    let phase = "setup";
-    let UID = 0;
-
-    // --------- DOM ----------
-    const elSetup = document.getElementById("setup");
-    const elGame = document.getElementById("game");
-    const playerFactionSel = document.getElementById("playerFaction");
-    const aiFactionSel = document.getElementById("aiFaction");
-    const btnStart = document.getElementById("btnStart");
-    const btnRestart = document.getElementById("btnRestart");
-
-    const turnText = document.getElementById("turnText");
-    const statusText = document.getElementById("statusText");
-    const youLabel = document.getElementById("youLabel");
-    const aiLabel = document.getElementById("aiLabel");
-    const selLabel = document.getElementById("selLabel");
-
-    const gridEl = document.getElementById("grid");
-    const colBtnsEl = document.getElementById("colBtns");
-    const logEl = document.getElementById("log");
-
-    const playerHandEl = document.getElementById("playerHand");
-    const aiHandEl = document.getElementById("aiHand");
-    const playerCountEl = document.getElementById("playerCount");
-    const aiCountEl = document.getElementById("aiCount");
-
-    // --------- Helpers ----------
-    const titleCase = (s) => (s || "").replace(/[_-]/g," ").replace(/\b\w/g, c => c.toUpperCase()).trim();
-
-    function log(line, muted=false){
-      const div = document.createElement("div");
-      div.innerHTML = muted ? `<span class="muted">${escapeHtml(line)}</span>` : escapeHtml(line);
-      logEl.appendChild(div);
-      logEl.scrollTop = logEl.scrollHeight;
+  function drawToHand(sideObj){
+    while (sideObj.hand.length < HAND_SIZE && sideObj.deck.length){
+      sideObj.hand.push(sideObj.deck.pop());
     }
+  }
 
-    function escapeHtml(s){
-      return String(s ?? "").replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      }[c]));
+  function countBoardUnits(side){
+    let n=0;
+    for (let r=0;r<4;r++) for (let c=0;c<4;c++){
+      const u = board[r][c];
+      if (u && u.side === side) n++;
     }
+    return n;
+  }
 
-    function shuffle(arr){
-      const a = [...arr];
-      for (let i=a.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [a[i],a[j]] = [a[j],a[i]];
+  // ================== TIER / COST ==================
+  // Uses card.tier if present. Otherwise derives a tier (1..5) from stats.
+  function deriveTier(card){
+    if (card.tier != null) return clampTier(Number(card.tier));
+    const s = card.stats || {};
+    const fp = Number(s.firepower ?? 0);
+    const ar = Number(s.armor ?? 0);
+    const hp = Number(s.hp ?? 0);
+    const mo = Number(s.mobility ?? 0);
+    const ac = Number(s.accuracy ?? 0);
+    const ut = Number(s.utility ?? 0);
+
+    // quick heuristic: power score -> tier
+    const score = fp + ar + (hp/2) + mo + ac + (ut/2);
+    const t = Math.round(score / 6); // tuned for your current stat ranges
+    return clampTier(t);
+  }
+
+  function clampTier(t){
+    if (!Number.isFinite(t)) return 1;
+    return Math.max(1, Math.min(5, t));
+  }
+
+  function costToDeploy(card){
+    return deriveTier(card);
+  }
+
+  // ================== ANGLES / DAMAGE ==================
+  function armorPenaltyForAngle(angle){
+    if (angle === "side") return 1;
+    if (angle === "flanked") return 2;
+    return 0;
+  }
+
+  function getFrontDirForSide(side){
+    return side === "player" ? -1 : +1;
+  }
+
+  function classifyAngle(attackerPos, targetPos, targetSide){
+    const dr = attackerPos.r - targetPos.r;
+    const dc = attackerPos.c - targetPos.c;
+    const frontDir = getFrontDirForSide(targetSide);
+
+    const behind = (frontDir === -1) ? (dr > 0) : (dr < 0);
+    if (behind) return "flanked";
+    if (dc !== 0) return "side";
+    return "frontal";
+  }
+
+  function unitHasText(unit, needle){
+    const n = String(needle).toLowerCase();
+    return (unit.card.abilities || []).some(a => {
+      const hay = `${a.name || ""} ${a.text || ""}`.toLowerCase();
+      return hay.includes(n);
+    });
+  }
+
+  function extraDamageFromAngleVuln(targetUnit, angle){
+    if (angle === "side" || angle === "flanked"){
+      if (unitHasText(targetUnit, "receive +1 damage from flanked") ||
+          unitHasText(targetUnit, "receive +1 damage from flanked and side") ||
+          unitHasText(targetUnit, "lumbering giant")){
+        return 1;
       }
-      return a;
     }
+    return 0;
+  }
 
-    function deepCopy(obj){
-      return JSON.parse(JSON.stringify(obj));
-    }
+  function computeDamage(attackerUnit, targetUnit, angle){
+    const firepower = Number(attackerUnit.card.stats.firepower ?? 1);
+    const armor = Number(targetUnit.card.stats.armor ?? 0);
+    const effArmor = Math.max(0, armor - armorPenaltyForAngle(angle));
 
-    function makeDeck(cards){
-      const deck = [];
-      for (const c of cards){
-        for (let i=0;i<COPIES_PER_CARD;i++){
-          deck.push(deepCopy(c));
+    let dmg = Math.max(1, firepower - Math.floor(effArmor / 2));
+    dmg += extraDamageFromAngleVuln(targetUnit, angle);
+    return Math.max(1, dmg);
+  }
+
+  // ================== TARGETING ==================
+  // For attack mode, attacker can shoot "forward" within range:
+  // same column and adjacent columns at each step.
+  function getAttackableTargets(attackerPos){
+    const attacker = board[attackerPos.r][attackerPos.c];
+    if (!attacker) return [];
+    const dir = attacker.side === "player" ? -1 : +1;
+    const range = Math.max(1, Number(attacker.card.stats.accuracy ?? 1));
+
+    const targets = [];
+    for (let step=1; step<=range; step++){
+      const rr = attackerPos.r + dir*step;
+      if (rr < 0 || rr > 3) break;
+
+      const colsToCheck = [attackerPos.c, attackerPos.c-1, attackerPos.c+1];
+      for (const cc of colsToCheck){
+        if (cc < 0 || cc > 3) continue;
+        const maybe = board[rr][cc];
+        if (maybe && maybe.side !== attacker.side){
+          targets.push({ r: rr, c: cc });
         }
       }
-      return shuffle(deck);
+    }
+    return targets;
+  }
+
+  function getMoveDestinations(unitPos){
+    const u = board[unitPos.r][unitPos.c];
+    if (!u) return [];
+    if (u.side !== activeSide) return [];
+    if (u.movedThisTurn >= Number(u.card.stats.mobility ?? 0)) return [];
+    if (ap < COST_MOVE) return [];
+
+    const dests = [];
+    const dirs = [
+      {dr:-1,dc:0},
+      {dr:+1,dc:0},
+      {dr:0,dc:-1},
+      {dr:0,dc:+1},
+    ];
+    for (const d of dirs){
+      const rr = unitPos.r + d.dr;
+      const cc = unitPos.c + d.dc;
+      if (rr < 0 || rr > 3 || cc < 0 || cc > 3) continue;
+      if (!board[rr][cc]) dests.push({r:rr,c:cc});
+    }
+    return dests;
+  }
+
+  // ================== DEPLOY ==================
+  function findDropRow(side, col){
+    if (side === "player"){
+      for (let r=3;r>=0;r--) if (!board[r][col]) return r;
+    } else {
+      for (let r=0;r<4;r++) if (!board[r][col]) return r;
+    }
+    return null;
+  }
+
+  function canDeployToColumn(side, col){
+    return findDropRow(side, col) !== null;
+  }
+
+  function deployFromHand(side, handIndex, col){
+    const who = side === "player" ? player : ai;
+    const row = findDropRow(side, col);
+    if (row === null) return { ok:false, reason:"Column full." };
+
+    const card = who.hand[handIndex];
+    const cost = costToDeploy(card);
+    if (ap < cost) return { ok:false, reason:`Not enough points (need ${cost}).` };
+
+    // spend
+    ap -= cost;
+
+    // remove card
+    const played = who.hand.splice(handIndex, 1)[0];
+
+    board[row][col] = {
+      uid: ++UID,
+      side,
+      card: played,
+      hp: played.stats.hp,
+      movedThisTurn: 0
+    };
+
+    log(`${titleCase(side)} deploys ${played.name} (Tier ${deriveTier(played)}) in column ${col+1}.`);
+    return { ok:true };
+  }
+
+  // ================== ACTIONS ==================
+  function clearSelection(){
+    selectedHandIndex = null;
+    selectedUnit = null;
+    selLabel.textContent = "None";
+  }
+
+  function spend(cost){
+    ap = Math.max(0, ap - cost);
+  }
+
+  function doMove(fromPos, toPos){
+    const u = board[fromPos.r][fromPos.c];
+    if (!u) return false;
+    if (u.side !== activeSide) return false;
+    if (ap < COST_MOVE) return false;
+    if (u.movedThisTurn >= Number(u.card.stats.mobility ?? 0)) return false;
+    if (board[toPos.r][toPos.c]) return false;
+
+    board[toPos.r][toPos.c] = u;
+    board[fromPos.r][fromPos.c] = null;
+
+    u.movedThisTurn += 1;
+    spend(COST_MOVE);
+    log(`${titleCase(activeSide)} ${u.card.name} moves (cost ${COST_MOVE}).`, true);
+    return true;
+  }
+
+  function doAttack(attackerPos, targetPos){
+    const attacker = board[attackerPos.r][attackerPos.c];
+    const target = board[targetPos.r][targetPos.c];
+    if (!attacker || !target) return false;
+    if (attacker.side !== activeSide) return false;
+    if (target.side === activeSide) return false;
+    if (ap < COST_ATTACK) return false;
+
+    // validate target is in attackable list
+    const legal = getAttackableTargets(attackerPos).some(p => p.r===targetPos.r && p.c===targetPos.c);
+    if (!legal) return false;
+
+    const angle = classifyAngle(attackerPos, targetPos, target.side);
+    const dmg = computeDamage(attacker, target, angle);
+
+    spend(COST_ATTACK);
+    target.hp -= dmg;
+
+    const sideA = attacker.side === "player" ? "You" : "AI";
+    const sideT = target.side === "player" ? "You" : "AI";
+    log(`${sideA} ${attacker.card.name} hits ${sideT} ${target.card.name} for ${dmg} (${angle.toUpperCase()}) — (cost ${COST_ATTACK}).`);
+
+    if (target.hp <= 0){
+      log(`${titleCase(target.side)} ${target.card.name} is destroyed!`);
+      board[targetPos.r][targetPos.c] = null;
     }
 
-    function drawToHand(sideObj){
-      while (sideObj.hand.length < HAND_SIZE && sideObj.deck.length){
-        sideObj.hand.push(sideObj.deck.pop());
+    return true;
+  }
+
+  // ================== TURN FLOW ==================
+  function beginTurn(side){
+    activeSide = side;
+
+    // round points only apply to PLAYER turns as you described, but AI should mirror for balance
+    ap = round;
+
+    // reset moved counters for that side
+    for (let r=0;r<4;r++) for (let c=0;c<4;c++){
+      const u = board[r][c];
+      if (u && u.side === side) u.movedThisTurn = 0;
+    }
+
+    clearSelection();
+    mode = "deploy";
+    renderAll();
+
+    if (side === "player"){
+      log(`— Round ${round}: Your turn (${ap} points).`, true);
+    } else {
+      log(`— Round ${round}: AI turn (${ap} points).`, true);
+    }
+  }
+
+  function endTurn(){
+    // draw at end of side turn
+    if (activeSide === "player") drawToHand(player);
+    else drawToHand(ai);
+
+    if (checkEnd()) return;
+
+    if (activeSide === "player"){
+      // AI turn next
+      beginTurn("ai");
+      window.setTimeout(aiTurn, 450);
+    } else {
+      // next round starts for player
+      round += 1;
+      beginTurn("player");
+    }
+  }
+
+  function checkEnd(){
+    const pUnits = countBoardUnits("player");
+    const aUnits = countBoardUnits("ai");
+
+    const pHas = pUnits > 0 || player.hand.length > 0 || player.deck.length > 0;
+    const aHas = aUnits > 0 || ai.hand.length > 0 || ai.deck.length > 0;
+
+    if (!pHas && !aHas){ gameOver("Draw — both sides ran out."); return true; }
+    if (!aHas){ gameOver("You win!"); return true; }
+    if (!pHas){ gameOver("AI wins!"); return true; }
+    return false;
+  }
+
+  function gameOver(msg){
+    statusText.textContent = msg;
+    turnText.textContent = "Game over.";
+    btnRestart.classList.remove("hidden");
+    btnEndTurn.disabled = true;
+    actDeploy.disabled = actMove.disabled = actAttack.disabled = true;
+    log(msg);
+    renderAll();
+  }
+
+  // ================== AI (simple) ==================
+  function aiTurn(){
+    if (activeSide !== "ai") return;
+
+    // 1) Deploy as many as possible
+    let safety = 40;
+    while (ap > 0 && ai.hand.length > 0 && safety-- > 0){
+      // pick cheapest card we can afford
+      const affordable = ai.hand
+        .map((card, idx) => ({card, idx, cost: costToDeploy(card)}))
+        .filter(x => x.cost <= ap);
+
+      if (!affordable.length) break;
+      affordable.sort((a,b)=>a.cost-b.cost);
+
+      // try to place it in a random non-full column
+      const choice = affordable[0];
+      const cols = shuffle([0,1,2,3]);
+      let placed = false;
+      for (const col of cols){
+        if (!canDeployToColumn("ai", col)) continue;
+        const res = deployFromHand("ai", choice.idx, col);
+        if (res.ok){ placed = true; break; }
       }
+      if (!placed) break;
     }
 
-    function countBoardUnits(side){
-      let n=0;
+    // 2) Attack with any unit if possible (cost 2)
+    let attacked = true;
+    let attackSafety = 40;
+    while (ap >= COST_ATTACK && attacked && attackSafety-- > 0){
+      attacked = false;
+
+      outer:
       for (let r=0;r<4;r++){
         for (let c=0;c<4;c++){
           const u = board[r][c];
-          if (u && u.side === side) n++;
-        }
-      }
-      return n;
-    }
+          if (!u || u.side !== "ai") continue;
+          const targets = getAttackableTargets({r,c});
+          if (!targets.length) continue;
 
-    function findDropRow(side, col){
-      if (side === "player"){
-        for (let r=3;r>=0;r--){
-          if (!board[r][col]) return r;
-        }
-      } else {
-        for (let r=0;r<4;r++){
-          if (!board[r][col]) return r;
-        }
-      }
-      return null;
-    }
-
-    function placeCardFromHand(side, handIndex, col){
-      const who = (side === "player") ? player : ai;
-      const row = findDropRow(side, col);
-      if (row === null) return false;
-
-      const card = who.hand.splice(handIndex, 1)[0];
-      board[row][col] = {
-        uid: ++UID,
-        side,
-        card,
-        hp: card.stats.hp
-      };
-      log(`${titleCase(side)} deploys ${card.name} in column ${col+1}.`);
-      return true;
-    }
-
-    // --------- Movement ----------
-    function resolveMovement(side){
-      const moved = new Set();
-      const dir = (side === "player") ? -1 : +1;
-
-      // front-to-back
-      const rowOrder = (side === "player") ? [0,1,2,3] : [3,2,1,0];
-      let any = false;
-
-      for (const r of rowOrder){
-        for (let c=0;c<4;c++){
-          const u = board[r][c];
-          if (!u || u.side !== side) continue;
-          if (moved.has(u.uid)) continue;
-          moved.add(u.uid);
-
-          const steps = moveTilesForMobility(u.card.stats.mobility);
-          if (steps <= 0) continue;
-
-          let curR = r;
-          let did = 0;
-
-          for (let s=0; s<steps; s++){
-            const nr = curR + dir;
-            if (nr < 0 || nr > 3) break;
-            if (board[nr][c]) break;
-
-            board[nr][c] = u;
-            board[curR][c] = null;
-            curR = nr;
-            did++;
-          }
-
-          if (did > 0){
-            any = true;
-            log(`${titleCase(side)} ${u.card.name} advances ${did} tile${did===1?"":"s"}.`, true);
-          }
-        }
-      }
-
-      if (!any) log(`${titleCase(side)} movement: no advances.`, true);
-    }
-
-    // --------- Angle + Damage ----------
-    function getFrontDirForSide(side){
-      // direction of "front" for that side (from their perspective)
-      return side === "player" ? -1 : +1;
-    }
-
-    // Determine angle from TARGET's perspective given attacker/target positions.
-    function classifyAngle(attackerPos, targetPos, targetSide){
-      const dr = attackerPos.r - targetPos.r;
-      const dc = attackerPos.c - targetPos.c;
-      const frontDir = getFrontDirForSide(targetSide); // -1 player faces up, +1 ai faces down
-
-      // If attacker is in front of target (same front direction), it's frontal/side.
-      const inFront = (frontDir === -1) ? (dr < 0) : (dr > 0);
-      const behind = (frontDir === -1) ? (dr > 0) : (dr < 0);
-
-      if (behind) return "flanked";
-      if (dc !== 0) return "side"; // front-left or front-right
-      return "frontal";
-    }
-
-    function unitHasText(unit, needle){
-      const n = String(needle).toLowerCase();
-      return (unit.card.abilities || []).some(a => {
-        const hay = `${a.name || ""} ${a.text || ""}`.toLowerCase();
-        return hay.includes(n);
-      });
-    }
-
-    function extraDamageFromAngleVuln(targetUnit, angle){
-      if (angle === "side" || angle === "flanked"){
-        // matches your M12 text ("Receive +1 damage from Flanked and Side attacks")
-        if (unitHasText(targetUnit, "receive +1 damage from flanked") || unitHasText(targetUnit, "receive +1 damage from flanked and side")){
-          return 1;
-        }
-        if (unitHasText(targetUnit, "lumbering giant") && unitHasText(targetUnit, "receive +1 damage")) {
-          return 1;
-        }
-      }
-      return 0;
-    }
-
-    function computeDamage(attackerUnit, targetUnit, angle){
-      const firepower = Number(attackerUnit.card.stats.firepower ?? 1);
-      const armor = Number(targetUnit.card.stats.armor ?? 0);
-
-      const effArmor = Math.max(0, armor - armorPenaltyForAngle(angle));
-      let dmg = Math.max(1, firepower - Math.floor(effArmor / 2));
-      dmg += extraDamageFromAngleVuln(targetUnit, angle);
-      return Math.max(1, dmg);
-    }
-
-    // --------- Combat (phase 2 targeting) ----------
-    // A unit shoots forward within range (Accuracy), checking:
-    // 1) same column, then 2) adjacent columns, at each distance step.
-    function findTargetForAttacker(attacker, pos){
-      const dir = attacker.side === "player" ? -1 : +1;
-      const range = Math.max(1, Number(attacker.card.stats.accuracy ?? 1));
-
-      for (let step = 1; step <= range; step++){
-        const rr = pos.r + dir*step;
-        if (rr < 0 || rr > 3) break;
-
-        // priority: same column, then left/right
-        const colsToCheck = [pos.c, pos.c-1, pos.c+1];
-        for (const cc of colsToCheck){
-          if (cc < 0 || cc > 3) continue;
-          const maybe = board[rr][cc];
-          if (maybe && maybe.side !== attacker.side){
-            return { unit: maybe, pos: { r: rr, c: cc } };
-          }
-        }
-      }
-
-      return null;
-    }
-
-    function resolveCombat(){
-      const events = [];
-
-      // snapshot positions
-      for (let r=0;r<4;r++){
-        for (let c=0;c<4;c++){
-          const attacker = board[r][c];
-          if (!attacker) continue;
-
-          const targetHit = findTargetForAttacker(attacker, {r,c});
-          if (!targetHit) continue;
-
-          const angle = classifyAngle({r,c}, targetHit.pos, targetHit.unit.side);
-          const dmg = computeDamage(attacker, targetHit.unit, angle);
-
-          events.push({
-            attacker,
-            attackerPos: {r,c},
-            target: targetHit.unit,
-            targetPos: targetHit.pos,
-            angle,
-            dmg
+          // prioritize targets with lowest hp
+          targets.sort((p1,p2)=>{
+            const t1 = board[p1.r][p1.c]; const t2 = board[p2.r][p2.c];
+            return (t1?.hp ?? 999) - (t2?.hp ?? 999);
           });
+
+          if (doAttack({r,c}, targets[0])){
+            attacked = true;
+            break outer;
+          }
+        }
+      }
+    }
+
+    // 3) Move forward if points remain
+    let moveSafety = 40;
+    while (ap >= COST_MOVE && moveSafety-- > 0){
+      let moved = false;
+
+      // try to move units toward player (down)
+      // prefer units closer to top first
+      for (let r=3; r>=0 && !moved; r--){
+        for (let c=0; c<4 && !moved; c++){
+          const u = board[r][c];
+          if (!u || u.side !== "ai") continue;
+          if (u.movedThisTurn >= Number(u.card.stats.mobility ?? 0)) continue;
+
+          const forward = { r: r+1, c };
+          if (forward.r <= 3 && !board[forward.r][forward.c]){
+            moved = doMove({r,c}, forward);
+          }
         }
       }
 
-      if (!events.length){
-        log("No shots fired.", true);
+      if (!moved) break;
+    }
+
+    renderAll();
+    endTurn();
+  }
+
+  // ================== UI / INPUT ==================
+  function setMode(newMode){
+    mode = newMode;
+    actDeploy.classList.toggle("active", mode==="deploy");
+    actMove.classList.toggle("active", mode==="move");
+    actAttack.classList.toggle("active", mode==="attack");
+    renderAll();
+  }
+
+  actDeploy.onclick = () => setMode("deploy");
+  actMove.onclick = () => setMode("move");
+  actAttack.onclick = () => setMode("attack");
+  actClear.onclick = () => { clearSelection(); renderAll(); };
+
+  btnEndTurn.onclick = () => {
+    if (activeSide !== "player") return;
+    endTurn();
+  };
+
+  function onClickCell(r,c){
+    if (activeSide !== "player") return;
+
+    const cellUnit = board[r][c];
+
+    // DEPLOY MODE: select hand card then click empty tile in a column to deploy (drops to nearest slot)
+    if (mode === "deploy"){
+      if (selectedHandIndex === null) return;
+
+      // deploy based on clicked column (any row click -> same column)
+      const col = c;
+      const card = player.hand[selectedHandIndex];
+      const cost = costToDeploy(card);
+
+      if (ap < cost){
+        log(`Not enough points to deploy ${card.name} (need ${cost}).`, true);
+        return;
+      }
+      const row = findDropRow("player", col);
+      if (row === null){
+        log(`Column ${col+1} is full.`, true);
         return;
       }
 
-      // Apply simultaneously
-      for (const e of events){
-        const cur = board[e.targetPos.r][e.targetPos.c];
-        if (!cur || cur.uid !== e.target.uid) continue;
-        cur.hp -= e.dmg;
+      const res = deployFromHand("player", selectedHandIndex, col);
+      if (res.ok){
+        selectedHandIndex = null;
+        selLabel.textContent = selectedUnit ? unitLabel(selectedUnit) : "None";
+        renderAll();
       }
-
-      // Log
-      for (const e of events){
-        const sideA = e.attacker.side === "player" ? "You" : "AI";
-        const sideT = e.target.side === "player" ? "You" : "AI";
-        const tag = e.angle.toUpperCase();
-        log(`${sideA} ${e.attacker.card.name} hits ${sideT} ${e.target.card.name} for ${e.dmg} (${tag}).`);
-      }
-
-      // Cleanup dead
-      for (let r=0;r<4;r++){
-        for (let c=0;c<4;c++){
-          const u = board[r][c];
-          if (u && u.hp <= 0){
-            log(`${titleCase(u.side)} ${u.card.name} is destroyed!`);
-            board[r][c] = null;
-          }
-        }
-      }
+      return;
     }
 
-    function checkEnd(){
-      const pUnits = countBoardUnits("player");
-      const aUnits = countBoardUnits("ai");
-      const pHas = pUnits > 0 || player.hand.length > 0 || player.deck.length > 0;
-      const aHas = aUnits > 0 || ai.hand.length > 0 || ai.deck.length > 0;
-
-      if (!pHas && !aHas){ endGame("Draw — both sides ran out."); return true; }
-      if (!aHas){ endGame("You win!"); return true; }
-      if (!pHas){ endGame("AI wins!"); return true; }
-      return false;
-    }
-
-    function endGame(msg){
-      phase = "end";
-      statusText.textContent = msg;
-      turnText.textContent = "Game over.";
-      btnRestart.classList.remove("hidden");
-      log(msg);
-      renderAll();
-    }
-
-    // --------- Rendering ----------
-    function renderColumns(){
-      colBtnsEl.innerHTML = "";
-      for (let col=0; col<4; col++){
-        const b = document.createElement("button");
-        b.className = "colBtn";
-        b.textContent = `Deploy ${col+1}`;
-        b.onclick = () => onPlayerChooseColumn(col);
-        colBtnsEl.appendChild(b);
-      }
-    }
-
-    function renderGrid(){
-      gridEl.innerHTML = "";
-      for (let r=0;r<4;r++){
-        for (let c=0;c<4;c++){
-          const cell = document.createElement("div");
-          cell.className = "cell" + (board[r][c] ? "" : " empty");
-          const u = board[r][c];
-          if (u){
-            const img = document.createElement("img");
-            img.className = "unitImg";
-            img.src = u.card.image;
-            img.alt = u.card.name;
-
-            const hp = document.createElement("div");
-            hp.className = "hpTag" + (u.side === "ai" ? " ai" : "");
-            hp.innerHTML = `<span class="dot"></span><span>${u.hp}</span>`;
-
-            const side = document.createElement("div");
-            side.className = "sideMark";
-            side.textContent = u.side === "player" ? "YOU" : "AI";
-
-            const move = document.createElement("div");
-            move.className = "moveTag";
-            move.textContent = `MOB ${u.card.stats.mobility} • ACC ${u.card.stats.accuracy}`;
-
-            cell.appendChild(img);
-            cell.appendChild(hp);
-            cell.appendChild(side);
-            cell.appendChild(move);
-          }
-          gridEl.appendChild(cell);
-        }
-      }
-    }
-
-    function renderHand(side){
-      const who = side === "player" ? player : ai;
-      const root = side === "player" ? playerHandEl : aiHandEl;
-      root.innerHTML = "";
-
-      for (let i=0;i<who.hand.length;i++){
-        const card = who.hand[i];
-        const div = document.createElement("div");
-        div.className = "handCard" + (side==="player" && selectedHandIndex === i ? " selected" : "");
-        if (side === "ai"){
-          div.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.7);font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.22);">Card</div>`;
-        } else {
-          div.innerHTML = `
-            <img src="${card.image}" alt="${escapeHtml(card.name)}">
-            <div class="mini">HP ${card.stats.hp} • MOB ${card.stats.mobility}</div>
-          `;
-          div.onclick = () => {
-            if (phase !== "player") return;
-            selectedHandIndex = (selectedHandIndex === i) ? null : i;
-            selLabel.textContent = selectedHandIndex === null ? "None" : player.hand[selectedHandIndex]?.name || "None";
-            renderAll();
-          };
-        }
-        root.appendChild(div);
-      }
-    }
-
-    function renderCounts(){
-      playerCountEl.textContent = `Deck ${player.deck.length} • Hand ${player.hand.length} • Board ${countBoardUnits("player")}`;
-      aiCountEl.textContent = `Deck ${ai.deck.length} • Hand ${ai.hand.length} • Board ${countBoardUnits("ai")}`;
-      youLabel.textContent = titleCase(player.faction);
-      aiLabel.textContent = titleCase(ai.faction);
-    }
-
-    function renderTurnText(){
-      if (phase === "player"){
-        turnText.textContent = "Your turn: select a card, deploy → move → shoot → draw.";
-        statusText.textContent = "";
-      } else if (phase === "ai"){
-        turnText.textContent = "AI turn… deploy → move → shoot → draw.";
-        statusText.textContent = "";
-      }
-    }
-
-    function renderAll(){
-      renderColumns();
-      renderGrid();
-      renderHand("ai");
-      renderHand("player");
-      renderCounts();
-      renderTurnText();
-
-      const enable = phase === "player" && selectedHandIndex !== null;
-      const btns = [...colBtnsEl.querySelectorAll("button")];
-      for (let col=0; col<4; col++){
-        const drop = findDropRow("player", col);
-        btns[col].disabled = !(enable && drop !== null);
-      }
-    }
-
-    // --------- Turns ----------
-    function onPlayerChooseColumn(col){
-      if (phase !== "player") return;
-      if (selectedHandIndex === null) return;
-
-      const ok = placeCardFromHand("player", selectedHandIndex, col);
-      if (!ok) return;
-
+    // selecting your unit
+    if (cellUnit && cellUnit.side === "player"){
+      selectedUnit = {r,c};
       selectedHandIndex = null;
-      selLabel.textContent = "None";
-
-      resolveMovement("player");
-      resolveCombat();
-      drawToHand(player);
-
+      selLabel.textContent = unitLabel(selectedUnit);
       renderAll();
-      if (checkEnd()) return;
-
-      phase = "ai";
-      renderAll();
-      window.setTimeout(aiTurn, 450);
+      return;
     }
 
-    function aiTurn(){
-      if (phase !== "ai") return;
-
-      let played = false;
-      for (let tries=0; tries<20 && !played; tries++){
-        if (!ai.hand.length) break;
-        const handIndex = Math.floor(Math.random() * ai.hand.length);
-        const col = Math.floor(Math.random() * 4);
-        const drop = findDropRow("ai", col);
-        if (drop === null) continue;
-        played = placeCardFromHand("ai", handIndex, col);
+    // MOVE MODE: if selected unit, click green destination
+    if (mode === "move" && selectedUnit){
+      const dests = getMoveDestinations(selectedUnit);
+      const legal = dests.some(p => p.r===r && p.c===c);
+      if (!legal) return;
+      const ok = doMove(selectedUnit, {r,c});
+      if (ok){
+        selectedUnit = {r,c};
+        selLabel.textContent = unitLabel(selectedUnit);
+        renderAll();
       }
-
-      if (!played){
-        log("AI cannot deploy.", true);
-      }
-
-      resolveMovement("ai");
-      resolveCombat();
-      drawToHand(ai);
-
-      renderAll();
-      if (checkEnd()) return;
-
-      phase = "player";
-      renderAll();
+      return;
     }
 
-    // --------- Setup ----------
-    function populateSetupSelectors(){
-      const available = factions
-        .map(f => f.faction)
-        .filter(f => ["germany","allies"].includes(String(f).toLowerCase()));
-
-      playerFactionSel.innerHTML = "";
-      aiFactionSel.innerHTML = "";
-
-      for (const f of available){
-        const opt1 = document.createElement("option");
-        opt1.value = f;
-        opt1.textContent = titleCase(f);
-        playerFactionSel.appendChild(opt1);
-
-        const opt2 = document.createElement("option");
-        opt2.value = f;
-        opt2.textContent = titleCase(f);
-        aiFactionSel.appendChild(opt2);
+    // ATTACK MODE: if selected unit, click red enemy target
+    if (mode === "attack" && selectedUnit){
+      if (!cellUnit || cellUnit.side !== "ai") return;
+      const targets = getAttackableTargets(selectedUnit);
+      const legal = targets.some(p => p.r===r && p.c===c);
+      if (!legal) return;
+      const ok = doAttack(selectedUnit, {r,c});
+      if (ok){
+        renderAll();
       }
+      return;
+    }
+  }
 
-      if (available.includes("germany")) playerFactionSel.value = "germany";
-      if (available.includes("allies")) aiFactionSel.value = "allies";
-      if (playerFactionSel.value === aiFactionSel.value && available.length > 1){
-        aiFactionSel.value = available.find(x => x !== playerFactionSel.value);
+  function unitLabel(pos){
+    const u = board[pos.r][pos.c];
+    if (!u) return "None";
+    return `${u.card.name} (HP ${u.hp})`;
+  }
+
+  // ================== RENDER ==================
+  function renderGrid(){
+    gridEl.innerHTML = "";
+
+    // compute highlights
+    const moveDests = (activeSide==="player" && mode==="move" && selectedUnit) ? getMoveDestinations(selectedUnit) : [];
+    const atkTargets = (activeSide==="player" && mode==="attack" && selectedUnit) ? getAttackableTargets(selectedUnit) : [];
+
+    for (let r=0;r<4;r++){
+      for (let c=0;c<4;c++){
+        const u = board[r][c];
+        const cell = document.createElement("div");
+        cell.className = "cell" + (u ? "" : " empty");
+
+        // selection highlight
+        if (selectedUnit && selectedUnit.r===r && selectedUnit.c===c){
+          cell.classList.add("hilite");
+        }
+        if (moveDests.some(p=>p.r===r && p.c===c)){
+          cell.classList.add("move");
+        }
+        if (atkTargets.some(p=>p.r===r && p.c===c)){
+          cell.classList.add("target");
+        }
+
+        cell.onclick = () => onClickCell(r,c);
+
+        if (u){
+          const img = document.createElement("img");
+          img.className = "unitImg";
+          img.src = u.card.image;
+          img.alt = u.card.name;
+
+          const hp = document.createElement("div");
+          hp.className = "hpTag" + (u.side==="ai" ? " ai" : "");
+          hp.innerHTML = `<span class="dot"></span><span>${u.hp}</span>`;
+
+          const side = document.createElement("div");
+          side.className = "sideMark";
+          side.textContent = (u.side==="player") ? "YOU" : "AI";
+
+          const t = deriveTier(u.card);
+          const mob = Number(u.card.stats.mobility ?? 0);
+          const acc = Number(u.card.stats.accuracy ?? 0);
+          const moved = u.movedThisTurn ?? 0;
+
+          const bottom = document.createElement("div");
+          bottom.className = "tagBottom";
+          bottom.textContent = `T${t} • MOB ${mob} (${moved}/${mob}) • ACC ${acc}`;
+
+          cell.appendChild(img);
+          cell.appendChild(hp);
+          cell.appendChild(side);
+          cell.appendChild(bottom);
+        }
+
+        gridEl.appendChild(cell);
       }
     }
+  }
 
-    function startGame(){
-      const pf = playerFactionSel.value;
-      const af = aiFactionSel.value;
-
-      const pBlock = factions.find(f => f.faction === pf);
-      const aBlock = factions.find(f => f.faction === af);
-
-      player = { side:"player", faction: pf, deck: makeDeck(pBlock.cards), hand: [] };
-      ai = { side:"ai", faction: af, deck: makeDeck(aBlock.cards), hand: [] };
-
-      drawToHand(player);
-      drawToHand(ai);
-
-      board = Array.from({length:4}, () => Array.from({length:4}, () => null));
-      selectedHandIndex = null;
-      phase = "player";
-      UID = 0;
-
-      logEl.innerHTML = "";
-      log(`Game start: You = ${titleCase(pf)} vs AI = ${titleCase(af)}.`);
-      log("Phase 2 active: forward + adjacent shots; frontal/side/flanked angles.", true);
-
-      elSetup.classList.add("hidden");
-      elGame.classList.remove("hidden");
-      btnRestart.classList.remove("hidden");
-
-      renderAll();
+  function renderHand(){
+    // AI hand face down
+    aiHandEl.innerHTML = "";
+    for (let i=0;i<ai.hand.length;i++){
+      const div = document.createElement("div");
+      div.className = "handCard";
+      div.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.7);font-weight:900;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.22);">Card</div>`;
+      aiHandEl.appendChild(div);
     }
 
-    function resetToSetup(){
-      phase = "setup";
-      elGame.classList.add("hidden");
-      elSetup.classList.remove("hidden");
-      btnRestart.classList.add("hidden");
-      selectedHandIndex = null;
-      selLabel.textContent = "None";
-      logEl.innerHTML = "";
+    playerHandEl.innerHTML = "";
+    for (let i=0;i<player.hand.length;i++){
+      const card = player.hand[i];
+      const cost = costToDeploy(card);
+      const tier = deriveTier(card);
+
+      const div = document.createElement("div");
+      div.className = "handCard" + (selectedHandIndex===i ? " selected" : "");
+      div.innerHTML = `
+        <img src="${card.image}" alt="${escapeHtml(card.name)}">
+        <div class="mini">T${tier} • Cost ${cost}</div>
+      `;
+      div.onclick = () => {
+        if (activeSide !== "player") return;
+        // selecting a hand card automatically puts you in deploy mode
+        setMode("deploy");
+        selectedUnit = null;
+        selectedHandIndex = (selectedHandIndex === i) ? null : i;
+        selLabel.textContent = selectedHandIndex===null ? "None" : `${player.hand[selectedHandIndex].name} (Deploy cost ${costToDeploy(player.hand[selectedHandIndex])})`;
+        renderAll();
+      };
+      playerHandEl.appendChild(div);
+    }
+  }
+
+  function renderCounts(){
+    playerCountEl.textContent = `Deck ${player.deck.length} • Hand ${player.hand.length} • Board ${countBoardUnits("player")}`;
+    aiCountEl.textContent = `Deck ${ai.deck.length} • Hand ${ai.hand.length} • Board ${countBoardUnits("ai")}`;
+    youLabel.textContent = titleCase(player.faction);
+    aiLabel.textContent = titleCase(ai.faction);
+  }
+
+  function renderTop(){
+    apText.textContent = String(ap);
+    btnEndTurn.disabled = (activeSide !== "player");
+
+    sideSub.textContent = activeSide === "player"
+      ? `Round ${round} • Your turn`
+      : `Round ${round} • AI turn`;
+
+    turnText.textContent = activeSide === "player"
+      ? `Round ${round}: You have ${ap} point(s). Deploy (Tier cost), Move (1), Attack (2), then End Turn.`
+      : `Round ${round}: AI playing…`;
+
+    statusText.textContent = "";
+  }
+
+  function renderActions(){
+    const isP = (activeSide === "player");
+    actDeploy.disabled = !isP;
+    actMove.disabled = !isP || !selectedUnit || ap < COST_MOVE;
+    actAttack.disabled = !isP || !selectedUnit || ap < COST_ATTACK;
+
+    actDeploy.classList.toggle("active", mode==="deploy");
+    actMove.classList.toggle("active", mode==="move");
+    actAttack.classList.toggle("active", mode==="attack");
+  }
+
+  function renderAll(){
+    renderTop();
+    renderGrid();
+    renderHand();
+    renderCounts();
+    renderActions();
+  }
+
+  // ================== SETUP ==================
+  function populateSetupSelectors(){
+    const available = factions
+      .map(f => f.faction)
+      .filter(f => ["germany","allies"].includes(String(f).toLowerCase()));
+
+    playerFactionSel.innerHTML = "";
+    aiFactionSel.innerHTML = "";
+
+    for (const f of available){
+      const opt1 = document.createElement("option");
+      opt1.value = f;
+      opt1.textContent = titleCase(f);
+      playerFactionSel.appendChild(opt1);
+
+      const opt2 = document.createElement("option");
+      opt2.value = f;
+      opt2.textContent = titleCase(f);
+      aiFactionSel.appendChild(opt2);
     }
 
-    // --------- Init ----------
-    btnStart.addEventListener("click", startGame);
-    btnRestart.addEventListener("click", () => { resetToSetup(); });
+    if (available.includes("germany")) playerFactionSel.value = "germany";
+    if (available.includes("allies")) aiFactionSel.value = "allies";
+    if (playerFactionSel.value === aiFactionSel.value && available.length > 1){
+      aiFactionSel.value = available.find(x => x !== playerFactionSel.value);
+    }
+  }
 
-    (async function init(){
-      try{
-        const res = await fetch(DATA_URL, { cache: "no-store" });
-        if (!res.ok) throw new Error(`Failed to load tanks.json (${res.status})`);
-        data = await res.json();
-        factions = data.factions || [];
-        populateSetupSelectors();
-      }catch(err){
-        alert(err.message + "\n\nIf you opened this as file://, use a local server (python3 -m http.server).");
-      }
-    })();
-  </script>
+  function startGame(){
+    const pf = playerFactionSel.value;
+    const af = aiFactionSel.value;
+
+    const pBlock = factions.find(f => f.faction === pf);
+    const aBlock = factions.find(f => f.faction === af);
+
+    player = { side:"player", faction: pf, deck: makeDeck(pBlock.cards), hand: [] };
+    ai = { side:"ai", faction: af, deck: makeDeck(aBlock.cards), hand: [] };
+
+    drawToHand(player);
+    drawToHand(ai);
+
+    board = Array.from({length:4}, () => Array.from({length:4}, () => null));
+    UID = 0;
+
+    round = 1;
+    logEl.innerHTML = "";
+    log(`Game start: You = ${titleCase(pf)} vs AI = ${titleCase(af)}.`);
+    log(`Rules: Round N gives N points. Deploy costs Tier. Move=1, Attack=2.`, true);
+
+    elSetup.classList.add("hidden");
+    elGame.classList.remove("hidden");
+    btnRestart.classList.remove("hidden");
+    btnEndTurn.disabled = false;
+
+    beginTurn("player");
+  }
+
+  function resetToSetup(){
+    elGame.classList.add("hidden");
+    elSetup.classList.remove("hidden");
+    btnRestart.classList.add("hidden");
+    logEl.innerHTML = "";
+  }
+
+  btnStart.addEventListener("click", startGame);
+  btnRestart.addEventListener("click", resetToSetup);
+
+  // ================== INIT ==================
+  (async function init(){
+    try{
+      const res = await fetch(DATA_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error(`Failed to load tanks.json (${res.status})`);
+      const data = await res.json();
+      factions = data.factions || [];
+      populateSetupSelectors();
+    }catch(err){
+      alert(err.message + "\n\nIf you opened this as file://, use a local server (python3 -m http.server).");
+    }
+  })();
+</script>
 </body>
 </html>

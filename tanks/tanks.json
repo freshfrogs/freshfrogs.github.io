@@ -1,191 +1,206 @@
 {
-    "factions": [
-      {
-        "faction": "germany",
-        "cards": [
-          {
-            "id": "ger_ferdinand",
-            "name": "Ferdinand",
-            "image": "Germany/Ferdinand.png",
-            "stats": { "firepower": 7, "armor": 6, "mobility": 2, "accuracy": 4, "utility": 3, "hp": 13 },
-            "abilities": [
-              { "name": "Hulking Predator", "text": "Cannot attack after moving" },
-              { "name": "Superheavy Armor", "text": "+1 Armor damage resistance vs frontal attacks" },
-              { "name": "88mm Pak 43/2 L/70", "text": "Deal 4 damage vs Heavy Tanks" }
-            ]
-          },
-          {
-            "id": "ger_jagdpanther",
-            "name": "Jagdpanther",
-            "image": "Germany/Jagdpanther.png",
-            "stats": { "firepower": 5, "armor": 5, "mobility": 3, "accuracy": 4, "utility": 3, "hp": 11 },
-            "abilities": [
-              { "name": "Versatile Assault", "text": "+1 damage vs Medium and Heavy Tanks" },
-              { "name": "Flanking Tactics", "text": "Increase damage dealt by 2 when attacking Mobility 2 tank" },
-              { "name": "88mm Pak 43 L/71", "text": "Deal 3 damage vs targets with HP 5 or less" }
-            ]
-          },
-          {
-            "id": "ger_panther",
-            "name": "Panther",
-            "image": "Germany/Panther.png",
-            "stats": { "firepower": 5, "armor": 4, "mobility": 3, "accuracy": 4, "utility": 3, "hp": 9 },
-            "abilities": [
-              { "name": "Versatile Assault", "text": "+1 damage vs Medium and Heavy Tanks" },
-              { "name": "Flanking Tactics", "text": "Increase damage dealt by 2 when attacking Mobility 2 tank" },
-              { "name": "75mm KwK 42 L/70", "text": "Deal 2 damage vs targets with HP 5 or less" }
-            ]
-          },
-          {
-            "id": "ger_panzer_iii",
-            "name": "Panzer III",
-            "image": "Germany/PanzerIII.png",
-            "stats": { "firepower": 4, "armor": 4, "mobility": 3, "accuracy": 2, "utility": 3, "hp": 9 },
-            "abilities": [
-              { "name": "Low Profile", "text": "Increase damage dealt by 1 when in cover" },
-              { "name": "Rapid Response", "text": "If Mobility is 4, gain +1 Range" },
-              { "name": "Limited Ammo", "text": "Cannot increase Range beyond 2" }
-            ]
-          },
-          {
-            "id": "ger_panzer_iv",
-            "name": "Panzer IV",
-            "image": "Germany/PanzerIV.png",
-            "stats": { "firepower": 5, "armor": 5, "mobility": 3, "accuracy": 3, "utility": 3, "hp": 10 },
-            "abilities": [
-              { "name": "Versatile Assault", "text": "+1 damage vs Medium and Heavy Tanks" },
-              { "name": "Schürzen Armor", "text": "Reduce damage from Mobility 4+ tanks by 1" },
-              { "name": "Potent Shells", "text": "Deal 3 damage vs targets with HP 5 or less" }
-            ]
-          },
-          {
-            "id": "ger_pz_1c",
-            "name": "PZ 1C",
-            "image": "Germany/PZ1C.png",
-            "stats": { "firepower": 2, "armor": 2, "mobility": 5, "accuracy": 2, "utility": 3, "hp": 11 },
-            "abilities": [
-              { "name": "Versatile Assault", "text": "+1 damage vs Medium and Heavy Tanks" },
-              { "name": "Flanking Tactics", "text": "Increase damage dealt by 2 when attacking Mobility 2 tank" },
-              { "name": "88mm Pak 43 L/71", "text": "Deal 5 damage vs targets with HP 5 or less" }
-            ]
-          },
-          {
-            "id": "ger_tiger_i",
-            "name": "Tiger I",
-            "image": "Germany/TigerI.png",
-            "stats": { "firepower": 6, "armor": 5, "mobility": 2, "accuracy": 3, "utility": 3, "hp": 11 },
-            "abilities": [
-              { "name": "Peak Firepower", "text": "+1 damage vs targets with HP 6 or more" },
-              { "name": "Panzer Ace", "text": "On attack, roll a die: On 4+, ignore Armor" },
-              { "name": "Mechanical Strain", "text": "Move & attack: On a 1, lose 1 HP (HP 5 or less)" }
-            ]
-          },
-          {
-            "id": "ger_tiger_ii",
-            "name": "Tiger II (Königstiger)",
-            "image": "Germany/TigerII.png",
-            "stats": { "firepower": 6, "armor": 6, "mobility": 2, "accuracy": 4, "utility": 2, "hp": 12 },
-            "abilities": [
-              { "name": "Frontal Fortress", "text": "Reduce first frontal hit each turn by 2" },
-              { "name": "88mm KwK 43", "text": "+1 damage vs Heavy Tanks" },
-              { "name": "Mechanical Strain", "text": "Move & attack: On a 1, lose 1 Mobility" }
-            ]
-          }
-        ]
-      },
-      {
-        "faction": "allies",
-        "cards": [
-          {
-            "id": "all_chaffee",
-            "name": "Chaffee",
-            "image": "Allies/Chaffee.png",
-            "stats": { "firepower": 3, "armor": 3, "mobility": 4, "accuracy": 3, "utility": 3, "hp": 9 },
-            "abilities": [
-              { "name": "Speedy", "text": "Gain +1 Range and Mobility when not in cover" },
-              { "name": "Recon", "text": "Deal 2 damage vs unseen targets" },
-              { "name": "75mm M6 Gun", "text": "Increase attack range by 1" }
-            ]
-          },
-          {
-            "id": "all_churchill_i",
-            "name": "Churchill I",
-            "image": "Allies/Churchill1.png",
-            "stats": { "firepower": 4, "armor": 5, "mobility": 1, "accuracy": 2, "utility": 2, "hp": 12 },
-            "abilities": [
-              { "name": "Heavy Armor", "text": "-1 damage received from attacks" },
-              { "name": "6-Pounder", "text": "Increase attack range by 1; +2 damage vs Armored targets" },
-              { "name": "Infantry Support", "text": "Gain a Suppression from attacks by 1 when at Velocity 2 or less" }
-            ]
-          },
-          {
-            "id": "all_hellcat",
-            "name": "Hellcat",
-            "image": "Allies/Hellcat.png",
-            "stats": { "firepower": 4, "armor": 3, "mobility": 4, "accuracy": 3, "utility": 3, "hp": 9 },
-            "abilities": [
-              { "name": "Speedy", "text": "Gain +1 Range and Mobility when not in cover" },
-              { "name": "105mm T5E1", "text": "+1 damage vs Heavy Tanks" },
-              { "name": "Hunter", "text": "Gain cover bonus when attacking non-cover targets" }
-            ]
-          },
-          {
-            "id": "all_m3_lee",
-            "name": "M3 Lee",
-            "image": "Allies/M3Lee.png",
-            "stats": { "firepower": 4, "armor": 3, "mobility": 2, "accuracy": 3, "utility": 3, "hp": 11 },
-            "abilities": [
-              { "name": "Dual Weapons", "text": "37mm M5 & 75mm M2 can both attack each turn" },
-              { "name": "Multi-Gun Coordination", "text": "-1 damage while resolving two attacks" },
-              { "name": "Overwatch", "text": "Gain cover bonus when defending" }
-            ]
-          },
-          {
-            "id": "all_m4_sherman",
-            "name": "M4 Sherman",
-            "image": "Allies/M4Sherman.png",
-            "stats": { "firepower": 4, "armor": 4, "mobility": 3, "accuracy": 3, "utility": 3, "hp": 12 },
-            "abilities": [
-              { "name": "Coordinated Attack", "text": "Gain an extra attack die when hitting targets with Mobility 3 or less" },
-              { "name": "Gyrostabilizer", "text": "Gain +1 ATK against moving targets" },
-              { "name": "105mm Howitzer", "text": "Deal 3 damage vs targets with HP 5 or less" }
-            ]
-          },
-          {
-            "id": "all_m12_spg",
-            "name": "M12 SPG",
-            "image": "Allies/M12.png",
-            "stats": { "firepower": 6, "armor": 2, "mobility": 2, "accuracy": 2, "utility": 3, "hp": 10 },
-            "abilities": [
-              { "name": "Slow", "text": "Turn skipped after attacking" },
-              { "name": "155mm M1917", "text": "Increase attack range by 1; +2 damage vs cover" },
-              { "name": "Lumbering Giant", "text": "Receive +1 damage from Flanked and Side attacks" }
-            ]
-          },
-          {
-            "id": "all_matilda",
-            "name": "Matilda",
-            "image": "Allies/Matilda.png",
-            "stats": { "firepower": 3, "armor": 4, "mobility": 1, "accuracy": 2, "utility": 2, "hp": 13 },
-            "abilities": [
-              { "name": "Heavy Armor", "text": "-1 damage received from attacks" },
-              { "name": "85mm D-5T", "text": "Increase attack range by 1; +2 damage vs Armored targets" },
-              { "name": "Superior Defender", "text": "Gain an extra attack die when hitting targets with Mobility 3 or less" }
-            ]
-          },
-          {
-            "id": "all_t29",
-            "name": "T29",
-            "image": "Allies/T29.png",
-            "stats": { "firepower": 7, "armor": 6, "mobility": 2, "accuracy": 3, "utility": 3, "hp": 13 },
-            "abilities": [
-              { "name": "Frontal Fortress", "text": "Reduce first frontal hit each turn by 2" },
-              { "name": "105mm T5E1", "text": "+1 damage vs Heavy Tanks" },
-              { "name": "Overmatch", "text": "Ignore Frontal Fortress after the first attack" }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-  
+  "factions": [
+    {
+      "faction": "germany",
+      "cards": [
+        {
+          "id": "ger_ferdinand",
+          "name": "Ferdinand",
+          "tier": 5,
+          "image": "Germany/Ferdinand.png",
+          "stats": { "firepower": 7, "armor": 6, "mobility": 2, "accuracy": 4, "utility": 3, "hp": 13 },
+          "abilities": [
+            { "name": "Hulking Predator", "text": "Cannot attack after moving" },
+            { "name": "Superheavy Armor", "text": "+1 Armor damage resistance vs frontal attacks" },
+            { "name": "88mm Pak 43/2 L/70", "text": "Deal 4 damage vs Heavy Tanks" }
+          ]
+        },
+        {
+          "id": "ger_jagdpanther",
+          "name": "Jagdpanther",
+          "tier": 3,
+          "image": "Germany/Jagdpanther.png",
+          "stats": { "firepower": 5, "armor": 5, "mobility": 3, "accuracy": 4, "utility": 3, "hp": 11 },
+          "abilities": [
+            { "name": "Versatile Assault", "text": "+1 damage vs Medium and Heavy Tanks" },
+            { "name": "Flanking Tactics", "text": "Increase damage dealt by 2 when attacking Mobility 2 tank" },
+            { "name": "88mm Pak 43 L/71", "text": "Deal 3 damage vs targets with HP 5 or less" }
+          ]
+        },
+        {
+          "id": "ger_panther",
+          "name": "Panther",
+          "tier": 3,
+          "image": "Germany/Panther.png",
+          "stats": { "firepower": 5, "armor": 4, "mobility": 3, "accuracy": 4, "utility": 3, "hp": 9 },
+          "abilities": [
+            { "name": "Versatile Assault", "text": "+1 damage vs Medium and Heavy Tanks" },
+            { "name": "Flanking Tactics", "text": "Increase damage dealt by 2 when attacking Mobility 2 tank" },
+            { "name": "75mm KwK 42 L/70", "text": "Deal 2 damage vs targets with HP 5 or less" }
+          ]
+        },
+        {
+          "id": "ger_panzer_iii",
+          "name": "Panzer III",
+          "tier": 1,
+          "image": "Germany/PanzerIII.png",
+          "stats": { "firepower": 4, "armor": 4, "mobility": 3, "accuracy": 2, "utility": 3, "hp": 9 },
+          "abilities": [
+            { "name": "Low Profile", "text": "Increase damage dealt by 1 when in cover" },
+            { "name": "Rapid Response", "text": "If Mobility is 4, gain +1 Range" },
+            { "name": "Limited Ammo", "text": "Cannot increase Range beyond 2" }
+          ]
+        },
+        {
+          "id": "ger_panzer_iv",
+          "name": "Panzer IV",
+          "tier": 2,
+          "image": "Germany/PanzerIV.png",
+          "stats": { "firepower": 5, "armor": 5, "mobility": 3, "accuracy": 3, "utility": 3, "hp": 10 },
+          "abilities": [
+            { "name": "Versatile Assault", "text": "+1 damage vs Medium and Heavy Tanks" },
+            { "name": "Schürzen Armor", "text": "Reduce damage from Mobility 4+ tanks by 1" },
+            { "name": "Potent Shells", "text": "Deal 3 damage vs targets with HP 5 or less" }
+          ]
+        },
+        {
+          "id": "ger_pz_1c",
+          "name": "PZ 1C",
+          "tier": 1,
+          "image": "Germany/PZ1C.png",
+          "stats": { "firepower": 2, "armor": 2, "mobility": 5, "accuracy": 2, "utility": 3, "hp": 11 },
+          "abilities": [
+            { "name": "Versatile Assault", "text": "+1 damage vs Medium and Heavy Tanks" },
+            { "name": "Flanking Tactics", "text": "Increase damage dealt by 2 when attacking Mobility 2 tank" },
+            { "name": "88mm Pak 43 L/71", "text": "Deal 5 damage vs targets with HP 5 or less" }
+          ]
+        },
+        {
+          "id": "ger_tiger_i",
+          "name": "Tiger I",
+          "tier": 4,
+          "image": "Germany/TigerI.png",
+          "stats": { "firepower": 6, "armor": 5, "mobility": 2, "accuracy": 3, "utility": 3, "hp": 11 },
+          "abilities": [
+            { "name": "Peak Firepower", "text": "+1 damage vs targets with HP 6 or more" },
+            { "name": "Panzer Ace", "text": "On attack, roll a die: On 4+, ignore Armor" },
+            { "name": "Mechanical Strain", "text": "Move & attack: On a 1, lose 1 HP (HP 5 or less)" }
+          ]
+        },
+        {
+          "id": "ger_tiger_ii",
+          "name": "Tiger II (Königstiger)",
+          "tier": 5,
+          "image": "Germany/TigerII.png",
+          "stats": { "firepower": 6, "armor": 6, "mobility": 2, "accuracy": 4, "utility": 2, "hp": 12 },
+          "abilities": [
+            { "name": "Frontal Fortress", "text": "Reduce first frontal hit each turn by 2" },
+            { "name": "88mm KwK 43", "text": "+1 damage vs Heavy Tanks" },
+            { "name": "Mechanical Strain", "text": "Move & attack: On a 1, lose 1 Mobility" }
+          ]
+        }
+      ]
+    },
+    {
+      "faction": "allies",
+      "cards": [
+        {
+          "id": "all_chaffee",
+          "name": "Chaffee",
+          "tier": 1,
+          "image": "Allies/Chaffee.png",
+          "stats": { "firepower": 3, "armor": 3, "mobility": 4, "accuracy": 3, "utility": 3, "hp": 9 },
+          "abilities": [
+            { "name": "Speedy", "text": "Gain +1 Range and Mobility when not in cover" },
+            { "name": "Recon", "text": "Deal 2 damage vs unseen targets" },
+            { "name": "75mm M6 Gun", "text": "Increase attack range by 1" }
+          ]
+        },
+        {
+          "id": "all_churchill_i",
+          "name": "Churchill I",
+          "tier": 3,
+          "image": "Allies/Churchill1.png",
+          "stats": { "firepower": 4, "armor": 5, "mobility": 1, "accuracy": 2, "utility": 2, "hp": 12 },
+          "abilities": [
+            { "name": "Heavy Armor", "text": "-1 damage received from attacks" },
+            { "name": "6-Pounder", "text": "Increase attack range by 1; +2 damage vs Armored targets" },
+            { "name": "Infantry Support", "text": "Gain a Suppression from attacks by 1 when at Velocity 2 or less" }
+          ]
+        },
+        {
+          "id": "all_hellcat",
+          "name": "Hellcat",
+          "tier": 2,
+          "image": "Allies/Hellcat.png",
+          "stats": { "firepower": 4, "armor": 3, "mobility": 4, "accuracy": 3, "utility": 3, "hp": 9 },
+          "abilities": [
+            { "name": "Speedy", "text": "Gain +1 Range and Mobility when not in cover" },
+            { "name": "105mm T5E1", "text": "+1 damage vs Heavy Tanks" },
+            { "name": "Hunter", "text": "Gain cover bonus when attacking non-cover targets" }
+          ]
+        },
+        {
+          "id": "all_m3_lee",
+          "name": "M3 Lee",
+          "tier": 2,
+          "image": "Allies/M3Lee.png",
+          "stats": { "firepower": 4, "armor": 3, "mobility": 2, "accuracy": 3, "utility": 3, "hp": 11 },
+          "abilities": [
+            { "name": "Dual Weapons", "text": "37mm M5 & 75mm M2 can both attack each turn" },
+            { "name": "Multi-Gun Coordination", "text": "-1 damage while resolving two attacks" },
+            { "name": "Overwatch", "text": "Gain cover bonus when defending" }
+          ]
+        },
+        {
+          "id": "all_m4_sherman",
+          "name": "M4 Sherman",
+          "tier": 3,
+          "image": "Allies/M4Sherman.png",
+          "stats": { "firepower": 4, "armor": 4, "mobility": 3, "accuracy": 3, "utility": 3, "hp": 12 },
+          "abilities": [
+            { "name": "Coordinated Attack", "text": "Gain an extra attack die when hitting targets with Mobility 3 or less" },
+            { "name": "Gyrostabilizer", "text": "Gain +1 ATK against moving targets" },
+            { "name": "105mm Howitzer", "text": "Deal 3 damage vs targets with HP 5 or less" }
+          ]
+        },
+        {
+          "id": "all_m12_spg",
+          "name": "M12 SPG",
+          "tier": 4,
+          "image": "Allies/M12.png",
+          "stats": { "firepower": 6, "armor": 2, "mobility": 2, "accuracy": 2, "utility": 3, "hp": 10 },
+          "abilities": [
+            { "name": "Slow", "text": "Turn skipped after attacking" },
+            { "name": "155mm M1917", "text": "Increase attack range by 1; +2 damage vs cover" },
+            { "name": "Lumbering Giant", "text": "Receive +1 damage from Flanked and Side attacks" }
+          ]
+        },
+        {
+          "id": "all_matilda",
+          "name": "Matilda",
+          "tier": 2,
+          "image": "Allies/Matilda.png",
+          "stats": { "firepower": 3, "armor": 4, "mobility": 1, "accuracy": 2, "utility": 2, "hp": 13 },
+          "abilities": [
+            { "name": "Heavy Armor", "text": "-1 damage received from attacks" },
+            { "name": "85mm D-5T", "text": "Increase attack range by 1; +2 damage vs Armored targets" },
+            { "name": "Superior Defender", "text": "Gain an extra attack die when hitting targets with Mobility 3 or less" }
+          ]
+        },
+        {
+          "id": "all_t29",
+          "name": "T29",
+          "tier": 5,
+          "image": "Allies/T29.png",
+          "stats": { "firepower": 7, "armor": 6, "mobility": 2, "accuracy": 3, "utility": 3, "hp": 13 },
+          "abilities": [
+            { "name": "Frontal Fortress", "text": "Reduce first frontal hit each turn by 2" },
+            { "name": "105mm T5E1", "text": "+1 damage vs Heavy Tanks" },
+            { "name": "Overmatch", "text": "Ignore Frontal Fortress after the first attack" }
+          ]
+        }
+      ]
+    }
+  ]
+}
