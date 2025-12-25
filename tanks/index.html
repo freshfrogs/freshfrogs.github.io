@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tankers — Action Points Prototype</title>
+  <title>Tankers — Action Points (Tier Costs)</title>
   <style>
     :root{
       --bg:#0c0f14;
@@ -235,6 +235,7 @@
       gap:8px;
       align-items:center;
     }
+
     .pill{
       display:inline-flex;
       align-items:center;
@@ -308,6 +309,7 @@
       box-shadow: 0 0 0 3px rgba(247,195,74,.12);
     }
     .actionBtn:disabled{opacity:.45; cursor:not-allowed}
+
     .log{
       border:1px solid var(--line);
       background: rgba(0,0,0,.18);
@@ -336,7 +338,7 @@
       <div class="brand">
         <span style="font-size:18px;">🪖</span>
         <span>Tankers</span>
-        <span class="badge">Action Points</span>
+        <span class="badge">AP + Tier Costs</span>
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <button class="btn hidden" id="btnRestart">Restart</button>
@@ -350,7 +352,7 @@
     <div id="setup" class="setup">
       <h2>Start Game</h2>
       <p>
-        Option 2 (AP): Each round your points = round number (1,2,3...). Deploy cost = tank Tier (Tier 1 costs 1, Tier 2 costs 2...).
+        Each round you get points equal to the round number (1, 2, 3...). Deploy cost = <b>Tier</b> from <code>tanks.json</code>.
         Move costs 1 per tile. Attack costs 2.
       </p>
       <div class="setupRow">
@@ -392,7 +394,7 @@
           <div class="handRow" id="aiHand"></div>
 
           <div class="handTitle" style="margin-top:6px;">
-            <div>Your hand (deploy costs tier points)</div>
+            <div>Your hand (Tier = cost)</div>
             <div id="playerCount" class="muted"></div>
           </div>
           <div class="handRow" id="playerHand"></div>
@@ -416,7 +418,7 @@
           <div class="kv"><span>Opponent</span><b id="aiLabel">—</b></div>
           <div class="kv"><span>Selection</span><b id="selLabel">None</b></div>
 
-          <div class="actions" id="actionBar">
+          <div class="actions">
             <button class="actionBtn" id="actDeploy">Deploy (Tier)</button>
             <button class="actionBtn" id="actMove">Move (1)</button>
             <button class="actionBtn" id="actAttack">Attack (2)</button>
@@ -426,7 +428,7 @@
           <div class="log" id="log"></div>
 
           <div class="note">
-            Angle rules: <b>Side</b> = armor −1, <b>Flanked</b> = armor −2. Damage is calculated per attack.
+            Angle rules: <b>Side</b> = armor −1, <b>Flanked</b> = armor −2.
           </div>
         </div>
       </div>
@@ -453,9 +455,9 @@
   let board = null;
   let UID = 0;
 
-  let round = 1;            // your described "round one = 1 point"
-  let activeSide = "player"; // "player" or "ai"
-  let ap = 0;               // points remaining for active side
+  let round = 1;
+  let activeSide = "player"; // "player" | "ai"
+  let ap = 0;
 
   // selection
   let selectedHandIndex = null; // for deploy
@@ -543,31 +545,23 @@
     return n;
   }
 
-  // ================== TIER / COST ==================
-  // Uses card.tier if present. Otherwise derives a tier (1..5) from stats.
-  function deriveTier(card){
-    if (card.tier != null) return clampTier(Number(card.tier));
-    const s = card.stats || {};
-    const fp = Number(s.firepower ?? 0);
-    const ar = Number(s.armor ?? 0);
-    const hp = Number(s.hp ?? 0);
-    const mo = Number(s.mobility ?? 0);
-    const ac = Number(s.accuracy ?? 0);
-    const ut = Number(s.utility ?? 0);
-
-    // quick heuristic: power score -> tier
-    const score = fp + ar + (hp/2) + mo + ac + (ut/2);
-    const t = Math.round(score / 6); // tuned for your current stat ranges
-    return clampTier(t);
-  }
-
+  // ================== TIER / COST (FROM JSON) ==================
   function clampTier(t){
     if (!Number.isFinite(t)) return 1;
-    return Math.max(1, Math.min(5, t));
+    return Math.max(1, Math.min(9, t)); // allow >5 later if you want
+  }
+
+  function deriveTier(card){
+    const raw = Number(card?.tier);
+    if (!Number.isFinite(raw)){
+      console.warn("Missing tier on card:", card?.id, card?.name);
+      return 1;
+    }
+    return clampTier(raw);
   }
 
   function costToDeploy(card){
-    return deriveTier(card);
+    return deriveTier(card); // Tier = cost
   }
 
   // ================== ANGLES / DAMAGE ==================
@@ -622,8 +616,7 @@
   }
 
   // ================== TARGETING ==================
-  // For attack mode, attacker can shoot "forward" within range:
-  // same column and adjacent columns at each step.
+  // Forward within Accuracy range; check same column then adjacent columns.
   function getAttackableTargets(attackerPos){
     const attacker = board[attackerPos.r][attackerPos.c];
     if (!attacker) return [];
@@ -656,10 +649,7 @@
 
     const dests = [];
     const dirs = [
-      {dr:-1,dc:0},
-      {dr:+1,dc:0},
-      {dr:0,dc:-1},
-      {dr:0,dc:+1},
+      {dr:-1,dc:0},{dr:+1,dc:0},{dr:0,dc:-1},{dr:0,dc:+1},
     ];
     for (const d of dirs){
       const rr = unitPos.r + d.dr;
@@ -693,17 +683,14 @@
     const cost = costToDeploy(card);
     if (ap < cost) return { ok:false, reason:`Not enough points (need ${cost}).` };
 
-    // spend
     ap -= cost;
-
-    // remove card
     const played = who.hand.splice(handIndex, 1)[0];
 
     board[row][col] = {
       uid: ++UID,
       side,
       card: played,
-      hp: played.stats.hp,
+      hp: Number(played.stats.hp ?? 1),
       movedThisTurn: 0
     };
 
@@ -747,7 +734,6 @@
     if (target.side === activeSide) return false;
     if (ap < COST_ATTACK) return false;
 
-    // validate target is in attackable list
     const legal = getAttackableTargets(attackerPos).some(p => p.r===targetPos.r && p.c===targetPos.c);
     if (!legal) return false;
 
@@ -765,18 +751,14 @@
       log(`${titleCase(target.side)} ${target.card.name} is destroyed!`);
       board[targetPos.r][targetPos.c] = null;
     }
-
     return true;
   }
 
   // ================== TURN FLOW ==================
   function beginTurn(side){
     activeSide = side;
-
-    // round points only apply to PLAYER turns as you described, but AI should mirror for balance
     ap = round;
 
-    // reset moved counters for that side
     for (let r=0;r<4;r++) for (let c=0;c<4;c++){
       const u = board[r][c];
       if (u && u.side === side) u.movedThisTurn = 0;
@@ -786,26 +768,19 @@
     mode = "deploy";
     renderAll();
 
-    if (side === "player"){
-      log(`— Round ${round}: Your turn (${ap} points).`, true);
-    } else {
-      log(`— Round ${round}: AI turn (${ap} points).`, true);
-    }
+    log(`— Round ${round}: ${side === "player" ? "Your" : "AI"} turn (${ap} points).`, true);
   }
 
   function endTurn(){
-    // draw at end of side turn
     if (activeSide === "player") drawToHand(player);
     else drawToHand(ai);
 
     if (checkEnd()) return;
 
     if (activeSide === "player"){
-      // AI turn next
       beginTurn("ai");
       window.setTimeout(aiTurn, 450);
     } else {
-      // next round starts for player
       round += 1;
       beginTurn("player");
     }
@@ -838,10 +813,9 @@
   function aiTurn(){
     if (activeSide !== "ai") return;
 
-    // 1) Deploy as many as possible
-    let safety = 40;
+    // 1) Deploy as many as possible, cheapest-first
+    let safety = 50;
     while (ap > 0 && ai.hand.length > 0 && safety-- > 0){
-      // pick cheapest card we can afford
       const affordable = ai.hand
         .map((card, idx) => ({card, idx, cost: costToDeploy(card)}))
         .filter(x => x.cost <= ap);
@@ -849,7 +823,6 @@
       if (!affordable.length) break;
       affordable.sort((a,b)=>a.cost-b.cost);
 
-      // try to place it in a random non-full column
       const choice = affordable[0];
       const cols = shuffle([0,1,2,3]);
       let placed = false;
@@ -861,9 +834,9 @@
       if (!placed) break;
     }
 
-    // 2) Attack with any unit if possible (cost 2)
+    // 2) Attack while possible (cost 2)
     let attacked = true;
-    let attackSafety = 40;
+    let attackSafety = 60;
     while (ap >= COST_ATTACK && attacked && attackSafety-- > 0){
       attacked = false;
 
@@ -875,7 +848,7 @@
           const targets = getAttackableTargets({r,c});
           if (!targets.length) continue;
 
-          // prioritize targets with lowest hp
+          // prefer lowest HP target
           targets.sort((p1,p2)=>{
             const t1 = board[p1.r][p1.c]; const t2 = board[p2.r][p2.c];
             return (t1?.hp ?? 999) - (t2?.hp ?? 999);
@@ -889,13 +862,11 @@
       }
     }
 
-    // 3) Move forward if points remain
-    let moveSafety = 40;
+    // 3) Spend remaining points moving forward (down) if space
+    let moveSafety = 60;
     while (ap >= COST_MOVE && moveSafety-- > 0){
       let moved = false;
 
-      // try to move units toward player (down)
-      // prefer units closer to top first
       for (let r=3; r>=0 && !moved; r--){
         for (let c=0; c<4 && !moved; c++){
           const u = board[r][c];
@@ -937,14 +908,12 @@
 
   function onClickCell(r,c){
     if (activeSide !== "player") return;
-
     const cellUnit = board[r][c];
 
-    // DEPLOY MODE: select hand card then click empty tile in a column to deploy (drops to nearest slot)
+    // DEPLOY: select hand card then click any tile in desired column
     if (mode === "deploy"){
       if (selectedHandIndex === null) return;
 
-      // deploy based on clicked column (any row click -> same column)
       const col = c;
       const card = player.hand[selectedHandIndex];
       const cost = costToDeploy(card);
@@ -977,11 +946,12 @@
       return;
     }
 
-    // MOVE MODE: if selected unit, click green destination
+    // MOVE: click green destination
     if (mode === "move" && selectedUnit){
       const dests = getMoveDestinations(selectedUnit);
       const legal = dests.some(p => p.r===r && p.c===c);
       if (!legal) return;
+
       const ok = doMove(selectedUnit, {r,c});
       if (ok){
         selectedUnit = {r,c};
@@ -991,16 +961,15 @@
       return;
     }
 
-    // ATTACK MODE: if selected unit, click red enemy target
+    // ATTACK: click red enemy target
     if (mode === "attack" && selectedUnit){
       if (!cellUnit || cellUnit.side !== "ai") return;
       const targets = getAttackableTargets(selectedUnit);
       const legal = targets.some(p => p.r===r && p.c===c);
       if (!legal) return;
+
       const ok = doAttack(selectedUnit, {r,c});
-      if (ok){
-        renderAll();
-      }
+      if (ok) renderAll();
       return;
     }
   }
@@ -1015,7 +984,6 @@
   function renderGrid(){
     gridEl.innerHTML = "";
 
-    // compute highlights
     const moveDests = (activeSide==="player" && mode==="move" && selectedUnit) ? getMoveDestinations(selectedUnit) : [];
     const atkTargets = (activeSide==="player" && mode==="attack" && selectedUnit) ? getAttackableTargets(selectedUnit) : [];
 
@@ -1025,16 +993,9 @@
         const cell = document.createElement("div");
         cell.className = "cell" + (u ? "" : " empty");
 
-        // selection highlight
-        if (selectedUnit && selectedUnit.r===r && selectedUnit.c===c){
-          cell.classList.add("hilite");
-        }
-        if (moveDests.some(p=>p.r===r && p.c===c)){
-          cell.classList.add("move");
-        }
-        if (atkTargets.some(p=>p.r===r && p.c===c)){
-          cell.classList.add("target");
-        }
+        if (selectedUnit && selectedUnit.r===r && selectedUnit.c===c) cell.classList.add("hilite");
+        if (moveDests.some(p=>p.r===r && p.c===c)) cell.classList.add("move");
+        if (atkTargets.some(p=>p.r===r && p.c===c)) cell.classList.add("target");
 
         cell.onclick = () => onClickCell(r,c);
 
@@ -1052,14 +1013,14 @@
           side.className = "sideMark";
           side.textContent = (u.side==="player") ? "YOU" : "AI";
 
-          const t = deriveTier(u.card);
+          const tier = deriveTier(u.card);
           const mob = Number(u.card.stats.mobility ?? 0);
           const acc = Number(u.card.stats.accuracy ?? 0);
           const moved = u.movedThisTurn ?? 0;
 
           const bottom = document.createElement("div");
           bottom.className = "tagBottom";
-          bottom.textContent = `T${t} • MOB ${mob} (${moved}/${mob}) • ACC ${acc}`;
+          bottom.textContent = `T${tier} • MOB ${mob} (${moved}/${mob}) • ACC ${acc}`;
 
           cell.appendChild(img);
           cell.appendChild(hp);
@@ -1082,11 +1043,12 @@
       aiHandEl.appendChild(div);
     }
 
+    // Player hand face up with tier/cost
     playerHandEl.innerHTML = "";
     for (let i=0;i<player.hand.length;i++){
       const card = player.hand[i];
-      const cost = costToDeploy(card);
       const tier = deriveTier(card);
+      const cost = costToDeploy(card);
 
       const div = document.createElement("div");
       div.className = "handCard" + (selectedHandIndex===i ? " selected" : "");
@@ -1096,11 +1058,12 @@
       `;
       div.onclick = () => {
         if (activeSide !== "player") return;
-        // selecting a hand card automatically puts you in deploy mode
         setMode("deploy");
         selectedUnit = null;
         selectedHandIndex = (selectedHandIndex === i) ? null : i;
-        selLabel.textContent = selectedHandIndex===null ? "None" : `${player.hand[selectedHandIndex].name} (Deploy cost ${costToDeploy(player.hand[selectedHandIndex])})`;
+        selLabel.textContent = selectedHandIndex===null
+          ? "None"
+          : `${player.hand[selectedHandIndex].name} (Tier ${deriveTier(player.hand[selectedHandIndex])}, cost ${costToDeploy(player.hand[selectedHandIndex])})`;
         renderAll();
       };
       playerHandEl.appendChild(div);
@@ -1150,9 +1113,7 @@
 
   // ================== SETUP ==================
   function populateSetupSelectors(){
-    const available = factions
-      .map(f => f.faction)
-      .filter(f => ["germany","allies"].includes(String(f).toLowerCase()));
+    const available = factions.map(f => f.faction);
 
     playerFactionSel.innerHTML = "";
     aiFactionSel.innerHTML = "";
@@ -1169,10 +1130,11 @@
       aiFactionSel.appendChild(opt2);
     }
 
+    // default to germany vs allies if present
     if (available.includes("germany")) playerFactionSel.value = "germany";
     if (available.includes("allies")) aiFactionSel.value = "allies";
     if (playerFactionSel.value === aiFactionSel.value && available.length > 1){
-      aiFactionSel.value = available.find(x => x !== playerFactionSel.value);
+      aiFactionSel.value = available.find(x => x !== playerFactionSel.value) || available[0];
     }
   }
 
@@ -1182,6 +1144,11 @@
 
     const pBlock = factions.find(f => f.faction === pf);
     const aBlock = factions.find(f => f.faction === af);
+
+    if (!pBlock || !aBlock) {
+      alert("Missing faction data in tanks.json.");
+      return;
+    }
 
     player = { side:"player", faction: pf, deck: makeDeck(pBlock.cards), hand: [] };
     ai = { side:"ai", faction: af, deck: makeDeck(aBlock.cards), hand: [] };
@@ -1195,7 +1162,7 @@
     round = 1;
     logEl.innerHTML = "";
     log(`Game start: You = ${titleCase(pf)} vs AI = ${titleCase(af)}.`);
-    log(`Rules: Round N gives N points. Deploy costs Tier. Move=1, Attack=2.`, true);
+    log(`Rules: Round N gives N points. Deploy costs Tier (from JSON). Move=1, Attack=2.`, true);
 
     elSetup.classList.add("hidden");
     elGame.classList.remove("hidden");
