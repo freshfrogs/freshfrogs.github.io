@@ -1,5 +1,9 @@
-/* BASIC RESET */
+/* ============================================
+   Fresh Frogs - Modern Glass Design
+   Preserves all functionality, updates visuals
+   ============================================ */
 
+/* BASIC RESET */
 *,
 *::before,
 *::after {
@@ -8,115 +12,113 @@
 
 body {
   margin: 0;
-  font-family: monospace;
-  background: #7cc1ff;
-  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #1a1a1a;
+  min-height: 100vh;
 }
 
 a {
   color: inherit;
+  text-decoration: none;
 }
 
 /* PAGE WRAPPER */
-
 .page {
   min-height: 100vh;
-  max-width: 1120px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem 2rem;
+  padding: 0 20px 40px;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
-/* HEADER */
-
+/* HEADER - Glass Morphism */
 .site-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: 1.25rem 0 0.75rem;
-  top: 0;
-  z-index: 20;
-  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 20px 30px;
+  margin: 20px 0 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 20px;
+  z-index: 50;
 }
 
 .logo {
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  padding: 0.35rem 0.75rem;
+  color: white;
+  letter-spacing: -0.5px;
 }
 
 .nav {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
-  font-size: 0.9rem;
+  justify-content: space-between;
+  gap: 16px;
 }
 
-/* Make hero links look just like nav links */
-.nav a,
-.hero-actions a {
-    color: inherit;
-    text-decoration: none;
-    padding: 0.2rem 0;
-    position: relative;
-    margin: 8px;
-    border-bottom: 0px solid white;
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 30px;
 }
 
-.nav a::after,
-.hero-actions a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -0.25rem;
-  width: 0%;
-  height: 2px;
-  background: linear-gradient(to right, #22c55e, #22d3ee);
-  transition: width 160ms ease-out;
+.nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 15px;
 }
 
 .nav a:hover,
-.hero-actions a:hover {
-  color: darkcyan;
+.nav a.active {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.nav a:hover::after,
-.hero-actions a:hover::after {
-  width: 80%;
+.nav a::after {
+  display: none; /* Remove old underline effect */
 }
 
-.cta-btn {
-  padding: 0.55rem 1.2rem;
-  border-radius: 5px;
-  border: none;
-  color: #022c22;
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  white-space: nowrap;
-  background: royalblue;
-  color: white;
-}
-
-.cta-btn:hover {
-  filter: brightness(1.05);
-}
-
-/* HERO – TEMPLATE 4 (CENTERED) */
-
+/* HERO SECTION */
 .hero {
-  max-width: 720px;
-  margin: 2.4rem auto 1.8rem;
-  padding: 2.2rem 1.8rem 2.1rem;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  justify-items: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 30px;
+  padding: 60px 40px;
+  margin-bottom: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   text-align: center;
-  row-gap: 1.6rem;
+}
+
+.hero-media {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.fly {
+  width: 120px;
+  height: 120px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  image-rendering: pixelated;
+  margin: 0;
+}
+
+.fly:hover {
+  transform: translateY(-10px) scale(1.05);
 }
 
 .hero-main {
@@ -127,204 +129,148 @@ a {
 }
 
 .hero-title {
+  font-size: 48px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   line-height: 1.1;
-  text-shadow: 2px 2px darkslateblue;
+  text-shadow: none;
 }
 
 .hero-subtitle {
-  color: inherit;
-  max-width: 36rem;
-  font-size: 1.1em;
+  font-size: 18px;
+  color: #666;
+  line-height: 1.6;
+  max-width: 700px;
+  margin: 0 auto 30px;
 }
 
 .hero-actions {
   display: flex;
+  gap: 15px;
+  justify-content: center;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.8rem;
 }
 
-.hero-media {
-  width: 100%;
-  max-width: 420px;
-  display: flex;
-  justify-content: center;
+.hero-actions a {
+  padding: 14px 32px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  margin: 0;
 }
 
-.hero-placeholder {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  border-radius: 18px;
-  background: radial-gradient(
-      circle at top left,
-      rgba(74, 222, 128, 0.18),
-      transparent 55%
-    ),
-    radial-gradient(
-      circle at bottom right,
-      rgba(56, 189, 248, 0.18),
-      transparent 55%
-    ),
-    #020617;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-  color: #9ca3af;
+.hero-actions a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 /* BUTTONS */
-
-.btn {
-  border-radius: 999px;
-  padding: 0.65rem 1.4rem;
-  font-size: 0.92rem;
-  border: 1px solid transparent;
+.btn,
+.cta-btn,
+.wallet-btn,
+.connect-btn {
+  padding: 14px 32px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
-  font-weight: 500;
-  transition:
-    background 200ms ease-out,
-    color 200ms ease-out,
-    border-color 200ms ease-out,
-    transform 140ms ease-out;
+  transition: all 0.3s ease;
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
-.btn.primary {  
-  padding: 0.55rem 1.2rem;
-  border-radius: 0px;
-  border: none;
-  color: #022c22;
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  white-space: nowrap;
-  background: #2081e2;
+.btn:hover,
+.cta-btn:hover,
+.wallet-btn:hover,
+.connect-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  box-shadow: 2px 2px darkslateblue;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  border-radius: 12px;
+  padding: 14px 32px;
 }
 
 .btn.secondary {
-  padding: 0.55rem 1.2rem;
-  border-radius: 0px;
-  border: none;
-  color: #022c22;
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  white-space: nowrap;
-  background: lightcoral;
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  box-shadow: none;
+}
+
+.btn.secondary:hover {
+  background: #667eea;
   color: white;
-  box-shadow: 2px 2px darkslateblue;
 }
 
-.btn:hover {
-  transform: translateY(-1px);
-}
-
-/* MAIN – DASHBOARD LAYOUT */
-/* Single column layout: all panels full-width, stacked vertically */
-
+/* MAIN DASHBOARD LAYOUT */
 .dashboard-main {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
-  padding: 0.6rem 0 1.6rem;
-  max-width: 1120px;
+  gap: 40px;
+  padding: 0;
+  max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
 }
 
-.panel {
-  background: lightseagreen;
-  border: 0px solid white;
-  padding: 1.2rem 1.3rem 1.3rem;
-  box-shadow: 2px 2px darkslateblue;
-  border-radius: 0px;
+.panel,
+.dashboard-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 30px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: none;
 }
 
 .panel h2 {
-  font-size: 1rem;
+  font-size: 32px;
+  font-weight: 700;
   margin-top: 0;
-  margin-bottom: 0.4rem;
-  color: white;
-  text-shadow: 2px 2px darkslateblue;
+  margin-bottom: 10px;
+  color: #1a1a1a;
+  text-shadow: none;
 }
 
 .panel p {
-  margin: 0;
-  color: white;
-  font-size: 1em;
+  margin: 0 0 30px;
+  color: #666;
+  font-size: 16px;
 }
 
-/* FOOTER */
-
-.site-footer {
-  padding-top: 0.8rem;
-  border-top: 1px solid white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.8rem;
-  color: white;
+.dashboard-note {
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 14px;
 }
 
-.footer-links {
-  display: flex;
-  gap: 0.8rem;
-}
-
-.footer-links a {
-  color: white;
-  text-decoration: none;
-}
-
-/* RESPONSIVE HEADER + HERO */
-
-@media (max-width: 768px) {
-  .site-header {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 0.9rem;
-  }
-
-  .nav {
-    flex: 1 1 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .hero {
-    margin-top: 1.8rem;
-    padding: 1.8rem 1.4rem 1.8rem;
-  }
-
-  .hero-placeholder {
-    max-width: 100%;
-  }
-}
-
-/* FROG IMAGES */
-
-.fly {
-  width: 128px;
-  height: 128px;
-  margin: 8px;
-  box-shadow: 2px 2px darkslateblue;
-  image-rendering: pixelated;
-}
-
-/* SHARED GRID LAYOUT FOR ALL FROG LISTS
-   (recent sales, mints, pond, owned, staked, rarity) */
-
+/* GRID LAYOUTS */
 .recent_sales,
 .nft-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 25px;
   width: 100%;
-  margin: 0 auto 2rem;
+  margin: 0 auto 20px;
 }
 
 @media (max-width: 960px) {
@@ -341,99 +287,110 @@ a {
   }
 }
 
-/* FROG CARD (used everywhere: owned, staked, sales, mints, pond, rarity) */
+/* FROG CARD */
+.recent_sale_card {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+  align-self: flex-start;
+}
+
+.recent_sale_card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
 
 .sale_card_title {
   float: left;
   margin-left: 4px;
-  color: lightgreen;
-  text-shadow: 2px 2px darkslateblue;
+  color: #667eea;
+  font-weight: 600;
+  text-shadow: none;
 }
 
 .sale_card_price {
   float: right;
   margin-right: 4px;
+  color: #1a1a1a;
+  font-weight: 600;
 }
 
 .recent_sale_header {
   text-align: left;
   margin: 8px;
   height: 16px;
+  padding: 12px;
 }
 
-.frog_img {
-  height: 128px;
-  width: 128px;
-  image-rendering: pixelated;
-}
-
-.recent_sale_img {
-  height: 128px;
-  width: 128px;
-  image-rendering: pixelated;
-}
-
-.recent_sale_properties {
-  border-top: 1px solid white;
-  padding: 8px;
-  margin: 8px;
-  color: lightseagreen;
-  margin-bottom: 0px;
-  font-size: 0.9em;
-}
-
-.recent_sale_properties p {
-  margin: 2px;
-  text-align: left;
-  color: white;
-  font-size: 1em;
-}
-
-.recent_sale_traits {
-}
-
-/* Layered frog container (used by ethereum-dapp.js helpers) */
-
+/* FROG IMAGE CONTAINER */
 .frog_img_cont {
   position: relative;
-  margin: 24px auto;
-  width: 128px;
-  height: 128px;
+  margin: 0;
+  width: 100%;
+  aspect-ratio: 1;
   overflow: hidden;
-  border-radius: 0px;
-  box-shadow: 2px 2px darkslateblue;
-  background-color: #020617;
+  border-radius: 0;
+  box-shadow: none;
+  background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
   background-repeat: no-repeat;
   background-size: 220% 220%;
   background-position: bottom right;
 }
 
-/* Attribute layers (built by build_trait) */
+.frog_img,
+.recent_sale_img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
 
+/* FROG TRAITS */
+.recent_sale_traits {
+  padding: 20px;
+}
+
+.recent_sale_properties {
+  border-top: 1px solid #f0f0f0;
+  padding: 12px 0 0;
+  margin: 12px 0 0;
+  color: #1a1a1a;
+  font-size: 14px;
+}
+
+.recent_sale_properties p {
+  margin: 8px 0;
+  text-align: left;
+  color: #666;
+  font-size: 14px;
+}
+
+/* ATTRIBUTE LAYERS */
 .trait_overlay,
 .attribute_overlay {
   position: absolute;
   left: 0;
   top: 0;
-  width: 128px;
-  height: 128px;
+  width: 100%;
+  height: 100%;
   image-rendering: pixelated;
   pointer-events: auto;
-  transition:
-    transform 160ms ease-out,
-    box-shadow 160ms ease-out,
-    filter 160ms ease-out;
+  transition: transform 160ms ease-out, box-shadow 160ms ease-out, filter 160ms ease-out;
 }
 
 .trait_overlay:hover,
 .attribute_overlay:hover {
   transform: translateY(-3px) scale(1.08);
-  box-shadow: 0 0 8px rgba(125, 211, 252, 0.7);
+  box-shadow: 0 0 8px rgba(102, 126, 234, 0.7);
   filter: brightness(1.1);
   z-index: 5;
 }
-
-/* Trait list text in the card */
 
 .frog-attr-text {
   cursor: default;
@@ -441,215 +398,140 @@ a {
 }
 
 .frog-attr-text.is-highlighted {
-  color: #7dd3fc;
-  text-shadow: 0 0 4px rgba(125, 211, 252, 0.7);
+  color: #667eea;
+  text-shadow: 0 0 4px rgba(102, 126, 234, 0.7);
 }
 
 .trait_overlay.is-highlighted,
 .attribute_overlay.is-highlighted {
   transform: translateY(-3px) scale(1.08);
-  box-shadow: 0 0 8px rgba(125, 211, 252, 0.7);
+  box-shadow: 0 0 8px rgba(102, 126, 234, 0.7);
   filter: brightness(1.1);
   z-index: 5;
 }
 
-/* WALLET SIDEBAR / DASHBOARD (legacy IDs safe even if not shown) */
-
-.sidebar .wallet-summary {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  font-size: 0.85rem;
-}
-
-.wallet-header {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.2rem;
-}
-
-.wallet-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 999px;
-  object-fit: cover;
-}
-
-.wallet-username {
-  font-weight: bold;
-  color: white;
-  text-shadow: 2px 2px darkslateblue;
-  font-size: 1.1em;
-}
-
-.wallet-address {
-  font-size: 0.8em;
-  color: white;
-}
-
-.wallet-status-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: #e5e7eb;
-}
-
-.wallet-status-row span:last-child {
-  font-weight: bold;
-  color: lightgreen;
-}
-
-.wallet-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.4rem 0.6rem;
-}
-
-.wallet-stat {
-  background: antiquewhite;
-  padding: 0.35rem 0.45rem;
-  border-radius: 0px;
-  color: #333;
-}
-
-.wallet-stat .stat-label {
-  display: block;
-  font-size: 0.8rem;
-  color: #333;
-}
-
-.wallet-stat .stat-value {
-  display: block;
-  font-size: 1.1em;
-  font-weight: bold;
-  color: #333;
-}
-
-.wallet-connect-btn {
-  margin-top: 0.4rem;
-  width: auto;
-}
-
 /* RARITY BADGES */
-
 .rarity_badge {
-  text-shadow: 2px 2px darkslateblue;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  text-shadow: none;
 }
 
 .rarity_legendary {
-  border-color: gold;
-  color: gold;
+  background: gold;
+  color: #1a1a1a;
 }
 
 .rarity_epic {
-  border-color: #a855f7;
-  color: #c4b5fd;
+  background: #a855f7;
+  color: white;
 }
 
 .rarity_rare {
-  border-color: #22d3ee;
-  color: #a5f3fc;
+  background: #22d3ee;
+  color: #1a1a1a;
 }
 
 .rarity_common {
-  border-color: #9ca3af;
-  color: #e5e7eb;
+  background: #9ca3af;
+  color: white;
 }
 
 .rarity_unknown {
-  opacity: 0.7;
+  background: #e5e7eb;
+  color: #666;
 }
 
-/* RECENT SALE / FROG CARD LINK BUTTONS (used for all frog cards) */
-
+/* ACTION BUTTONS */
+.frog-actions,
 .recent_sale_links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0px;
-  margin: 0px;
-  margin-top: 10px;
+  gap: 8px;
+  margin-top: 12px;
 }
 
+.frog_action_btn,
 .sale_link_btn {
-  background: cornflowerblue;
+  flex: 1;
+  min-width: 100px;
+  background: #667eea;
   color: white;
   border: none;
-  box-shadow: 2px 2px darkslateblue;
-  padding: 4px 8px;
-  font-family: monospace;
-  width: 100%;
-  margin: 4px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  padding: 10px 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  border-radius: 8px;
   cursor: pointer;
-  background: lightcoral;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  margin: 0;
 }
 
+.frog_action_btn:hover,
 .sale_link_btn:hover {
-  transform: translateY(-1px);
-  background: white;
-  color: #333;
+  transform: translateY(-2px);
+  background: #5568d3;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  color: white;
 }
 
 .sale_link_btn.opensea {
-  border-color: #2081e2;
-  background-color: #2081e2;
+  background: #2081e2;
+}
+
+.sale_link_btn.opensea:hover {
+  background: #1a6bc4;
 }
 
 .sale_link_btn.etherscan {
-  border-color: antiquewhite;
-  background: antiquewhite;
-  color: #333;
+  background: #f0f0f0;
+  color: #1a1a1a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.staking-sale-note {
-  margin-top: 4px;
-  font-size: 0.7rem;
-  color: #9ca3af;
+.sale_link_btn.etherscan:hover {
+  background: #e0e0e0;
+  color: #1a1a1a;
 }
 
-.staking-sale-stats {
-  margin-top: 4px;
-  font-size: 0.75rem;
-  color: #e0f2fe;
-}
-
-.staking-sale-stats strong {
-  color: white;
-}
-
-/* STAKING LEVEL + PROGRESS (dashboard cards) */
-
+/* STAKING META */
 .stake-meta {
-  margin: 8px;
-  margin-top: 0px;
-  padding-top: 0px;
-  font-size: 0.75rem;
-  color: #e5e7eb;
+  margin: 12px 0 0;
+  padding: 12px;
+  font-size: 13px;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 8px;
 }
 
 .stake-meta-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  color: #1a1a1a;
 }
 
 .stake-meta-subrow {
-  font-size: 0.9em;
-  border-top: 1px solid white;
-  padding: 8px;
-  color: white;
+  font-size: 12px;
+  border-top: 1px solid rgba(102, 126, 234, 0.2);
+  padding-top: 8px;
+  color: #666;
   margin-top: 8px;
 }
 
 .stake-level-label {
-  font-weight: 600;
-  color: #fbbf24;
-  text-shadow: 2px 2px darkslateblue;
+  font-weight: 700;
+  color: #667eea;
+  text-shadow: none;
 }
 
 .stake-rewards-label {
-  font-weight: 500;
-  color: #fbbf24;
+  font-weight: 600;
+  color: #667eea;
 }
 
 .stake-progress {
@@ -657,9 +539,9 @@ a {
   width: 100%;
   height: 8px;
   border-radius: 999px;
-  background: white;
+  background: #e5e7eb;
   overflow: hidden;
-  margin-top: 2px;
+  margin-top: 8px;
 }
 
 .stake-progress-bar {
@@ -669,72 +551,81 @@ a {
   bottom: 0;
   width: 0%;
   border-radius: inherit;
-  background: #fbbf24;
+  background: linear-gradient(90deg, #667eea, #764ba2);
   transition: width 260ms ease-out;
 }
 
 .stake-progress-label {
-  margin-top: 3px;
-  font-size: 0.7rem;
+  margin-top: 4px;
+  font-size: 11px;
   color: #9ca3af;
 }
 
-/* DASHBOARD NOTE */
-
-.dashboard-note {
-  font-size: 0.78rem;
+.staking-sale-note {
+  margin-top: 8px;
+  font-size: 12px;
   color: #9ca3af;
-  margin-bottom: 0.6rem;
 }
 
-/* Reuse recent_sale_card style for owned / staked NFTs */
-/* Make cards a bit slimmer and stop stretching them to full row height */
-.recent_sale_card {
-  width: 240px;
-  max-width: 240px;
-  margin: 8px auto;
-  align-self: flex-start;
-  background: lightseagreen;
-  padding: 8px;
-  box-shadow: 2px 2px darkslateblue;
+.staking-sale-stats {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #667eea;
 }
 
-/* Reuse recent_sale_card style for owned / staked NFTs */
-.nft-grid .recent_sale_card {
-  max-width: 240px;      /* 🔹 same cap for wallet grids */
-  width: 240px;
-  margin: 8px auto;
+.staking-sale-stats strong {
+  color: #667eea;
 }
 
-/* HEADER NAV: active state for view tabs */
-
-.nav a[data-view] {
-  cursor: pointer;
-}
-
-.nav a.active {
-  color: darkcyan;
-}
-
-.nav a.active::after {
-  width: 80%;
-}
-
-.frog-owner-link {
-  color: inherit;
+/* OWNER LINKS */
+.frog-owner-link,
+.frog-name-link {
+  color: #667eea;
   text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
 }
 
-.frog-owner-link:hover {
+.frog-owner-link:hover,
+.frog-name-link:hover {
+  color: #5568d3;
   text-decoration: underline;
 }
 
-/* Morph gallery */
+/* FOOTER */
+.site-footer {
+  padding: 30px 0;
+  margin-top: 60px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-size: 14px;
+  color: white;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.footer-links a {
+  color: white;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.footer-links a:hover {
+  opacity: 0.8;
+}
+
+/* MORPH GALLERY */
 .morph-gallery {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin: 16px 0 24px;
+  gap: 12px;
+  margin: 20px 0 30px;
   justify-content: center;
 }
 
@@ -742,10 +633,18 @@ a {
   width: 128px;
   height: 128px;
   padding: 0;
-  border: 2px solid transparent;
+  border: 3px solid transparent;
   background: transparent;
   cursor: pointer;
   position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.morph-thumb:hover {
+  border-color: #667eea;
+  transform: translateY(-4px);
 }
 
 .morph-thumb img {
@@ -757,62 +656,33 @@ a {
 
 .morph-thumb-label {
   position: absolute;
-  bottom: 2px;
+  bottom: 4px;
   left: 4px;
-  font-size: 12px;
-  background: rgba(0,0,0,0.65);
+  font-size: 11px;
+  background: rgba(0, 0, 0, 0.75);
   color: white;
-  padding: 1px 4px;
+  padding: 2px 6px;
   border-radius: 4px;
+  font-weight: 600;
 }
 
 .morph-thumb.selected {
-  border-color: #52ff9b; /* neon-ish frog green */
-  box-shadow: 0 0 0 2px rgba(82,255,155,0.5);
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
 }
 
-/* your existing button styles stay the same */
-.recent_sale_card .frog-actions{
-  display: flex;
-  gap: 0px;
-  justify-content: center;
-}
-
-/* makes <a> behave exactly like your <button> */
-.frog-actions .frog_action_btn{
-  background: cornflowerblue;
-  color: white;
-  border: none;
-  box-shadow: 2px 2px darkslateblue;
-  padding: 4px 8px;
-  font-family: monospace;
-  width: 100%;
-  margin: 4px;
-  cursor: pointer;
-}
-
-.frog_action_btn:hover {
-  transform: translateY(-1px);
-  background: white;
-  color: #333;
-}
-
+/* BACKGROUND (if using floating frogs) */
 #frog-bg {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
-  background: #7cc1ff; /* your sky */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   overflow: hidden;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  pointer-events: none; /* don't block clicks on the site */
-}
-
-.page {
-  position: relative;
-  z-index: 1;
+  pointer-events: none;
 }
 
 .frog-sprite {
@@ -825,6 +695,132 @@ a {
   border-radius: 100%;
 }
 
-.site-header{position:sticky;top:0;z-index:50;}
-.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;}
-.nav-left,.nav-right{display:flex;align-items:center;gap:12px;}
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .site-header {
+    padding: 20px;
+  }
+
+  .nav {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .nav-left,
+  .nav-right {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .nav a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .hero {
+    padding: 40px 20px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+  }
+
+  .fly {
+    width: 80px;
+    height: 80px;
+  }
+
+  .panel {
+    padding: 24px 20px;
+  }
+
+  .panel h2 {
+    font-size: 24px;
+  }
+
+  .dashboard-main {
+    gap: 24px;
+  }
+}
+
+/* WALLET SIDEBAR (if used) */
+.sidebar .wallet-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.wallet-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.wallet-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.wallet-username {
+  font-weight: 700;
+  color: #1a1a1a;
+  font-size: 18px;
+}
+
+.wallet-address {
+  font-size: 13px;
+  color: #666;
+}
+
+.wallet-status-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #666;
+}
+
+.wallet-status-row span:last-child {
+  font-weight: 700;
+  color: #667eea;
+}
+
+.wallet-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.wallet-stat {
+  background: rgba(102, 126, 234, 0.1);
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.wallet-stat .stat-label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.wallet-stat .stat-value {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: #667eea;
+  margin-top: 4px;
+}
+
+.wallet-connect-btn {
+  margin-top: 12px;
+  width: 100%;
+}
