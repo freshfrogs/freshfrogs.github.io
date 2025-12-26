@@ -3,122 +3,224 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tankers — Inscryption Lanes</title>
+  <title>Tankers — Card Lanes</title>
   <style>
     :root{
-      --bg:#0c0f14;
-      --text:#e7edf7;
-      --muted:#9bb0cc;
-      --line:rgba(255,255,255,.10);
-      --accent:#f7c34a;
+      --bg0:#07090d;
+      --bg1:#0c1018;
+      --panel:#0d111a;
+      --panel2:#101827;
+      --line:rgba(255,255,255,.11);
+
+      --gold:#f0c14b;
+      --gold2:#d79d2a;
+      --steel:#9fb3cf;
+      --text:#e8eef9;
+      --muted:#a6b7d1;
+
       --good:#62ff9b;
       --bad:#ff5b5b;
-      --radius:14px;
+
+      --r:16px;
+
+      /* “Pixel-ish” vibe without external font */
+      --font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --font2: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
+
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 700px at 15% 0%, rgba(247,195,74,.12), transparent 55%),
-                  radial-gradient(1000px 600px at 90% 20%, rgba(80,180,255,.10), transparent 55%),
-                  var(--bg);
       color:var(--text);
+      background:
+        radial-gradient(1100px 700px at 12% 0%, rgba(240,193,75,.14), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(120,180,255,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      font-family: var(--font2);
     }
+
     header{
-      position:sticky; top:0; z-index:10;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(6,8,12,.75);
       backdrop-filter: blur(10px);
-      background: rgba(12,15,20,.70);
-      border-bottom:1px solid var(--line);
+      border-bottom: 1px solid var(--line);
     }
-    .wrap{max-width:1200px;margin:0 auto;padding:16px;}
-    .top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.4px;}
-    .badge{font-size:12px;color:#111;background:var(--accent);padding:4px 8px;border-radius:999px;font-weight:900;}
+
+    .wrap{max-width:1200px;margin:0 auto;padding:14px 16px;}
+    .top{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-family: var(--font);
+      font-weight: 900;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+    }
+
+    .badge{
+      font-size:12px;
+      color:#120f07;
+      background: linear-gradient(180deg, var(--gold), var(--gold2));
+      padding:4px 10px;
+      border-radius:999px;
+      font-weight: 900;
+      border: 1px solid rgba(0,0,0,.35);
+    }
+
     .btn{
-      border:1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      color:var(--text);
-      padding:9px 12px;
-      border-radius:12px;
-      cursor:pointer;
-      font-weight:900;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 900;
+      font-family: var(--font);
+      letter-spacing:.04em;
+      text-transform: uppercase;
     }
-    .btn:hover{border-color: rgba(247,195,74,.45)}
+    .btn:hover{border-color: rgba(240,193,75,.45)}
     .btn:disabled{opacity:.45; cursor:not-allowed}
+
     select{
       border:1px solid var(--line);
       background: rgba(255,255,255,.05);
       color:var(--text);
-      padding:9px 12px;
+      padding:10px 12px;
       border-radius:12px;
-      font-weight:800;
+      font-weight: 900;
+      font-family: var(--font);
+      letter-spacing:.03em;
       outline:none;
+    }
+
+    /* Card-frame panels (to match your card vibe) */
+    .frame{
+      border-radius: var(--r);
+      border: 1px solid rgba(240,193,75,.22);
+      background:
+        linear-gradient(180deg, rgba(240,193,75,.07), rgba(0,0,0,.18));
+      padding: 1px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.45);
+    }
+    .frame > .inner{
+      border-radius: calc(var(--r) - 1px);
+      border: 1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.20)),
+        repeating-linear-gradient(45deg, rgba(255,255,255,.02), rgba(255,255,255,.02) 6px, rgba(0,0,0,.02) 6px, rgba(0,0,0,.02) 12px);
+      overflow:hidden;
     }
 
     .layout{
       display:grid;
-      grid-template-columns: 1fr 340px;
-      gap:14px;
+      grid-template-columns: 1fr 360px;
+      gap: 14px;
+      margin-top: 14px;
     }
-    @media (max-width: 980px){ .layout{grid-template-columns:1fr;} }
+    @media (max-width: 980px){
+      .layout{grid-template-columns: 1fr;}
+    }
 
+    /* Setup */
     .setup{
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      padding:14px;
+      padding: 14px;
     }
-    .setup h2{margin:0 0 8px 0;font-size:18px;}
-    .setup p{margin:0 0 14px 0;color:var(--muted);font-size:13px;line-height:1.35;}
-    .setupRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .setupCol{display:flex;flex-direction:column;gap:6px;min-width:220px}
-    .setupCol label{color:var(--muted);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .setup h2{
+      margin:0 0 10px 0;
+      font-family: var(--font);
+      letter-spacing:.06em;
+      text-transform: uppercase;
+      font-size: 18px;
+    }
+    .setup p{
+      margin:0 0 12px 0;
+      color:var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .row{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end}
+    .col{display:flex; flex-direction:column; gap:6px; min-width:240px}
+    .col label{
+      font-family: var(--font);
+      font-size: 12px;
+      letter-spacing:.10em;
+      text-transform: uppercase;
+      color: var(--steel);
+      font-weight: 900;
+    }
+    .note{
+      margin-top:10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    code{
+      font-family: var(--font);
+      font-size: 12px;
+      color: rgba(240,193,75,.95);
+    }
 
-    .board{
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      overflow:hidden;
-    }
+    /* Board */
     .boardTop{
-      padding:12px 12px 10px;
-      border-bottom:1px solid var(--line);
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap:10px;
-      flex-wrap:wrap;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap;
     }
-    .boardTop .title{font-weight:900;letter-spacing:.3px;}
-    .boardTop .sub{color:var(--muted);font-size:12px;line-height:1.2;}
+    .boardTop .title{
+      font-family: var(--font);
+      font-weight: 900;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+    .boardTop .sub{
+      margin-top:4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.2;
+    }
 
     .grid{
       display:grid;
       grid-template-columns: repeat(4, 1fr);
-      gap:10px;
-      padding:12px;
+      gap: 10px;
+      padding: 12px;
     }
+
     .cell{
+      position: relative;
       aspect-ratio: 3/4;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      position:relative;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
       overflow:hidden;
-      display:flex;
-      align-items:center;
-      justify-content:center;
       cursor:pointer;
       user-select:none;
     }
     .cell.empty::after{
       content:"";
       position:absolute; inset:0;
-      background: radial-gradient(400px 240px at 50% 20%, rgba(255,255,255,.06), transparent 55%);
+      background: radial-gradient(380px 240px at 50% 20%, rgba(255,255,255,.06), transparent 58%);
       opacity:.9;
       pointer-events:none;
     }
-    .cell.hilite{border-color: rgba(247,195,74,.85); box-shadow: 0 0 0 3px rgba(247,195,74,.14);}
+
+    /* highlight only back row when a card is selected */
+    .cell.placeable{
+      border-color: rgba(240,193,75,.75);
+      box-shadow: 0 0 0 3px rgba(240,193,75,.12);
+    }
+    .cell.blocked{
+      border-color: rgba(255,255,255,.10);
+      opacity: .75;
+      cursor:not-allowed;
+    }
 
     .unitImg{
       width:100%;
@@ -127,191 +229,209 @@
       display:block;
       pointer-events:none;
     }
+
     .cardBack{
       width:100%;
       height:100%;
       display:flex;
       align-items:center;
       justify-content:center;
-      background:
-        radial-gradient(900px 500px at 30% 20%, rgba(247,195,74,.18), transparent 60%),
-        radial-gradient(700px 420px at 80% 70%, rgba(80,180,255,.14), transparent 60%),
-        rgba(0,0,0,.35);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:14px;
-      color: rgba(231,237,247,.75);
-      font-weight:1000;
+      font-family: var(--font);
+      font-weight: 900;
       letter-spacing:.18em;
-      text-transform:uppercase;
-      pointer-events:none;
-    }
-    .hpTag{
-      position:absolute;
-      left:8px; top:8px;
-      background: rgba(0,0,0,.55);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:999px;
-      padding:4px 8px;
-      font-size:12px;
-      font-weight:900;
-      display:flex;
-      gap:6px;
-      align-items:center;
-      pointer-events:none;
-    }
-    .hpTag .dot{
-      width:8px;height:8px;border-radius:999px;background: var(--good);
-      box-shadow: 0 0 0 3px rgba(98,255,155,.12);
-    }
-    .hpTag.ai .dot{background: var(--bad); box-shadow: 0 0 0 3px rgba(255,91,91,.12);}
-    .sideMark{
-      position:absolute;
-      right:8px; top:8px;
-      background: rgba(0,0,0,.55);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:999px;
-      padding:4px 8px;
-      font-size:11px;
-      color:var(--muted);
-      font-weight:900;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      pointer-events:none;
-    }
-    .tagBottom{
-      position:absolute;
-      left:8px; bottom:8px;
-      background: rgba(0,0,0,.55);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:999px;
-      padding:4px 8px;
-      font-size:11px;
-      color:var(--muted);
-      font-weight:900;
+      text-transform: uppercase;
+      color: rgba(232,238,249,.70);
+      background:
+        radial-gradient(900px 500px at 30% 20%, rgba(240,193,75,.18), transparent 60%),
+        radial-gradient(700px 420px at 80% 70%, rgba(120,180,255,.14), transparent 60%),
+        rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
       pointer-events:none;
     }
 
-    .hands{
-      border-top:1px solid var(--line);
-      padding:12px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    .handTitle{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-    .handRow{
-      display:grid;
-      grid-template-columns: repeat(5, minmax(0,1fr));
-      gap:10px;
-    }
-    @media (max-width:700px){ .handRow{grid-template-columns: repeat(4, 1fr);} }
-    @media (max-width:520px){ .handRow{grid-template-columns: repeat(3, 1fr);} }
-
-    .handCard{
-      border:1px solid var(--line);
-      border-radius:14px;
-      overflow:hidden;
-      background: rgba(0,0,0,.18);
-      cursor:pointer;
-      position:relative;
-      aspect-ratio: 2/3;
-      transition: transform .08s ease, border-color .08s ease;
-    }
-    .handCard:hover{transform: translateY(-2px); border-color: rgba(247,195,74,.45);}
-    .handCard.selected{
-      border-color: rgba(247,195,74,.85);
-      box-shadow: 0 0 0 3px rgba(247,195,74,.16);
-    }
-    .handCard img{width:100%;height:100%;object-fit:cover;display:block; pointer-events:none;}
-    .handCard .mini{
+    .chip{
       position:absolute;
-      left:8px; bottom:8px;
-      background: rgba(0,0,0,.55);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:999px;
-      padding:4px 8px;
-      font-size:12px;
-      font-weight:900;
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-
-    .pill{
       display:inline-flex;
       align-items:center;
       gap:6px;
       padding:4px 8px;
       border-radius:999px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      font-weight:900;
-      font-size:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.55);
+      font-family: var(--font);
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing:.05em;
+      text-transform: uppercase;
+      pointer-events:none;
     }
-    .pill .dot{
-      width:8px;height:8px;border-radius:999px;background: var(--accent);
-      box-shadow: 0 0 0 3px rgba(247,195,74,.12);
+    .chip.topLeft{left:8px; top:8px;}
+    .chip.topRight{right:8px; top:8px;}
+    .chip.bottomLeft{left:8px; bottom:8px;}
+    .dot{width:8px;height:8px;border-radius:99px;background:var(--good);box-shadow:0 0 0 3px rgba(98,255,155,.12);}
+    .dot.ai{background:var(--bad);box-shadow:0 0 0 3px rgba(255,91,91,.12);}
+
+    .laneLabel{
+      position:absolute; inset:auto 0 0 0;
+      padding:6px 8px;
+      font-family: var(--font);
+      font-size: 11px;
+      color: rgba(166,183,209,.9);
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,.55));
+      text-align:center;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+      pointer-events:none;
     }
 
-    .side{
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      overflow:hidden;
+    /* Hands */
+    .hands{
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 12px;
       display:flex;
       flex-direction:column;
-      min-height: 560px;
+      gap: 10px;
     }
+    .handTitle{
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      font-family: var(--font);
+      font-weight: 900;
+      letter-spacing:.10em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: var(--steel);
+    }
+    .handRow{
+      display:grid;
+      grid-template-columns: repeat(5, minmax(0,1fr));
+      gap: 10px;
+    }
+    @media (max-width:720px){ .handRow{grid-template-columns: repeat(4, 1fr);} }
+    @media (max-width:520px){ .handRow{grid-template-columns: repeat(3, 1fr);} }
+
+    .handCard{
+      aspect-ratio: 2/3;
+      border-radius: 14px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      cursor:pointer;
+      position:relative;
+      transition: transform .08s ease, border-color .08s ease;
+    }
+    .handCard:hover{transform: translateY(-2px); border-color: rgba(240,193,75,.40);}
+    .handCard.selected{
+      border-color: rgba(240,193,75,.85);
+      box-shadow: 0 0 0 3px rgba(240,193,75,.16);
+    }
+    .handCard img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;}
+    .handCard .cost{
+      position:absolute; left:8px; bottom:8px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.55);
+      font-family: var(--font);
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing:.06em;
+      text-transform: uppercase;
+    }
+
+    /* Side panel */
     .sideTop{
-      padding:12px 12px 10px;
-      border-bottom:1px solid var(--line);
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap;
+    }
+    .sideTop .title{
+      font-family: var(--font);
+      font-weight: 900;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+    .sideTop .sub{
+      margin-top:4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .panel{
+      padding: 12px;
       display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap:10px;
-      flex-wrap:wrap;
+      flex-direction:column;
+      gap: 10px;
     }
-    .sideTop .title{font-weight:900;letter-spacing:.3px;}
-    .sideTop .sub{color:var(--muted);font-size:12px;}
-    .panel{padding:12px; display:flex; flex-direction:column; gap:10px;}
+
     .kv{
-      display:flex; justify-content:space-between; gap:10px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      border-radius:12px;
-      padding:10px 10px;
-      font-size:13px;
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.20);
+      border-radius: 12px;
+      padding: 10px;
+      font-family: var(--font);
+      font-weight: 900;
+      letter-spacing:.03em;
+      text-transform: uppercase;
+      font-size: 12px;
     }
-    .kv span{color:var(--muted);font-weight:900}
-    .kv b{font-weight:900}
+    .kv span{color: var(--steel)}
+    .kv b{font-family: var(--font); color: var(--text)}
+
+    .pill{
+      display:inline-flex; align-items:center; gap:7px;
+      padding:4px 10px;
+      border-radius:999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      font-family: var(--font);
+      font-weight: 900;
+      letter-spacing:.05em;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+    .pill .dot2{
+      width:8px;height:8px;border-radius:99px;background: var(--gold);
+      box-shadow:0 0 0 3px rgba(240,193,75,.12);
+    }
+
+    .preview{
+      border-radius: 14px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      aspect-ratio: 2/3;
+      position:relative;
+    }
+    .preview img{width:100%;height:100%;object-fit:cover;display:block;}
+    .preview .hint{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      font-family: var(--font);
+      font-weight: 900;
+      letter-spacing:.12em;
+      text-transform: uppercase;
+      color: rgba(232,238,249,.65);
+    }
 
     .log{
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      border-radius:12px;
-      padding:10px;
-      height: 330px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.20);
+      padding: 10px;
+      height: 320px;
       overflow:auto;
-      font-size:12px;
-      line-height:1.35;
-      color: rgba(231,237,247,.92);
+      font-size: 12px;
+      color: rgba(232,238,249,.92);
+      line-height: 1.35;
     }
     .log .muted{color: var(--muted)}
-    .note{color:var(--muted);font-size:12px;line-height:1.35;}
     .hidden{display:none!important}
-    code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
   </style>
 </head>
+
 <body>
 <header>
   <div class="wrap">
@@ -319,7 +439,7 @@
       <div class="brand">
         <span style="font-size:18px;">🪖</span>
         <span>Tankers</span>
-        <span class="badge">Lanes + Face-down + Direct Hits</span>
+        <span class="badge">Face-Down • Advance • Auto-Fire</span>
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <button class="btn hidden" id="btnRestart">Restart</button>
@@ -328,39 +448,45 @@
   </div>
 </header>
 
-<main>
-  <div class="wrap">
-    <div id="setup" class="setup">
-      <h2>Start Game</h2>
+<main class="wrap">
+  <div class="frame" id="setupFrame">
+    <div class="inner setup" id="setup">
+      <h2>Start Match</h2>
       <p>
-        Each round you get points equal to the round number (1, 2, 3...). Deploy cost = <b>Tier</b> from <code>tanks.json</code>.
-        Cards are played <b>face-down to the opponent</b>, then on the owner's <b>next</b> turn they <b>flip active</b>.
-        End of turn: active tanks auto-shoot down their lane. If no enemy tank blocks the lane → <b>direct hit</b> to the opponent.
+        Play cards ONLY on your back row. They are face-down to the opponent. On your next turn they
+        advance 1 row and flip revealed. End of turn: revealed tanks auto-fire down their lane.
+        If no enemy is ahead in that lane → direct base damage.
       </p>
-      <div class="setupRow">
-        <div class="setupCol">
-          <label for="playerFaction">Your faction</label>
+      <div class="row">
+        <div class="col">
+          <label>Your faction</label>
           <select id="playerFaction"></select>
         </div>
-        <div class="setupCol">
-          <label for="aiFaction">Opponent faction</label>
+        <div class="col">
+          <label>Opponent faction</label>
           <select id="aiFaction"></select>
         </div>
-        <div class="setupCol" style="min-width:auto;">
+        <div class="col" style="min-width:auto">
           <label>&nbsp;</label>
           <button class="btn" id="btnStart">Start</button>
         </div>
       </div>
-      <div class="note" style="margin-top:10px;">
+      <div class="note">
         If images don’t load, run: <code>python3 -m http.server 8080</code> then open <code>http://localhost:8080/tankers.html</code>.
       </div>
+      <div class="note">
+        <b>Tier cost:</b> uses <code>card.tier</code> if present. If missing, it will auto-derive a tier for now (you can override later).
+      </div>
     </div>
+  </div>
 
-    <div id="game" class="layout hidden">
-      <div class="board">
+  <div class="layout hidden" id="game">
+    <!-- BOARD -->
+    <div class="frame">
+      <div class="inner">
         <div class="boardTop">
           <div>
-            <div class="title">Battlefield (4 lanes)</div>
+            <div class="title">Battle Grid (4 lanes • 4 rows)</div>
             <div class="sub" id="turnText">—</div>
           </div>
           <div class="sub" id="statusText">—</div>
@@ -370,44 +496,44 @@
 
         <div class="hands">
           <div class="handTitle">
-            <div>Your hand (select a card → click a column to play)</div>
-            <div id="playerCount" class="muted"></div>
+            <div>Your hand</div>
+            <div id="playerCount">—</div>
           </div>
           <div class="handRow" id="playerHand"></div>
 
           <div class="handTitle">
             <div>Opponent hand (hidden)</div>
-            <div id="aiCount" class="muted"></div>
+            <div id="aiCount">—</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="side">
+    <!-- SIDE -->
+    <div class="frame">
+      <div class="inner">
         <div class="sideTop">
           <div>
-            <div class="title">Turn</div>
+            <div class="title">Command Panel</div>
             <div class="sub" id="sideSub">—</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-            <span class="pill"><span class="dot"></span><span>Points:</span><b id="apText">0</b></span>
+            <span class="pill"><span class="dot2"></span><span>Points</span><b id="apText">0</b></span>
             <button class="btn" id="btnEndTurn">End Turn</button>
           </div>
         </div>
 
         <div class="panel">
           <div class="kv"><span>You</span><b id="youLabel">—</b></div>
-          <div class="kv"><span>Opponent</span><b id="aiLabel">—</b></div>
-
+          <div class="kv"><span>Enemy</span><b id="aiLabel">—</b></div>
           <div class="kv"><span>Your Base HP</span><b id="pBase">—</b></div>
           <div class="kv"><span>Enemy Base HP</span><b id="aBase">—</b></div>
 
-          <div class="kv"><span>Selected card</span><b id="selLabel">None</b></div>
-
-          <div class="note">
-            <b>Face-down rule:</b> A played tank is inactive until it flips on its owner’s next turn.<br>
-            <b>Lane shots:</b> Active tanks shoot the nearest enemy in the same column within <b>Accuracy</b> range.
-            If there are <b>no enemy tanks anywhere</b> in that lane → direct hit to base.
+          <div class="preview" id="preview">
+            <div class="hint">Select a Card</div>
           </div>
+
+          <div class="kv"><span>Selected</span><b id="selLabel">None</b></div>
 
           <div class="log" id="log"></div>
         </div>
@@ -417,590 +543,639 @@
 </main>
 
 <script>
-  // ================== CONFIG ==================
-  const DATA_URL = "tanks.json";
-  const HAND_SIZE = 5;
-  const COPIES_PER_CARD = 2;
+/* ===================== CONFIG ===================== */
+const DATA_URL = "tanks.json";
+const HAND_SIZE = 5;
+const COPIES_PER_CARD = 2;
+const BASE_HP_START = 20;
 
-  const BASE_HP_START = 20;
+/* ===================== STATE ===================== */
+// board rows: 0..3 top->bottom, cols: 0..3 left->right
+// unit: { uid, side, card, hp, facedown, deployedTurn }
+let factions = [];
+let player = null;
+let ai = null;
+let board = null;
+let UID = 0;
 
-  // ================== STATE ==================
-  let factions = [];
-  let player = null;
-  let ai = null;
+let round = 1;
+let turnIndex = 0;
+let activeSide = "player";
+let ap = 0;
 
-  // board rows 0..3 top->bottom, cols 0..3 left->right
-  // cell null or unit { uid, side, card, hp, active, deployedTurn }
-  let board = null;
-  let UID = 0;
+let playerBaseHP = BASE_HP_START;
+let aiBaseHP = BASE_HP_START;
 
-  let round = 1;
-  let activeSide = "player"; // "player" | "ai"
-  let ap = 0;
+let selectedHandIndex = null;
 
-  let turnNumber = 0; // increments each beginTurn()
+/* ===================== DOM ===================== */
+const elSetupFrame = document.getElementById("setupFrame");
+const elSetup = document.getElementById("setup");
+const elGame = document.getElementById("game");
 
-  let playerBaseHP = BASE_HP_START;
-  let aiBaseHP = BASE_HP_START;
+const playerFactionSel = document.getElementById("playerFaction");
+const aiFactionSel = document.getElementById("aiFaction");
+const btnStart = document.getElementById("btnStart");
+const btnRestart = document.getElementById("btnRestart");
 
-  let selectedHandIndex = null;
+const gridEl = document.getElementById("grid");
+const playerHandEl = document.getElementById("playerHand");
+const playerCountEl = document.getElementById("playerCount");
+const aiCountEl = document.getElementById("aiCount");
 
-  // ================== DOM ==================
-  const elSetup = document.getElementById("setup");
-  const elGame = document.getElementById("game");
-  const playerFactionSel = document.getElementById("playerFaction");
-  const aiFactionSel = document.getElementById("aiFaction");
-  const btnStart = document.getElementById("btnStart");
-  const btnRestart = document.getElementById("btnRestart");
+const turnText = document.getElementById("turnText");
+const statusText = document.getElementById("statusText");
+const sideSub = document.getElementById("sideSub");
+const apText = document.getElementById("apText");
 
-  const gridEl = document.getElementById("grid");
-  const logEl = document.getElementById("log");
-  const turnText = document.getElementById("turnText");
-  const statusText = document.getElementById("statusText");
+const youLabel = document.getElementById("youLabel");
+const aiLabel = document.getElementById("aiLabel");
+const pBaseEl = document.getElementById("pBase");
+const aBaseEl = document.getElementById("aBase");
 
-  const playerHandEl = document.getElementById("playerHand");
-  const playerCountEl = document.getElementById("playerCount");
-  const aiCountEl = document.getElementById("aiCount");
+const selLabel = document.getElementById("selLabel");
+const previewEl = document.getElementById("preview");
 
-  const youLabel = document.getElementById("youLabel");
-  const aiLabel = document.getElementById("aiLabel");
-  const selLabel = document.getElementById("selLabel");
-  const sideSub = document.getElementById("sideSub");
-  const apText = document.getElementById("apText");
-  const pBaseEl = document.getElementById("pBase");
-  const aBaseEl = document.getElementById("aBase");
+const btnEndTurn = document.getElementById("btnEndTurn");
+const logEl = document.getElementById("log");
 
-  const btnEndTurn = document.getElementById("btnEndTurn");
+/* ===================== HELPERS ===================== */
+const titleCase = (s) => (s || "").replace(/[_-]/g," ").replace(/\b\w/g, c => c.toUpperCase()).trim();
 
-  // ================== HELPERS ==================
-  const titleCase = (s) => (s || "").replace(/[_-]/g," ").replace(/\b\w/g, c => c.toUpperCase()).trim();
-
-  function escapeHtml(s){
-    return String(s ?? "").replace(/[&<>"']/g, c => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[c]));
+function escapeHtml(s){
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function log(line, muted=false){
+  const div = document.createElement("div");
+  div.innerHTML = muted ? `<span class="muted">${escapeHtml(line)}</span>` : escapeHtml(line);
+  logEl.appendChild(div);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+function shuffle(arr){
+  const a = [...arr];
+  for (let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
   }
+  return a;
+}
+function deepCopy(obj){ return JSON.parse(JSON.stringify(obj)); }
 
-  function log(line, muted=false){
-    const div = document.createElement("div");
-    div.innerHTML = muted ? `<span class="muted">${escapeHtml(line)}</span>` : escapeHtml(line);
-    logEl.appendChild(div);
-    logEl.scrollTop = logEl.scrollHeight;
+function makeDeck(cards){
+  const deck = [];
+  for (const c of cards){
+    for (let i=0;i<COPIES_PER_CARD;i++) deck.push(deepCopy(c));
   }
-
-  function shuffle(arr){
-    const a = [...arr];
-    for (let i=a.length-1;i>0;i--){
-      const j = Math.floor(Math.random()*(i+1));
-      [a[i],a[j]] = [a[j],a[i]];
-    }
-    return a;
+  return shuffle(deck);
+}
+function drawToHand(sideObj){
+  while (sideObj.hand.length < HAND_SIZE && sideObj.deck.length){
+    sideObj.hand.push(sideObj.deck.pop());
   }
-
-  function deepCopy(obj){ return JSON.parse(JSON.stringify(obj)); }
-
-  function makeDeck(cards){
-    const deck = [];
-    for (const c of cards){
-      for (let i=0;i<COPIES_PER_CARD;i++) deck.push(deepCopy(c));
-    }
-    return shuffle(deck);
+}
+function countBoardUnits(side){
+  let n=0;
+  for (let r=0;r<4;r++) for (let c=0;c<4;c++){
+    const u = board[r][c];
+    if (u && u.side === side) n++;
   }
+  return n;
+}
 
-  function drawToHand(sideObj){
-    while (sideObj.hand.length < HAND_SIZE && sideObj.deck.length){
-      sideObj.hand.push(sideObj.deck.pop());
-    }
-  }
+/* ===================== TIER / COST ===================== */
+// If you add `tier` into tanks.json, that will override this.
+function clampTier(t){ return Math.max(1, Math.min(9, t)); }
+function deriveTier(card){
+  const raw = Number(card?.tier);
+  if (Number.isFinite(raw)) return clampTier(raw);
 
-  function countBoardUnits(side){
-    let n=0;
-    for (let r=0;r<4;r++) for (let c=0;c<4;c++){
-      const u = board[r][c];
-      if (u && u.side === side) n++;
-    }
-    return n;
-  }
+  // auto-derive (temporary): based on stats bulk (so game works even before you fill tiers)
+  const fp = Number(card?.stats?.firepower ?? 1);
+  const ar = Number(card?.stats?.armor ?? 0);
+  const hp = Number(card?.stats?.hp ?? 1);
+  const acc = Number(card?.stats?.accuracy ?? 1);
+  const score = fp*2 + ar*1.5 + hp*1.2 + acc*0.5;
+  if (score >= 30) return 4;
+  if (score >= 24) return 3;
+  if (score >= 18) return 2;
+  return 1;
+}
+function costToDeploy(card){ return deriveTier(card); }
 
-  // ================== TIER / COST ==================
-  function clampTier(t){
-    if (!Number.isFinite(t)) return 1;
-    return Math.max(1, Math.min(9, t));
-  }
+/* ===================== PLACEMENT (BACK ROW ONLY) ===================== */
+function backRowForSide(side){
+  return (side === "player") ? 3 : 0;
+}
+function canPlaceOnCell(side, r, c){
+  const back = backRowForSide(side);
+  if (r !== back) return false;
+  if (board[r][c]) return false;
+  return true;
+}
+function deployFromHand(side, handIndex, col){
+  const who = (side === "player") ? player : ai;
+  const r = backRowForSide(side);
 
-  function deriveTier(card){
-    const raw = Number(card?.tier);
-    if (!Number.isFinite(raw)){
-      console.warn("Missing tier on card:", card?.id, card?.name);
-      return 1;
-    }
-    return clampTier(raw);
-  }
+  if (board[r][col]) return {ok:false, reason:`Lane ${col+1} back row is occupied.`};
 
-  function costToDeploy(card){
-    return deriveTier(card);
-  }
+  const card = who.hand[handIndex];
+  const cost = costToDeploy(card);
+  if (ap < cost) return {ok:false, reason:`Need ${cost} points.`};
 
-  // ================== DEPLOY (face-down/inactive) ==================
-  function findDropRow(side, col){
-    // Only allow placing in the "first" square closest to the player
-    const r = (side === "player") ? 3 : 0; // player bottom row, AI top row
-    return board[r][col] ? null : r;
-  }
+  ap -= cost;
+  const played = who.hand.splice(handIndex, 1)[0];
 
-  function deployFromHand(side, handIndex, col){
-    const who = side === "player" ? player : ai;
-    const row = findDropRow(side, col);
-    if (row === null) return { ok:false, reason:"Lane full." };
-
-    const card = who.hand[handIndex];
-    const cost = costToDeploy(card);
-    if (ap < cost) return { ok:false, reason:`Not enough points (need ${cost}).` };
-
-    ap -= cost;
-    const played = who.hand.splice(handIndex, 1)[0];
-
-    board[row][col] = {
-      uid: ++UID,
-      side,
-      card: played,
-      hp: Number(played.stats.hp ?? 1),
-      active: false,        // flips on owner's next turn
-      deployedTurn: turnNumber
-    };
-
-    log(`${titleCase(side)} plays a card face-down in lane ${col+1} (cost ${cost}).`);
-    return { ok:true };
-  }
-
-  // ================== FLIP ON OWNER'S NEXT TURN ==================
-  function flipNewUnits(side){
-    let flips = 0;
-    for (let r=0;r<4;r++) for (let c=0;c<4;c++){
-      const u = board[r][c];
-      if (!u || u.side !== side) continue;
-      if (u.active) continue;
-
-      // strict: must have been deployed on a previous turn (not this same turn)
-      if (u.deployedTurn < turnNumber){
-        u.active = true;
-        flips++;
-      }
-    }
-    if (flips) log(`${titleCase(side)} flips ${flips} unit(s) active.`, true);
-  }
-
-  // ================== AUTO ATTACK (END OF TURN) ==================
-  function findNearestEnemyInLane(attackerPos){
-    const attacker = board[attackerPos.r][attackerPos.c];
-    if (!attacker) return null;
-
-    const dir = attacker.side === "player" ? -1 : +1;
-    const range = Math.max(1, Number(attacker.card.stats.accuracy ?? 1));
-
-    for (let step=1; step<=range; step++){
-      const rr = attackerPos.r + dir*step;
-      if (rr < 0 || rr > 3) break;
-      const t = board[rr][attackerPos.c];
-      if (t && t.side !== attacker.side) return { r: rr, c: attackerPos.c };
-    }
-    return null;
-  }
-
-  function laneHasAnyEnemy(attackerSide, col){
-    for (let r=0;r<4;r++){
-      const u = board[r][col];
-      if (u && u.side !== attackerSide) return true;
-    }
-    return false;
-  }
-
-  function computeDamageToUnit(attackerUnit, targetUnit){
-    const firepower = Number(attackerUnit.card.stats.firepower ?? 1);
-    const armor = Number(targetUnit.card.stats.armor ?? 0);
-    return Math.max(1, firepower - Math.floor(armor / 2));
-  }
-
-  function computeDirectDamage(attackerUnit){
-    // direct damage = firepower (simple, tweak later)
-    return Math.max(1, Number(attackerUnit.card.stats.firepower ?? 1));
-  }
-
-  function autoAttack(side){
-    // resolve front-to-back in direction (so it feels consistent)
-    const rows = side === "player" ? [0,1,2,3] : [3,2,1,0];
-    let didAnything = false;
-
-    for (const r of rows){
-      for (let c=0;c<4;c++){
-        const u = board[r][c];
-        if (!u || u.side !== side) continue;
-        if (!u.active) continue; // only flipped units can shoot
-
-        const targetPos = findNearestEnemyInLane({r,c});
-        if (targetPos){
-          const t = board[targetPos.r][targetPos.c];
-          if (!t) continue;
-
-          const dmg = computeDamageToUnit(u, t);
-          t.hp -= dmg;
-          didAnything = true;
-
-          const aName = (side === "player") ? "You" : "AI";
-          const tName = (t.side === "player") ? "You" : "AI";
-          log(`${aName} ${u.card.name} shoots lane ${c+1} → ${tName} unit for ${dmg}.`);
-
-          if (t.hp <= 0){
-            log(`${tName} unit in lane ${c+1} is destroyed!`);
-            board[targetPos.r][targetPos.c] = null;
-          }
-        } else {
-          // no enemy in range: if lane has NO enemy tanks at all, direct hit base
-          if (!laneHasAnyEnemy(side, c)){
-            const direct = computeDirectDamage(u);
-            didAnything = true;
-
-            if (side === "player"){
-              aiBaseHP -= direct;
-              log(`You ${u.card.name} fires lane ${c+1} → DIRECT HIT for ${direct}! (Enemy base ${aiBaseHP})`);
-            } else {
-              playerBaseHP -= direct;
-              log(`AI ${u.card.name} fires lane ${c+1} → DIRECT HIT for ${direct}! (Your base ${playerBaseHP})`);
-            }
-          } else {
-            // blocked somewhere down-lane, but out of range → no shot
-            log(`${titleCase(side)} ${u.card.name} can’t reach a target in lane ${c+1}.`, true);
-          }
-        }
-
-        if (playerBaseHP <= 0 || aiBaseHP <= 0) return; // stop immediately if someone dies
-      }
-    }
-
-    if (!didAnything) log(`${titleCase(side)}: no attacks.`, true);
-  }
-
-  // ================== TURN FLOW ==================
-  function beginTurn(side){
-    activeSide = side;
-    turnNumber += 1;
-
-    ap = round; // points = round number
-
-    // draw at start of turn
-    const who = (side === "player") ? player : ai;
-    drawToHand(who);
-
-    // flip inactive units from earlier turns
-    flipNewUnits(side);
-
-    selectedHandIndex = null;
-    selLabel.textContent = "None";
-
-    renderAll();
-    log(`— Round ${round}: ${side === "player" ? "Your" : "AI"} turn (${ap} point${ap===1?"":"s"}).`, true);
-  }
-
-  function endTurn(){
-    if (checkEnd()) return;
-
-    // end of turn: auto attack
-    autoAttack(activeSide);
-    renderAll();
-
-    if (checkEnd()) return;
-
-    // next side
-    if (activeSide === "player"){
-      beginTurn("ai");
-      window.setTimeout(aiTurn, 450);
-    } else {
-      round += 1;
-      beginTurn("player");
-    }
-  }
-
-  function checkEnd(){
-    if (aiBaseHP <= 0){ gameOver("You win — enemy base destroyed!"); return true; }
-    if (playerBaseHP <= 0){ gameOver("You lose — your base was destroyed!"); return true; }
-    return false;
-  }
-
-  function gameOver(msg){
-    statusText.textContent = msg;
-    turnText.textContent = "Game over.";
-    btnRestart.classList.remove("hidden");
-    btnEndTurn.disabled = true;
-    log(msg);
-    renderAll();
-  }
-
-  // ================== AI (simple) ==================
-  function aiTurn(){
-    if (activeSide !== "ai") return;
-
-    // deploy cheapest-first while possible
-    let safety = 60;
-    while (ap > 0 && ai.hand.length > 0 && safety-- > 0){
-      const affordable = ai.hand
-        .map((card, idx) => ({card, idx, cost: costToDeploy(card)}))
-        .filter(x => x.cost <= ap);
-
-      if (!affordable.length) break;
-      affordable.sort((a,b)=>a.cost-b.cost);
-
-      const choice = affordable[0];
-      const cols = shuffle([0,1,2,3]);
-
-      let placed = false;
-      for (const col of cols){
-        const row = findDropRow("ai", col);
-        if (row === null) continue;
-        const res = deployFromHand("ai", choice.idx, col);
-        if (res.ok){ placed = true; break; }
-      }
-      if (!placed) break;
-    }
-
-    renderAll();
-    endTurn();
-  }
-
-  // ================== INPUT ==================
-  btnEndTurn.onclick = () => {
-    if (activeSide !== "player") return;
-    endTurn();
+  board[r][col] = {
+    uid: ++UID,
+    side,
+    card: played,
+    hp: Number(played?.stats?.hp ?? 1),
+    facedown: true,       // face-down to opponent until it advances next turn
+    deployedTurn: turnIndex
   };
 
-  function onClickCell(r,c){
-    if (activeSide !== "player") return;
-    if (selectedHandIndex === null) return;
+  log(`${side === "player" ? "You" : "AI"} deploys a tank in lane ${col+1} (face-down to opponent).`);
+  return {ok:true};
+}
 
-    const backRow = 3;
-    if (r !== backRow){
-      log("You can only place cards on your back row (bottom row).", true);
-      return;
-    }
+/* ===================== ADVANCE + REVEAL (NEXT OWNER TURN) ===================== */
+function advanceAndReveal(side){
+  // At start of owner's turn:
+  // - Any facedown unit from previous turns advances 1 row forward (if empty)
+  // - Then it flips revealed (facedown=false)
+  const dir = (side === "player") ? -1 : +1;
+  const rows = (side === "player") ? [0,1,2,3] : [3,2,1,0]; // move front-first
 
-    const card = player.hand[selectedHandIndex];
-    const cost = costToDeploy(card);
+  let advanced = 0, flipped = 0;
 
-    if (ap < cost){
-      log(`Not enough points to play ${card.name} (need ${cost}).`, true);
-      return;
-    }
+  for (const r of rows){
+    for (let c=0;c<4;c++){
+      const u = board[r][c];
+      if (!u || u.side !== side) continue;
+      if (!u.facedown) continue;
 
-    const row = findDropRow("player", c);
-    if (row === null){
-      log(`Lane ${c+1} is full.`, true);
-      return;
-    }
+      // must wait until owner's NEXT turn (not the turn it was played)
+      if (u.deployedTurn >= turnIndex) continue;
 
-    const res = deployFromHand("player", selectedHandIndex, c);
-    if (res.ok){
-      selectedHandIndex = null;
-      selLabel.textContent = "None";
-      renderAll();
+      // advance 1 row if possible
+      const nr = r + dir;
+      if (nr >= 0 && nr <= 3 && !board[nr][c]){
+        board[nr][c] = u;
+        board[r][c] = null;
+        advanced++;
+      }
+
+      // flip revealed
+      u.facedown = false;
+      flipped++;
     }
   }
 
-  // ================== RENDER ==================
-  function renderGrid(){
-    gridEl.innerHTML = "";
-    for (let r=0;r<4;r++){
-      for (let c=0;c<4;c++){
-        const u = board[r][c];
-        const cell = document.createElement("div");
-        cell.className = "cell" + (u ? "" : " empty");
-        cell.onclick = () => onClickCell(r,c);
+  if (advanced) log(`${titleCase(side)}: ${advanced} unit(s) advanced 1 row.`, true);
+  if (flipped) log(`${titleCase(side)}: ${flipped} unit(s) flipped revealed.`, true);
+}
 
-        if (u){
-          const ownerSeesFaceUp = (u.side === "player"); // you see your own cards immediately
-          const opponentSeesFaceUp = u.active;           // enemy sees it only after flip
+/* ===================== COMBAT (END OF TURN AUTO-FIRE) ===================== */
+function laneHasEnemyAhead(attackerSide, col, fromRow){
+  // any enemy in front direction (strictly ahead), or anywhere ahead of that attacker
+  const dir = (attackerSide === "player") ? -1 : +1;
+  for (let r = fromRow + dir; r >= 0 && r <= 3; r += dir){
+    const u = board[r][col];
+    if (u && u.side !== attackerSide) return true;
+  }
+  return false;
+}
+function nearestEnemyAhead(attackerSide, col, fromRow){
+  const dir = (attackerSide === "player") ? -1 : +1;
+  for (let r = fromRow + dir; r >= 0 && r <= 3; r += dir){
+    const u = board[r][col];
+    if (u && u.side !== attackerSide) return {r, c:col};
+  }
+  return null;
+}
+function dmgToUnit(attacker, target){
+  const fp = Number(attacker.card?.stats?.firepower ?? 1);
+  const ar = Number(target.card?.stats?.armor ?? 0);
+  return Math.max(1, fp - Math.floor(ar / 2));
+}
+function dmgToBase(attacker){
+  // simple: direct base damage = firepower (you can adjust later)
+  return Math.max(1, Number(attacker.card?.stats?.firepower ?? 1));
+}
 
-          const showFaceUp = ownerSeesFaceUp || opponentSeesFaceUp;
+function autoFire(side){
+  // Resolve “front first” so it feels consistent.
+  const rows = (side === "player") ? [0,1,2,3] : [3,2,1,0];
+  let shots = 0;
 
-          if (showFaceUp){
-            const img = document.createElement("img");
-            img.className = "unitImg";
-            img.src = u.card.image;
-            img.alt = u.card.name;
-            cell.appendChild(img);
+  for (const r of rows){
+    for (let c=0;c<4;c++){
+      const u = board[r][c];
+      if (!u || u.side !== side) continue;
+      if (u.facedown) continue; // only revealed units can attack
 
-            const hp = document.createElement("div");
-            hp.className = "hpTag" + (u.side==="ai" ? " ai" : "");
-            hp.innerHTML = `<span class="dot"></span><span>${u.hp}</span>`;
-            cell.appendChild(hp);
+      const targetPos = nearestEnemyAhead(side, c, r);
 
-            const tier = deriveTier(u.card);
-            const acc = Number(u.card.stats.accuracy ?? 0);
-            const bottom = document.createElement("div");
-            bottom.className = "tagBottom";
-            bottom.textContent = u.active ? `ACTIVE • T${tier} • ACC ${acc}` : `FACE-DOWN • T${tier}`;
-            cell.appendChild(bottom);
-          } else {
-            const back = document.createElement("div");
-            back.className = "cardBack";
-            back.textContent = "UNKNOWN";
-            cell.appendChild(back);
+      if (targetPos){
+        const t = board[targetPos.r][targetPos.c];
+        if (!t) continue;
 
-            const bottom = document.createElement("div");
-            bottom.className = "tagBottom";
-            bottom.textContent = `FACE-DOWN`;
-            cell.appendChild(bottom);
-          }
+        const dmg = dmgToUnit(u, t);
+        t.hp -= dmg;
+        shots++;
 
-          const side = document.createElement("div");
-          side.className = "sideMark";
-          side.textContent = (u.side==="player") ? "YOU" : "AI";
-          cell.appendChild(side);
+        const aName = (side === "player") ? "You" : "AI";
+        const tName = (t.side === "player") ? "You" : "AI";
+        log(`${aName} ${u.card.name} fires lane ${c+1} → ${tName} tank for ${dmg}.`);
+
+        if (t.hp <= 0){
+          log(`${tName} tank in lane ${c+1} is destroyed!`);
+          board[targetPos.r][targetPos.c] = null;
+        }
+      } else {
+        // No enemy ahead in that lane → direct hit
+        const direct = dmgToBase(u);
+        shots++;
+
+        if (side === "player"){
+          aiBaseHP -= direct;
+          log(`You ${u.card.name} fires lane ${c+1} → DIRECT HIT ${direct}! (Enemy base ${aiBaseHP})`);
+        } else {
+          playerBaseHP -= direct;
+          log(`AI ${u.card.name} fires lane ${c+1} → DIRECT HIT ${direct}! (Your base ${playerBaseHP})`);
         }
 
-        gridEl.appendChild(cell);
+        if (playerBaseHP <= 0 || aiBaseHP <= 0) return;
       }
     }
   }
 
-  function renderHand(){
-    playerHandEl.innerHTML = "";
-    for (let i=0;i<player.hand.length;i++){
-      const card = player.hand[i];
-      const tier = deriveTier(card);
-      const cost = costToDeploy(card);
+  if (!shots) log(`${titleCase(side)}: no shots fired.`, true);
+}
 
-      const div = document.createElement("div");
-      div.className = "handCard" + (selectedHandIndex===i ? " selected" : "");
-      div.innerHTML = `
-        <img src="${card.image}" alt="${escapeHtml(card.name)}">
-        <div class="mini">T${tier} • Cost ${cost}</div>
-      `;
-      div.onclick = () => {
-        if (activeSide !== "player") return;
-        selectedHandIndex = (selectedHandIndex === i) ? null : i;
-        selLabel.textContent = selectedHandIndex===null
-          ? "None"
-          : `${player.hand[selectedHandIndex].name} (Tier ${deriveTier(player.hand[selectedHandIndex])}, cost ${costToDeploy(player.hand[selectedHandIndex])})`;
-        renderAll();
-      };
-      playerHandEl.appendChild(div);
-    }
-  }
+/* ===================== TURN FLOW ===================== */
+function beginTurn(side){
+  activeSide = side;
+  turnIndex += 1;
 
-  function renderCounts(){
-    playerCountEl.textContent = `Deck ${player.deck.length} • Hand ${player.hand.length} • Board ${countBoardUnits("player")}`;
-    aiCountEl.textContent = `Deck ${ai.deck.length} • Hand ${ai.hand.length} • Board ${countBoardUnits("ai")} (hidden)`;
+  ap = round; // points = round number
 
-    youLabel.textContent = titleCase(player.faction);
-    aiLabel.textContent = titleCase(ai.faction);
+  const who = (side === "player") ? player : ai;
+  drawToHand(who);
 
-    pBaseEl.textContent = String(playerBaseHP);
-    aBaseEl.textContent = String(aiBaseHP);
-  }
+  // face-down units from earlier turns advance + flip now
+  advanceAndReveal(side);
 
-  function renderTop(){
-    apText.textContent = String(ap);
-    btnEndTurn.disabled = (activeSide !== "player");
+  selectedHandIndex = null;
+  selLabel.textContent = "None";
+  renderPreview(null);
 
-    sideSub.textContent = activeSide === "player"
-      ? `Round ${round} • Your turn`
-      : `Round ${round} • AI turn`;
+  renderAll();
+  log(`— Round ${round}: ${side === "player" ? "Your" : "AI"} turn (${ap} point${ap===1?"":"s"}).`, true);
+}
 
-    turnText.textContent = activeSide === "player"
-      ? `Round ${round}: You have ${ap} point(s). Play cards (face-down), then End Turn (auto-attacks fire).`
-      : `Round ${round}: AI is playing…`;
+function endTurn(){
+  if (checkEnd()) return;
 
-    statusText.textContent = "";
-  }
+  // auto-fire at end of active side's turn
+  autoFire(activeSide);
+  renderAll();
+  if (checkEnd()) return;
 
-  function renderAll(){
-    renderTop();
-    renderGrid();
-    renderHand();
-    renderCounts();
-  }
-
-  // ================== SETUP ==================
-  function populateSetupSelectors(){
-    const available = factions.map(f => f.faction);
-
-    playerFactionSel.innerHTML = "";
-    aiFactionSel.innerHTML = "";
-
-    for (const f of available){
-      const opt1 = document.createElement("option");
-      opt1.value = f;
-      opt1.textContent = titleCase(f);
-      playerFactionSel.appendChild(opt1);
-
-      const opt2 = document.createElement("option");
-      opt2.value = f;
-      opt2.textContent = titleCase(f);
-      aiFactionSel.appendChild(opt2);
-    }
-
-    if (available.includes("germany")) playerFactionSel.value = "germany";
-    if (available.includes("allies")) aiFactionSel.value = "allies";
-    if (playerFactionSel.value === aiFactionSel.value && available.length > 1){
-      aiFactionSel.value = available.find(x => x !== playerFactionSel.value) || available[0];
-    }
-  }
-
-  function startGame(){
-    const pf = playerFactionSel.value;
-    const af = aiFactionSel.value;
-
-    const pBlock = factions.find(f => f.faction === pf);
-    const aBlock = factions.find(f => f.faction === af);
-
-    if (!pBlock || !aBlock) {
-      alert("Missing faction data in tanks.json.");
-      return;
-    }
-
-    player = { side:"player", faction: pf, deck: makeDeck(pBlock.cards), hand: [] };
-    ai     = { side:"ai",     faction: af, deck: makeDeck(aBlock.cards), hand: [] };
-
-    board = Array.from({length:4}, () => Array.from({length:4}, () => null));
-    UID = 0;
-
-    round = 1;
-    turnNumber = 0;
-    playerBaseHP = BASE_HP_START;
-    aiBaseHP = BASE_HP_START;
-
-    logEl.innerHTML = "";
-    log(`Game start: You = ${titleCase(pf)} vs AI = ${titleCase(af)}.`);
-    log(`Played cards are inactive until they flip on their owner’s next turn. Auto-attacks at end of turn. Direct hit if lane is clear.`, true);
-
-    elSetup.classList.add("hidden");
-    elGame.classList.remove("hidden");
-    btnRestart.classList.remove("hidden");
-
+  // switch turns
+  if (activeSide === "player"){
+    beginTurn("ai");
+    window.setTimeout(aiTurn, 450);
+  } else {
+    round += 1;
     beginTurn("player");
   }
+}
 
-  function resetToSetup(){
-    elGame.classList.add("hidden");
-    elSetup.classList.remove("hidden");
-    btnRestart.classList.add("hidden");
-    logEl.innerHTML = "";
+function checkEnd(){
+  if (aiBaseHP <= 0){
+    gameOver("You win — enemy base destroyed!");
+    return true;
+  }
+  if (playerBaseHP <= 0){
+    gameOver("You lose — your base was destroyed!");
+    return true;
+  }
+  return false;
+}
+function gameOver(msg){
+  statusText.textContent = msg;
+  turnText.textContent = "Game over.";
+  btnEndTurn.disabled = true;
+  btnRestart.classList.remove("hidden");
+  log(msg);
+  renderAll();
+}
+
+/* ===================== AI (simple) ===================== */
+function aiTurn(){
+  if (activeSide !== "ai") return;
+
+  // deploy cheapest-first while possible
+  let safety = 60;
+  while (ap > 0 && ai.hand.length > 0 && safety-- > 0){
+    const affordable = ai.hand
+      .map((card, idx) => ({card, idx, cost: costToDeploy(card)}))
+      .filter(x => x.cost <= ap);
+
+    if (!affordable.length) break;
+    affordable.sort((a,b)=>a.cost-b.cost);
+
+    const choice = affordable[0];
+    const cols = shuffle([0,1,2,3]);
+
+    let placed = false;
+    for (const col of cols){
+      const r = backRowForSide("ai");
+      if (board[r][col]) continue;
+      const res = deployFromHand("ai", choice.idx, col);
+      if (res.ok){ placed = true; break; }
+    }
+    if (!placed) break;
   }
 
-  btnStart.addEventListener("click", startGame);
-  btnRestart.addEventListener("click", resetToSetup);
+  renderAll();
+  endTurn();
+}
 
-  // ================== INIT ==================
-  (async function init(){
-    try{
-      const res = await fetch(DATA_URL, { cache: "no-store" });
-      if (!res.ok) throw new Error(`Failed to load tanks.json (${res.status})`);
-      const data = await res.json();
-      factions = data.factions || [];
-      populateSetupSelectors();
-    }catch(err){
-      alert(err.message + "\n\nIf you opened this as file://, use a local server (python3 -m http.server).");
+/* ===================== INPUT ===================== */
+btnEndTurn.onclick = () => {
+  if (activeSide !== "player") return;
+  endTurn();
+};
+
+function onClickCell(r,c){
+  if (activeSide !== "player") return;
+  if (selectedHandIndex === null) return;
+
+  // Only allow placement on player's back row
+  if (!canPlaceOnCell("player", r, c)){
+    log("You can only place cards on your back row (bottom row) into an empty slot.", true);
+    return;
+  }
+
+  const card = player.hand[selectedHandIndex];
+  const cost = costToDeploy(card);
+  if (ap < cost){
+    log(`Not enough points to play ${card.name} (need ${cost}).`, true);
+    return;
+  }
+
+  const res = deployFromHand("player", selectedHandIndex, c);
+  if (res.ok){
+    selectedHandIndex = null;
+    selLabel.textContent = "None";
+    renderPreview(null);
+    renderAll();
+  }
+}
+
+/* ===================== RENDER ===================== */
+function renderPreview(card){
+  previewEl.innerHTML = "";
+  if (!card){
+    const hint = document.createElement("div");
+    hint.className = "hint";
+    hint.textContent = "Select a Card";
+    previewEl.appendChild(hint);
+    return;
+  }
+  const img = document.createElement("img");
+  img.src = card.image;
+  img.alt = card.name;
+  previewEl.appendChild(img);
+}
+
+function renderGrid(){
+  gridEl.innerHTML = "";
+
+  const placeRow = backRowForSide("player");
+  const hasSelected = (selectedHandIndex !== null) && (activeSide === "player");
+
+  for (let r=0;r<4;r++){
+    for (let c=0;c<4;c++){
+      const u = board[r][c];
+      const cell = document.createElement("div");
+      cell.className = "cell" + (u ? "" : " empty");
+      cell.onclick = () => onClickCell(r,c);
+
+      // highlight legal placement tiles on back row when a card is selected
+      if (hasSelected){
+        if (r === placeRow && !board[r][c]) cell.classList.add("placeable");
+        if (r !== placeRow) cell.classList.add("blocked");
+        if (r === placeRow && board[r][c]) cell.classList.add("blocked");
+      }
+
+      if (u){
+        const ownerIsPlayer = (u.side === "player");
+        const showFaceUp = ownerIsPlayer || !u.facedown; // enemy sees face-down until flipped
+
+        if (showFaceUp){
+          const img = document.createElement("img");
+          img.className = "unitImg";
+          img.src = u.card.image;
+          img.alt = u.card.name;
+          cell.appendChild(img);
+
+          const hpChip = document.createElement("div");
+          hpChip.className = "chip topLeft";
+          hpChip.innerHTML = `<span class="dot ${u.side==="ai"?"ai":""}"></span><span>${u.hp}</span>`;
+          cell.appendChild(hpChip);
+
+          const sideChip = document.createElement("div");
+          sideChip.className = "chip topRight";
+          sideChip.textContent = (u.side==="player") ? "YOU" : "AI";
+          cell.appendChild(sideChip);
+
+          const tier = deriveTier(u.card);
+          const lane = document.createElement("div");
+          lane.className = "laneLabel";
+          lane.textContent = u.facedown ? `FACE-DOWN • T${tier}` : `REVEALED • T${tier}`;
+          cell.appendChild(lane);
+        } else {
+          const back = document.createElement("div");
+          back.className = "cardBack";
+          back.textContent = "UNKNOWN";
+          cell.appendChild(back);
+
+          const sideChip = document.createElement("div");
+          sideChip.className = "chip topRight";
+          sideChip.textContent = "AI";
+          cell.appendChild(sideChip);
+
+          const lane = document.createElement("div");
+          lane.className = "laneLabel";
+          lane.textContent = "FACE-DOWN";
+          cell.appendChild(lane);
+        }
+      }
+
+      gridEl.appendChild(cell);
     }
-  })();
+  }
+}
+
+function renderHand(){
+  playerHandEl.innerHTML = "";
+  for (let i=0;i<player.hand.length;i++){
+    const card = player.hand[i];
+    const cost = costToDeploy(card);
+    const tier = deriveTier(card);
+
+    const div = document.createElement("div");
+    div.className = "handCard" + (selectedHandIndex===i ? " selected" : "");
+    div.innerHTML = `
+      <img src="${card.image}" alt="${escapeHtml(card.name)}">
+      <div class="cost">T${tier} • ${cost}</div>
+    `;
+
+    div.onclick = () => {
+      if (activeSide !== "player") return;
+      selectedHandIndex = (selectedHandIndex === i) ? null : i;
+
+      if (selectedHandIndex === null){
+        selLabel.textContent = "None";
+        renderPreview(null);
+      } else {
+        const sel = player.hand[selectedHandIndex];
+        selLabel.textContent = `${sel.name} (T${deriveTier(sel)}, Cost ${costToDeploy(sel)})`;
+        renderPreview(sel);
+      }
+      renderAll();
+    };
+
+    playerHandEl.appendChild(div);
+  }
+}
+
+function renderCounts(){
+  playerCountEl.textContent = `DECK ${player.deck.length} • HAND ${player.hand.length} • BOARD ${countBoardUnits("player")}`;
+  aiCountEl.textContent = `DECK ${ai.deck.length} • HAND ${ai.hand.length} • BOARD ${countBoardUnits("ai")}`;
+
+  youLabel.textContent = titleCase(player.faction);
+  aiLabel.textContent = titleCase(ai.faction);
+
+  pBaseEl.textContent = String(playerBaseHP);
+  aBaseEl.textContent = String(aiBaseHP);
+}
+
+function renderTop(){
+  apText.textContent = String(ap);
+  btnEndTurn.disabled = (activeSide !== "player");
+
+  sideSub.textContent = activeSide === "player"
+    ? `ROUND ${round} • YOUR TURN`
+    : `ROUND ${round} • ENEMY TURN`;
+
+  turnText.textContent = activeSide === "player"
+    ? `Round ${round}: You have ${ap} point(s). Place on your back row. End Turn to fire.`
+    : `Round ${round}: Enemy is acting…`;
+
+  statusText.textContent = "";
+}
+
+function renderAll(){
+  renderTop();
+  renderGrid();
+  renderHand();
+  renderCounts();
+}
+
+/* ===================== SETUP ===================== */
+function populateSelectors(){
+  const available = factions.map(f => f.faction);
+  playerFactionSel.innerHTML = "";
+  aiFactionSel.innerHTML = "";
+
+  for (const f of available){
+    const o1 = document.createElement("option");
+    o1.value = f;
+    o1.textContent = titleCase(f);
+    playerFactionSel.appendChild(o1);
+
+    const o2 = document.createElement("option");
+    o2.value = f;
+    o2.textContent = titleCase(f);
+    aiFactionSel.appendChild(o2);
+  }
+
+  if (available.includes("germany")) playerFactionSel.value = "germany";
+  if (available.includes("allies")) aiFactionSel.value = "allies";
+  if (playerFactionSel.value === aiFactionSel.value && available.length > 1){
+    aiFactionSel.value = available.find(x => x !== playerFactionSel.value) || available[0];
+  }
+}
+
+function startGame(){
+  const pf = playerFactionSel.value;
+  const af = aiFactionSel.value;
+
+  const pBlock = factions.find(f => f.faction === pf);
+  const aBlock = factions.find(f => f.faction === af);
+
+  if (!pBlock || !aBlock){
+    alert("Missing factions in tanks.json.");
+    return;
+  }
+
+  player = { side:"player", faction: pf, deck: makeDeck(pBlock.cards), hand: [] };
+  ai     = { side:"ai",     faction: af, deck: makeDeck(aBlock.cards), hand: [] };
+
+  board = Array.from({length:4}, () => Array.from({length:4}, () => null));
+  UID = 0;
+
+  round = 1;
+  turnIndex = 0;
+  activeSide = "player";
+  ap = 0;
+
+  playerBaseHP = BASE_HP_START;
+  aiBaseHP = BASE_HP_START;
+
+  selectedHandIndex = null;
+  selLabel.textContent = "None";
+  renderPreview(null);
+
+  logEl.innerHTML = "";
+  log(`Match start: YOU = ${titleCase(pf)} vs ENEMY = ${titleCase(af)}.`);
+  log(`Rule: Deploy on back row. Next owner turn → advance 1 row + flip revealed. End of turn → auto-fire.`, true);
+
+  elSetupFrame.classList.add("hidden");
+  elGame.classList.remove("hidden");
+  btnRestart.classList.remove("hidden");
+
+  beginTurn("player");
+}
+
+function resetToSetup(){
+  elGame.classList.add("hidden");
+  elSetupFrame.classList.remove("hidden");
+  btnRestart.classList.add("hidden");
+  logEl.innerHTML = "";
+}
+
+btnStart.addEventListener("click", startGame);
+btnRestart.addEventListener("click", resetToSetup);
+
+/* ===================== INIT ===================== */
+(async function init(){
+  try{
+    const res = await fetch(DATA_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Failed to load tanks.json (${res.status})`);
+    const data = await res.json();
+    factions = data.factions || [];
+    populateSelectors();
+  }catch(err){
+    alert(err.message + "\n\nIf you opened as file://, use a local server (python3 -m http.server).");
+  }
+})();
 </script>
 </body>
 </html>
