@@ -33,236 +33,117 @@
       min-height:100vh;
     }
 
-    .wrap{
-      max-width:1200px;
-      margin:0 auto;
-      padding:18px 16px 28px;
-    }
+    .wrap{max-width:1200px;margin:0 auto;padding:18px 16px 28px}
 
     header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:12px;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:16px;margin-bottom:12px;flex-wrap:wrap;
     }
 
-    .title{
-      display:flex;
-      align-items:baseline;
-      gap:10px;
-      flex-wrap:wrap;
-    }
+    .title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
     .title h1{
-      margin:0;
-      letter-spacing:.06em;
-      font-size:20px;
-      text-transform:uppercase;
-      color:#f5f7ff;
+      margin:0;letter-spacing:.06em;font-size:20px;text-transform:uppercase;color:#f5f7ff;
     }
-    .title .sub{
-      font-size:12px;
-      color:var(--muted);
-      letter-spacing:.02em;
-    }
+    .title .sub{font-size:12px;color:var(--muted);letter-spacing:.02em}
 
-    .topbar{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
+    .topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 
     .pill{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 10px;
-      border-radius:999px;
+      display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border:1px solid var(--line);
       box-shadow: 0 8px 18px rgba(0,0,0,.18);
-      font-size:12px;
-      color:var(--muted);
-      user-select:none;
+      font-size:12px;color:var(--muted);user-select:none;
     }
-    .pill strong{color:var(--text); font-weight:800}
+    .pill strong{color:var(--text);font-weight:800}
 
     .btn{
-      cursor:pointer;
-      border:1px solid var(--line);
+      cursor:pointer;border:1px solid var(--line);
       background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      color:var(--text);
-      border-radius:12px;
-      padding:10px 12px;
-      font-weight:800;
-      letter-spacing:.02em;
-      box-shadow: var(--shadow);
+      color:var(--text);border-radius:12px;padding:10px 12px;
+      font-weight:800;letter-spacing:.02em;box-shadow: var(--shadow);
     }
     .btn:hover{filter:brightness(1.07)}
-    .btn:disabled{
-      cursor:not-allowed;
-      opacity:.5;
-      filter:none;
-      box-shadow:none;
-    }
+    .btn:disabled{cursor:not-allowed;opacity:.5;filter:none;box-shadow:none}
     .btn.primary{
       border-color: rgba(202,165,90,.35);
       background: linear-gradient(180deg, rgba(202,165,90,.22), rgba(202,165,90,.08));
     }
 
     select{
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      border:1px solid var(--line);
-      padding:10px 12px;
-      border-radius:12px;
-      font-weight:800;
-      outline:none;
+      background: rgba(255,255,255,.06);color: var(--text);
+      border:1px solid var(--line);padding:10px 12px;border-radius:12px;font-weight:800;outline:none;
     }
 
-    .gridShell{
-      display:grid;
-      grid-template-columns: 1fr 330px;
-      gap:14px;
-      margin-top:12px;
-    }
-    @media (max-width: 980px){
-      .gridShell{grid-template-columns:1fr}
-    }
+    .gridShell{display:grid;grid-template-columns: 1fr 330px;gap:14px;margin-top:12px}
+    @media (max-width: 980px){ .gridShell{grid-template-columns:1fr} }
 
     .board{
       background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      padding:12px;
-      box-shadow: var(--shadow);
-      position:relative;
-      overflow:hidden;
+      border:1px solid var(--line);border-radius: var(--radius);
+      padding:12px;box-shadow: var(--shadow);
+      position:relative;overflow:hidden;
     }
     .board::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
+      content:"";position:absolute;inset:-2px;
       background:
         radial-gradient(800px 400px at 50% 0%, rgba(202,165,90,.10), transparent 55%),
         radial-gradient(800px 400px at 50% 100%, rgba(101,214,122,.07), transparent 55%);
-      pointer-events:none;
-      filter: blur(.2px);
+      pointer-events:none;filter: blur(.2px);
     }
     .boardInner{position:relative}
 
-    .hpbar{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:12px;
-    }
+    .hpbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
     .hpBox{
-      flex:1;
-      background: rgba(0,0,0,.25);
-      border:1px solid var(--line);
-      border-radius: 14px;
-      padding:10px 12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+      flex:1;background: rgba(0,0,0,.25);border:1px solid var(--line);
+      border-radius: 14px;padding:10px 12px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
     }
-    .hpBox .who{
-      font-weight:1000;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      font-size:12px;
-      color: var(--muted);
-    }
-    .hpBox .hp{
-      font-weight:1000;
-      font-size:16px;
-    }
+    .hpBox .who{font-weight:1000;letter-spacing:.08em;text-transform:uppercase;font-size:12px;color: var(--muted)}
+    .hpBox .hp{font-weight:1000;font-size:16px}
     .hpBox .hp.good{color:var(--good)}
     .hpBox .hp.bad{color:var(--bad)}
 
     .laneHints{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      margin:0 2px 10px;
-      font-size:12px;
-      color:var(--muted);
-      letter-spacing:.06em;
-      text-transform:uppercase;
+      display:flex;justify-content:space-between;gap:10px;margin:0 2px 10px;
+      font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;
     }
 
-    /* 4 lanes, each lane has 4 slots (opp front/back, player front/back) */
-    .lanes{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: var(--gap);
-    }
+    .lanes{display:grid;grid-template-columns: repeat(4, 1fr);gap: var(--gap)}
     .lane{
-      border:1px solid var(--line);
-      border-radius: 14px;
-      padding:10px;
-      background: rgba(0,0,0,.16);
-      position:relative;
+      border:1px solid var(--line);border-radius: 14px;padding:10px;
+      background: rgba(0,0,0,.16);position:relative;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
     }
     .laneTitle{
-      position:absolute;
-      top:8px;
-      left:10px;
-      font-size:11px;
-      color:rgba(255,255,255,.35);
-      letter-spacing:.1em;
-      text-transform:uppercase;
-      user-select:none;
+      position:absolute;top:8px;left:10px;font-size:11px;color:rgba(255,255,255,.35);
+      letter-spacing:.1em;text-transform:uppercase;user-select:none;
     }
 
-    /* Slot matches card ratio */
     .slot{
       aspect-ratio: 2 / 3;
       width:100%;
       border:1px dashed rgba(255,255,255,.12);
       border-radius: 12px;
       background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
-      overflow:hidden;
-      margin-top:24px;
+      display:flex;align-items:center;justify-content:center;
+      position:relative;overflow:hidden;margin-top:24px;
       cursor: default;
     }
     .slot + .slot{ margin-top:10px; }
 
-    .slot.back[data-owner="player"]{
-      cursor:pointer;
-    }
+    /* Only YOUR back row is clickable to place */
+    .slot.back[data-owner="player"]{ cursor:pointer; }
 
     .slot.back::after{
       content:"BACK";
-      position:absolute;
-      bottom:8px;
-      right:8px;
-      font-size:10px;
-      color:rgba(255,255,255,.24);
-      letter-spacing:.10em;
-      text-transform:uppercase;
-      user-select:none;
+      position:absolute;bottom:8px;right:8px;font-size:10px;
+      color:rgba(255,255,255,.24);letter-spacing:.10em;text-transform:uppercase;user-select:none;
     }
     .slot.front::after{
       content:"FRONT";
-      position:absolute;
-      bottom:8px;
-      right:8px;
-      font-size:10px;
-      color:rgba(255,255,255,.24);
-      letter-spacing:.10em;
-      text-transform:uppercase;
-      user-select:none;
+      position:absolute;bottom:8px;right:8px;font-size:10px;
+      color:rgba(255,255,255,.24);letter-spacing:.10em;text-transform:uppercase;user-select:none;
     }
 
     .slot.placeable{
@@ -277,149 +158,73 @@
     }
 
     .card{
-      width:100%;
-      height:100%;
-      border-radius: 10px;
-      border:1px solid rgba(255,255,255,.10);
-      overflow:hidden;
-      background: rgba(0,0,0,.28);
-      position:relative;
-      box-shadow: 0 8px 20px rgba(0,0,0,.35);
-      user-select:none;
-      display:flex;
-      align-items:stretch;
-      justify-content:stretch;
+      width:100%;height:100%;
+      border-radius: 10px;border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;background: rgba(0,0,0,.28);
+      position:relative;box-shadow: 0 8px 20px rgba(0,0,0,.35);
+      user-select:none;display:flex;align-items:stretch;justify-content:stretch;
     }
-
-    .card img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-      pointer-events:none;
-    }
+    .card img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 
     .badge{
-      position:absolute;
-      top:8px;
-      left:8px;
-      background: rgba(0,0,0,.55);
+      position:absolute;top:8px;left:8px;background: rgba(0,0,0,.55);
       border:1px solid rgba(255,255,255,.18);
-      border-radius:999px;
-      padding:4px 8px;
-      font-size:11px;
-      font-weight:1000;
-      letter-spacing:.06em;
-      color:#fff;
-      backdrop-filter: blur(6px);
-      user-select:none;
+      border-radius:999px;padding:4px 8px;
+      font-size:11px;font-weight:1000;letter-spacing:.06em;color:#fff;
+      backdrop-filter: blur(6px);user-select:none;
     }
     .badge.cost{ left:auto; right:8px; border-color: rgba(202,165,90,.35); color:#ffe9b5; }
     .badge.fd{ top:auto; bottom:8px; left:8px; border-color: rgba(255,255,255,.14); color: rgba(255,255,255,.85); }
 
     .damageFloat{
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:1000;
-      font-size:34px;
-      color:#fff;
+      position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+      font-weight:1000;font-size:34px;color:#fff;
       text-shadow: 0 10px 20px rgba(0,0,0,.65);
-      opacity:0;
-      transform: translateY(8px);
-      pointer-events:none;
+      opacity:0;transform: translateY(8px);pointer-events:none;
     }
     .damageFloat.show{
-      opacity:1;
-      transform: translateY(0);
+      opacity:1;transform: translateY(0);
       transition: opacity .15s ease, transform .15s ease;
     }
 
-    /* Right panel */
     .side{
       background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      padding:12px;
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
+      border:1px solid var(--line);border-radius: var(--radius);
+      padding:12px;box-shadow: var(--shadow);
+      overflow:hidden;position:relative;
     }
-
     .side h2{
-      margin:0 0 10px;
-      font-size:13px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
+      margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
       color: rgba(255,255,255,.85);
     }
 
-    .hand{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
+    .hand{display:grid;grid-template-columns: 1fr 1fr;gap:10px}
 
     .handCard{
       border:1px solid rgba(255,255,255,.10);
-      border-radius:12px;
-      overflow:hidden;
-      background: rgba(0,0,0,.22);
-      cursor:pointer;
-      position:relative;
-      box-shadow: 0 10px 22px rgba(0,0,0,.25);
+      border-radius:12px;overflow:hidden;background: rgba(0,0,0,.22);
+      cursor:pointer;position:relative;box-shadow: 0 10px 22px rgba(0,0,0,.25);
     }
     .handCard:hover{filter:brightness(1.06)}
     .handCard.selected{
       outline:2px solid rgba(202,165,90,.45);
       box-shadow: 0 0 0 4px rgba(202,165,90,.12), 0 10px 22px rgba(0,0,0,.25);
     }
-    .handCard img{
-      width:100%;
-      height:150px;
-      object-fit:cover;
-      display:block;
-      pointer-events:none;
-    }
+    .handCard img{width:100%;height:150px;object-fit:cover;display:block;pointer-events:none}
     .handMeta{
-      padding:8px 8px 10px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:8px;
+      padding:8px 8px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
     }
-    .handMeta .nm{
-      font-weight:1000;
-      font-size:12px;
-      line-height:1.1;
-    }
-    .handMeta .tiny{
-      font-size:11px;
-      color: var(--muted);
-      line-height:1.1;
-    }
+    .handMeta .nm{font-weight:1000;font-size:12px;line-height:1.1}
+    .handMeta .tiny{font-size:11px;color: var(--muted);line-height:1.1}
     .handMeta .cost{
-      font-weight:1000;
-      color:#ffe9b5;
-      background: rgba(202,165,90,.15);
-      border:1px solid rgba(202,165,90,.30);
-      padding:3px 7px;
-      border-radius:999px;
-      font-size:11px;
-      white-space:nowrap;
-      margin-top:1px;
+      font-weight:1000;color:#ffe9b5;background: rgba(202,165,90,.15);
+      border:1px solid rgba(202,165,90,.30);padding:3px 7px;border-radius:999px;
+      font-size:11px;white-space:nowrap;margin-top:1px;
     }
 
     .log{
-      margin-top:12px;
-      border-top:1px solid var(--line);
-      padding-top:10px;
-      max-height: 250px;
-      overflow:auto;
-      font-size:12px;
-      color: var(--muted);
+      margin-top:12px;border-top:1px solid var(--line);padding-top:10px;
+      max-height: 250px;overflow:auto;font-size:12px;color: var(--muted);
     }
     .log p{margin:0 0 6px}
     .log .good{color:rgba(101,214,122,.9)}
@@ -427,39 +232,20 @@
     .log .warn{color:rgba(255,209,102,.95)}
 
     .hint{
-      margin-top:10px;
-      padding:10px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      color: var(--muted);
-      font-size:12px;
-      line-height:1.35;
+      margin-top:10px;padding:10px;border-radius:12px;border:1px solid var(--line);
+      background: rgba(0,0,0,.18);color: var(--muted);font-size:12px;line-height:1.35;
     }
     .hint b{color:var(--text)}
-
-    .divider{height:1px; background:var(--line); margin:10px 0}
+    .divider{height:1px;background:var(--line);margin:10px 0}
 
     .error{
-      padding:12px;
-      border-radius:12px;
-      border:1px solid rgba(255,75,75,.35);
-      background: rgba(255,75,75,.10);
-      color:#ffd7d7;
-      font-weight:800;
-      margin-top:12px;
-      line-height:1.35;
-      white-space:pre-wrap;
+      padding:12px;border-radius:12px;border:1px solid rgba(255,75,75,.35);
+      background: rgba(255,75,75,.10);color:#ffd7d7;font-weight:800;
+      margin-top:12px;line-height:1.35;white-space:pre-wrap;
     }
 
-    .statusRow{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-    .statusRow .muted{color:var(--muted); font-size:12px}
+    .statusRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+    .statusRow .muted{color:var(--muted);font-size:12px}
   </style>
 </head>
 <body>
@@ -467,7 +253,7 @@
   <header>
     <div class="title">
       <h1>Tankers</h1>
-      <div class="sub">Face-down back row • flip + advance next turn • auto-fire</div>
+      <div class="sub">Opponent deploys top row (face-down) → flips when it drops to row 2</div>
     </div>
 
     <div class="topbar">
@@ -500,8 +286,8 @@
         </div>
 
         <div class="laneHints">
-          <div>Opponent (top)</div>
-          <div>Your Back Row is clickable (bottom)</div>
+          <div>Top row = Opponent BACK (deploy)</div>
+          <div>Bottom row = Your BACK (deploy)</div>
         </div>
 
         <div class="lanes" id="lanes"></div>
@@ -521,11 +307,11 @@
       <div class="divider"></div>
 
       <div class="hint">
-        <b>Rules:</b><br>
-        • Place only on your <b>BACK row</b>. Cards are <b>face-down</b> (inactive) until your next turn.<br>
-        • At the start of that player's next turn: back-row cards that have waited 1 turn <b>move to FRONT</b> (if open) and <b>flip revealed</b>.<br>
-        • End Turn triggers your FRONT row to <b>auto-fire</b> down the lane. If no tank blocks: <b>base takes damage</b>.<br>
-        • Points reset each turn to the current turn number (Turn 1 = 1 point, Turn 2 = 2 points, etc). Tier = cost.
+        <b>Rows (top → bottom):</b><br>
+        1) Opponent BACK (deploy face-down)<br>
+        2) Opponent FRONT (revealed + attacks)<br>
+        3) Your FRONT (revealed + attacks)<br>
+        4) Your BACK (deploy; face-down to opponent)
       </div>
 
       <div class="log" id="log"></div>
@@ -534,20 +320,14 @@
 </div>
 
 <script>
-/* ===========================
-   CONFIG
-   =========================== */
 const JSON_PATH = "tanks.json";
-const CARD_BACK = "assets/img/card-back.png"; // must exist and load
+const CARD_BACK = "assets/img/card-back.png";
 
 const LANES = 4;
 const PLAYER_MAX_HP = 20;
 const START_HAND = 4;
 const DRAW_PER_TURN = 1;
 
-/* ===========================
-   UTIL
-   =========================== */
 const $ = (s)=>document.querySelector(s);
 const lanesEl = $("#lanes");
 const handEl = $("#hand");
@@ -617,42 +397,36 @@ async function loadDB(){
   if (!data || !Array.isArray(data.factions)) throw new Error(`Expected { "factions": [...] }`);
   return data;
 }
-
 function showError(text){
   errEl.style.display = "block";
   errEl.textContent =
 `Could not load ${JSON_PATH}.
 
 Fix checklist:
-1) Make sure tanks.json is next to this HTML file.
-2) Open via a local server (NOT file://). Example:
-   - VSCode Live Server
-   - python3 -m http.server
+1) tanks.json next to this HTML
+2) run from a local server (not file://)
 
 Details:
 ${text}`;
 }
 function hideError(){ errEl.style.display = "none"; errEl.textContent = ""; }
 
-/* ===========================
-   GAME MODEL
-   =========================== */
-// Each side has: back[LANES], front[LANES]
-// CardState:
-// { owner: "player"|"opponent", data, hp, faceDown, turnsInBack }
+/* CardState:
+   { owner, data, hp, faceDown, turnsInBack }
+*/
 function makeCardState(card, owner){
   return {
     owner,
     data: card,
     hp: Number(card?.stats?.hp ?? 10),
-    faceDown: true,        // ALWAYS face-down when played (inactive)
-    turnsInBack: 0         // increments at start of owner's turns
+    faceDown: true,
+    turnsInBack: 0
   };
 }
 
+// Player always sees their own faces.
+// Opponent back-row face-down cards show CARD_BACK until flipped.
 function visibleImageFor(cardState){
-  // You (player) always see your own card faces.
-  // Opponent back-row face-down cards show CARD_BACK until flipped.
   if (cardState.owner === "opponent" && cardState.faceDown) return CARD_BACK;
   return cardState.data.image;
 }
@@ -666,14 +440,12 @@ function makeDeck(factionName){
   }));
   return shuffle(cards);
 }
-
 function drawToHand(side, n=1){
   for (let i=0;i<n;i++){
     if (side.deck.length === 0) return;
     side.hand.push(side.deck.pop());
   }
 }
-
 function pickFactions(playerFaction){
   const all = db.factions.map(f=>f.faction);
   if (!all.includes(playerFaction)) playerFaction = all[0];
@@ -681,37 +453,39 @@ function pickFactions(playerFaction){
   return { playerFaction, oppFaction };
 }
 
-/* ===========================
-   UI BUILD
-   =========================== */
+/* ========== IMPORTANT FIX: ROW ORDER ========== */
 function buildBoardUI(){
   lanesEl.innerHTML = "";
   for (let lane=0; lane<LANES; lane++){
     const laneEl = document.createElement("div");
     laneEl.className = "lane";
     laneEl.dataset.lane = lane;
+
+    // TOP → BOTTOM:
+    // opponent BACK (deploy face-down)
+    // opponent FRONT (revealed)
+    // player FRONT
+    // player BACK (deploy)
     laneEl.innerHTML = `
       <div class="laneTitle">Lane ${lane+1}</div>
 
-      <div class="slot front" data-owner="opponent" data-row="front" data-lane="${lane}"></div>
       <div class="slot back"  data-owner="opponent" data-row="back"  data-lane="${lane}"></div>
+      <div class="slot front" data-owner="opponent" data-row="front" data-lane="${lane}"></div>
 
-      <div class="slot front" data-owner="player" data-row="front" data-lane="${lane}"></div>
-      <div class="slot back"  data-owner="player" data-row="back"  data-lane="${lane}"></div>
+      <div class="slot front" data-owner="player"   data-row="front" data-lane="${lane}"></div>
+      <div class="slot back"  data-owner="player"   data-row="back"  data-lane="${lane}"></div>
     `;
     lanesEl.appendChild(laneEl);
   }
 
   lanesEl.addEventListener("click", (e)=>{
     const slot = e.target.closest(".slot");
-    if (!slot) return;
-    if (!game) return;
+    if (!slot || !game) return;
 
     const owner = slot.dataset.owner;
     const row = slot.dataset.row;
     const lane = Number(slot.dataset.lane);
 
-    // Only player can place; only on player back row; only during player turn
     if (game.active !== "player") return;
     if (owner !== "player" || row !== "back") return;
 
@@ -719,17 +493,9 @@ function buildBoardUI(){
   });
 }
 
-/* ===========================
-   SELECTION / PLACEMENT
-   =========================== */
-function selectHand(idx){
-  game.selectedHandIndex = idx;
-  renderHand();
-}
-function clearSelection(){
-  game.selectedHandIndex = null;
-  renderHand();
-}
+/* selection/placement */
+function selectHand(idx){ game.selectedHandIndex = idx; renderHand(); }
+function clearSelection(){ game.selectedHandIndex = null; renderHand(); }
 
 function placeSelectedIntoLane(lane){
   const idx = game.selectedHandIndex;
@@ -756,29 +522,20 @@ function placeSelectedIntoLane(lane){
   game.player.hand.splice(idx, 1);
   game.selectedHandIndex = null;
 
-  // Always faceDown on back row. (Player sees their art, but it's still inactive.)
   game.player.back[lane] = makeCardState(card, "player");
 
-  log(`You deploy ${card.name} to BACK row (Lane ${lane+1}). It will flip + advance next turn.`, "good");
+  log(`You deploy ${card.name} to BACK row (Lane ${lane+1}). It will flip next turn when it advances.`, "good");
   ui.selHint.textContent = "Placed. End Turn when ready.";
-
   renderAll();
 }
 
-/* ===========================
-   TURN FLOW
-   =========================== */
+/* turn flow */
 function startTurn(sideName){
   game.active = sideName;
-
-  // points reset to turn number
   const side = sideName === "player" ? game.player : game.opp;
+
   side.points = game.turn;
-
-  // increment wait counter for back-row units, then promote eligible ones
   progressBackRow(sideName);
-
-  // draw
   drawToHand(side, DRAW_PER_TURN);
 
   if (sideName === "player"){
@@ -801,22 +558,18 @@ function progressBackRow(sideName){
 
     backCard.turnsInBack += 1;
 
-    // Must wait exactly 1 full turn in back row:
-    // placed on turn T => at start of turn T+1, turnsInBack becomes 1 => still waiting.
-    // at start of turn T+2, turnsInBack becomes 2 => eligible to advance/flip.
+    // wait one full turn in back row
     if (backCard.turnsInBack < 2) continue;
 
     if (side.front[lane] === null){
       side.front[lane] = backCard;
       side.back[lane] = null;
-
-      // flip revealed (active)
       backCard.faceDown = false;
 
       if (sideName === "player"){
-        log(`${backCard.data.name} advances to FRONT and flips revealed (Lane ${lane+1}).`, "good");
+        log(`${backCard.data.name} advances + flips revealed (Lane ${lane+1}).`, "good");
       } else {
-        log(`Opponent tank advances to FRONT and flips revealed (Lane ${lane+1}).`, "bad");
+        log(`Opponent tank advances + flips revealed (Lane ${lane+1}).`, "bad");
       }
     }
   }
@@ -828,10 +581,7 @@ function resolveAttacks(attackerSideName){
 
   for (let lane=0; lane<LANES; lane++){
     const atk = A.front[lane];
-    if (!atk) continue;
-
-    // Only revealed/active units can attack.
-    if (atk.faceDown) continue;
+    if (!atk || atk.faceDown) continue;
 
     const fp = Number(atk.data?.stats?.firepower ?? 0);
     if (fp <= 0) continue;
@@ -843,7 +593,6 @@ function resolveAttacks(attackerSideName){
       def.hp -= dmg;
 
       floatDamage(attackerSideName === "player" ? "opponent" : "player", "front", lane, `-${dmg}`);
-
       log(`${atk.data.name} hits ${def.data.name} (Lane ${lane+1}) for ${dmg}.`, attackerSideName === "player" ? "good" : "bad");
 
       if (def.hp <= 0){
@@ -875,13 +624,9 @@ function checkGameOver(){
   return false;
 }
 
-/* ===========================
-   OPPONENT AI
-   =========================== */
+/* opponent AI */
 function opponentPlay(){
   const opp = game.opp;
-
-  // spend points, highest cost first, place only on BACK row
   const laneOrder = shuffle([...Array(LANES).keys()]);
   const sorted = opp.hand.slice().sort((a,b)=>getCost(b)-getCost(a));
 
@@ -892,24 +637,19 @@ function opponentPlay(){
     const lane = laneOrder.find(L => opp.back[L] === null);
     if (lane === undefined) break;
 
-    // remove from hand
     const idx = opp.hand.findIndex(x => x.id === card.id);
     if (idx >= 0) opp.hand.splice(idx,1);
 
     opp.points -= cost;
-
-    // Always faceDown on back row and hidden to player visually via CARD_BACK until flip
     opp.back[lane] = makeCardState(card, "opponent");
 
-    log(`Opponent deploys a tank to BACK row (Lane ${lane+1}) face-down.`, "bad");
+    log(`Opponent deploys a tank to TOP BACK row (Lane ${lane+1}) face-down.`, "bad");
   }
 
   renderAll();
 }
 
-/* ===========================
-   RENDER
-   =========================== */
+/* render */
 function renderAll(){
   if (!game) return;
 
@@ -946,7 +686,6 @@ function renderBoard(){
 
     slot.innerHTML = "";
 
-    // highlight placeable back slots
     slot.classList.remove("placeable","blocked");
     if (hasSelected && owner === "player" && row === "back"){
       if (side.back[lane] === null) slot.classList.add("placeable");
@@ -977,7 +716,6 @@ function renderBoard(){
     costB.textContent = `T${tier} • ${cost}`;
     cardEl.appendChild(costB);
 
-    // show "FACE DOWN" badge on any back-row inactive card (optional)
     if (cardState.faceDown){
       const fd = document.createElement("div");
       fd.className = "badge fd";
@@ -1049,9 +787,7 @@ function floatDamage(owner, row, lane, text){
   setTimeout(()=>dmg.classList.remove("show"), 420);
 }
 
-/* ===========================
-   GAME START / BUTTONS
-   =========================== */
+/* game start */
 function newGame(){
   hideError();
   logEl.innerHTML = "";
@@ -1094,7 +830,7 @@ function newGame(){
   btnEnd.disabled = false;
 
   log(`New game: YOU = ${playerFaction.toUpperCase()} vs OPPONENT = ${oppFaction.toUpperCase()}.`, "good");
-  log(`Turn 1: You have 1 point. Place a tank on your BACK row.`, "warn");
+  log(`Turn 1: Place a tank on your BACK row (bottom).`, "warn");
 }
 
 btnNew.addEventListener("click", newGame);
@@ -1102,27 +838,19 @@ btnNew.addEventListener("click", newGame);
 btnEnd.addEventListener("click", ()=>{
   if (!game || game.active !== "player") return;
 
-  // Player end-turn attack
   resolveAttacks("player");
   if (checkGameOver()) return;
 
-  // Opponent turn start
   startTurn("opponent");
-
-  // Opponent plays (back row, face down)
   opponentPlay();
-
-  // Opponent end-turn attack
   resolveAttacks("opponent");
   if (checkGameOver()) return;
 
-  // Next turn
   game.turn += 1;
   startTurn("player");
 });
 
 (async function init(){
-  // preload card back
   const pre = new Image();
   pre.src = CARD_BACK;
 
