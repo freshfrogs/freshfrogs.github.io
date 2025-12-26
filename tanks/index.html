@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tankers — Lanes</title>
+  <title>Tankers — Prototype</title>
   <style>
     :root{
-      --bg:#0d0f12;
-      --panel:#151920;
-      --panel2:#10141a;
-      --brass:#caa55a;
+      --bg:#0b0d11;
+      --panel: rgba(255,255,255,.05);
+      --panel2: rgba(0,0,0,.22);
+      --line: rgba(255,255,255,.10);
       --text:#e8edf6;
       --muted:#9aa7bd;
       --good:#65d67a;
       --bad:#ff4b4b;
       --warn:#ffd166;
-      --line: rgba(255,255,255,.08);
+      --brass:#caa55a;
       --shadow: 0 10px 30px rgba(0,0,0,.45);
       --radius:14px;
       --gap:12px;
@@ -28,7 +28,7 @@
       background:
         radial-gradient(1200px 700px at 30% -10%, rgba(202,165,90,.12), transparent 55%),
         radial-gradient(1200px 700px at 80% 0%, rgba(101,214,122,.08), transparent 55%),
-        linear-gradient(180deg, #0b0d11 0%, #0a0c10 35%, #07090c 100%);
+        linear-gradient(180deg, #0b0d11 0%, #080a0e 40%, #06080b 100%);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
       min-height:100vh;
     }
@@ -39,10 +39,9 @@
       display:flex;align-items:center;justify-content:space-between;
       gap:16px;margin-bottom:12px;flex-wrap:wrap;
     }
-
     .title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
     .title h1{
-      margin:0;letter-spacing:.06em;font-size:20px;text-transform:uppercase;color:#f5f7ff;
+      margin:0;letter-spacing:.08em;font-size:20px;text-transform:uppercase;color:#f5f7ff;
     }
     .title .sub{font-size:12px;color:var(--muted);letter-spacing:.02em}
 
@@ -55,13 +54,13 @@
       box-shadow: 0 8px 18px rgba(0,0,0,.18);
       font-size:12px;color:var(--muted);user-select:none;
     }
-    .pill strong{color:var(--text);font-weight:800}
+    .pill strong{color:var(--text);font-weight:900}
 
     .btn{
       cursor:pointer;border:1px solid var(--line);
       background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
       color:var(--text);border-radius:12px;padding:10px 12px;
-      font-weight:800;letter-spacing:.02em;box-shadow: var(--shadow);
+      font-weight:900;letter-spacing:.02em;box-shadow: var(--shadow);
     }
     .btn:hover{filter:brightness(1.07)}
     .btn:disabled{cursor:not-allowed;opacity:.5;filter:none;box-shadow:none}
@@ -72,10 +71,10 @@
 
     select{
       background: rgba(255,255,255,.06);color: var(--text);
-      border:1px solid var(--line);padding:10px 12px;border-radius:12px;font-weight:800;outline:none;
+      border:1px solid var(--line);padding:10px 12px;border-radius:12px;font-weight:900;outline:none;
     }
 
-    .gridShell{display:grid;grid-template-columns: 1fr 330px;gap:14px;margin-top:12px}
+    .gridShell{display:grid;grid-template-columns: 1fr 340px;gap:14px;margin-top:12px}
     @media (max-width: 980px){ .gridShell{grid-template-columns:1fr} }
 
     .board{
@@ -89,7 +88,7 @@
       background:
         radial-gradient(800px 400px at 50% 0%, rgba(202,165,90,.10), transparent 55%),
         radial-gradient(800px 400px at 50% 100%, rgba(101,214,122,.07), transparent 55%);
-      pointer-events:none;filter: blur(.2px);
+      pointer-events:none;
     }
     .boardInner{position:relative}
 
@@ -99,7 +98,10 @@
       border-radius: 14px;padding:10px 12px;
       display:flex;align-items:center;justify-content:space-between;gap:10px;
     }
-    .hpBox .who{font-weight:1000;letter-spacing:.08em;text-transform:uppercase;font-size:12px;color: var(--muted)}
+    .hpBox .who{
+      font-weight:1000;letter-spacing:.10em;text-transform:uppercase;
+      font-size:12px;color: var(--muted)
+    }
     .hpBox .hp{font-weight:1000;font-size:16px}
     .hpBox .hp.good{color:var(--good)}
     .hpBox .hp.bad{color:var(--bad)}
@@ -109,6 +111,7 @@
       font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;
     }
 
+    /* 4x4 board via lanes: 4 lanes x 4 rows */
     .lanes{display:grid;grid-template-columns: repeat(4, 1fr);gap: var(--gap)}
     .lane{
       border:1px solid var(--line);border-radius: 14px;padding:10px;
@@ -120,6 +123,7 @@
       letter-spacing:.1em;text-transform:uppercase;user-select:none;
     }
 
+    /* Slot matches card ratio */
     .slot{
       aspect-ratio: 2 / 3;
       width:100%;
@@ -132,7 +136,7 @@
     }
     .slot + .slot{ margin-top:10px; }
 
-    /* Only YOUR back row is clickable to place */
+    /* Only YOUR back row (bottom) is clickable for placement */
     .slot.back[data-owner="player"]{ cursor:pointer; }
 
     .slot.back::after{
@@ -187,6 +191,7 @@
       transition: opacity .15s ease, transform .15s ease;
     }
 
+    /* Right panel */
     .side{
       background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
       border:1px solid var(--line);border-radius: var(--radius);
@@ -199,7 +204,6 @@
     }
 
     .hand{display:grid;grid-template-columns: 1fr 1fr;gap:10px}
-
     .handCard{
       border:1px solid rgba(255,255,255,.10);
       border-radius:12px;overflow:hidden;background: rgba(0,0,0,.22);
@@ -222,15 +226,6 @@
       font-size:11px;white-space:nowrap;margin-top:1px;
     }
 
-    .log{
-      margin-top:12px;border-top:1px solid var(--line);padding-top:10px;
-      max-height: 250px;overflow:auto;font-size:12px;color: var(--muted);
-    }
-    .log p{margin:0 0 6px}
-    .log .good{color:rgba(101,214,122,.9)}
-    .log .bad{color:rgba(255,75,75,.9)}
-    .log .warn{color:rgba(255,209,102,.95)}
-
     .hint{
       margin-top:10px;padding:10px;border-radius:12px;border:1px solid var(--line);
       background: rgba(0,0,0,.18);color: var(--muted);font-size:12px;line-height:1.35;
@@ -238,22 +233,31 @@
     .hint b{color:var(--text)}
     .divider{height:1px;background:var(--line);margin:10px 0}
 
+    .log{
+      margin-top:12px;border-top:1px solid var(--line);padding-top:10px;
+      max-height: 260px;overflow:auto;font-size:12px;color: var(--muted);
+    }
+    .log p{margin:0 0 6px}
+    .log .good{color:rgba(101,214,122,.9)}
+    .log .bad{color:rgba(255,75,75,.9)}
+    .log .warn{color:rgba(255,209,102,.95)}
+
     .error{
       padding:12px;border-radius:12px;border:1px solid rgba(255,75,75,.35);
-      background: rgba(255,75,75,.10);color:#ffd7d7;font-weight:800;
+      background: rgba(255,75,75,.10);color:#ffd7d7;font-weight:900;
       margin-top:12px;line-height:1.35;white-space:pre-wrap;
     }
-
     .statusRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
     .statusRow .muted{color:var(--muted);font-size:12px}
   </style>
 </head>
+
 <body>
 <div class="wrap">
   <header>
     <div class="title">
       <h1>Tankers</h1>
-      <div class="sub">Opponent deploys top row (face-down) → flips when it drops to row 2</div>
+      <div class="sub">Deploy face-down on BACK row → next own turn advances + flips → auto-fire</div>
     </div>
 
     <div class="topbar">
@@ -286,7 +290,7 @@
         </div>
 
         <div class="laneHints">
-          <div>Top row = Opponent BACK (deploy)</div>
+          <div>Top row = Opponent BACK (deploy face-down)</div>
           <div>Bottom row = Your BACK (deploy)</div>
         </div>
 
@@ -314,12 +318,20 @@
         4) Your BACK (deploy; face-down to opponent)
       </div>
 
+      <div class="hint">
+        <b>Points:</b> each new round you get points equal to the <b>Turn</b> number.
+        Tier = cost (auto-derived unless you add <code>"tier"</code> or <code>"cost"</code> in JSON).
+      </div>
+
       <div class="log" id="log"></div>
     </aside>
   </div>
 </div>
 
 <script>
+/* ===========================
+   CONFIG
+   =========================== */
 const JSON_PATH = "tanks.json";
 const CARD_BACK = "assets/img/card-back.png";
 
@@ -328,6 +340,9 @@ const PLAYER_MAX_HP = 20;
 const START_HAND = 4;
 const DRAW_PER_TURN = 1;
 
+/* ===========================
+   UTIL
+   =========================== */
 const $ = (s)=>document.querySelector(s);
 const lanesEl = $("#lanes");
 const handEl = $("#hand");
@@ -403,29 +418,34 @@ function showError(text){
 `Could not load ${JSON_PATH}.
 
 Fix checklist:
-1) tanks.json next to this HTML
-2) run from a local server (not file://)
+1) tanks.json is next to this HTML file
+2) run from a local server (NOT file://)
+   - VSCode Live Server
+   - python3 -m http.server
 
 Details:
 ${text}`;
 }
 function hideError(){ errEl.style.display = "none"; errEl.textContent = ""; }
 
+/* ===========================
+   GAME MODEL
+   =========================== */
 /* CardState:
-   { owner, data, hp, faceDown, turnsInBack }
+   { owner: "player"|"opponent", data, hp, faceDown, turnsInBack }
 */
 function makeCardState(card, owner){
   return {
     owner,
     data: card,
     hp: Number(card?.stats?.hp ?? 10),
-    faceDown: true,
-    turnsInBack: 0
+    faceDown: true,     // always face-down when deployed
+    turnsInBack: 0      // increments at start of owner's turns
   };
 }
 
-// Player always sees their own faces.
-// Opponent back-row face-down cards show CARD_BACK until flipped.
+// Player always sees their own card faces.
+// Opponent back-row face-down cards show card-back until flipped.
 function visibleImageFor(cardState){
   if (cardState.owner === "opponent" && cardState.faceDown) return CARD_BACK;
   return cardState.data.image;
@@ -440,12 +460,14 @@ function makeDeck(factionName){
   }));
   return shuffle(cards);
 }
+
 function drawToHand(side, n=1){
   for (let i=0;i<n;i++){
     if (side.deck.length === 0) return;
     side.hand.push(side.deck.pop());
   }
 }
+
 function pickFactions(playerFaction){
   const all = db.factions.map(f=>f.faction);
   if (!all.includes(playerFaction)) playerFaction = all[0];
@@ -453,7 +475,14 @@ function pickFactions(playerFaction){
   return { playerFaction, oppFaction };
 }
 
-/* ========== IMPORTANT FIX: ROW ORDER ========== */
+/* ===========================
+   UI BUILD (4 rows, correct order)
+   TOP → BOTTOM:
+   1) opponent BACK   (deploy face-down)
+   2) opponent FRONT  (revealed)
+   3) player FRONT
+   4) player BACK     (deploy)
+   =========================== */
 function buildBoardUI(){
   lanesEl.innerHTML = "";
   for (let lane=0; lane<LANES; lane++){
@@ -461,11 +490,6 @@ function buildBoardUI(){
     laneEl.className = "lane";
     laneEl.dataset.lane = lane;
 
-    // TOP → BOTTOM:
-    // opponent BACK (deploy face-down)
-    // opponent FRONT (revealed)
-    // player FRONT
-    // player BACK (deploy)
     laneEl.innerHTML = `
       <div class="laneTitle">Lane ${lane+1}</div>
 
@@ -493,7 +517,9 @@ function buildBoardUI(){
   });
 }
 
-/* selection/placement */
+/* ===========================
+   HAND / SELECTION / PLACEMENT
+   =========================== */
 function selectHand(idx){ game.selectedHandIndex = idx; renderHand(); }
 function clearSelection(){ game.selectedHandIndex = null; renderHand(); }
 
@@ -524,18 +550,25 @@ function placeSelectedIntoLane(lane){
 
   game.player.back[lane] = makeCardState(card, "player");
 
-  log(`You deploy ${card.name} to BACK row (Lane ${lane+1}). It will flip next turn when it advances.`, "good");
+  log(`You deploy ${card.name} to BACK row (Lane ${lane+1}). It flips + advances at the start of your next turn.`, "good");
   ui.selHint.textContent = "Placed. End Turn when ready.";
   renderAll();
 }
 
-/* turn flow */
+/* ===========================
+   TURN FLOW
+   =========================== */
 function startTurn(sideName){
   game.active = sideName;
   const side = sideName === "player" ? game.player : game.opp;
 
+  // points reset to turn number
   side.points = game.turn;
+
+  // advance eligible back-row units and flip
   progressBackRow(sideName);
+
+  // draw
   drawToHand(side, DRAW_PER_TURN);
 
   if (sideName === "player"){
@@ -549,6 +582,8 @@ function startTurn(sideName){
   renderAll();
 }
 
+// IMPORTANT: "wait until next turn, then move + reveal"
+// placed on your turn -> at the start of your next turn -> turnsInBack becomes 1 -> eligible
 function progressBackRow(sideName){
   const side = sideName === "player" ? game.player : game.opp;
 
@@ -558,8 +593,8 @@ function progressBackRow(sideName){
 
     backCard.turnsInBack += 1;
 
-    // wait one full turn in back row
-    if (backCard.turnsInBack < 2) continue;
+    // eligible as soon as it has waited through 1 "next own turn" start
+    if (backCard.turnsInBack < 1) continue; // (kept for clarity)
 
     if (side.front[lane] === null){
       side.front[lane] = backCard;
@@ -567,9 +602,9 @@ function progressBackRow(sideName){
       backCard.faceDown = false;
 
       if (sideName === "player"){
-        log(`${backCard.data.name} advances + flips revealed (Lane ${lane+1}).`, "good");
+        log(`${backCard.data.name} advances to FRONT and flips revealed (Lane ${lane+1}).`, "good");
       } else {
-        log(`Opponent tank advances + flips revealed (Lane ${lane+1}).`, "bad");
+        log(`Opponent tank advances to FRONT and flips revealed (Lane ${lane+1}).`, "bad");
       }
     }
   }
@@ -581,7 +616,7 @@ function resolveAttacks(attackerSideName){
 
   for (let lane=0; lane<LANES; lane++){
     const atk = A.front[lane];
-    if (!atk || atk.faceDown) continue;
+    if (!atk || atk.faceDown) continue; // should never be faceDown in front, but safe
 
     const fp = Number(atk.data?.stats?.firepower ?? 0);
     if (fp <= 0) continue;
@@ -624,9 +659,12 @@ function checkGameOver(){
   return false;
 }
 
-/* opponent AI */
+/* ===========================
+   OPPONENT AI (deploys only to top BACK row)
+   =========================== */
 function opponentPlay(){
   const opp = game.opp;
+
   const laneOrder = shuffle([...Array(LANES).keys()]);
   const sorted = opp.hand.slice().sort((a,b)=>getCost(b)-getCost(a));
 
@@ -649,7 +687,9 @@ function opponentPlay(){
   renderAll();
 }
 
-/* render */
+/* ===========================
+   RENDER
+   =========================== */
 function renderAll(){
   if (!game) return;
 
@@ -686,6 +726,7 @@ function renderBoard(){
 
     slot.innerHTML = "";
 
+    // highlight placeable player back slots
     slot.classList.remove("placeable","blocked");
     if (hasSelected && owner === "player" && row === "back"){
       if (side.back[lane] === null) slot.classList.add("placeable");
@@ -716,6 +757,7 @@ function renderBoard(){
     costB.textContent = `T${tier} • ${cost}`;
     cardEl.appendChild(costB);
 
+    // show "FACE DOWN" on any inactive deployed card
     if (cardState.faceDown){
       const fd = document.createElement("div");
       fd.className = "badge fd";
@@ -769,6 +811,7 @@ function renderHand(){
       </div>
     `;
 
+    // dim if can't afford now
     if (game.active !== "player" || cost > game.player.points){
       el.style.opacity = "0.6";
     }
@@ -787,7 +830,9 @@ function floatDamage(owner, row, lane, text){
   setTimeout(()=>dmg.classList.remove("show"), 420);
 }
 
-/* game start */
+/* ===========================
+   GAME START / BUTTONS
+   =========================== */
 function newGame(){
   hideError();
   logEl.innerHTML = "";
@@ -838,19 +883,32 @@ btnNew.addEventListener("click", newGame);
 btnEnd.addEventListener("click", ()=>{
   if (!game || game.active !== "player") return;
 
+  // Player end-turn attack
   resolveAttacks("player");
   if (checkGameOver()) return;
 
+  // Opponent turn start (advance+flip their waiting units, draw, points)
   startTurn("opponent");
+
+  // Opponent deploys face-down to TOP back row
   opponentPlay();
+
+  // Opponent end-turn attack
   resolveAttacks("opponent");
   if (checkGameOver()) return;
 
+  // Next round
   game.turn += 1;
+
+  // Player turn start (advance+flip your waiting units)
   startTurn("player");
 });
 
+/* ===========================
+   INIT
+   =========================== */
 (async function init(){
+  // preload card back
   const pre = new Image();
   pre.src = CARD_BACK;
 
