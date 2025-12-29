@@ -784,11 +784,10 @@ a {
   background: cornflowerblue;
   color: white;
   border: none;
-  box-shadow: 0px 0px darkslateblue;
+  box-shadow: 2px 2px darkslateblue;
   padding: 4px 8px;
   font-family: monospace;
   width: 100%;
-  border-radius: 5px;
   margin: 4px;
   cursor: pointer;
 }
