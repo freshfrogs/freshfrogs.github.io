@@ -400,8 +400,8 @@ a {
   width: 128px;
   height: 128px;
   overflow: hidden;
-  border-radius: 0px;
-  box-shadow: 2px 2px darkslateblue;
+  border-radius: 5px;
+  box-shadow: 0px 0px darkslateblue;
   background-color: #020617;
   background-repeat: no-repeat;
   background-size: 220% 220%;
@@ -696,7 +696,8 @@ a {
   align-self: flex-start;
   background: lightseagreen;
   padding: 8px;
-  box-shadow: 2px 2px darkslateblue;
+  box-shadow: 0px 0px darkslateblue;
+  border-radius: 5px;
 }
 
 /* Reuse recent_sale_card style for owned / staked NFTs */
