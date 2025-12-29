@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
-
 /* BASIC RESET */
 
 *,
@@ -10,7 +8,7 @@
 
 body {
   margin: 0;
-  font-family: 'Space Mono', monospace;
+  font-family: monospace;
   background: #7cc1ff;
   color: white;
 }
@@ -579,7 +577,7 @@ a {
   border: none;
   box-shadow: 2px 2px darkslateblue;
   padding: 4px 8px;
-  font-family: 'Space Mono', monospace;
+  font-family: monospace;
   width: 100%;
   margin: 4px;
   cursor: pointer;
@@ -788,7 +786,7 @@ a {
   border: none;
   box-shadow: 0px 0px darkslateblue;
   padding: 4px 8px;
-  font-family: 'Space Mono', monospace;
+  font-family: monospace;
   width: 100%;
   border-radius: 5px;
   margin: 4px;
@@ -800,3 +798,35 @@ a {
   background: white;
   color: #333;
 }
+
+#frog-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: #7cc1ff; /* your sky */
+  overflow: hidden;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  pointer-events: none; /* don't block clicks on the site */
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+}
+
+.frog-sprite {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  pointer-events: none;
+  border-radius: 100%;
+}
+
+.site-header{position:sticky;top:0;z-index:50;}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.nav-left,.nav-right{display:flex;align-items:center;gap:12px;}
