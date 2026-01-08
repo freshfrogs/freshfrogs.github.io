@@ -1,0 +1,20 @@
+{
+  "description": "Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more! Available for mint at https://freshfrogs.github.io/",
+  "external_url": "https://freshfrogs.github.io/frog/805.png",
+  "image": "ipfs://QmdzLTSiyWAbTJRujCA9JH5DcW2QXPk1efEePAN8Nfd6mv/805.png",
+  "name": "Frog #805",
+  "dna": "98b41d8746961900c49cbdc1e3e22b01fe238193",
+  "edition": 805,
+  "date": 1643417392588,
+  "compiler": "HashLips Art Engine",
+  "attributes": [
+    {
+      "trait_type": "Frog",
+      "value": "splendidLeafFrog"
+    },
+    {
+      "trait_type": "Trait",
+      "value": "red(2)"
+    }
+  ]
+}

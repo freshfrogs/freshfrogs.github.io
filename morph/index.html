@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<style>
+  html {
+    background: cornflowerblue;
+  }
+  body {
+    font: inherit !important;
+    font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
+  }
+  section {
+    font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
+    font-size: auto;
+    color: #1a202c !important;
+    background-color: white;
+    text-align: center;
+    border-radius: 7px;
+    padding: 0px !important;
+    overflow: hidden;
+    margin-bottom: 8px;
+    font-size: small !important;
+    width: 100% !important;
+  }
+  img {
+    max-width: 100%;
+  }
+  header {
+    overflow: hidden;
+    background-color: transparent;
+    text-align: center;
+    border-radius: 5px;
+    width: auto !important;
+    font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji !important;
+    font-size: auto !important;
+    margin-bottom: 16px !important;
+    color: #19282F;
+    padding-bottom: 0px !important;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .wrapper {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .bodyb {
+    background-color: transparent;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 8px;
+    margin-top: 5%;
+  }
+  .pointer {
+    cursor: pointer;
+  }
+  .display_token {
+    display: inline-block;
+    background-color: transparent;
+    padding: 0px;
+    color: #333 !important;
+    border-radius: 5px;
+    overflow: hidden;
+    width: auto;
+    margin: 8px;
+    margin-bottom: 8px;
+    font-size: small;
+    transition: all .2s;
+    border: 2px solid white;
+    overflow: hidden;
+  }
+  .display_token_cont {
+    display: inline-block;
+    margin: 0px;
+    border-radius: 5px;
+    background-color: transparent;
+  }
+  .display_token_img_cont {
+    border-radius: 100%;
+    border: none;
+    margin: 0px;
+    width: 128px;
+    height: 128px;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+    border-bottom-left-radius: 100%;
+    border-bottom-right-radius: 100%;
+  }
+  .innerLeft {
+    
+  }
+  .renderLeft {
+    width: auto;
+    background: transparent;
+    color: #333;
+    margin: auto;
+    padding: 0px;
+    min-width: 168px;
+    border: none;
+  }
+  .renderRight {
+    border-radius: 0px;
+    background: white;
+    color: #1a202c;
+    padding: 8px;
+    width: auto;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+  }
+  .innerRight {
+
+  }
+  .frogImg4 {
+    transition: all .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 256px;
+    height: 256px;
+    border-radius: 100%;
+  }
+  .frogImg4:hover{
+    -ms-transform: scale(1.25); /* IE 9 */
+    -webkit-transform: scale(1.25); /* Safari 3-8 */
+    transform: scale(1.25);
+  }
+  .frogImg3 {
+    transition: all .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    border-radius: 100%;
+    cursor: pointer;
+  }
+  .frogImg3:hover{
+    -ms-transform: scale(1.25); /* IE 9 */
+    -webkit-transform: scale(1.25); /* Safari 3-8 */
+    transform: scale(1.25);
+  }
+  .frogImg5 {
+    transition: all .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    border-radius: 100%;
+    cursor: pointer;
+  }
+  .frogImg6 {
+    transition: all .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 256px;
+    height: 256px;
+    border-radius: 100%;
+  }
+  .parentPanel {
+    width: 70% !important;
+    height: auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    float: none;
+    padding: 8px !important;
+    border: none;
+    min-width: 333px;
+    background-color: transparent;
+    color: white;
+  }
+  .connectButton{
+    margin: 2px;
+    padding: 10px;
+    background: white;
+    border: 0px solid lightgray;
+    border-radius: 5px;
+    min-width: 150px;
+    height: 40px;
+    vertical-align: middle;
+    font-size: small;
+    cursor: pointer;
+  }
+  .connectButton:hover{
+    background: lightgray;
+    cursor: pointer
+  }
+  .unstake_button {
+    margin: 2px;
+    background: white;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    width: 48%;
+    height: 25px;
+    vertical-align: middle;
+    font-size: small;
+    padding: 0px !important;
+    cursor: pointer;
+  }
+  .unstake_button:hover{
+    background: lightgray;
+    cursor: pointer
+  }
+  .logoHeader {
+    margin: auto;
+    width: 80%;
+    padding: 0px;
+    padding-bottom: 0px;
+    color: white;
+    font-size: 14px;
+  }
+  .bottomPanel {
+    margin: auto;
+    width: auto;
+    padding: 16px;
+    padding-top: 0px;
+  }
+  .clogo {
+    width: 128px;
+    height: auto;
+    border-radius: 100%;
+    margin: 12px;
+  }
+  .disconnectedStatus {
+    background: red;
+    width: 14px;
+    height: 14px;
+    border-radius: 100%;
+    margin: 0px;
+    margin-right: 2;
+    display: inherit;
+    margin-right: 6px;
+    margin-bottom: -3px;
+  }
+  .connectedStatus {
+    background: green;
+    width: 14px;
+    height: 14px;
+    border-radius: 100%;
+    margin: 0px;
+    margin-right: 2;
+    display: inherit;
+    margin-right: 6px;
+    margin-bottom: -3px;
+  }
+  .pendingStatus {
+    background: orange;
+    width: 14px;
+    height: 14px;
+    border-radius: 100%;
+    margin: 0px;
+    margin-right: 2;
+    display: inherit;
+    margin-right: 6px;
+    margin-bottom: -3px;
+  }
+  .tknaui {
+    display: inline-block;
+  }
+  .rsltelmnt {
+    display: inline-block;
+  }
+  .tknbui {
+    display: inline-block;
+  }
+  .morph-token-result {
+    background: white;
+    border-radius: 5px;
+    width: 40%;
+    height: auto;
+    margin: auto;
+    padding: 16px;
+    min-width: 256px;
+  }
+  .morph-token-display {
+    width: 256px;
+    height: 256px;
+    margin: auto;
+    background: lightskyblue;
+    border-radius: 5px;
+  }
+  .morph-json-container {
+    margin: auto;
+    width: auto;
+    border: 1px solid lightgray;
+    padding: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 5px;
+    overflow: auto;
+  }
+  .tokens-dropdown-option {
+    background-color: white;
+    padding: 2px;
+    font-size: small;
+  }
+
+</style>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <title>freshfrogs.io</title>
+  <head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    
+    <script src="https://freshfrogs.github.io/source/collection_abi.js"></script>
+    <script src="https://freshfrogs.github.io/source/ffstatic.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+    <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
+    <script>
+
+      // <-- [Google Analytics]
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-6PB0WKB4SH');
+      // -- >
+
+      document.addEventListener("DOMContentLoaded", async () => { await connect(true); await updateMorphTokenInfo(); })
+      //<a href="https://freshfrogs.github.io/learn-more" target="_blank"><button id="learnmoreButton" class="connectButton">💡 Learn More</button></a>
+
+    </script>
+    
+  </head>
+  <body class="bodyb">
+    <section id="parentPanel" class="parentPanel">
+      <div id="console" class="bottomPanel">
+        <div id="outputPanel" style="color: white;"></div>
+        <br>
+        <div id="morph-token-result" class="morph-token-result">
+          <div id="morph-token-display" class="morph-token-display"></div>
+          <div style="display: inline-flex; width: 100%;">
+            <div style="text-align: center; width: 48%; margin: 8px;">
+              <select id="token-ids-b" name="token-ids-b" class="connectButton" style="border: 1px solid lightgray; width: 100%;"></select>
+            </div>
+            <div style="text-align: center; width: 48%; margin: 8px;">
+              <select id="token-ids-a" name="token-ids-a" class="connectButton" style="border: 1px solid lightgray; width: 100%;"></select>
+            </div>
+          </div>
+          <div id="morph-json-container" class="morph-json-container">
+            <strong id="morph-token-ids"></strong>
+            <pre id="morph-json" style="text-align: left; width: fit-content; margin: auto;"></pre>
+          </div>
+        </div>
+<<<<<<< HEAD
+      </div>
+    </section>
+    <section id="frogs" style="background: transparent; border: none !important;"></section>
+  </body>
+=======
+
+        <section
+          class="panel dashboard-section"
+          id="morphed-owned-panel"
+          style="background: transparent; box-shadow: none; padding: 0; margin-top: 24px;"
+        >
+          <h2>Your Morphed Frogs</h2>
+          <p class="dashboard-note" id="morphed-frogs-status">
+            Connect your wallet to load your morphed frogs.
+          </p>
+
+          <div id="morphed-frogs-grid" class="nft-grid"></div>
+        </section>
+
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <span class="footer-links" style="color: white;">
+        <a href="#">freshfrogs.github.io</a>
+      </span>
+    </footer>
+  </div>
+
+  <!-- Web3 -->
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+  <!-- ABIs + legacy helpers -->
+  <script src="../assets/collection_abi.js"></script>
+  <script src="../assets/controller_abi.js"></script>
+  <script src="../assets/ethereum-dapp.js"></script>
+
+  <!-- Rarity rankings -->
+  <script src="../assets/rarityrankings.js"></script>
+
+  <!-- Main site logic -->
+  <script src="../assets/site.js"></script>
+
+  <!-- Morph logic -->
+  <script src="../assets/morph.js"></script>
+</body>
+>>>>>>> 4f4b9fb9223b156a12adbe347c20a4114108059a
+</html>
