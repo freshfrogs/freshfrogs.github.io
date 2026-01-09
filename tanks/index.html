@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tankers — Prototype</title>
+  <style>
+    :root{
+      --bg:#0b0d11;
+      --panel: rgba(255,255,255,.05);
+      --panel2: rgba(0,0,0,.22);
+      --line: rgba(255,255,255,.10);
+      --text:#e8edf6;
+      --muted:#9aa7bd;
+      --good:#65d67a;
+      --bad:#ff4b4b;
+      --warn:#ffd166;
+      --brass:#caa55a;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --radius:14px;
+      --gap:12px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 30% -10%, rgba(202,165,90,.12), transparent 55%),
+        radial-gradient(1200px 700px at 80% 0%, rgba(101,214,122,.08), transparent 55%),
+        linear-gradient(180deg, #0b0d11 0%, #080a0e 40%, #06080b 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      min-height:100vh;
+    }
+
+    .wrap{max-width:1200px;margin:0 auto;padding:18px 16px 28px}
+
+    header{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:16px;margin-bottom:12px;flex-wrap:wrap;
+    }
+    .title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+    .title h1{
+      margin:0;letter-spacing:.08em;font-size:20px;text-transform:uppercase;color:#f5f7ff;
+    }
+    .title .sub{font-size:12px;color:var(--muted);letter-spacing:.02em}
+
+    .topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+
+    .pill{
+      display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(0,0,0,.18);
+      font-size:12px;color:var(--muted);user-select:none;
+    }
+    .pill strong{color:var(--text);font-weight:900}
+
+    .btn{
+      cursor:pointer;border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      color:var(--text);border-radius:12px;padding:10px 12px;
+      font-weight:900;letter-spacing:.02em;box-shadow: var(--shadow);
+    }
+    .btn:hover{filter:brightness(1.07)}
+    .btn:disabled{cursor:not-allowed;opacity:.5;filter:none;box-shadow:none}
+    .btn.primary{
+      border-color: rgba(202,165,90,.35);
+      background: linear-gradient(180deg, rgba(202,165,90,.22), rgba(202,165,90,.08));
+    }
+
+    select{
+      background: rgba(255,255,255,.06);color: var(--text);
+      border:1px solid var(--line);padding:10px 12px;border-radius:12px;font-weight:900;outline:none;
+    }
+
+    .gridShell{display:grid;grid-template-columns: 1fr 340px;gap:14px;margin-top:12px}
+    @media (max-width: 980px){ .gridShell{grid-template-columns:1fr} }
+
+    .board{
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--line);border-radius: var(--radius);
+      padding:12px;box-shadow: var(--shadow);
+      position:relative;overflow:hidden;
+    }
+    .board::before{
+      content:"";position:absolute;inset:-2px;
+      background:
+        radial-gradient(800px 400px at 50% 0%, rgba(202,165,90,.10), transparent 55%),
+        radial-gradient(800px 400px at 50% 100%, rgba(101,214,122,.07), transparent 55%);
+      pointer-events:none;
+    }
+    .boardInner{position:relative}
+
+    .hpbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .hpBox{
+      flex:1;background: rgba(0,0,0,.25);border:1px solid var(--line);
+      border-radius: 14px;padding:10px 12px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .hpBox .who{
+      font-weight:1000;letter-spacing:.10em;text-transform:uppercase;
+      font-size:12px;color: var(--muted)
+    }
+    .hpBox .hp{font-weight:1000;font-size:16px}
+    .hpBox .hp.good{color:var(--good)}
+    .hpBox .hp.bad{color:var(--bad)}
+
+    .laneHints{
+      display:flex;justify-content:space-between;gap:10px;margin:0 2px 10px;
+      font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;
+    }
+
+    /* 4x4 board via lanes: 4 lanes x 4 rows */
+    .lanes{display:grid;grid-template-columns: repeat(4, 1fr);gap: var(--gap)}
+    .lane{
+      border:1px solid var(--line);border-radius: 14px;padding:10px;
+      background: rgba(0,0,0,.16);position:relative;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .laneTitle{
+      position:absolute;top:8px;left:10px;font-size:11px;color:rgba(255,255,255,.35);
+      letter-spacing:.1em;text-transform:uppercase;user-select:none;
+    }
+
+    /* Slot matches card ratio */
+    .slot{
+      aspect-ratio: 2 / 3;
+      width:100%;
+      border:1px dashed rgba(255,255,255,.12);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display:flex;align-items:center;justify-content:center;
+      position:relative;overflow:hidden;margin-top:24px;
+      cursor: default;
+    }
+    .slot + .slot{ margin-top:10px; }
+
+    /* Only YOUR back row (bottom) is clickable for placement */
+    .slot.back[data-owner="player"]{ cursor:pointer; }
+
+    .slot.back::after{
+      content:"BACK";
+      position:absolute;bottom:8px;right:8px;font-size:10px;
+      color:rgba(255,255,255,.24);letter-spacing:.10em;text-transform:uppercase;user-select:none;
+    }
+    .slot.front::after{
+      content:"FRONT";
+      position:absolute;bottom:8px;right:8px;font-size:10px;
+      color:rgba(255,255,255,.24);letter-spacing:.10em;text-transform:uppercase;user-select:none;
+    }
+
+    .slot.placeable{
+      outline:2px solid rgba(101,214,122,.35);
+      box-shadow: 0 0 0 4px rgba(101,214,122,.08);
+      border-style:solid;
+    }
+    .slot.blocked{
+      outline:2px solid rgba(255,75,75,.25);
+      box-shadow: 0 0 0 4px rgba(255,75,75,.06);
+      border-style:solid;
+    }
+
+    .card{
+      width:100%;height:100%;
+      border-radius: 10px;border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;background: rgba(0,0,0,.28);
+      position:relative;box-shadow: 0 8px 20px rgba(0,0,0,.35);
+      user-select:none;display:flex;align-items:stretch;justify-content:stretch;
+    }
+    .card img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+
+    .badge{
+      position:absolute;top:8px;left:8px;background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:999px;padding:4px 8px;
+      font-size:11px;font-weight:1000;letter-spacing:.06em;color:#fff;
+      backdrop-filter: blur(6px);user-select:none;
+    }
+    .badge.cost{ left:auto; right:8px; border-color: rgba(202,165,90,.35); color:#ffe9b5; }
+    .badge.fd{ top:auto; bottom:8px; left:8px; border-color: rgba(255,255,255,.14); color: rgba(255,255,255,.85); }
+
+    .damageFloat{
+      position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+      font-weight:1000;font-size:34px;color:#fff;
+      text-shadow: 0 10px 20px rgba(0,0,0,.65);
+      opacity:0;transform: translateY(8px);pointer-events:none;
+    }
+    .damageFloat.show{
+      opacity:1;transform: translateY(0);
+      transition: opacity .15s ease, transform .15s ease;
+    }
+
+    /* Right panel */
+    .side{
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--line);border-radius: var(--radius);
+      padding:12px;box-shadow: var(--shadow);
+      overflow:hidden;position:relative;
+    }
+    .side h2{
+      margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
+      color: rgba(255,255,255,.85);
+    }
+
+    .hand{display:grid;grid-template-columns: 1fr 1fr;gap:10px}
+    .handCard{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:12px;overflow:hidden;background: rgba(0,0,0,.22);
+      cursor:pointer;position:relative;box-shadow: 0 10px 22px rgba(0,0,0,.25);
+    }
+    .handCard:hover{filter:brightness(1.06)}
+    .handCard.selected{
+      outline:2px solid rgba(202,165,90,.45);
+      box-shadow: 0 0 0 4px rgba(202,165,90,.12), 0 10px 22px rgba(0,0,0,.25);
+    }
+    .handCard img{width:100%;height:150px;object-fit:cover;display:block;pointer-events:none}
+    .handMeta{
+      padding:8px 8px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
+    }
+    .handMeta .nm{font-weight:1000;font-size:12px;line-height:1.1}
+    .handMeta .tiny{font-size:11px;color: var(--muted);line-height:1.1}
+    .handMeta .cost{
+      font-weight:1000;color:#ffe9b5;background: rgba(202,165,90,.15);
+      border:1px solid rgba(202,165,90,.30);padding:3px 7px;border-radius:999px;
+      font-size:11px;white-space:nowrap;margin-top:1px;
+    }
+
+    .hint{
+      margin-top:10px;padding:10px;border-radius:12px;border:1px solid var(--line);
+      background: rgba(0,0,0,.18);color: var(--muted);font-size:12px;line-height:1.35;
+    }
+    .hint b{color:var(--text)}
+    .divider{height:1px;background:var(--line);margin:10px 0}
+
+    .log{
+      margin-top:12px;border-top:1px solid var(--line);padding-top:10px;
+      max-height: 260px;overflow:auto;font-size:12px;color: var(--muted);
+    }
+    .log p{margin:0 0 6px}
+    .log .good{color:rgba(101,214,122,.9)}
+    .log .bad{color:rgba(255,75,75,.9)}
+    .log .warn{color:rgba(255,209,102,.95)}
+
+    .error{
+      padding:12px;border-radius:12px;border:1px solid rgba(255,75,75,.35);
+      background: rgba(255,75,75,.10);color:#ffd7d7;font-weight:900;
+      margin-top:12px;line-height:1.35;white-space:pre-wrap;
+    }
+    .statusRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+    .statusRow .muted{color:var(--muted);font-size:12px}
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <header>
+    <div class="title">
+      <h1>Tankers</h1>
+      <div class="sub">Deploy face-down on BACK row → next own turn advances + flips → auto-fire</div>
+    </div>
+
+    <div class="topbar">
+      <div class="pill"><span>Turn</span> <strong id="turnNum">1</strong></div>
+      <div class="pill"><span>Your points</span> <strong id="pPts">1</strong></div>
+      <div class="pill"><span>Opponent points</span> <strong id="oPts">1</strong></div>
+
+      <select id="factionPick" title="Pick your faction">
+        <option value="germany">Germany</option>
+        <option value="allies">Allies</option>
+      </select>
+
+      <button class="btn" id="btnNew">New Game</button>
+      <button class="btn primary" id="btnEnd" disabled>End Turn</button>
+    </div>
+  </header>
+
+  <div class="gridShell">
+    <div class="board">
+      <div class="boardInner">
+        <div class="hpbar">
+          <div class="hpBox">
+            <div class="who">You</div>
+            <div class="hp good" id="pHP">20</div>
+          </div>
+          <div class="hpBox">
+            <div class="who">Opponent</div>
+            <div class="hp good" id="oHP">20</div>
+          </div>
+        </div>
+
+        <div class="laneHints">
+          <div>Top row = Opponent BACK (deploy face-down)</div>
+          <div>Bottom row = Your BACK (deploy)</div>
+        </div>
+
+        <div class="lanes" id="lanes"></div>
+        <div id="err" class="error" style="display:none"></div>
+      </div>
+    </div>
+
+    <aside class="side">
+      <h2>Your Hand</h2>
+      <div class="hand" id="hand"></div>
+
+      <div class="statusRow">
+        <div class="pill"><span>Selected</span> <strong id="selName">None</strong></div>
+        <div class="muted" id="selHint">Click a card, then click an empty BACK slot.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="hint">
+        <b>Rows (top → bottom):</b><br>
+        1) Opponent BACK (deploy face-down)<br>
+        2) Opponent FRONT (revealed + attacks)<br>
+        3) Your FRONT (revealed + attacks)<br>
+        4) Your BACK (deploy; face-down to opponent)
+      </div>
+
+      <div class="hint">
+        <b>Points:</b> each new round you get points equal to the <b>Turn</b> number.
+        Tier = cost (auto-derived unless you add <code>"tier"</code> or <code>"cost"</code> in JSON).
+      </div>
+
+      <div class="log" id="log"></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+/* ===========================
+   CONFIG
+   =========================== */
+const JSON_PATH = "tanks.json";
+const CARD_BACK = "assets/img/card-back.png";
+
+const LANES = 4;
+const PLAYER_MAX_HP = 20;
+const START_HAND = 4;
+const DRAW_PER_TURN = 1;
+
+/* ===========================
+   UTIL
+   =========================== */
+const $ = (s)=>document.querySelector(s);
+const lanesEl = $("#lanes");
+const handEl = $("#hand");
+const logEl = $("#log");
+const errEl = $("#err");
+const btnEnd = $("#btnEnd");
+const btnNew = $("#btnNew");
+const factionPick = $("#factionPick");
+
+const ui = {
+  turn: $("#turnNum"),
+  pPts: $("#pPts"),
+  oPts: $("#oPts"),
+  pHP: $("#pHP"),
+  oHP: $("#oHP"),
+  selName: $("#selName"),
+  selHint: $("#selHint"),
+};
+
+let db = null;
+let game = null;
+
+function log(msg, cls=""){
+  const p = document.createElement("p");
+  p.textContent = msg;
+  if (cls) p.className = cls;
+  logEl.prepend(p);
+}
+function shuffle(arr){
+  for (let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function deepCopy(obj){ return JSON.parse(JSON.stringify(obj)); }
+function clampInt(n, a, b){ n = Math.floor(Number(n) || 0); return Math.max(a, Math.min(b, n)); }
+
+function deriveTier(card){
+  if (card.tier != null) return clampInt(card.tier, 1, 9);
+  const s = card.stats || {};
+  const score =
+    (s.firepower || 0) * 1.2 +
+    (s.armor || 0) * 1.0 +
+    (s.hp || 0) * 0.5 +
+    (s.mobility || 0) * 0.2 +
+    (s.accuracy || 0) * 0.2 +
+    (s.utility || 0) * 0.1;
+
+  if (score <= 12) return 1;
+  if (score <= 15) return 2;
+  if (score <= 18) return 3;
+  if (score <= 21) return 4;
+  if (score <= 24) return 5;
+  if (score <= 27) return 6;
+  return 7;
+}
+function getCost(card){
+  if (card.cost != null) return Math.max(1, Math.floor(card.cost));
+  return deriveTier(card);
+}
+
+async function loadDB(){
+  const res = await fetch(JSON_PATH, { cache: "no-store" });
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+  const data = await res.json();
+  if (!data || !Array.isArray(data.factions)) throw new Error(`Expected { "factions": [...] }`);
+  return data;
+}
+function showError(text){
+  errEl.style.display = "block";
+  errEl.textContent =
+`Could not load ${JSON_PATH}.
+
+Fix checklist:
+1) tanks.json is next to this HTML file
+2) run from a local server (NOT file://)
+   - VSCode Live Server
+   - python3 -m http.server
+
+Details:
+${text}`;
+}
+function hideError(){ errEl.style.display = "none"; errEl.textContent = ""; }
+
+/* ===========================
+   GAME MODEL
+   =========================== */
+/* CardState:
+   { owner: "player"|"opponent", data, hp, faceDown, turnsInBack }
+*/
+function makeCardState(card, owner){
+  return {
+    owner,
+    data: card,
+    hp: Number(card?.stats?.hp ?? 10),
+    faceDown: true,     // always face-down when deployed
+    turnsInBack: 0      // increments at start of owner's turns
+  };
+}
+
+// Player always sees their own card faces.
+// Opponent back-row face-down cards show card-back until flipped.
+function visibleImageFor(cardState){
+  if (cardState.owner === "opponent" && cardState.faceDown) return CARD_BACK;
+  return cardState.data.image;
+}
+
+function makeDeck(factionName){
+  const f = db.factions.find(x => x.faction === factionName);
+  const cards = (f?.cards || []).map(c => ({
+    ...deepCopy(c),
+    tier: c.tier ?? deriveTier(c),
+    cost: c.cost ?? getCost(c),
+  }));
+  return shuffle(cards);
+}
+
+function drawToHand(side, n=1){
+  for (let i=0;i<n;i++){
+    if (side.deck.length === 0) return;
+    side.hand.push(side.deck.pop());
+  }
+}
+
+function pickFactions(playerFaction){
+  const all = db.factions.map(f=>f.faction);
+  if (!all.includes(playerFaction)) playerFaction = all[0];
+  const oppFaction = all.find(x => x !== playerFaction) || playerFaction;
+  return { playerFaction, oppFaction };
+}
+
+/* ===========================
+   UI BUILD (4 rows, correct order)
+   TOP → BOTTOM:
+   1) opponent BACK   (deploy face-down)
+   2) opponent FRONT  (revealed)
+   3) player FRONT
+   4) player BACK     (deploy)
+   =========================== */
+function buildBoardUI(){
+  lanesEl.innerHTML = "";
+  for (let lane=0; lane<LANES; lane++){
+    const laneEl = document.createElement("div");
+    laneEl.className = "lane";
+    laneEl.dataset.lane = lane;
+
+    laneEl.innerHTML = `
+      <div class="laneTitle">Lane ${lane+1}</div>
+
+      <div class="slot back"  data-owner="opponent" data-row="back"  data-lane="${lane}"></div>
+      <div class="slot front" data-owner="opponent" data-row="front" data-lane="${lane}"></div>
+
+      <div class="slot front" data-owner="player"   data-row="front" data-lane="${lane}"></div>
+      <div class="slot back"  data-owner="player"   data-row="back"  data-lane="${lane}"></div>
+    `;
+    lanesEl.appendChild(laneEl);
+  }
+
+  lanesEl.addEventListener("click", (e)=>{
+    const slot = e.target.closest(".slot");
+    if (!slot || !game) return;
+
+    const owner = slot.dataset.owner;
+    const row = slot.dataset.row;
+    const lane = Number(slot.dataset.lane);
+
+    if (game.active !== "player") return;
+    if (owner !== "player" || row !== "back") return;
+
+    placeSelectedIntoLane(lane);
+  });
+}
+
+/* ===========================
+   HAND / SELECTION / PLACEMENT
+   =========================== */
+function selectHand(idx){ game.selectedHandIndex = idx; renderHand(); }
+function clearSelection(){ game.selectedHandIndex = null; renderHand(); }
+
+function placeSelectedIntoLane(lane){
+  const idx = game.selectedHandIndex;
+  if (idx == null){
+    ui.selHint.textContent = "Select a card first.";
+    return;
+  }
+  const card = game.player.hand[idx];
+  if (!card) return;
+
+  const cost = getCost(card);
+  if (cost > game.player.points){
+    ui.selHint.textContent = `Not enough points. Need ${cost}, you have ${game.player.points}.`;
+    renderAll();
+    return;
+  }
+  if (game.player.back[lane] !== null){
+    ui.selHint.textContent = "That BACK slot is occupied.";
+    renderAll();
+    return;
+  }
+
+  game.player.points -= cost;
+  game.player.hand.splice(idx, 1);
+  game.selectedHandIndex = null;
+
+  game.player.back[lane] = makeCardState(card, "player");
+
+  log(`You deploy ${card.name} to BACK row (Lane ${lane+1}). It flips + advances at the start of your next turn.`, "good");
+  ui.selHint.textContent = "Placed. End Turn when ready.";
+  renderAll();
+}
+
+/* ===========================
+   TURN FLOW
+   =========================== */
+function startTurn(sideName){
+  game.active = sideName;
+  const side = sideName === "player" ? game.player : game.opp;
+
+  // points reset to turn number
+  side.points = game.turn;
+
+  // advance eligible back-row units and flip
+  progressBackRow(sideName);
+
+  // draw
+  drawToHand(side, DRAW_PER_TURN);
+
+  if (sideName === "player"){
+    log(`Your turn ${game.turn}. Points: ${side.points}.`, "warn");
+    ui.selHint.textContent = "Click a card, then click an empty BACK slot.";
+  } else {
+    log(`Opponent turn ${game.turn}.`, "warn");
+    ui.selHint.textContent = "Opponent is acting…";
+  }
+
+  renderAll();
+}
+
+// IMPORTANT: "wait until next turn, then move + reveal"
+// placed on your turn -> at the start of your next turn -> turnsInBack becomes 1 -> eligible
+function progressBackRow(sideName){
+  const side = sideName === "player" ? game.player : game.opp;
+
+  for (let lane=0; lane<LANES; lane++){
+    const backCard = side.back[lane];
+    if (!backCard) continue;
+
+    backCard.turnsInBack += 1;
+
+    // eligible as soon as it has waited through 1 "next own turn" start
+    if (backCard.turnsInBack < 1) continue; // (kept for clarity)
+
+    if (side.front[lane] === null){
+      side.front[lane] = backCard;
+      side.back[lane] = null;
+      backCard.faceDown = false;
+
+      if (sideName === "player"){
+        log(`${backCard.data.name} advances to FRONT and flips revealed (Lane ${lane+1}).`, "good");
+      } else {
+        log(`Opponent tank advances to FRONT and flips revealed (Lane ${lane+1}).`, "bad");
+      }
+    }
+  }
+}
+
+function resolveAttacks(attackerSideName){
+  const A = attackerSideName === "player" ? game.player : game.opp;
+  const D = attackerSideName === "player" ? game.opp : game.player;
+
+  for (let lane=0; lane<LANES; lane++){
+    const atk = A.front[lane];
+    if (!atk || atk.faceDown) continue; // should never be faceDown in front, but safe
+
+    const fp = Number(atk.data?.stats?.firepower ?? 0);
+    if (fp <= 0) continue;
+
+    const def = D.front[lane];
+    if (def){
+      const armor = Number(def.data?.stats?.armor ?? 0);
+      const dmg = Math.max(1, fp - Math.floor(armor/2));
+      def.hp -= dmg;
+
+      floatDamage(attackerSideName === "player" ? "opponent" : "player", "front", lane, `-${dmg}`);
+      log(`${atk.data.name} hits ${def.data.name} (Lane ${lane+1}) for ${dmg}.`, attackerSideName === "player" ? "good" : "bad");
+
+      if (def.hp <= 0){
+        log(`${def.data.name} is destroyed!`, "warn");
+        D.front[lane] = null;
+      }
+    } else {
+      D.hp -= fp;
+      log(`${atk.data.name} fires down Lane ${lane+1} and hits the ${attackerSideName === "player" ? "opponent" : "player"} for ${fp}.`, attackerSideName === "player" ? "good" : "bad");
+    }
+
+    if (D.hp <= 0) break;
+  }
+
+  renderAll();
+}
+
+function checkGameOver(){
+  if (game.player.hp <= 0){
+    log("You lose.", "bad");
+    btnEnd.disabled = true;
+    return true;
+  }
+  if (game.opp.hp <= 0){
+    log("You win!", "good");
+    btnEnd.disabled = true;
+    return true;
+  }
+  return false;
+}
+
+/* ===========================
+   OPPONENT AI (deploys only to top BACK row)
+   =========================== */
+function opponentPlay(){
+  const opp = game.opp;
+
+  const laneOrder = shuffle([...Array(LANES).keys()]);
+  const sorted = opp.hand.slice().sort((a,b)=>getCost(b)-getCost(a));
+
+  for (const card of sorted){
+    const cost = getCost(card);
+    if (cost > opp.points) continue;
+
+    const lane = laneOrder.find(L => opp.back[L] === null);
+    if (lane === undefined) break;
+
+    const idx = opp.hand.findIndex(x => x.id === card.id);
+    if (idx >= 0) opp.hand.splice(idx,1);
+
+    opp.points -= cost;
+    opp.back[lane] = makeCardState(card, "opponent");
+
+    log(`Opponent deploys a tank to TOP BACK row (Lane ${lane+1}) face-down.`, "bad");
+  }
+
+  renderAll();
+}
+
+/* ===========================
+   RENDER
+   =========================== */
+function renderAll(){
+  if (!game) return;
+
+  ui.turn.textContent = String(game.turn);
+  ui.pPts.textContent = String(game.player.points);
+  ui.oPts.textContent = String(game.opp.points);
+
+  ui.pHP.textContent = String(game.player.hp);
+  ui.oHP.textContent = String(game.opp.hp);
+
+  ui.pHP.className = "hp " + (game.player.hp >= 11 ? "good" : "bad");
+  ui.oHP.className = "hp " + (game.opp.hp >= 11 ? "good" : "bad");
+
+  renderBoard();
+  renderHand();
+
+  const sel = (game.selectedHandIndex != null) ? game.player.hand[game.selectedHandIndex] : null;
+  ui.selName.textContent = sel ? sel.name : "None";
+
+  btnEnd.disabled = !game || game.active !== "player";
+}
+
+function renderBoard(){
+  const slots = lanesEl.querySelectorAll(".slot");
+  const hasSelected = (game.active === "player" && game.selectedHandIndex != null);
+
+  slots.forEach(slot=>{
+    const owner = slot.dataset.owner;
+    const row = slot.dataset.row;
+    const lane = Number(slot.dataset.lane);
+
+    const side = owner === "player" ? game.player : game.opp;
+    const cardState = (row === "front") ? side.front[lane] : side.back[lane];
+
+    slot.innerHTML = "";
+
+    // highlight placeable player back slots
+    slot.classList.remove("placeable","blocked");
+    if (hasSelected && owner === "player" && row === "back"){
+      if (side.back[lane] === null) slot.classList.add("placeable");
+      else slot.classList.add("blocked");
+    }
+
+    if (!cardState) return;
+
+    const cardEl = document.createElement("div");
+    cardEl.className = "card";
+
+    const img = document.createElement("img");
+    img.src = visibleImageFor(cardState);
+    img.alt = cardState.data.name;
+    img.onerror = () => { img.src = CARD_BACK; };
+    cardEl.appendChild(img);
+
+    const cost = getCost(cardState.data);
+    const tier = deriveTier(cardState.data);
+
+    const hpB = document.createElement("div");
+    hpB.className = "badge";
+    hpB.textContent = `HP ${cardState.hp}`;
+    cardEl.appendChild(hpB);
+
+    const costB = document.createElement("div");
+    costB.className = "badge cost";
+    costB.textContent = `T${tier} • ${cost}`;
+    cardEl.appendChild(costB);
+
+    // show "FACE DOWN" on any inactive deployed card
+    if (cardState.faceDown){
+      const fd = document.createElement("div");
+      fd.className = "badge fd";
+      fd.textContent = "FACE DOWN";
+      cardEl.appendChild(fd);
+    }
+
+    const dmg = document.createElement("div");
+    dmg.className = "damageFloat";
+    dmg.textContent = "";
+    cardEl.appendChild(dmg);
+
+    slot.appendChild(cardEl);
+  });
+}
+
+function renderHand(){
+  handEl.innerHTML = "";
+  if (!game) return;
+
+  const hand = game.player.hand;
+  if (hand.length === 0){
+    const empty = document.createElement("div");
+    empty.style.gridColumn = "1 / -1";
+    empty.className = "hint";
+    empty.innerHTML = `<b>No cards in hand.</b><br>End turns to draw more.`;
+    handEl.appendChild(empty);
+    return;
+  }
+
+  hand.forEach((card, idx)=>{
+    const el = document.createElement("div");
+    el.className = "handCard" + (game.selectedHandIndex === idx ? " selected" : "");
+    el.addEventListener("click", ()=>{
+      if (!game || game.active !== "player") return;
+      if (game.selectedHandIndex === idx) clearSelection();
+      else selectHand(idx);
+    });
+
+    const cost = getCost(card);
+    const tier = deriveTier(card);
+
+    el.innerHTML = `
+      <img src="${card.image}" alt="${card.name}" draggable="false">
+      <div class="handMeta">
+        <div>
+          <div class="nm">${card.name}</div>
+          <div class="tiny">T${tier} • FP ${card.stats.firepower} • AR ${card.stats.armor}</div>
+        </div>
+        <div class="cost">${cost}</div>
+      </div>
+    `;
+
+    // dim if can't afford now
+    if (game.active !== "player" || cost > game.player.points){
+      el.style.opacity = "0.6";
+    }
+
+    handEl.appendChild(el);
+  });
+}
+
+function floatDamage(owner, row, lane, text){
+  const slot = document.querySelector(`.slot[data-owner="${owner}"][data-row="${row}"][data-lane="${lane}"]`);
+  if (!slot) return;
+  const dmg = slot.querySelector(".damageFloat");
+  if (!dmg) return;
+  dmg.textContent = text;
+  dmg.classList.add("show");
+  setTimeout(()=>dmg.classList.remove("show"), 420);
+}
+
+/* ===========================
+   GAME START / BUTTONS
+   =========================== */
+function newGame(){
+  hideError();
+  logEl.innerHTML = "";
+
+  const { playerFaction, oppFaction } = pickFactions(factionPick.value);
+
+  const player = {
+    faction: playerFaction,
+    hp: PLAYER_MAX_HP,
+    points: 1,
+    deck: makeDeck(playerFaction),
+    hand: [],
+    back: Array(LANES).fill(null),
+    front: Array(LANES).fill(null),
+  };
+  const opp = {
+    faction: oppFaction,
+    hp: PLAYER_MAX_HP,
+    points: 1,
+    deck: makeDeck(oppFaction),
+    hand: [],
+    back: Array(LANES).fill(null),
+    front: Array(LANES).fill(null),
+  };
+
+  game = {
+    turn: 1,
+    active: "player",
+    player,
+    opp,
+    selectedHandIndex: null,
+  };
+
+  drawToHand(player, START_HAND);
+  drawToHand(opp, START_HAND);
+
+  buildBoardUI();
+  renderAll();
+
+  btnEnd.disabled = false;
+
+  log(`New game: YOU = ${playerFaction.toUpperCase()} vs OPPONENT = ${oppFaction.toUpperCase()}.`, "good");
+  log(`Turn 1: Place a tank on your BACK row (bottom).`, "warn");
+}
+
+btnNew.addEventListener("click", newGame);
+
+btnEnd.addEventListener("click", ()=>{
+  if (!game || game.active !== "player") return;
+
+  // Player end-turn attack
+  resolveAttacks("player");
+  if (checkGameOver()) return;
+
+  // Opponent turn start (advance+flip their waiting units, draw, points)
+  startTurn("opponent");
+
+  // Opponent deploys face-down to TOP back row
+  opponentPlay();
+
+  // Opponent end-turn attack
+  resolveAttacks("opponent");
+  if (checkGameOver()) return;
+
+  // Next round
+  game.turn += 1;
+
+  // Player turn start (advance+flip your waiting units)
+  startTurn("player");
+});
+
+/* ===========================
+   INIT
+   =========================== */
+(async function init(){
+  // preload card back
+  const pre = new Image();
+  pre.src = CARD_BACK;
+
+  try{
+    db = await loadDB();
+    log(`Loaded ${db.factions.length} faction(s) from ${JSON_PATH}.`, "good");
+    newGame();
+  }catch(e){
+    showError(String(e && e.message ? e.message : e));
+  }
+})();
+</script>
+</body>
+</html>

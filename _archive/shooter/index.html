@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pixel Soldier – 2D Shooter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrapper">
+    <h1>Pixel Soldier</h1>
+    <p class="instructions">
+      Move: <b>A / D</b> or <b>← / →</b> ·
+      Jump: <b>W</b> or <b>↑</b> ·
+      Shoot: <b>Space</b>
+    </p>
+    <canvas id="game" width="800" height="450"></canvas>
+    <p class="instructions small">
+      Upload the PNGs &amp; sound files to this folder (or update the paths in <code>game.js</code>).
+    </p>
+  </div>
+
+  <!-- Sound effects (replace with your own .wav/.mp3 files) -->
+  <audio id="sndShoot" src="shoot.wav" preload="auto"></audio>
+  <audio id="sndJump" src="jump.wav" preload="auto"></audio>
+  <audio id="sndHit" src="hit.wav" preload="auto"></audio>
+
+  <script src="game.js"></script>
+</body>
+</html>

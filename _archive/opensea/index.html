@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <title>FreshFrogs NFT Collection - OpenSea Feed</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="../style.css" type="text/css">
+      <link rel="shortcut icon" type="image/x-icon" href="https://freshfrogs.github.io/assets/blackWhite.png">
+      <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+  </head>
+  <body>
+    <div class="main_panel">
+      <div class="desc_cont">
+        <img src="https://freshfrogs.github.io/assets/FLY.gif" class="fly"/>
+        <h2>freshfrogs.github.io</h2>
+        <p class="title_desc">
+          Fresh Frogs NFT is a collection of 4,040 randomly generated frogs that are each unique with thousands of different color combinations, traits, accessories, and more
+        </p>
+        opensea.io/collection/fresh-frogs
+        <br>
+        <a class="pointer" href="https://opensea.io/collection/fresh-frogs" target="_blank">Shop on OpenSea ⛵</a>
+        <hr>
+        already own a Frog? <a class="pointer" href="https://freshfrogs.io/the-pond">Stake and Earn Rewards! 🐸</a>
+        <br>
+        Waiting to Connect Web3 <a class="pointer" href="#" id="connect-wallet-link">Connect Wallet 🔌</a>
+      </div>
+    </div>
+    <div class="recent_sales" id="recent-sales">
+      <p id="recent-sales-status" class="recent_sales_status">Loading OpenSea sales...</p>
+    </div>
+    <script>
+      const CONTRACT_ADDRESS = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b'.toLowerCase();
+      const COLLECTION_SLUG = 'fresh-frogs';
+      const OPENSEA_API_KEY = '48ffee972fc245fa965ecfe902b02ab4';
+      const EVENTS_ENDPOINT = 'https://api.opensea.io/api/v2/events';
+      const LEGACY_EVENTS_ENDPOINT = 'https://api.opensea.io/api/v1/events';
+      const FALLBACK_IMAGE_BASE = 'https://freshfrogs.github.io/frog/';
+      const rarityMap = buildRarityMap(window.freshfrogs_rarity_rankings || []);
+      const browserProvider = typeof window !== 'undefined' ? window.ethereum : null;
+
+      document.addEventListener('DOMContentLoaded', () => {
+        setupWalletConnector();
+        loadRecentSales();
+      });
+
+      async function loadRecentSales() {
+        const container = document.getElementById('recent-sales');
+        const statusEl = document.getElementById('recent-sales-status');
+
+        try {
+          const sales = await fetchOpenSeaSales();
+
+          if (!sales.length) {
+            if (statusEl) {
+              statusEl.textContent = 'No recent OpenSea sales found.';
+            }
+            return;
+          }
+
+          if (statusEl) {
+            statusEl.remove();
+          }
+
+          for (const sale of sales) {
+            const card = buildSaleCard(sale);
+            if (card) {
+              container.appendChild(card);
+            }
+          }
+        } catch (error) {
+          console.error('Unable to load OpenSea sales', error);
+          if (statusEl) {
+            statusEl.textContent = error && error.status === 401
+              ? 'Add your OpenSea API key in opensea/index.html to load recent sales.'
+              : 'Unable to load OpenSea sales.';
+          }
+        }
+      }
+
+      async function fetchOpenSeaSales() {
+        const attempts = [
+          {
+            endpoint: EVENTS_ENDPOINT,
+            params: {
+              collection_slug: COLLECTION_SLUG,
+              event_type: 'sale',
+              limit: '20',
+              chain: 'ethereum'
+            }
+          },
+          {
+            endpoint: LEGACY_EVENTS_ENDPOINT,
+            params: {
+              collection_slug: COLLECTION_SLUG,
+              event_type: 'successful',
+              only_opensea: 'false',
+              limit: '20'
+            }
+          }
+        ];
+
+        let lastError = null;
+
+        for (const attempt of attempts) {
+          try {
+            const events = await requestOpenSeaEvents(attempt.endpoint, attempt.params);
+            if (events.length) {
+              return events;
+            }
+          } catch (error) {
+            lastError = error;
+            console.warn('OpenSea event request failed', error);
+          }
+        }
+
+        if (lastError) {
+          throw lastError;
+        }
+
+        return [];
+      }
+
+      async function requestOpenSeaEvents(endpoint, params) {
+        const query = new URLSearchParams(params || {});
+        const response = await fetch(`${endpoint}?${query.toString()}`, { headers: getOpenSeaHeaders() });
+
+        if (!response.ok) {
+          const error = new Error(`OpenSea events request failed (${response.status})`);
+          error.status = response.status;
+          throw error;
+        }
+
+        const payload = await response.json();
+        const events = payload.asset_events || payload.events || payload.sales || [];
+        return events
+          .map((event) => normalizeEvent(event))
+          .filter(Boolean);
+      }
+
+      function getOpenSeaHeaders() {
+        const headers = { Accept: 'application/json' };
+        if (OPENSEA_API_KEY) {
+          headers['X-API-KEY'] = OPENSEA_API_KEY;
+        }
+        return headers;
+      }
+
+      function normalizeEvent(event) {
+        const asset = event.asset || event.nft || event.item || {};
+        const tokenId = normalizeTokenId(
+          asset.token_id ||
+            asset.tokenId ||
+            (asset.identifier && asset.identifier.tokenId) ||
+            (asset.nft_id && asset.nft_id.split('/').pop())
+        );
+
+        if (!tokenId) {
+          return null;
+        }
+
+        const metadata = {
+          name: asset.name || `Frog #${tokenId}`,
+          image_url: asset.image_url || asset.image || `${FALLBACK_IMAGE_BASE}${tokenId}.png`,
+          attributes: asset.traits || asset.attributes || []
+        };
+
+        const buyer = event.winner_account || event.taker || event.to_account || {};
+        const owner = formatOwnerName(buyer);
+        const price = formatPrice(event);
+
+        return {
+          tokenId,
+          metadata,
+          owner,
+          price
+        };
+      }
+
+      function buildSaleCard({ tokenId, metadata, owner, price }) {
+        const frogName = metadata && metadata.name ? metadata.name : `Frog #${tokenId}`;
+        const rarityRank = typeof rarityMap !== 'undefined' ? Number(rarityMap[tokenId]) : null;
+        const rarityTier = rarityRank ? getRarityTier(rarityRank) : null;
+        const rarityText = rarityTier ? rarityTier.label : 'Rarity Unknown';
+        const rarityClass = rarityTier ? `rarity_badge ${rarityTier.className}` : 'rarity_badge rarity_unknown';
+        const imageUrl = metadata && metadata.image_url ? metadata.image_url : `${FALLBACK_IMAGE_BASE}${tokenId}.png`;
+        const traitsHtml = buildTraitsHtml(metadata);
+
+        const card = document.createElement('div');
+        card.className = 'recent_sale_card';
+        card.innerHTML = `
+          <strong class="sale_card_title">${owner}</strong><strong class="sale_card_price">${price}</strong>
+          <div style="clear: both;"></div>
+          <div class="frog_img_cont">
+            <img src="${imageUrl}" class="recent_sale_img" alt="Frog #${tokenId}" loading="lazy" />
+          </div>
+          <div class="recent_sale_traits">
+            <strong class="sale_card_title">${frogName}</strong><strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
+            <div class="recent_sale_properties">
+              ${traitsHtml}
+            </div>
+          </div>
+        `;
+
+        return card;
+      }
+
+      function buildTraitsHtml(metadata) {
+        const traits = [];
+        const MAX_TRAITS = 3;
+
+        if (metadata && Array.isArray(metadata.attributes)) {
+          const frogTrait = metadata.attributes.find(
+            (attr) => attr.trait_type === 'Frog' || attr.trait_type === 'SpecialFrog'
+          );
+          if (frogTrait) {
+            traits.push(`Frog: ${frogTrait.value}`);
+          }
+
+          metadata.attributes
+            .filter((attr) => attr !== frogTrait)
+            .slice(0, MAX_TRAITS - traits.length)
+            .forEach((attr) => {
+              const label = attr.trait_type || attr.display_type || 'Trait';
+              const value = attr.value || attr.trait_value || 'Unknown';
+              traits.push(`${label}: ${value}`);
+            });
+        }
+
+        if (!traits.length) {
+          traits.push('Metadata unavailable');
+        }
+
+        return traits.map((trait) => `<p>${trait}</p>`).join('');
+      }
+
+      function setupWalletConnector() {
+        const connectLink = document.getElementById('connect-wallet-link');
+        if (!connectLink) {
+          return;
+        }
+
+        connectLink.addEventListener('click', async (event) => {
+          event.preventDefault();
+
+          if (!browserProvider || typeof browserProvider.request !== 'function') {
+            alert('A Web3 wallet (like MetaMask) is required to connect.');
+            return;
+          }
+
+          try {
+            const accounts = await browserProvider.request({ method: 'eth_requestAccounts' });
+            const primaryAccount = Array.isArray(accounts) ? accounts[0] : null;
+
+            if (isValidWalletAddress(primaryAccount)) {
+              const normalized = primaryAccount.toLowerCase();
+              window.location.href = `${window.location.origin}/${normalized}`;
+            }
+          } catch (error) {
+            console.warn('Wallet connection was not completed', error);
+          }
+        });
+      }
+
+      function buildRarityMap(rankings) {
+        return rankings.reduce((acc, frog) => {
+          if (frog && typeof frog.id !== 'undefined') {
+            const frogId = Number(frog.id);
+            const rankingValue = frog.ranking || frog.rank;
+            acc[frogId] = typeof rankingValue !== 'undefined' ? rankingValue : 'N/A';
+          }
+          return acc;
+        }, {});
+      }
+
+      function getRarityTier(rank) {
+        if (!rank) {
+          return null;
+        }
+
+        if (rank <= 41) {
+          return { label: 'Legendary', className: 'rarity_legendary' };
+        }
+        if (rank <= 404) {
+          return { label: 'Epic', className: 'rarity_epic' };
+        }
+        if (rank <= 1010) {
+          return { label: 'Rare', className: 'rarity_rare' };
+        }
+
+        return { label: 'Common', className: 'rarity_common' };
+      }
+
+      function normalizeTokenId(value) {
+        if (typeof value === 'number') {
+          return value;
+        }
+        if (typeof value === 'string') {
+          if (!value.length) {
+            return null;
+          }
+          if (value.startsWith('0x')) {
+            return parseInt(value, 16);
+          }
+          const parsed = parseInt(value, 10);
+          return Number.isNaN(parsed) ? null : parsed;
+        }
+        if (value && typeof value.tokenId !== 'undefined') {
+          return normalizeTokenId(value.tokenId);
+        }
+        return null;
+      }
+
+      function isValidWalletAddress(address) {
+        if (!address || typeof address !== 'string') {
+          return false;
+        }
+        return /^0x[a-fA-F0-9]{40}$/.test(address);
+      }
+
+      function formatOwnerName(account) {
+        if (!account) {
+          return 'Unknown buyer';
+        }
+
+        const user = account.user || account.profile || account.account;
+        const username = user && (user.username || user.display_name || user.address);
+        if (username && username.trim().length) {
+          return username.trim();
+        }
+
+        const address = account.address || account.owner || account.wallet_address;
+        if (!address) {
+          return 'Unknown buyer';
+        }
+        const normalized = address.startsWith('0x') ? address : `0x${address}`;
+        return `${normalized.slice(0, 6)}..${normalized.slice(-4)}`.toLowerCase();
+      }
+
+      function formatPrice(event) {
+        if (!event) {
+          return 'Unknown';
+        }
+
+        const payment = event.payment_token || event.payment || (event.price && event.price.payment_token) || {};
+        const decimals = payment.decimals || 18;
+        const symbol = payment.symbol || payment.token_symbol || 'ETH';
+        const totalPrice =
+          event.total_price ||
+          event.sale_price ||
+          (event.price && (event.price.value || event.price.current && event.price.current.value)) ||
+          (event.gross_amount && event.gross_amount.value);
+        const quantity = event.quantity || (event.asset && event.asset.quantity) || 1;
+
+        if (!totalPrice) {
+          return 'Unknown';
+        }
+
+        const numericTotal = typeof totalPrice === 'string' ? Number(totalPrice) : Number(totalPrice || 0);
+        const normalizedValue = numericTotal / Math.pow(10, decimals);
+        const perItem = normalizedValue / Number(quantity || 1);
+        const formatted = perItem.toLocaleString(undefined, { maximumFractionDigits: 4 });
+        return `${formatted} ${symbol}`;
+      }
+    </script>
+  </body>
+</html>

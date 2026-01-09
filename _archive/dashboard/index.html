@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FreshFrogs – Wallet Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body class="layout-4">
+  <div class="page">
+    <!-- HEADER -->
+    <header class="site-header">
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="collection.html">Collection</a>
+        <a href="rarity.html">Rarity</a>
+        <a href="wallet.html">Wallet</a>
+      </nav>
+      <button class="cta-btn" id="connect-wallet-button">Connect Wallet</button>
+    </header>
+
+    <!-- DASHBOARD HERO -->
+    <section class="hero">
+      <div class="hero-main">
+        <h1 class="hero-title">Wallet Dashboard</h1>
+        <p class="hero-subtitle">
+          View your owned and staked FreshFrogs, track rewards, and jump straight to
+          OpenSea or Etherscan for any frog in your collection.
+        </p>
+      </div>
+    </section>
+
+    <!-- MAIN DASHBOARD LAYOUT -->
+    <main class="dashboard-main">
+      <!-- LEFT: OWNED / STAKED LISTS -->
+      <section class="panel dashboard-section" style="background: transparent; box-shadow: none;">
+        <h2>Owned Frogs</h2>
+        <p class="dashboard-note">These are Frogs currently held in your wallet.</p>
+
+        <div id="owned-frogs-grid" class="nft-grid">
+        </div>
+      </section>
+
+      <section class="panel dashboard-section" style="background: transparent; box-shadow: none;">
+        <h2>Staked Frogs</h2>
+        <p class="dashboard-note">These Frogs are staked in the FreshFrogs controller.</p>
+
+        <div id="staked-frogs-grid" class="nft-grid">
+        </div>
+      </section>
+
+      <!-- RIGHT: USER SUMMARY (re-use same dashboard card as homepage) -->
+      <aside class="panel sidebar dashboard-sidebar">
+        <h2>User Dashboard</h2>
+
+        <div class="wallet-summary">
+          <div class="wallet-header">
+            <img
+              id="dashboard-avatar"
+              class="wallet-avatar"
+              src="https://freshfrogs.github.io/assets/blackWhite.png"
+              alt="Profile avatar"
+            />
+            <div>
+              <div id="dashboard-username" class="wallet-username">Not connected</div>
+              <div id="dashboard-wallet" class="wallet-address">Wallet: —</div>
+            </div>
+          </div>
+
+          <div class="wallet-status-row">
+            <span>Status</span>
+            <span id="wallet-status-label">Disconnected</span>
+          </div>
+
+          <div class="wallet-stats-grid">
+            <div class="wallet-stat">
+              <span class="stat-label">Owned Frogs</span>
+              <span id="stat-owned" class="stat-value">0</span>
+            </div>
+            <div class="wallet-stat">
+              <span class="stat-label">Staked Frogs</span>
+              <span id="stat-staked" class="stat-value">0</span>
+            </div>
+            <div class="wallet-stat">
+              <span class="stat-label">Rewards Available</span>
+              <span id="stat-rewards-available" class="stat-value">0</span>
+            </div>
+            <div class="wallet-stat">
+              <span class="stat-label">Rewards Earned</span>
+              <span id="stat-rewards-earned" class="stat-value">0</span>
+            </div>
+          </div>
+
+          <button class="btn primary wallet-connect-btn" onclick="connectWallet()">
+            Connect Wallet
+          </button>
+        </div>
+      </aside>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <span class="footer-links">
+        <a href="#">Twitter</a>
+        <a href="#">OpenSea</a>
+        <a href="#">Etherscan</a>
+      </span>
+    </footer>
+  </div>
+
+  <!-- Web3 for wallet / staking functions -->
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+  <!-- ABIs + legacy staking helpers (used for staking level / progress) -->
+  <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
+  <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
+  <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
+
+  <!-- Rarity rankings (must load before site.js) -->
+  <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+
+  <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
+  <script src="https://freshfrogs.github.io/assets/site.js"></script>
+</body>
+</html>
+

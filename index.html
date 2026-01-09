@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>freshfrogs.github.io</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body class="layout-4">
+  
+
+  <div class="page">
+    <!-- HEADER (hidden until wallet is connected) -->
+    <header class="site-header">
+      <nav class="nav">
+        <div class="nav-left">
+          <a href="/" data-view="collection">Collection</a>
+          <a href="/rarity/" data-view="rarity">Rarity</a>
+          <a href="/pond/" data-view="pond">Pond</a>
+          <a href="/morph/" data-view="morph">Morph</a>
+        </div>
+        <div class="nav-right">
+          <a href="#" id="header-connect-wallet-btn">Connect Wallet</a>
+          <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- HERO (ALWAYS VISIBLE) -->
+    <section class="hero">
+      <div class="hero-main">
+        <div class="hero-media">
+          <img src="https://freshfrogs.github.io/frog/16.png" class="fly" />
+          <img src="https://freshfrogs.github.io/frog/3753.png" class="fly" />
+          <img src="https://freshfrogs.github.io/frog/467.png" class="fly" />
+          <img src="https://freshfrogs.github.io/frog/594.png" class="fly" />
+        </div>
+        <h1 class="hero-title">freshfrogs.github.io</h1>
+        <p class="hero-subtitle">
+          A collection of 4,040 randomly generated frogs on the Ethereum
+          blockchain, that are each unique with thousands of different
+          combinations!
+          Stake and earn rewards, level up, unlock custom trait animations and
+          more! All secondary sales are entitled to a <b>5%</b> royalty.
+        </p>
+
+        <!-- HERO ACTIONS: three nav-style links -->
+        <div class="hero-actions">
+          <!-- Uses same ID so existing JS connect logic still works -->
+          <a href="#" id="landing-connect-btn">
+            Connect Wallet
+          </a>
+          <a href="https://opensea.io/collection/fresh-frogs" target="_blank" rel="noopener noreferrer">
+            Shop on OpenSea ⛵
+          </a>
+          <a href="https://snakeesc.github.io">
+            Escape the Snake 🐍
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN DASHBOARD LAYOUT (hidden until connected) -->
+    <main class="dashboard-main">
+      <!-- Recent Activity (sales / stakes / morphs) -->
+      <section
+        class="panel dashboard-section"
+        id="recent-activity-panel"
+        style="background: transparent; box-shadow: none; padding: 0;"
+      >
+        <!-- Recent Sales -->
+        <h2>Recent Sales</h2>
+        <p class="dashboard-note" id="recent-sales-status">
+          Loading recent sales...
+        </p>
+        <div class="recent_sales" id="recent-sales"></div>
+        <button id="load-more-activity" class="btn secondary" type="button">
+          Load More
+        </button>
+
+        <!-- Recent Stakes -->
+        <h2 style="margin-top: 2rem;">Recent Stakes</h2>
+        <p class="dashboard-note" id="recent-stakes-status">
+          Loading recent stakes...
+        </p>
+        <div class="recent_sales" id="recent-stakes"></div>
+
+        <!-- Recent Morphs (homepage) -->
+        <h2 style="margin-top: 2rem;">Recent Morphs</h2>
+        <p class="dashboard-note" id="recent-home-morphs-status">
+          Loading recent morphs...
+        </p>
+        <div class="recent_sales" id="recent-home-morphs-grid"></div>
+      </section>
+
+      <!-- Rarity Rankings -->
+      <section
+        class="panel dashboard-section"
+        id="rarity-panel"
+        style="display:none; background: transparent; box-shadow: none; padding: 0;"
+      >
+        <h2>Rarity Rankings</h2>
+        <p class="dashboard-note" id="rarity-status">
+          Top ranked Frogs across the collection (lower rank = rarer).
+        </p>
+
+        <div id="rarity-grid" class="recent_sales"></div>
+
+        <button id="load-more-rarity" class="btn secondary" type="button">
+          Load More
+        </button>
+      </section>
+
+      <!-- Pond -->
+      <section
+        class="panel dashboard-section"
+        id="pond-panel"
+        style="display:none; background: transparent; box-shadow: none; padding: 0;"
+      >
+        <h2>The Pond</h2>
+        <p class="dashboard-note" id="pond-status">
+          All Frogs currently staked by the community.
+        </p>
+
+        <div id="pond-grid" class="recent_sales"></div>
+
+        <button id="load-more-pond" class="btn secondary" type="button">
+          Load More
+        </button>
+
+        <h3>Recent Morphs</h3>
+        <p class="dashboard-note" id="recent-morphs-status">
+          Loading recent morphs...
+        </p>
+
+        <div id="recent-morphs-grid" class="recent_sales"></div>
+      </section>
+
+      <!-- Owned Frogs -->
+      <section
+        class="panel dashboard-section"
+        id="owned-panel"
+        style="display:none; background: transparent; box-shadow: none; padding: 0;"
+      >
+        <h2>Owned Frogs</h2>
+        <p class="dashboard-note" id="owned-frogs-status">
+          These are Frogs currently held in your wallet.
+        </p>
+
+        <div id="owned-frogs-grid" class="nft-grid"></div>
+      </section>
+
+      <!-- Staked Frogs -->
+      <section
+        class="panel dashboard-section"
+        id="staked-panel"
+        style="display:none; background: transparent; box-shadow: none; padding: 0;"
+      >
+        <h2>Staked Frogs</h2>
+        <p class="dashboard-note" id="staked-frogs-status">
+          These Frogs are staked in the FreshFrogs controller.
+        </p>
+
+        <div id="staked-frogs-grid" class="nft-grid"></div>
+      </section>
+    </main>
+
+    <!-- FOOTER (hidden until connected) -->
+    <footer class="site-footer">
+      <span class="footer-links" style="color: white;">
+        <a href="#">freshfrogs.github.io</a>
+      </span>
+    </footer>
+  </div>
+
+  <!-- Web3 for wallet / staking functions -->
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+  <!-- ABIs + legacy staking helpers -->
+  <script src="https://freshfrogs.github.io/assets/collection_abi.js"></script>
+  <script src="https://freshfrogs.github.io/assets/controller_abi.js"></script>
+  <script src="https://freshfrogs.github.io/assets/ethereum-dapp.js"></script>
+
+  <!-- Rarity rankings (must load before site.js) -->
+  <script src="https://freshfrogs.github.io/assets/rarityrankings.js"></script>
+
+  <!-- Main site logic (recent activity, wallet, dashboard, etc.) -->
+  <script src="/assets/site.js"></script>
+</body>
+</html>
