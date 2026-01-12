@@ -828,3 +828,59 @@ a {
 .site-header{position:sticky;top:0;z-index:50;}
 .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;}
 .nav-left,.nav-right{display:flex;align-items:center;gap:12px;}
+/* HERO BUTTONS (front-page) */
+.hero-actions .hero-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0; /* rely on .hero-actions gap instead of link margins */
+  padding: 0.75rem 1.1rem;
+  border-radius: 5px;
+  border: none;
+
+  background: transparent; /* overridden by per-button classes below */
+  color: #fff; /* white text on all buttons */
+  text-decoration: none;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+
+  box-shadow: 2px 2px darkslateblue;
+
+  transition: transform 140ms ease-out, filter 140ms ease-out;
+}
+
+/* Turn off nav-style underline for hero buttons */
+.hero-actions .hero-btn::after {
+  display: none;
+}
+
+.hero-actions .hero-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  color: #fff; /* override your .hero-actions a:hover color */
+}
+
+.hero-actions .hero-btn:active {
+  transform: translateY(0px);
+  filter: brightness(0.98);
+  color: #fff;
+}
+
+.hero-actions .hero-btn:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 3px;
+}
+
+/* Button colors */
+.hero-actions .hero-btn--wallet {
+  background: #ff7a59; /* light orange/red */
+}
+
+.hero-actions .hero-btn--opensea {
+  background: #4aa8ff; /* light blue */
+}
+
+.hero-actions .hero-btn--snake {
+  background: #0f6b3d; /* dark-ish green */
+}
