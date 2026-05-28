@@ -1982,6 +1982,9 @@ async function connectWallet() {
     // ✅ update nav visibility (morph hidden until connected, connect btn hidden after)
     ffApplyConnectionVisibility(true);
 
+    // Notify other scripts (e.g. morph.js) that a wallet just connected
+    document.dispatchEvent(new CustomEvent('ff:wallet-connected', { detail: { address } }));
+
     const activeNav = document.querySelector('.nav a.active[data-view]');
     const activeView = activeNav?.dataset.view;
     const onWalletView = activeView === 'wallet' || wasPublicWalletRoute;
