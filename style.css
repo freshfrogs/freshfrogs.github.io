@@ -9,11 +9,11 @@
 /* ── THEME VARIABLES ── */
 
 :root {
-  --bg: #ffffff;
+  --bg: #f0fdf4;
   --bg-card: #ffffff;
-  --bg-dark: #f8fafc;
-  --bg-hover: #f8fafc;
-  --bg-progress: #e2e8f0;
+  --bg-dark: #f0fdf4;
+  --bg-hover: #f0fdf4;
+  --bg-progress: #dcfce7;
   --input-bg: #ffffff;
 
   --text: #1e293b;
@@ -21,17 +21,17 @@
   --text-muted2: #64748b;
   --text-prop: #64748b;
   --text-faint: #94a3b8;
-  --text-note: #94a3b8;
+  --text-note: #86efac;
   --text-footer: #94a3b8;
 
   --accent: #16a34a;
-  --border: #e2e8f0;
+  --border: #d1fae5;
   --shadow: transparent;
 
-  --progress-fill: #fbbf24;
+  --progress-fill: #22c55e;
   --stake-color: #b45309;
 
-  --btn-primary-bg: #1e293b;
+  --btn-primary-bg: #16a34a;
   --btn-primary-text: #ffffff;
 }
 
@@ -63,7 +63,7 @@ a {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: var(--bg);
+  background: #ffffff;
   border-bottom: 1px solid var(--border);
   padding: 0.85rem 0 0.75rem;
   display: flex;
@@ -75,10 +75,9 @@ a {
 
 .logo {
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   font-size: 0.85rem;
-  text-transform: uppercase;
-  padding: 0.35rem 0.75rem;
+  color: var(--accent);
 }
 
 .nav {
@@ -108,18 +107,17 @@ a {
   color: var(--accent);
 }
 
-/* Connect Wallet button in nav */
 #header-connect-wallet-btn {
   font-family: monospace;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   border: 1px solid var(--border);
   padding: 0.3rem 0.9rem;
-  color: var(--text) !important;
-  background: var(--bg);
+  color: var(--accent) !important;
+  background: #f0fdf4;
 }
 
 #header-connect-wallet-btn:hover {
-  border-color: var(--text);
+  border-color: var(--accent);
 }
 
 #wallet-nav-link {
@@ -127,43 +125,44 @@ a {
   color: var(--text-muted);
 }
 
-/* ── HERO ── */
+/* ── HERO: 2x2 frogs left, text right ── */
 
 .hero {
-  max-width: 680px;
-  margin: 2.8rem auto 2rem;
+  max-width: 900px;
+  margin: 2.5rem auto 2rem;
   padding: 0 1rem;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2.5rem;
   align-items: center;
-  text-align: center;
-  gap: 0;
 }
 
 .hero-main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
+  display: contents;
 }
 
 .hero-media {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 0.6rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
 
 .fly {
-  width: 96px;
-  height: 96px;
+  width: 112px;
+  height: 112px;
   image-rendering: pixelated;
+  display: block;
+}
+
+/* Hero text column */
+.hero-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 
 .hero-title {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 700;
   line-height: 1.1;
   margin: 0;
@@ -171,23 +170,18 @@ a {
 
 .hero-subtitle {
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   line-height: 1.65;
-  max-width: 480px;
   margin: 0;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 0.6rem;
-  margin-top: 0.4rem;
 }
 
 .hero-placeholder {
-  width: 100%;
-  aspect-ratio: 4 / 3;
   background: var(--bg-dark);
   border: 1px solid var(--border);
   display: flex;
@@ -203,11 +197,11 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.55rem 1.2rem;
-  border: 1px solid #1e293b;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--accent);
   text-decoration: none;
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-family: monospace;
   line-height: 1;
   transition: opacity 80ms;
@@ -218,34 +212,36 @@ a {
 }
 
 .hero-actions .hero-btn:hover {
-  opacity: 0.85;
+  opacity: 0.8;
 }
 
 .hero-actions .hero-btn--wallet {
-  background: #1e293b;
+  background: var(--accent);
   color: #ffffff;
+  border-color: var(--accent);
 }
 
 .hero-actions .hero-btn--opensea {
   background: #ffffff;
-  color: #1e293b;
+  color: var(--accent);
 }
 
 .hero-actions .hero-btn--snake {
   background: #ffffff;
-  color: #1e293b;
+  color: var(--accent);
 }
 
 /* ── BUTTONS ── */
 
 .btn {
-  border-radius: 0;
-  padding: 0.55rem 1.2rem;
-  font-size: 0.82rem;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.8rem;
   border: 1px solid var(--border);
   cursor: pointer;
   font-weight: 600;
   font-family: monospace;
+  background: #fff;
+  color: var(--text-muted);
 }
 
 .btn.primary {
@@ -255,28 +251,29 @@ a {
 }
 
 .btn.secondary {
-  background: var(--bg-card);
+  background: #fff;
   color: var(--text-muted);
+  border-color: var(--border);
 }
 
 .btn:hover {
-  border-color: var(--text);
-  color: var(--text);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .cta-btn {
   padding: 0.4rem 0.9rem;
   border: 1px solid var(--border);
-  color: var(--text);
+  color: var(--accent);
   font-weight: 600;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   cursor: pointer;
-  background: var(--bg-card);
+  background: #fff;
   font-family: monospace;
 }
 
 .cta-btn:hover {
-  border-color: var(--text);
+  border-color: var(--accent);
 }
 
 /* ── DASHBOARD ── */
@@ -292,19 +289,18 @@ a {
 }
 
 .panel {
-  background: var(--bg-card);
+  background: transparent;
   border: none;
   padding: 1.2rem 1.3rem 1.3rem;
 }
 
-/* Section headings — small, uppercase, gray */
 .panel h2,
 .dashboard-section h2 {
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--text-faint);
+  color: var(--text-note);
   margin-top: 2rem;
   margin-bottom: 0.9rem;
   padding: 0;
@@ -320,7 +316,7 @@ a {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--text-faint);
+  color: var(--text-note);
   margin-top: 2rem;
   margin-bottom: 0.9rem;
 }
@@ -357,6 +353,15 @@ a {
 /* ── RESPONSIVE ── */
 
 @media (max-width: 768px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .hero-media {
+    justify-self: center;
+  }
+
   .site-header {
     flex-wrap: wrap;
     align-items: flex-start;
@@ -367,14 +372,6 @@ a {
     flex: 1 1 100%;
     flex-wrap: wrap;
   }
-
-  .hero {
-    margin-top: 1.8rem;
-  }
-
-  .hero-media {
-    flex-wrap: wrap;
-  }
 }
 
 /* ── FROG GRIDS ── */
@@ -383,7 +380,7 @@ a {
 .nft-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   margin: 0 auto 1.5rem;
 }
@@ -402,11 +399,11 @@ a {
   }
 }
 
-/* ── FROG CARD ── */
+/* ── FROG CARD — horizontal layout ── */
 
 .sale_card_title {
   color: var(--accent);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 
@@ -423,22 +420,22 @@ a {
 }
 
 .frog_img {
-  height: 96px;
-  width: 96px;
+  height: 128px;
+  width: 128px;
   image-rendering: pixelated;
 }
 
 .recent_sale_img {
-  height: 96px;
-  width: 96px;
+  height: 128px;
+  width: 128px;
   image-rendering: pixelated;
 }
 
 .recent_sale_properties {
   border-top: 1px solid var(--border);
-  padding: 6px 0 0;
-  margin: 6px 0 0;
-  font-size: 0.7rem;
+  padding: 5px 0 0;
+  margin: 5px 0 0;
+  font-size: 0.68rem;
   color: var(--text-muted);
 }
 
@@ -454,8 +451,8 @@ a {
 .frog_img_cont {
   position: relative;
   margin: 0 auto;
-  width: 96px;
-  height: 96px;
+  width: 128px;
+  height: 128px;
   overflow: hidden;
   outline: none;
   background-color: var(--bg-dark);
@@ -471,13 +468,11 @@ a {
   position: absolute;
   left: 0;
   top: 0;
-  width: 96px;
-  height: 96px;
+  width: 128px;
+  height: 128px;
   image-rendering: pixelated;
   pointer-events: auto;
-  transition:
-    transform 160ms ease-out,
-    filter 160ms ease-out;
+  transition: transform 160ms ease-out, filter 160ms ease-out;
 }
 
 .trait_overlay:hover,
@@ -589,30 +584,12 @@ a {
 
 /* ── RARITY BADGES ── */
 
-.rarity_badge {
-  text-shadow: none;
-}
-
-.rarity_legendary {
-  color: #b45309;
-  font-weight: 700;
-}
-
-.rarity_epic {
-  color: #7c3aed;
-}
-
-.rarity_rare {
-  color: #0891b2;
-}
-
-.rarity_common {
-  color: var(--text-muted);
-}
-
-.rarity_unknown {
-  opacity: 0.6;
-}
+.rarity_badge { text-shadow: none; }
+.rarity_legendary { color: #b45309; font-weight: 700; }
+.rarity_epic { color: #7c3aed; }
+.rarity_rare { color: #0891b2; }
+.rarity_common { color: var(--text-muted); }
+.rarity_unknown { opacity: 0.6; }
 
 /* ── CARD LINK BUTTONS ── */
 
@@ -632,120 +609,40 @@ a {
   border-right: 1px solid var(--border);
   padding: 5px 4px;
   font-family: monospace;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   cursor: pointer;
   text-align: center;
 }
 
-.sale_link_btn:last-child {
-  border-right: none;
-}
+.sale_link_btn:last-child { border-right: none; }
+.sale_link_btn:hover { color: var(--accent); background: var(--bg-hover); }
 
-.sale_link_btn:hover {
-  color: var(--text);
-  background: var(--bg-hover);
-}
+.sale_link_btn.opensea { background: #2081e2; color: white; border-color: #2081e2; }
+.sale_link_btn.etherscan { background: var(--bg-card); color: var(--text-muted); }
 
-.sale_link_btn.opensea {
-  background: #2081e2;
-  color: white;
-  border-color: #2081e2;
-}
-
-.sale_link_btn.etherscan {
-  background: var(--bg-card);
-  color: var(--text-muted);
-}
-
-.staking-sale-note {
-  margin-top: 4px;
-  font-size: 0.68rem;
-  color: var(--text-faint);
-}
-
-.staking-sale-stats {
-  margin-top: 4px;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-}
-
-.staking-sale-stats strong {
-  color: var(--text);
-}
+.staking-sale-note { margin-top: 4px; font-size: 0.65rem; color: var(--text-faint); }
+.staking-sale-stats { margin-top: 4px; font-size: 0.7rem; color: var(--text-muted); }
+.staking-sale-stats strong { color: var(--text); }
 
 /* ── STAKING ── */
 
-.stake-meta {
-  margin: 8px;
-  margin-top: 0;
-  padding-top: 0;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-}
-
-.stake-meta-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.stake-meta-subrow {
-  font-size: 0.9em;
-  border-top: 1px solid var(--border);
-  padding: 6px 0 0;
-  color: var(--text-muted);
-  margin-top: 6px;
-}
-
-.stake-level-label {
-  font-weight: 700;
-  color: var(--stake-color);
-}
-
-.stake-rewards-label {
-  font-weight: 600;
-  color: var(--stake-color);
-}
-
-.stake-progress {
-  position: relative;
-  width: 100%;
-  height: 5px;
-  background: var(--bg-progress);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  margin-top: 2px;
-}
-
-.stake-progress-bar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0%;
-  background: var(--progress-fill);
-  transition: width 260ms ease-out;
-}
-
-.stake-progress-label {
-  margin-top: 3px;
-  font-size: 0.65rem;
-  color: var(--text-faint);
-}
+.stake-meta { margin: 6px 8px; padding-top: 0; font-size: 0.7rem; color: var(--text-muted); }
+.stake-meta-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.stake-meta-subrow { font-size: 0.9em; border-top: 1px solid var(--border); padding: 5px 0 0; color: var(--text-muted); margin-top: 5px; }
+.stake-level-label { font-weight: 700; color: var(--stake-color); }
+.stake-rewards-label { font-weight: 600; color: var(--stake-color); }
+.stake-progress { position: relative; width: 100%; height: 4px; background: var(--bg-progress); border: 1px solid var(--border); overflow: hidden; margin-top: 2px; }
+.stake-progress-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: var(--progress-fill); transition: width 260ms ease-out; }
+.stake-progress-label { margin-top: 2px; font-size: 0.62rem; color: var(--text-faint); }
 
 /* ── DASHBOARD NOTE ── */
 
-.dashboard-note {
-  font-size: 0.75rem;
-  color: var(--text-note);
-  margin-bottom: 0.8rem;
-}
+.dashboard-note { font-size: 0.73rem; color: var(--text-note); margin-bottom: 0.8rem; }
 
-/* ── FROG CARD (main) ── */
+/* ── FROG CARD — vertical: image on top ── */
 
 .recent_sale_card {
   width: 100%;
-  max-width: none;
   margin: 0;
   align-self: flex-start;
   background: var(--bg-card);
@@ -754,71 +651,48 @@ a {
   overflow: hidden;
 }
 
-.nft-grid .recent_sale_card {
-  margin: 0;
-}
-
-/* Card header bar */
+.nft-grid .recent_sale_card { margin: 0; }
 
 .card-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 6px 10px;
-  border-bottom: 1px solid var(--border);
   font-size: 0.72rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.card-top .sale_card_title {
-  color: var(--accent);
-  font-weight: 700;
-}
+.card-top .sale_card_title { color: var(--accent); font-weight: 700; }
+.card-top .sale_card_price { color: var(--text); font-weight: 600; }
 
-.card-top .sale_card_price {
-  color: var(--text);
-  font-weight: 600;
-}
-
-/* Image area */
-
+/* No padding around image — fills edge to edge */
 .card-img-wrap {
   display: flex;
   justify-content: center;
-  padding: 12px 0;
-  background: var(--bg-card);
+  align-items: center;
+  padding: 0;
+  background: var(--bg-dark);
+  overflow: hidden;
 }
 
-/* Traits section */
+.card-img-wrap img,
+.card-img-wrap .frog_img_cont {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
 
 .recent_sale_traits {
   padding: 6px 10px;
   border-top: 1px solid var(--border);
 }
 
-.recent_sale_traits .sale_card_title {
-  float: left;
-  color: var(--accent);
-  font-size: 0.72rem;
-  font-weight: 700;
-}
+.recent_sale_traits .sale_card_title { float: left; color: var(--accent); font-size: 0.72rem; font-weight: 700; }
+.recent_sale_traits .sale_card_price { float: right; font-size: 0.68rem; font-weight: 600; }
+.recent_sale_traits::after { content: ""; display: table; clear: both; }
 
-.recent_sale_traits .sale_card_price {
-  float: right;
-  font-size: 0.68rem;
-  font-weight: 600;
-}
-
-.recent_sale_traits::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-/* Action buttons */
-
-.recent_sale_card .frog-actions {
-  display: flex;
-}
+.recent_sale_card .frog-actions { display: flex; }
 
 .frog-actions .frog_action_btn {
   flex: 1;
@@ -829,29 +703,17 @@ a {
   border-right: 1px solid var(--border);
   padding: 5px 4px;
   font-family: monospace;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   cursor: pointer;
   text-align: center;
 }
 
-.frog-actions .frog_action_btn:last-child {
-  border-right: none;
-}
-
-.frog_action_btn:hover {
-  background: var(--bg-hover);
-  color: var(--text);
-}
+.frog-actions .frog_action_btn:last-child { border-right: none; }
+.frog_action_btn:hover { background: var(--bg-hover); color: var(--accent); }
 
 /* ── SEARCH ── */
 
-.search-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
+.search-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
 
 .search-input {
   padding: 0.4rem 0.75rem;
@@ -863,14 +725,8 @@ a {
   width: 180px;
 }
 
-.search-input:focus {
-  outline: none;
-  border-color: var(--text);
-}
-
-.search-result {
-  margin-bottom: 1rem;
-}
+.search-input:focus { outline: none; border-color: var(--accent); }
+.search-result { margin-bottom: 1rem; }
 
 /* ── SUBPAGE TITLE ── */
 
@@ -880,72 +736,28 @@ a {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--text-faint);
+  color: var(--text-note);
   border-bottom: 1px solid var(--border);
   margin-bottom: 1.5rem;
 }
 
 /* ── NAV ACTIVE ── */
 
-.nav a[data-view] {
-  cursor: pointer;
-}
+.nav a[data-view] { cursor: pointer; }
+.nav a.active { color: var(--accent); }
 
-.nav a.active {
-  color: var(--accent);
-}
-
-.frog-owner-link {
-  color: inherit;
-  text-decoration: none;
-}
-
-.frog-owner-link:hover {
-  text-decoration: underline;
-}
+.frog-owner-link { color: inherit; text-decoration: none; }
+.frog-owner-link:hover { text-decoration: underline; }
 
 /* ── MORPH GALLERY ── */
 
-.morph-gallery {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 16px 0 24px;
-  justify-content: center;
-}
+.morph-gallery { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 24px; justify-content: center; }
+.morph-thumb { width: 80px; height: 80px; padding: 0; border: 1px solid transparent; background: transparent; cursor: pointer; position: relative; }
+.morph-thumb img { width: 80px; height: 80px; image-rendering: pixelated; display: block; }
+.morph-thumb-label { position: absolute; bottom: 2px; left: 4px; font-size: 10px; background: rgba(0,0,0,0.55); color: white; padding: 1px 4px; }
+.morph-thumb.selected { border-color: var(--accent); }
 
-.morph-thumb {
-  width: 96px;
-  height: 96px;
-  padding: 0;
-  border: 1px solid transparent;
-  background: transparent;
-  cursor: pointer;
-  position: relative;
-}
-
-.morph-thumb img {
-  width: 96px;
-  height: 96px;
-  image-rendering: pixelated;
-  display: block;
-}
-
-.morph-thumb-label {
-  position: absolute;
-  bottom: 2px;
-  left: 4px;
-  font-size: 11px;
-  background: rgba(0,0,0,0.55);
-  color: white;
-  padding: 1px 4px;
-}
-
-.morph-thumb.selected {
-  border-color: var(--accent);
-}
-
-/* ── BACKGROUND FROGS ── */
+/* ── BACKGROUND ── */
 
 #frog-bg {
   position: fixed;
@@ -959,10 +771,7 @@ a {
   pointer-events: none;
 }
 
-.page {
-  position: relative;
-  z-index: 1;
-}
+.page { position: relative; z-index: 1; }
 
 .frog-sprite {
   position: absolute;
@@ -971,3 +780,4 @@ a {
   image-rendering: pixelated;
   pointer-events: none;
 }
+</style>
