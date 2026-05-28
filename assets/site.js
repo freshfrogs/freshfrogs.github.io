@@ -43,6 +43,7 @@ const FF_RARITY_BATCH = 24;
 // Pond paging
 let FF_POND_PAGE_KEY = null;
 let FF_RARITY_LOADING = false;
+let FF_POND_LOADING = false;
 
 // ------------------------
 // Global wallet state
@@ -1255,10 +1256,14 @@ async function ffLoadMoreRarity() {
 
     FF_RARITY_INDEX += slice.length;
 
+    const allLoaded = FF_RARITY_INDEX >= rankings.length;
     if (status) {
-      status.textContent = FF_RARITY_INDEX >= rankings.length
+      status.textContent = allLoaded
         ? 'All frogs loaded.'
         : 'Top ranked Frogs across the collection (lower rank = rarer).';
+    }
+    if (allLoaded) {
+      document.getElementById('load-more-rarity')?.style.setProperty('display', 'none');
     }
   } catch (err) {
     console.error('ffLoadMoreRarity failed', err);
@@ -1289,7 +1294,6 @@ async function ffFetchPondFrogs(limit = 24, pageKey = null) {
   const target = FF_COLLECTION_ADDRESS.toLowerCase();
 
   const frogs = all.filter((nft) => nft?.contract?.address?.toLowerCase() === target);
-  console.log(frogs)
   return { frogs, pageKey: data.pageKey || null };
 }
 
@@ -1319,9 +1323,12 @@ async function ffDecoratePondOwner(card, tokenId) {
 }
 
 async function ffLoadMorePond() {
+  if (FF_POND_LOADING) return;
+  FF_POND_LOADING = true;
+
   const grid = document.getElementById('pond-grid');
   const status = document.getElementById('pond-status');
-  if (!grid) return;
+  if (!grid) { FF_POND_LOADING = false; return; }
 
   try {
     const { frogs, pageKey } = await ffFetchPondFrogs(24, FF_POND_PAGE_KEY);
@@ -1358,10 +1365,18 @@ async function ffLoadMorePond() {
     }
 
     FF_POND_PAGE_KEY = pageKey || null;
-    if (status) status.textContent = 'All Frogs currently staked by the community.';
+    const pondTotal = grid.children.length;
+    if (!FF_POND_PAGE_KEY) {
+      document.getElementById('load-more-pond')?.style.setProperty('display', 'none');
+      if (status) status.textContent = `${pondTotal} frog${pondTotal === 1 ? '' : 's'} staked in the pond.`;
+    } else {
+      if (status) status.textContent = `${pondTotal} frogs loaded — scroll down for more.`;
+    }
   } catch (err) {
     console.error('ffLoadMorePond failed', err);
     if (status) status.textContent = 'Unable to load pond frogs.';
+  } finally {
+    FF_POND_LOADING = false;
   }
 }
 
