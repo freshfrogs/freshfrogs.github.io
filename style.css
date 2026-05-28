@@ -56,15 +56,14 @@ a {
   font-size: 0.9rem;
 }
 
-/* Make hero links look just like nav links */
 .nav a,
 .hero-actions a {
-    color: inherit;
-    text-decoration: none;
-    padding: 0.2rem 0;
-    position: relative;
-    margin: 8px;
-    border-bottom: 0px solid white;
+  color: inherit;
+  text-decoration: none;
+  padding: 0.2rem 0;
+  position: relative;
+  margin: 8px;
+  border-bottom: 0px solid white;
 }
 
 .nav a::after,
@@ -75,38 +74,42 @@ a {
   bottom: -0.25rem;
   width: 0%;
   height: 2px;
-  background: linear-gradient(to right, #22c55e, #22d3ee);
+  background: #1e293b;
   transition: width 160ms ease-out;
 }
 
 .nav a:hover,
 .hero-actions a:hover {
-  color: darkcyan;
+  color: #16a34a;
 }
 
 .nav a:hover::after,
 .hero-actions a:hover::after {
   width: 80%;
+  background: #16a34a;
 }
 
 .cta-btn {
   padding: 0.55rem 1.2rem;
-  border-radius: 5px;
-  border: none;
-  color: #022c22;
+  border-radius: 0;
+  border: 2px solid #1e293b;
+  color: #1e293b;
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
-  background: royalblue;
-  color: white;
+  background: #f8fafc;
+  box-shadow: 3px 3px 0 #1e293b;
+  font-family: monospace;
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out;
 }
 
 .cta-btn:hover {
-  filter: brightness(1.05);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #1e293b;
 }
 
-/* HERO – TEMPLATE 4 (CENTERED) */
+/* HERO */
 
 .hero {
   max-width: 720px;
@@ -155,20 +158,10 @@ a {
 .hero-placeholder {
   width: 100%;
   aspect-ratio: 4 / 3;
-  border-radius: 18px;
-  background: radial-gradient(
-      circle at top left,
-      rgba(74, 222, 128, 0.18),
-      transparent 55%
-    ),
-    radial-gradient(
-      circle at bottom right,
-      rgba(56, 189, 248, 0.18),
-      transparent 55%
-    ),
-    #020617;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65);
+  border-radius: 0;
+  background: #020617;
+  border: 2px solid #1e293b;
+  box-shadow: 4px 4px 0 #1e293b;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -179,51 +172,41 @@ a {
 /* BUTTONS */
 
 .btn {
-  border-radius: 999px;
+  border-radius: 0;
   padding: 0.65rem 1.4rem;
   font-size: 0.92rem;
-  border: 1px solid transparent;
+  border: 2px solid #1e293b;
   cursor: pointer;
-  font-weight: 500;
-  transition:
-    background 200ms ease-out,
-    color 200ms ease-out,
-    border-color 200ms ease-out,
-    transform 140ms ease-out;
+  font-weight: 600;
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out;
+  font-family: monospace;
+  box-shadow: 3px 3px 0 #1e293b;
 }
 
 .btn.primary {
   padding: 0.55rem 1.2rem;
-  border-radius: 6px;
-  border: none;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.85rem;
-  cursor: pointer;
   white-space: nowrap;
-  background: #2081e2;
+  background: #1e293b;
   color: white;
-  box-shadow: 0 2px 6px rgba(32,129,226,0.35);
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.35);
 }
 
 .btn.secondary {
   padding: 0.55rem 1.2rem;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
-  color: #374151;
-  font-weight: 600;
+  color: #1e293b;
   font-size: 0.85rem;
-  cursor: pointer;
   white-space: nowrap;
-  background: #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  background: #f8fafc;
 }
 
 .btn:hover {
-  transform: translateY(-1px);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #1e293b;
 }
 
 /* MAIN – DASHBOARD LAYOUT */
-/* Single column layout: all panels full-width, stacked vertically */
 
 .dashboard-main {
   display: flex;
@@ -235,11 +218,12 @@ a {
 }
 
 .panel {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border: none;
   padding: 1.2rem 1.3rem 1.3rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  border-radius: 10px;
+  outline: 1px solid #1e293b;
+  box-shadow: 4px 4px 0 #1e293b;
+  border-radius: 0;
 }
 
 .panel h2 {
@@ -259,7 +243,7 @@ a {
 
 .site-footer {
   padding-top: 0.8rem;
-  border-top: 1px solid #bfdbfe;
+  border-top: 2px solid #1e293b;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -309,18 +293,18 @@ a {
   width: 128px;
   height: 128px;
   margin: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  outline: 1px solid #1e293b;
+  box-shadow: 3px 3px 0 #1e293b;
   image-rendering: pixelated;
 }
 
-/* SHARED GRID LAYOUT FOR ALL FROG LISTS
-   (recent sales, mints, pond, owned, staked, rarity) */
+/* SHARED GRID LAYOUT FOR ALL FROG LISTS */
 
 .recent_sales,
 .nft-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 20px;
   width: 100%;
   margin: 0 auto 2rem;
 }
@@ -339,17 +323,16 @@ a {
   }
 }
 
-/* FROG CARD (used everywhere: owned, staked, sales, mints, pond, rarity) */
+/* FROG CARD – shared everywhere */
 
 .sale_card_title {
-  float: left;
-  margin-left: 4px;
   color: #16a34a;
+  font-size: 0.8rem;
 }
 
 .sale_card_price {
-  float: right;
-  margin-right: 4px;
+  font-size: 0.8rem;
+  color: #1e293b;
 }
 
 .recent_sale_header {
@@ -371,41 +354,37 @@ a {
 }
 
 .recent_sale_properties {
-  border-top: 1px solid #e2e8f0;
-  padding: 8px;
-  margin: 8px;
-  color: #0891b2;
-  margin-bottom: 0px;
-  font-size: 0.9em;
+  border-top: 1px solid #cbd5e1;
+  padding: 8px 0 0;
+  margin: 6px 0 0;
+  font-size: 0.72rem;
+  color: #475569;
 }
 
 .recent_sale_properties p {
-  margin: 2px;
+  margin: 2px 0;
   text-align: left;
   color: #374151;
   font-size: 1em;
 }
 
-.recent_sale_traits {
-}
-
-/* Layered frog container (used by ethereum-dapp.js helpers) */
+/* Layered frog container */
 
 .frog_img_cont {
   position: relative;
-  margin: 24px auto;
+  margin: 0 auto;
   width: 128px;
   height: 128px;
   overflow: hidden;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: 0;
+  outline: 1px solid #1e293b;
   background-color: #020617;
   background-repeat: no-repeat;
   background-size: 220% 220%;
   background-position: bottom right;
 }
 
-/* Attribute layers (built by build_trait) */
+/* Attribute layers */
 
 .trait_overlay,
 .attribute_overlay {
@@ -430,7 +409,7 @@ a {
   z-index: 5;
 }
 
-/* Trait list text in the card */
+/* Trait text */
 
 .frog-attr-text {
   cursor: default;
@@ -450,7 +429,7 @@ a {
   z-index: 5;
 }
 
-/* WALLET SIDEBAR / DASHBOARD (legacy IDs safe even if not shown) */
+/* WALLET SIDEBAR */
 
 .sidebar .wallet-summary {
   display: flex;
@@ -469,14 +448,14 @@ a {
 .wallet-avatar {
   width: 64px;
   height: 64px;
-  border-radius: 999px;
+  border-radius: 0;
   object-fit: cover;
+  outline: 1px solid #1e293b;
 }
 
 .wallet-username {
   font-weight: bold;
   color: white;
-  text-shadow: none;
   font-size: 1.1em;
 }
 
@@ -504,10 +483,11 @@ a {
 }
 
 .wallet-stat {
-  background: antiquewhite;
+  background: #f8fafc;
   padding: 0.35rem 0.45rem;
-  border-radius: 0px;
+  border-radius: 0;
   color: #333;
+  outline: 1px solid #1e293b;
 }
 
 .wallet-stat .stat-label {
@@ -535,22 +515,19 @@ a {
 }
 
 .rarity_legendary {
-  border-color: gold;
-  color: gold;
+  color: #b45309;
+  font-weight: 700;
 }
 
 .rarity_epic {
-  border-color: #a855f7;
-  color: #c4b5fd;
+  color: #7c3aed;
 }
 
 .rarity_rare {
-  border-color: #22d3ee;
   color: #0891b2;
 }
 
 .rarity_common {
-  border-color: #9ca3af;
   color: #64748b;
 }
 
@@ -558,44 +535,48 @@ a {
   opacity: 0.7;
 }
 
-/* RECENT SALE / FROG CARD LINK BUTTONS (used for all frog cards) */
+/* FROG CARD LINK BUTTONS */
 
 .recent_sale_links {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0px;
-  margin: 0px;
-  margin-top: 10px;
+  flex-wrap: nowrap;
+  gap: 0;
+  margin: 0;
 }
 
 .sale_link_btn {
-  background: #f1f5f9;
-  color: #374151;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  padding: 4px 8px;
+  flex: 1;
+  background: #f8fafc;
+  color: #1e293b;
+  border: none;
+  border-top: 1px solid #1e293b;
+  border-right: 1px solid #1e293b;
+  padding: 6px 4px;
   font-family: monospace;
-  width: 100%;
-  margin: 4px;
+  font-size: 0.72rem;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 0;
+  text-align: center;
+}
+
+.sale_link_btn:last-child {
+  border-right: none;
 }
 
 .sale_link_btn:hover {
-  transform: translateY(-1px);
   background: #e2e8f0;
-  color: #1e293b;
 }
 
 .sale_link_btn.opensea {
-  border-color: #2081e2;
-  background-color: #2081e2;
+  background: #2081e2;
+  color: white;
+  border-color: #1e293b;
 }
 
 .sale_link_btn.etherscan {
-  border-color: antiquewhite;
-  background: antiquewhite;
-  color: #333;
+  background: #f8fafc;
+  color: #1e293b;
+  border-color: #1e293b;
 }
 
 .staking-sale-note {
@@ -614,14 +595,14 @@ a {
   color: #1e293b;
 }
 
-/* STAKING LEVEL + PROGRESS (dashboard cards) */
+/* STAKING LEVEL + PROGRESS */
 
 .stake-meta {
   margin: 8px;
-  margin-top: 0px;
-  padding-top: 0px;
+  margin-top: 0;
+  padding-top: 0;
   font-size: 0.75rem;
-  color: #e5e7eb;
+  color: #475569;
 }
 
 .stake-meta-row {
@@ -632,29 +613,29 @@ a {
 
 .stake-meta-subrow {
   font-size: 0.9em;
-  border-top: 1px solid #e2e8f0;
-  padding: 8px;
+  border-top: 1px solid #cbd5e1;
+  padding: 8px 0 0;
   color: #475569;
   margin-top: 8px;
 }
 
 .stake-level-label {
-  font-weight: 600;
-  color: #fbbf24;
-  text-shadow: none;
+  font-weight: 700;
+  color: #b45309;
 }
 
 .stake-rewards-label {
-  font-weight: 500;
-  color: #fbbf24;
+  font-weight: 600;
+  color: #b45309;
 }
 
 .stake-progress {
   position: relative;
   width: 100%;
-  height: 8px;
-  border-radius: 999px;
+  height: 6px;
+  border-radius: 0;
   background: #e2e8f0;
+  outline: 1px solid #cbd5e1;
   overflow: hidden;
   margin-top: 2px;
 }
@@ -665,7 +646,7 @@ a {
   top: 0;
   bottom: 0;
   width: 0%;
-  border-radius: inherit;
+  border-radius: 0;
   background: #fbbf24;
   transition: width 260ms ease-out;
 }
@@ -684,25 +665,109 @@ a {
   margin-bottom: 0.6rem;
 }
 
-/* Reuse recent_sale_card style for owned / staked NFTs */
-/* Make cards a bit slimmer and stop stretching them to full row height */
+/* FROG CARD (main) */
+
 .recent_sale_card {
   width: 100%;
   max-width: none;
-  margin: 8px auto;
+  margin: 4px auto;
   align-self: flex-start;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: #f8fafc;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  outline: 1px solid #1e293b;
+  box-shadow: 4px 4px 0 #1e293b;
+  overflow: hidden;
 }
 
-/* Reuse recent_sale_card style for owned / staked NFTs */
 .nft-grid .recent_sale_card {
-  width: 100%;
-  max-width: none;
-  margin: 8px auto;
+  margin: 4px auto;
+}
+
+/* Card header bar */
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 10px;
+  border-bottom: 1px solid #1e293b;
+  font-size: 0.75rem;
+}
+
+.card-top .sale_card_title {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.card-top .sale_card_price {
+  color: #1e293b;
+  font-weight: 700;
+}
+
+/* Image area */
+
+.card-img-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
+  background: #f8fafc;
+}
+
+/* Traits section */
+
+.recent_sale_traits {
+  padding: 8px 10px;
+  border-top: 1px solid #1e293b;
+}
+
+.recent_sale_traits .sale_card_title {
+  float: left;
+  color: #16a34a;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.recent_sale_traits .sale_card_price {
+  float: right;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.recent_sale_traits::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Action buttons row */
+
+.recent_sale_card .frog-actions {
+  display: flex;
+}
+
+.frog-actions .frog_action_btn {
+  flex: 1;
+  background: #f8fafc;
+  color: #1e293b;
+  border: none;
+  border-top: 1px solid #1e293b;
+  border-right: 1px solid #1e293b;
+  padding: 6px 4px;
+  font-family: monospace;
+  font-size: 0.72rem;
+  cursor: pointer;
+  border-radius: 0;
+  text-align: center;
+}
+
+.frog-actions .frog_action_btn:last-child {
+  border-right: none;
+}
+
+.frog_action_btn:hover {
+  background: #e2e8f0;
 }
 
 /* FROG ID SEARCH BAR */
@@ -717,8 +782,8 @@ a {
 
 .search-input {
   padding: 0.45rem 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border: 2px solid #1e293b;
+  border-radius: 0;
   font-family: monospace;
   font-size: 0.9rem;
   color: #1e293b;
@@ -728,37 +793,37 @@ a {
 
 .search-input:focus {
   outline: none;
-  border-color: #93c5fd;
-  box-shadow: 0 0 0 2px rgba(147,197,253,0.25);
+  box-shadow: 3px 3px 0 #1e293b;
 }
 
 .search-result {
   margin-bottom: 1rem;
 }
 
-/* SUBPAGE TITLE BAR (replaces full hero on rarity/pond/morph) */
+/* SUBPAGE TITLE BAR */
 
 .page-title-bar {
   padding: 1.5rem 0 1rem;
   font-size: 1.3rem;
   font-weight: 700;
   color: #1e293b;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 2px solid #1e293b;
   margin-bottom: 1.5rem;
 }
 
-/* HEADER NAV: active state for view tabs */
+/* HEADER NAV: active state */
 
 .nav a[data-view] {
   cursor: pointer;
 }
 
 .nav a.active {
-  color: darkcyan;
+  color: #16a34a;
 }
 
 .nav a.active::after {
   width: 80%;
+  background: #16a34a;
 }
 
 .frog-owner-link {
@@ -771,6 +836,7 @@ a {
 }
 
 /* Morph gallery */
+
 .morph-gallery {
   display: flex;
   flex-wrap: wrap;
@@ -804,40 +870,15 @@ a {
   background: rgba(0,0,0,0.65);
   color: white;
   padding: 1px 4px;
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 .morph-thumb.selected {
-  border-color: #52ff9b; /* neon-ish frog green */
-  box-shadow: 0 0 0 2px rgba(82,255,155,0.5);
+  border-color: #16a34a;
+  box-shadow: 3px 3px 0 #1e293b;
 }
 
-/* your existing button styles stay the same */
-.recent_sale_card .frog-actions{
-  display: flex;
-  gap: 0px;
-  justify-content: center;
-}
-
-/* makes <a> behave exactly like your <button> */
-.frog-actions .frog_action_btn{
-  background: #f1f5f9;
-  color: #374151;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  padding: 4px 8px;
-  font-family: monospace;
-  width: 100%;
-  margin: 4px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.frog_action_btn:hover {
-  transform: translateY(-1px);
-  background: #e2e8f0;
-  color: #1e293b;
-}
+/* FROG BACKGROUND */
 
 #frog-bg {
   position: fixed;
@@ -849,7 +890,7 @@ a {
   overflow: hidden;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  pointer-events: none; /* don't block clicks on the site */
+  pointer-events: none;
 }
 
 .page {
@@ -864,65 +905,72 @@ a {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   pointer-events: none;
-  border-radius: 100%;
+  border-radius: 0;
 }
 
-.site-header{position:sticky;top:0;z-index:50;background:rgba(219,234,254,0.92);backdrop-filter:blur(8px);}
-.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;}
-.nav-left,.nav-right{display:flex;align-items:center;gap:12px;}
-/* HERO BUTTONS (front-page) */
+/* STICKY HEADER – solid, no blur */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #dbeafe;
+  border-bottom: 2px solid #1e293b;
+}
+
+.nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.nav-left, .nav-right { display: flex; align-items: center; gap: 12px; }
+
+/* HERO BUTTONS */
+
 .hero-actions .hero-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin: 0; /* rely on .hero-actions gap instead of link margins */
+  margin: 0;
   padding: 0.75rem 1.1rem;
-  border-radius: 5px;
-  border: none;
-
-  background: transparent; /* overridden by per-button classes below */
-  color: #fff; /* white text on all buttons */
+  border-radius: 0;
+  border: 2px solid #1e293b;
   text-decoration: none;
   font-weight: 800;
   letter-spacing: 0.02em;
   line-height: 1;
-
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-
-  transition: transform 140ms ease-out, filter 140ms ease-out;
+  font-family: monospace;
+  box-shadow: 4px 4px 0 #1e293b;
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out;
 }
 
-/* Turn off nav-style underline for hero buttons */
 .hero-actions .hero-btn::after {
   display: none;
 }
 
 .hero-actions .hero-btn:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.06);
-  color: #fff; /* override your .hero-actions a:hover color */
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #1e293b;
+  filter: none;
 }
 
 .hero-actions .hero-btn:active {
-  transform: translateY(0px);
-  filter: brightness(0.98);
-  color: #fff;
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 #1e293b;
 }
 
 .hero-actions .hero-btn:focus-visible {
-  outline: 3px solid rgba(255, 255, 255, 0.85);
+  outline: 3px solid #1e293b;
   outline-offset: 3px;
 }
 
-/* Button colors */
 .hero-actions .hero-btn--wallet {
-  background: #ff7a59; /* light orange/red */
+  background: #ff7a59;
+  color: white;
 }
 
 .hero-actions .hero-btn--opensea {
-  background: #4aa8ff; /* light blue */
+  background: #4aa8ff;
+  color: white;
 }
 
 .hero-actions .hero-btn--snake {
-  background: #0f6b3d; /* dark-ish green */
+  background: #0f6b3d;
+  color: white;
 }

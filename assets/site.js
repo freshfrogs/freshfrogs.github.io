@@ -652,26 +652,28 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
   card.dataset.tokenId = tokenId;
   card.dataset.imgContainerId = imgContainerId;
 
-  // ✅ Frog name is now the OpenSea link
   card.innerHTML = `
-    <strong class="sale_card_title">${headerLeft || ''}</strong>
-    <strong class="sale_card_price">${headerRight || ''}</strong>
-    <div style="clear: both;"></div>
+    <div class="card-top">
+      <strong class="sale_card_title">${headerLeft || ''}</strong>
+      <strong class="sale_card_price">${headerRight || ''}</strong>
+    </div>
 
-    <div id="${imgContainerId}" class="frog_img_cont">
-      <img
-        src="https://freshfrogs.github.io/frog/${tokenId}.png"
-        class="recent_sale_img"
-        alt="Frog #${tokenId}"
-        loading="lazy"
-      />
+    <div class="card-img-wrap">
+      <div id="${imgContainerId}" class="frog_img_cont">
+        <img
+          src="https://freshfrogs.github.io/frog/${tokenId}.png"
+          class="recent_sale_img"
+          alt="Frog #${tokenId}"
+          loading="lazy"
+        />
+      </div>
     </div>
 
     <div class="recent_sale_traits">
       <strong class="sale_card_title">
         <a class="frog-name-link" href="${osLink}" target="_blank" rel="noopener noreferrer">${frogName}</a>
       </strong>
-      <strong class="sale_card_price ${rarityClass}">${rarityText}</strong><br>
+      <strong class="sale_card_price ${rarityClass}">${rarityText}</strong>
       <div class="recent_sale_properties">
         ${traitsHtml}
       </div>
@@ -679,7 +681,6 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
       ${actionHtml || ''}
     </div>
 
-    <!-- ✅ buttons back at the true bottom of the card -->
     ${ffActionButtonsHTML(tokenId)}
   `;
 
@@ -723,24 +724,27 @@ const name =
     "https://freshfrogs.github.io/assets/blackWhite.png";
 
   card.innerHTML = `
-    <strong class="sale_card_title">--</strong>
-    <strong class="sale_card_price">Morphed</strong>
-    <div style="clear: both;"></div>
+    <div class="card-top">
+      <strong class="sale_card_title">--</strong>
+      <strong class="sale_card_price">Morphed</strong>
+    </div>
 
-    <div id="${imgContainerId}" class="frog_img_cont">
-      <img
-        src="${fallbackImg}"
-        class="recent_sale_img"
-        alt="${ffEscapeHtml(name)}"
-        loading="lazy"
-      />
+    <div class="card-img-wrap">
+      <div id="${imgContainerId}" class="frog_img_cont">
+        <img
+          src="${fallbackImg}"
+          class="recent_sale_img"
+          alt="${ffEscapeHtml(name)}"
+          loading="lazy"
+        />
+      </div>
     </div>
 
     <div class="recent_sale_traits">
       <strong class="sale_card_title">
         <span class="frog-name-link">${ffEscapeHtml(name)}</span>
       </strong>
-      <strong class="sale_card_price rarity_badge rarity_unknown">MORPH TEST</strong><br>
+      <strong class="sale_card_price rarity_badge rarity_unknown">MORPH TEST</strong>
       <div class="recent_sale_properties">
         ${traitsHtml}
       </div>
@@ -921,7 +925,7 @@ function ffActionButtonsHTML(tokenId) {
         onclick="window.open('${osUrl}', '_blank', 'noopener,noreferrer')">
         OpenSea
       </button>
-      <button class="${cls}" type="button" style="background: antiquewhite; color: #333;"
+      <button class="${cls}" type="button"
         onclick="window.open('${esUrl}', '_blank', 'noopener,noreferrer')">
         EtherScan
       </button>
