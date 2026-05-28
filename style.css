@@ -705,6 +705,37 @@ a {
   margin: 8px auto;
 }
 
+/* FROG ID SEARCH BAR */
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #1e293b;
+  background: #ffffff;
+  width: 180px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 2px rgba(147,197,253,0.25);
+}
+
+.search-result {
+  margin-bottom: 1rem;
+}
+
 /* SUBPAGE TITLE BAR (replaces full hero on rarity/pond/morph) */
 
 .page-title-bar {

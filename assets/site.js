@@ -193,17 +193,18 @@ function ffInitNav() {
 }
 
 function ffWireHeroButtons() {
-  const heroConnectBtn = document.getElementById('hero-connect-wallet-btn');
+  const heroConnectBtn   = document.getElementById('hero-connect-wallet-btn');
   const headerConnectBtn = document.getElementById('header-connect-wallet-btn');
+  const landingConnectBtn = document.getElementById('landing-connect-btn');
 
   heroConnectBtn?.addEventListener('click', connectWallet);
 
-  headerConnectBtn?.addEventListener('click', (e) => {
-    e.preventDefault();
-    connectWallet();
+  [headerConnectBtn, landingConnectBtn].forEach((btn) => {
+    btn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      connectWallet();
+    });
   });
-
-  // View Collection removed — nothing to wire.
 }
 
 function ffShowView(view) {
@@ -224,16 +225,22 @@ function ffShowView(view) {
   if (ownedPanel)   ownedPanel.style.display   = (view === 'wallet') ? '' : 'none';
   if (stakedPanel)  stakedPanel.style.display  = (view === 'wallet') ? '' : 'none';
 
+  // Hide the landing hero when viewing wallet — it's only relevant pre-connect
+  const hero = document.querySelector('.hero');
+  if (hero) hero.style.display = (view === 'wallet') ? 'none' : '';
+
   if (view === 'collection') {
     // Homepage: 6 recent sales, 6 recent stakes, 6 recent morphs
     loadRecentActivity(); // uses FF_RECENT_LIMIT for sales
     ffLoadRecentStakes(); // new stakes section
     ffLoadRecentMorphs(6, 'recent-home-morphs-grid', 'recent-home-morphs-status'); // homepage morphs
   } else if (view === 'rarity') {
+    ffEnsureRaritySearch();
     ffEnsureRarityLoaded();
   } else if (view === 'pond') {
     // Pond shows staked frogs + the big recent morphs panel
     ffEnsureRecentMorphsAbovePond();
+    ffEnsurePondSearch();
     ffEnsurePondLoaded();
     ffEnsureRecentMorphsLoaded();
   } else if (view === 'wallet' && ffCurrentAccount) {
@@ -2007,7 +2014,8 @@ function ffInitWalletOnLoad() {
   const btnIds = [
     'connect-wallet-button',
     'hero-connect-wallet-btn',
-    'header-connect-wallet-btn'
+    'header-connect-wallet-btn',
+    'landing-connect-btn'
   ];
   btnIds.forEach((id) => {
     const b = document.getElementById(id);
@@ -2108,6 +2116,171 @@ function ffApplyConnectionVisibility(isConnected) {
   if (connectBtn) connectBtn.style.display = isConnected ? 'none' : '';
 }
 
+
+// ===================================================
+// Frog ID search (rarity + pond)
+// ===================================================
+function ffEnsureRaritySearch() {
+  if (document.getElementById('rarity-search-bar')) return;
+  const panel = document.getElementById('rarity-panel');
+  const grid  = document.getElementById('rarity-grid');
+  if (!panel || !grid) return;
+
+  const bar = document.createElement('div');
+  bar.id = 'rarity-search-bar';
+  bar.className = 'search-bar';
+  bar.innerHTML = `
+    <input type="number" id="rarity-search-input" class="search-input"
+      placeholder="Search Frog #..." min="0" max="4040" />
+    <button id="rarity-search-btn" class="btn secondary" type="button">Search</button>
+    <button id="rarity-search-clear" class="btn secondary" type="button" style="display:none;">Clear</button>
+  `;
+  const resultDiv = document.createElement('div');
+  resultDiv.id = 'rarity-search-result';
+  resultDiv.className = 'search-result';
+
+  panel.insertBefore(bar, grid);
+  panel.insertBefore(resultDiv, grid);
+
+  const input    = document.getElementById('rarity-search-input');
+  const btn      = document.getElementById('rarity-search-btn');
+  const clearBtn = document.getElementById('rarity-search-clear');
+
+  const doSearch = () => {
+    const id = parseTokenId(input.value);
+    if (id == null) return;
+    ffSearchRarityFrog(id);
+    clearBtn.style.display = '';
+  };
+  btn.addEventListener('click', doSearch);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
+  clearBtn.addEventListener('click', () => {
+    resultDiv.innerHTML = '';
+    input.value = '';
+    clearBtn.style.display = 'none';
+  });
+}
+
+function ffEnsurePondSearch() {
+  if (document.getElementById('pond-search-bar')) return;
+  const panel = document.getElementById('pond-panel');
+  const grid  = document.getElementById('pond-grid');
+  if (!panel || !grid) return;
+
+  const bar = document.createElement('div');
+  bar.id = 'pond-search-bar';
+  bar.className = 'search-bar';
+  bar.innerHTML = `
+    <input type="number" id="pond-search-input" class="search-input"
+      placeholder="Search Frog #..." min="0" max="4040" />
+    <button id="pond-search-btn" class="btn secondary" type="button">Search</button>
+    <button id="pond-search-clear" class="btn secondary" type="button" style="display:none;">Clear</button>
+  `;
+  const resultDiv = document.createElement('div');
+  resultDiv.id = 'pond-search-result';
+  resultDiv.className = 'search-result';
+
+  panel.insertBefore(bar, grid);
+  panel.insertBefore(resultDiv, grid);
+
+  const input    = document.getElementById('pond-search-input');
+  const btn      = document.getElementById('pond-search-btn');
+  const clearBtn = document.getElementById('pond-search-clear');
+
+  const doSearch = () => {
+    const id = parseTokenId(input.value);
+    if (id == null) return;
+    ffSearchPondFrog(id);
+    clearBtn.style.display = '';
+  };
+  btn.addEventListener('click', doSearch);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
+  clearBtn.addEventListener('click', () => {
+    resultDiv.innerHTML = '';
+    input.value = '';
+    clearBtn.style.display = 'none';
+  });
+}
+
+async function ffSearchRarityFrog(tokenId) {
+  const resultDiv = document.getElementById('rarity-search-result');
+  if (!resultDiv) return;
+
+  resultDiv.innerHTML = '<p class="dashboard-note">Loading...</p>';
+
+  try {
+    const rank     = getRarityRank(tokenId);
+    const metadata = await fetchFrogMetadata(tokenId);
+
+    resultDiv.innerHTML = '';
+
+    if (!metadata || !Object.keys(metadata).length) {
+      resultDiv.innerHTML = `<p class="dashboard-note">Frog #${tokenId} not found.</p>`;
+      return;
+    }
+
+    const card = createFrogCard({
+      tokenId, metadata,
+      headerLeft: '',
+      headerRight: rank ? `Rank #${rank}` : 'Rank unknown',
+      footerHtml: '', actionHtml: ''
+    });
+    resultDiv.appendChild(card);
+
+    if (card.dataset.imgContainerId) ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
+    ffAttachStakeMetaIfStaked(card, tokenId);
+    ffDecorateRarityOwner(card, tokenId);
+  } catch (err) {
+    resultDiv.innerHTML = `<p class="dashboard-note">Could not load Frog #${tokenId}.</p>`;
+  }
+}
+
+async function ffSearchPondFrog(tokenId) {
+  const resultDiv = document.getElementById('pond-search-result');
+  if (!resultDiv) return;
+
+  resultDiv.innerHTML = '<p class="dashboard-note">Checking pond...</p>';
+
+  try {
+    await ffInitReadContractsOnLoad();
+
+    let isStaked = false;
+    let stakerAddr = null;
+
+    if (typeof stakerAddress === 'function') {
+      stakerAddr = await stakerAddress(tokenId);
+      isStaked = !!(stakerAddr && stakerAddr !== ZERO_ADDRESS);
+    } else {
+      const ok = await ffEnsureReadContracts();
+      if (ok && window.collection?.methods?.ownerOf) {
+        const owner = await window.collection.methods.ownerOf(tokenId).call();
+        isStaked = owner?.toLowerCase() === FF_CONTROLLER_ADDRESS.toLowerCase();
+      }
+    }
+
+    resultDiv.innerHTML = '';
+
+    if (!isStaked) {
+      resultDiv.innerHTML = `<p class="dashboard-note">Frog #${tokenId} is not currently staked in the pond.</p>`;
+      return;
+    }
+
+    const metadata = await fetchFrogMetadata(tokenId);
+    const card = createFrogCard({
+      tokenId, metadata,
+      headerLeft: '', headerRight: 'Staked',
+      footerHtml: '', actionHtml: ''
+    });
+    resultDiv.appendChild(card);
+
+    if (card.dataset.imgContainerId) ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
+    ffAttachStakeMetaIfStaked(card, tokenId);
+    if (stakerAddr) ffSetOwnerLabel(card, stakerAddr);
+  } catch (err) {
+    console.error('ffSearchPondFrog failed:', err);
+    resultDiv.innerHTML = `<p class="dashboard-note">Could not check staking status for Frog #${tokenId}.</p>`;
+  }
+}
 
 function ffRomanToArabic(roman) {
   if (!roman) return null;
