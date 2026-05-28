@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>freshfrogs.github.io — Mint</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="layout-4">
+  <div id="frog-bg"></div>
+  <div class="page">
+    <header class="site-header">
+      <nav class="nav">
+        <a href="/" data-view="collection">Collection</a>
+        <a href="/rarity/" data-view="rarity">Rarity</a>
+        <a href="/pond/" data-view="pond">Pond</a>
+        <a href="/morph/" data-view="morph">Morph</a>
+        <a href="/mint/">Mint</a>
+        <a href="#" id="header-connect-wallet-btn">Connect</a>
+        <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
+      </nav>
+    </header>
+
+    <div class="page-title-bar">Mint a Frog</div>
+
+    <main class="dashboard-main">
+      <section
+        class="panel dashboard-section"
+        id="mint-panel"
+        style="background: transparent; box-shadow: none; padding: 0;"
+      >
+
+        <!-- Collection info (always visible) -->
+        <div class="recent_sale_card" style="width: 100%; max-width: 460px; margin: 0 0 1.5rem;">
+          <p style="margin: 6px 0;"><strong>Collection:</strong> Fresh Frogs NFT</p>
+          <p style="margin: 6px 0;"><strong>Smart Contract:</strong>
+            <a href="https://etherscan.io/address/0xbe4bef8735107db540de269ff82c7de9ef68c51b"
+               target="_blank" rel="noopener noreferrer" style="color:#0891b2;">
+              0xBE4B...C51b
+            </a>
+          </p>
+          <p style="margin: 6px 0;"><strong>Total Supply:</strong> 4,040</p>
+          <p style="margin: 6px 0;"><strong>Minted:</strong> <span id="mint-minted">—</span></p>
+          <p style="margin: 6px 0;"><strong>Remaining:</strong> <span id="mint-remaining">—</span></p>
+        </div>
+
+        <!-- Pre-connect prompt -->
+        <div id="mint-connect-prompt">
+          <p class="dashboard-note">Connect your wallet to see your mint options and pricing.</p>
+        </div>
+
+        <!-- Mint UI (shown after wallet connects) -->
+        <div id="mint-ui" style="display:none;">
+          <div class="recent_sale_card" style="width: 100%; max-width: 460px; margin: 0 0 1.5rem;">
+            <p style="margin: 6px 0;"><strong>Invite type:</strong> <span id="mint-invite-label">—</span></p>
+            <p style="margin: 6px 0;"><strong>Price per Frog:</strong> <span id="mint-price">—</span> ETH</p>
+            <p style="margin: 6px 0;"><strong>Mint limit:</strong> <span id="mint-limit">—</span></p>
+          </div>
+
+          <div class="search-bar" style="margin-bottom: 1.2rem;">
+            <label for="mint-quantity" style="font-weight: 600; white-space: nowrap;">Quantity:</label>
+            <input type="number" id="mint-quantity" class="search-input"
+              value="1" min="1" max="10" style="width: 72px;" />
+            <button id="mint-btn" class="btn primary" type="button">Mint Frog</button>
+          </div>
+
+          <p id="mint-status" class="dashboard-note"></p>
+        </div>
+
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span class="footer-links">
+        <a href="#">freshfrogs.github.io</a>
+      </span>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+  <!-- F0 / Factoria mint SDK -->
+  <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+  <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+
+  <!-- ABIs + staking helpers -->
+  <script src="/assets/collection_abi.js"></script>
+  <script src="/assets/controller_abi.js"></script>
+  <script src="/assets/ethereum-dapp.js"></script>
+
+  <!-- Rarity rankings (required by site.js) -->
+  <script src="/assets/rarityrankings.js"></script>
+
+  <!-- Main site logic (wallet connect, nav, etc.) -->
+  <script src="/assets/site.js"></script>
+
+  <!-- Mint page logic -->
+  <script src="/assets/mint.js"></script>
+
+  <script>
+    // Mark Mint nav link as active
+    window.addEventListener('load', () => {
+      document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+      const mintLink = document.querySelector('.nav a[href="/mint/"]');
+      if (mintLink) mintLink.classList.add('active');
+    });
+  </script>
+</body>
+</html>
