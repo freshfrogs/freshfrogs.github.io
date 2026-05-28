@@ -238,8 +238,11 @@ function ffShowView(view) {
     ffEnsureRaritySearch();
     ffEnsureRarityLoaded();
   } else if (view === 'pond') {
+    // Pond shows staked frogs + the big recent morphs panel
+    ffEnsureRecentMorphsAbovePond();
     ffEnsurePondSearch();
     ffEnsurePondLoaded();
+    ffEnsureRecentMorphsLoaded();
   } else if (view === 'wallet' && ffCurrentAccount) {
     const ownedGrid = document.getElementById('owned-frogs-grid');
     const stakedGrid = document.getElementById('staked-frogs-grid');
@@ -2076,7 +2079,6 @@ async function ffRestoreWalletSession() {
     ffLinkWalletAddress(address);
     ffUpdateWalletBasicUI(address);
     ffApplyConnectionVisibility(true);
-    document.dispatchEvent(new CustomEvent(‘ff:wallet-connected’, { detail: { address } }));
 
     // ✅ force wallet cards to re-render with actions if we’re on wallet view
     const activeNav = document.querySelector('.nav a.active[data-view]');
