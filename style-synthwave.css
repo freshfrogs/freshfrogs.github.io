@@ -1,0 +1,28 @@
+/* SYNTHWAVE — deep purple-black, hot pink accent, cyan progress */
+
+:root {
+  --bg: #0d0015;
+  --bg-card: #150020;
+  --bg-dark: #05000a;
+  --bg-hover: #1e0030;
+  --bg-progress: #1a002a;
+  --input-bg: #0d0015;
+
+  --text: #e8d5ff;
+  --text-muted: #9b72cf;
+  --text-muted2: #7a50b0;
+  --text-prop: #9b72cf;
+  --text-faint: #4a2080;
+  --text-note: #8060b0;
+  --text-footer: #6a40a0;
+
+  --accent: #ff2d78;
+  --border: #8800cc;
+  --shadow: #440066;
+
+  --progress-fill: #00f5ff;
+  --stake-color: #ff2d78;
+
+  --btn-primary-bg: #ff2d78;
+  --btn-primary-text: #ffffff;
+}

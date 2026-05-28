@@ -1,0 +1,28 @@
+/* RETRO TERMINAL — phosphor green on pure black */
+
+:root {
+  --bg: #000000;
+  --bg-card: #050505;
+  --bg-dark: #000000;
+  --bg-hover: #0a0a0a;
+  --bg-progress: #001a08;
+  --input-bg: #000000;
+
+  --text: #00ff41;
+  --text-muted: #00aa2b;
+  --text-muted2: #008820;
+  --text-prop: #00cc33;
+  --text-faint: #004410;
+  --text-note: #008f11;
+  --text-footer: #006618;
+
+  --accent: #00ff41;
+  --border: #00ff41;
+  --shadow: #003308;
+
+  --progress-fill: #00ff41;
+  --stake-color: #aaff00;
+
+  --btn-primary-bg: #00ff41;
+  --btn-primary-text: #000000;
+}
