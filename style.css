@@ -9,8 +9,8 @@
 body {
   margin: 0;
   font-family: monospace;
-  background: #7cc1ff;
-  color: white;
+  background: #dbeafe;
+  color: #1e293b;
 }
 
 a {
@@ -38,7 +38,7 @@ a {
   padding: 1.25rem 0 0.75rem;
   top: 0;
   z-index: 20;
-  color: white;
+  color: #1e293b;
 }
 
 .logo {
@@ -128,11 +128,11 @@ a {
 
 .hero-title {
   line-height: 1.1;
-  text-shadow: 2px 2px darkslateblue;
+  text-shadow: none;
 }
 
 .hero-subtitle {
-  color: inherit;
+  color: #475569;
   max-width: 36rem;
   font-size: 1.1em;
 }
@@ -191,32 +191,30 @@ a {
     transform 140ms ease-out;
 }
 
-.btn.primary {  
+.btn.primary {
   padding: 0.55rem 1.2rem;
-  border-radius: 0px;
+  border-radius: 6px;
   border: none;
-  color: #022c22;
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
   background: #2081e2;
   color: white;
-  box-shadow: 2px 2px darkslateblue;
+  box-shadow: 0 2px 6px rgba(32,129,226,0.35);
 }
 
 .btn.secondary {
   padding: 0.55rem 1.2rem;
-  border-radius: 0px;
-  border: none;
-  color: #022c22;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  color: #374151;
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
-  background: lightcoral;
-  color: white;
-  box-shadow: 2px 2px darkslateblue;
+  background: #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
 }
 
 .btn:hover {
@@ -236,24 +234,23 @@ a {
 }
 
 .panel {
-  background: lightseagreen;
-  border: 0px solid white;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   padding: 1.2rem 1.3rem 1.3rem;
-  box-shadow: 2px 2px darkslateblue;
-  border-radius: 0px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: 10px;
 }
 
 .panel h2 {
   font-size: 1rem;
   margin-top: 0;
-  margin-bottom: 0.4rem;
-  color: white;
-  text-shadow: 2px 2px darkslateblue;
+  margin-bottom: 0.6rem;
+  color: #1e293b;
 }
 
 .panel p {
   margin: 0;
-  color: white;
+  color: #64748b;
   font-size: 1em;
 }
 
@@ -261,13 +258,13 @@ a {
 
 .site-footer {
   padding-top: 0.8rem;
-  border-top: 1px solid white;
+  border-top: 1px solid #bfdbfe;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
   font-size: 0.8rem;
-  color: white;
+  color: #64748b;
 }
 
 .footer-links {
@@ -276,7 +273,7 @@ a {
 }
 
 .footer-links a {
-  color: white;
+  color: #4b5563;
   text-decoration: none;
 }
 
@@ -311,7 +308,7 @@ a {
   width: 128px;
   height: 128px;
   margin: 8px;
-  box-shadow: 2px 2px darkslateblue;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   image-rendering: pixelated;
 }
 
@@ -346,8 +343,7 @@ a {
 .sale_card_title {
   float: left;
   margin-left: 4px;
-  color: lightgreen;
-  text-shadow: 2px 2px darkslateblue;
+  color: #16a34a;
 }
 
 .sale_card_price {
@@ -374,10 +370,10 @@ a {
 }
 
 .recent_sale_properties {
-  border-top: 1px solid white;
+  border-top: 1px solid #e2e8f0;
   padding: 8px;
   margin: 8px;
-  color: lightseagreen;
+  color: #0891b2;
   margin-bottom: 0px;
   font-size: 0.9em;
 }
@@ -385,7 +381,7 @@ a {
 .recent_sale_properties p {
   margin: 2px;
   text-align: left;
-  color: white;
+  color: #374151;
   font-size: 1em;
 }
 
@@ -400,8 +396,8 @@ a {
   width: 128px;
   height: 128px;
   overflow: hidden;
-  border-radius: 0px;
-  box-shadow: 2px 2px darkslateblue;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   background-color: #020617;
   background-repeat: no-repeat;
   background-size: 220% 220%;
@@ -479,7 +475,7 @@ a {
 .wallet-username {
   font-weight: bold;
   color: white;
-  text-shadow: 2px 2px darkslateblue;
+  text-shadow: none;
   font-size: 1.1em;
 }
 
@@ -534,7 +530,7 @@ a {
 /* RARITY BADGES */
 
 .rarity_badge {
-  text-shadow: 2px 2px darkslateblue;
+  text-shadow: none;
 }
 
 .rarity_legendary {
@@ -549,12 +545,12 @@ a {
 
 .rarity_rare {
   border-color: #22d3ee;
-  color: #a5f3fc;
+  color: #0891b2;
 }
 
 .rarity_common {
   border-color: #9ca3af;
-  color: #e5e7eb;
+  color: #64748b;
 }
 
 .rarity_unknown {
@@ -572,22 +568,22 @@ a {
 }
 
 .sale_link_btn {
-  background: cornflowerblue;
-  color: white;
-  border: none;
-  box-shadow: 2px 2px darkslateblue;
+  background: #f1f5f9;
+  color: #374151;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   padding: 4px 8px;
   font-family: monospace;
   width: 100%;
   margin: 4px;
   cursor: pointer;
-  background: lightcoral;
+  border-radius: 4px;
 }
 
 .sale_link_btn:hover {
   transform: translateY(-1px);
-  background: white;
-  color: #333;
+  background: #e2e8f0;
+  color: #1e293b;
 }
 
 .sale_link_btn.opensea {
@@ -610,11 +606,11 @@ a {
 .staking-sale-stats {
   margin-top: 4px;
   font-size: 0.75rem;
-  color: #e0f2fe;
+  color: #475569;
 }
 
 .staking-sale-stats strong {
-  color: white;
+  color: #1e293b;
 }
 
 /* STAKING LEVEL + PROGRESS (dashboard cards) */
@@ -635,16 +631,16 @@ a {
 
 .stake-meta-subrow {
   font-size: 0.9em;
-  border-top: 1px solid white;
+  border-top: 1px solid #e2e8f0;
   padding: 8px;
-  color: white;
+  color: #475569;
   margin-top: 8px;
 }
 
 .stake-level-label {
   font-weight: 600;
   color: #fbbf24;
-  text-shadow: 2px 2px darkslateblue;
+  text-shadow: none;
 }
 
 .stake-rewards-label {
@@ -657,7 +653,7 @@ a {
   width: 100%;
   height: 8px;
   border-radius: 999px;
-  background: white;
+  background: #e2e8f0;
   overflow: hidden;
   margin-top: 2px;
 }
@@ -683,7 +679,7 @@ a {
 
 .dashboard-note {
   font-size: 0.78rem;
-  color: #9ca3af;
+  color: #6b7280;
   margin-bottom: 0.6rem;
 }
 
@@ -694,9 +690,11 @@ a {
   max-width: 240px;
   margin: 8px auto;
   align-self: flex-start;
-  background: lightseagreen;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
   padding: 8px;
-  box-shadow: 2px 2px darkslateblue;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 /* Reuse recent_sale_card style for owned / staked NFTs */
@@ -780,21 +778,22 @@ a {
 
 /* makes <a> behave exactly like your <button> */
 .frog-actions .frog_action_btn{
-  background: cornflowerblue;
-  color: white;
-  border: none;
-  box-shadow: 2px 2px darkslateblue;
+  background: #f1f5f9;
+  color: #374151;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   padding: 4px 8px;
   font-family: monospace;
   width: 100%;
   margin: 4px;
   cursor: pointer;
+  border-radius: 4px;
 }
 
 .frog_action_btn:hover {
   transform: translateY(-1px);
-  background: white;
-  color: #333;
+  background: #e2e8f0;
+  color: #1e293b;
 }
 
 #frog-bg {
@@ -803,7 +802,7 @@ a {
   width: 100%;
   height: 100%;
   z-index: 0;
-  background: #7cc1ff; /* your sky */
+  background: #dbeafe;
   overflow: hidden;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
@@ -825,7 +824,7 @@ a {
   border-radius: 100%;
 }
 
-.site-header{position:sticky;top:0;z-index:50;}
+.site-header{position:sticky;top:0;z-index:50;background:rgba(219,234,254,0.92);backdrop-filter:blur(8px);}
 .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;}
 .nav-left,.nav-right{display:flex;align-items:center;gap:12px;}
 /* HERO BUTTONS (front-page) */
@@ -845,7 +844,7 @@ a {
   letter-spacing: 0.02em;
   line-height: 1;
 
-  box-shadow: 2px 2px darkslateblue;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 
   transition: transform 140ms ease-out, filter 140ms ease-out;
 }
