@@ -678,9 +678,9 @@ function createFrogCard({ tokenId, metadata, headerLeft, headerRight, footerHtml
         ${traitsHtml}
       </div>
       ${footerHtml || ''}
-      ${actionHtml || ''}
     </div>
 
+    ${actionHtml || ''}
     ${ffActionButtonsHTML(tokenId)}
   `;
 
@@ -873,7 +873,7 @@ function buildTraitsHtml(metadata) {
       <p class="frog-attr-text"
          data-trait-type="${ffEscapeHtml(type)}"
          data-trait-value="${ffEscapeHtml(value)}">
-        ${ffEscapeHtml(type)}: ${ffEscapeHtml(value)}
+        ${ffEscapeHtml(type)} <span class="trait-value">${ffEscapeHtml(value)}</span>
       </p>`;
   }).filter(Boolean).join('');
 }

@@ -221,8 +221,6 @@ a {
   background: #f8fafc;
   border: none;
   padding: 1.2rem 1.3rem 1.3rem;
-  outline: 1px solid #1e293b;
-  box-shadow: 4px 4px 0 #1e293b;
   border-radius: 0;
 }
 
@@ -354,7 +352,7 @@ a {
 }
 
 .recent_sale_properties {
-  border-top: 1px solid #cbd5e1;
+  border-top: 1px solid #1e293b;
   padding: 8px 0 0;
   margin: 6px 0 0;
   font-size: 0.72rem;
@@ -413,7 +411,13 @@ a {
 
 .frog-attr-text {
   cursor: default;
+  color: #64748b;
   transition: color 160ms ease-out, text-shadow 160ms ease-out;
+}
+
+.frog-attr-text .trait-value {
+  color: #1e293b;
+  font-weight: 700;
 }
 
 .frog-attr-text.is-highlighted {
@@ -613,7 +617,7 @@ a {
 
 .stake-meta-subrow {
   font-size: 0.9em;
-  border-top: 1px solid #cbd5e1;
+  border-top: 1px solid #1e293b;
   padding: 8px 0 0;
   color: #475569;
   margin-top: 8px;
@@ -635,7 +639,7 @@ a {
   height: 6px;
   border-radius: 0;
   background: #e2e8f0;
-  outline: 1px solid #cbd5e1;
+  outline: 1px solid #1e293b;
   overflow: hidden;
   margin-top: 2px;
 }
