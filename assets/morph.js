@@ -19,14 +19,11 @@
     ffLoadUserGalleryOnStart();
     ffRenderMorphedFrogsOnMorphPage();
 
-    const connectBtn = document.getElementById('hero-connect-wallet-btn');
-    if (connectBtn && typeof connectWallet === 'function') {
-      connectBtn.addEventListener('click', async () => {
-        await connectWallet();
-        ffLoadUserGalleryOnStart(true);
-        ffRenderMorphedFrogsOnMorphPage(true);
-      });
-    }
+    // Reload morph content whenever any connect button triggers a wallet connection
+    document.addEventListener('ff:wallet-connected', () => {
+      ffLoadUserGalleryOnStart(true);
+      ffRenderMorphedFrogsOnMorphPage(true);
+    });
   });
 
   // ------------------------
