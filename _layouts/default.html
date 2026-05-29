@@ -700,117 +700,97 @@
         Load web page
       */
 
-      document.addEventListener("DOMContentLoaded", async () => {
+      var walletConnected = false;
 
-        const web3 = new Web3(window.ethereum);
-        const f0 = new F0();
-
-        COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+      document.addEventListener("DOMContentLoaded", function() {
 
         fetch_opensea_data();
 
-        try { // Connect
+        // Quantity controls via delegation (buttons created dynamically by display_token)
+        document.getElementById('mintingTray').addEventListener('click', function(e) {
+          if (e.target.id === 'add_token') {
+            if (mint_quantity >= 9) return;
+            mint_quantity++;
+            document.getElementById('mint_total_actual').innerHTML = (mint_price * mint_quantity);
+            document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
+          } else if (e.target.id === 'remove_token') {
+            if (mint_quantity <= 1) return;
+            mint_quantity--;
+            document.getElementById('mint_total_actual').innerHTML = (mint_price * mint_quantity);
+            document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
+          }
+        });
 
-          await f0.init({
+        // MINT button triggers wallet connect on first click
+        document.getElementById('mint_token').addEventListener('click', function(e) {
+          e.preventDefault();
+          if (!walletConnected) connectWallet();
+        });
 
-            web3: web3,
-            contract: CONTRACT_ADDRESS,
-            network: NETWORK
+        // "Connect Wallet" link in status area
+        document.getElementById('pre').addEventListener('click', function(e) {
+          var btn = e.target.closest('#connected');
+          if (btn) { e.preventDefault(); connectWallet(); }
+        });
 
-          })
+      });
 
-          // Assign variables
+      async function connectWallet() {
 
-          user_address = await web3.currentProvider.selectedAddress;
-          user_invites = await f0.myInvites();
+        if (!window.ethereum) {
+          consoleOutput('<div style="background:#ff99b6;padding:8px;border-radius:6px;">MetaMask not detected. <a href="https://metamask.io/download/" target="_blank"><b>Install MetaMask 🦊</b></a></div>');
+          return;
+        }
+
+        consoleOutput('Connecting wallet...');
+
+        try {
+
+          var web3 = new Web3(window.ethereum);
+          var f0   = new F0();
+          var _abi = typeof token_abi !== 'undefined' ? token_abi :
+            [{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
+
+          COLLECTION = collection = new web3.eth.Contract(_abi, CONTRACT_ADDRESS);
+
+          await f0.init({ web3: web3, contract: CONTRACT_ADDRESS, network: NETWORK });
+
+          user_address  = await web3.currentProvider.selectedAddress;
+          user_invites  = await f0.myInvites();
           user_inviteKeys = Object.keys(user_invites);
-          user_invite = "0x0000000000000000000000000000000000000000000000000000000000000000";
+          user_invite   = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
-          user_tokens = await collection.methods.balanceOf(user_address).call();
-
+          user_tokens   = await collection.methods.balanceOf(user_address).call();
           contract_name = await f0.api.name().call();
           contract_symbol = await f0.api.symbol().call();
-          contract_id = await f0.api.nextId().call();
+          contract_id   = await f0.api.nextId().call();
           mint_id = contract_id = parseInt(contract_id);
 
-          if (opensea_failed){
-
-            display_token(contract_id);
-            console.log('Nex token_id : ' + contract_id);
-
-          }
-
+          if (opensea_failed) display_token(contract_id);
           getInvites();
 
-          console.log('Connected  Smart Contract : '+contract_name+'('+contract_symbol+')');
-          console.log('Ethereum : '+contract_address);
-          console.log('Connected User : '+user_address);
+          walletConnected = true;
+          console.log('Connected: ' + contract_name + ' | ' + user_address);
 
-          // Update minting ui
-
-          // Remove token from minting tray
-
-          document.querySelector("#remove_token").addEventListener("click", async (e) => {
-            if (mint_quantity <= 1) {
-              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
-            } else {
-              mint_quantity = mint_quantity - 1;
-              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
-              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
-            }
-          })
-
-          // Add token to minting tray mint_total
-
-          document.querySelector("#add_token").addEventListener("click", async (e) => {
-            if (mint_quantity >= 9) {
-              return; // Quantity always greater than or equal to 1 AND always less than or equal to 9;
-            } else {
-              mint_quantity = mint_quantity + 1;
-              document.getElementById('mint_total_actual').innerHTML = (mint_price*mint_quantity);
-              document.getElementById('mint_quantity_actual').innerHTML = mint_quantity;
-            }
-
-            //if (mint_quantity <= (mint_limit - user_tokens)) {
-            //} else { console.log('User mint limit reached!'); console.log('Mint Limit '+mint_limit+' : '+user_tokens+' User Tokens'); }
-
-          })
-
-          // Send mint transaction to provider!
-
-          document.querySelector("#mint_total").addEventListener("click", async (e) => {
-
-            console.log('Sending mint transaction!');
-            console.log(mint_quantity+' FROGS @ Ξ'+mint_price+' : ['+(mint_price*mint_quantity)+']');
-            
+          // Wire mint button now that wallet is live
+          document.getElementById('mint_total').addEventListener('click', async function() {
             try {
-                
-              consoleOutput('<br>'+'<strong>Minting ('+mint_quantity+') FROG Tokens...</strong>'+'<br>'+'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<p></p>')
-              document.getElementById('pre').style.backgroundColor = '#99ffc5'
-                
-              let tokens = await f0.mint(user_invite, mint_quantity)
-              
-              // AWAIT RESPONSE!
-
-              consoleOutput('<br>'+'<strong>Congratulations</strong><br><b>'+mint_quantity+' FROG(s)</b> have successfully been minted!'+'<p></p>');
-              document.getElementById('pre').style.backgroundColor = '#99ffc5'
-              return; // BREAK!
-
-            } catch (e) {
-                
-              // Something went wrong!
-              
-              consoleOutput('<br><p>'+e.message+'</p><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><strong><u>Discord #Support</u></strong></a>')
-              document.getElementById('pre').style.backgroundColor = '#ff99b6'
-              return; // BREAK!
-
+              consoleOutput('<br><strong>Minting (' + mint_quantity + ') FROG Tokens...</strong><br>Please sign the transaction and wait...<p></p>');
+              document.getElementById('pre').style.backgroundColor = '#99ffc5';
+              await f0.mint(user_invite, mint_quantity);
+              consoleOutput('<br><strong>Congratulations!</strong><br><b>' + mint_quantity + ' FROG(s)</b> minted!<p></p>');
+              document.getElementById('pre').style.backgroundColor = '#99ffc5';
+            } catch(err) {
+              consoleOutput('<br>' + err.message + '<br><a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="pointer"><u>Discord #Support</u></a>');
+              document.getElementById('pre').style.backgroundColor = '#ff99b6';
             }
+          });
 
-          })
+        } catch(e) {
+          consoleOutput('<div style="background:#ff99b6;padding:8px;border-radius:6px;">Could not connect: ' + e.message + '</div>');
+        }
 
-        } catch (e) { consoleOutput('<strong></strong><br>'+e.message+'<a class="pointer" href="https://freshfrogs.github.io/"><b id="connected">🔌 Connect Wallet</b></a>'); }
-
-      })
+      }
 
 
       function consoleOutput(output) {

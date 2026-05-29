@@ -199,12 +199,22 @@
         }
       ]
 
+    // Guard against missing MetaMask
+    if (!window.ethereum) {
+      consoleOutput('<div style="background:#ff99b6;padding:8px;border-radius:6px;">MetaMask not detected. <a href="https://metamask.io/download/" target="_blank"><b>Install MetaMask 🦊</b></a></div>');
+      return;
+    }
     // Connect WEB3, Factoria
     const web3 = new Web3(window.ethereum);
     const f0 = new F0();
+    // Fallback ABI if token_abi.js fails to load from Factoria CDN
+    var _abi = typeof token_abi !== 'undefined' ? token_abi :
+      [{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+       {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+       {"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"}];
     // Connect Collection Smart Contract, Staking Smart Contract
     CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-    COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+    COLLECTION = collection = new web3.eth.Contract(_abi, CONTRACT_ADDRESS);
     try { // Attempt to Connect!
       await f0.init({
         web3: web3,

@@ -737,9 +737,13 @@
       gtag('config', 'G-6PB0WKB4SH');
       // -- >
 
-      document.addEventListener("DOMContentLoaded", async () => {
+      document.addEventListener("DOMContentLoaded", function() {
 
-        connect();
+        // Connect only on button click — not automatically
+        document.getElementById('pre').addEventListener('click', function(e) {
+          var btn = e.target.closest('#connected');
+          if (btn) { e.preventDefault(); connect(); }
+        });
 
       })
 
