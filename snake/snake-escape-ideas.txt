@@ -1,9 +1,0 @@
-Bullfrog - mega frog
-Tadpoles - respawn a frog after certain ammount of time
-Turtle - snake has to go around
-Frog forcefield - force other frog to bounce away. Repell other frogs away
-Regenrate in another area of the screen
-Buff text when one activates
-Sticks his tongue out and jumps to that point across the screen.
-Frog that repells the snake, stinky frog
-Left click - temp buff that increases frog speed
