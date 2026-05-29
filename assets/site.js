@@ -230,7 +230,8 @@ function ffShowView(view) {
   if (hero) hero.style.display = (view === 'wallet') ? 'none' : '';
 
   if (view === 'collection') {
-    // Homepage: 6 recent sales, 6 recent stakes, 6 recent morphs
+    // Homepage: largest sales + recent sales + recent stakes + recent morphs
+    ffLoadLargestSales();
     loadRecentActivity(); // uses FF_RECENT_LIMIT for sales
     ffLoadRecentStakes(); // new stakes section
     ffLoadRecentMorphs(6, 'recent-home-morphs-grid', 'recent-home-morphs-status'); // homepage morphs
@@ -435,6 +436,52 @@ async function ffLoadRecentStakes() {
   }
 }
 
+
+async function ffLoadLargestSales() {
+  const container = document.getElementById('largest-sales-grid');
+  const statusEl = document.getElementById('largest-sales-status');
+  if (!container) return;
+
+  if (statusEl) statusEl.textContent = 'Loading...';
+
+  try {
+    const sales = await fetchRecentSales(50);
+    const sorted = sales
+      .filter(s => s.priceText)
+      .map(s => ({ ...s, _eth: parseFloat(s.priceText) || 0 }))
+      .filter(s => s._eth > 0)
+      .sort((a, b) => b._eth - a._eth)
+      .slice(0, 6);
+
+    if (!sorted.length) {
+      if (statusEl) statusEl.textContent = 'No sales data available.';
+      return;
+    }
+
+    if (statusEl) statusEl.textContent = '';
+    container.innerHTML = '';
+
+    for (const sale of sorted) {
+      const tokenId = sale.tokenId;
+      let metadata = normalizeMetadata(sale.metadata);
+      if (!hasUsableMetadata(metadata)) {
+        metadata = await fetchFrogMetadata(tokenId).catch(() => ({}));
+      }
+      const card = createFrogCard({
+        tokenId,
+        metadata,
+        headerLeft: `#${tokenId}`,
+        headerRight: sale.priceText,
+      });
+      container.appendChild(card);
+      ffPrepareSimpleCard(card);
+      if (sale.buyerAddress) ffSetOwnerLabel(card, sale.buyerAddress, 'sold to');
+    }
+  } catch (err) {
+    console.warn('ffLoadLargestSales failed:', err);
+    if (statusEl) statusEl.textContent = 'Could not load largest sales.';
+  }
+}
 
 // Attach staking block to any card (recent, pond, rarity, etc.)
 async function ffAttachStakeMetaIfStaked(card, tokenId) {
@@ -842,34 +889,32 @@ async function ffBuildLayeredFrogImage(tokenId, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
+  const baseUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
+
   try {
-    const baseUrl = `https://freshfrogs.github.io/frog/${tokenId}.png`;
-    container.style.backgroundImage    = `url("${baseUrl}")`;
-    container.style.backgroundRepeat   = 'no-repeat';
-    container.style.backgroundSize     = '1000%';
-    container.style.backgroundPosition = 'bottom right';
-    container.innerHTML = '';
-
-    if (typeof SOURCE_PATH === 'undefined' || typeof build_trait !== 'function') {
-      const img = document.createElement('img');
-      img.src = baseUrl;
-      img.alt = `Frog #${tokenId}`;
-      img.className = 'recent_sale_img';
-      img.loading = 'lazy';
-      container.appendChild(img);
-      return;
-    }
-
-    const metadataUrl = `${SOURCE_PATH}/frog/json/${tokenId}.json`;
-    const metadata = await (await fetch(metadataUrl)).json();
+    const metaUrl = `https://freshfrogs.github.io/frog/json/${tokenId}.json`;
+    const res = await fetch(metaUrl, { cache: 'force-cache' });
+    if (!res.ok) throw new Error('metadata fetch failed');
+    const metadata = await res.json();
     const attrs = Array.isArray(metadata.attributes) ? metadata.attributes : [];
+    if (!attrs.length) throw new Error('no attributes');
+
+    container.innerHTML = '';
+    container.style.position = 'relative';
 
     for (const attr of attrs) {
-      if (!attr?.trait_type || !attr?.value) continue;
-      build_trait(attr.trait_type, attr.value, containerId);
+      if (!attr?.trait_type || attr?.value == null) continue;
+      const layerUrl = `https://freshfrogs.github.io/frog/build_files/${attr.trait_type}/${attr.value}.png`;
+      const img = new Image();
+      img.alt = '';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none;';
+      img.src = layerUrl;
+      container.appendChild(img);
     }
   } catch {
-    container.innerHTML = `<img src="https://freshfrogs.github.io/frog/${tokenId}.png" class="recent_sale_img" alt="Frog #${tokenId}" loading="lazy" />`;
+    container.innerHTML = `<img src="${baseUrl}" class="recent_sale_img" alt="Frog #${tokenId}" loading="lazy" style="width:100%;height:100%;image-rendering:pixelated;" />`;
   }
 }
 

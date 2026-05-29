@@ -7,30 +7,30 @@
 }
 
 :root {
-  --bg: #f8fafc;
-  --bg-card: #ffffff;
-  --bg-dark: #f0fdf4;
-  --bg-hover: #f0fdf4;
-  --bg-progress: #dcfce7;
-  --input-bg: #ffffff;
+  --bg: #0c1a0f;
+  --bg-card: #111f14;
+  --bg-dark: #030a04;
+  --bg-hover: #1a2e1a;
+  --bg-progress: #1a3a1a;
+  --input-bg: #0c1a0f;
 
-  --text: #0f172a;
-  --text-muted: #64748b;
-  --text-muted2: #64748b;
-  --text-prop: #64748b;
-  --text-faint: #94a3b8;
-  --text-note: #94a3b8;
-  --text-footer: #94a3b8;
+  --text: #c8f5c8;
+  --text-muted: #6fa86f;
+  --text-muted2: #5a925a;
+  --text-prop: #6fa86f;
+  --text-faint: #3d6a3d;
+  --text-note: #5a8a5a;
+  --text-footer: #4a7a4a;
 
-  --accent: #16a34a;
-  --border: #e2e8f0;
-  --shadow: transparent;
+  --accent: #39ff14;
+  --border: #2a5a2a;
+  --shadow: #000000;
 
-  --progress-fill: #16a34a;
-  --stake-color: #b45309;
+  --progress-fill: #39ff14;
+  --stake-color: #a0ff40;
 
-  --btn-primary-bg: #16a34a;
-  --btn-primary-text: #ffffff;
+  --btn-primary-bg: #39ff14;
+  --btn-primary-text: #0c1a0f;
 }
 
 body {
@@ -59,7 +59,7 @@ a { color: inherit; }
   position: sticky;
   top: 0;
   z-index: 50;
-  background: #ffffff;
+  background: var(--bg);
   border-bottom: 2px solid var(--border);
   padding: 0.85rem 0 0.75rem;
   display: flex;
@@ -124,7 +124,7 @@ a { color: inherit; }
 /* ── HERO — centered, frogs in a row ── */
 
 .hero {
-  background: #ffffff;
+  background: var(--bg-card);
   max-width: 100%;
   margin: 0;
   padding: 3rem 1rem 2.5rem;
@@ -232,9 +232,9 @@ a { color: inherit; }
 }
 
 .hero-actions .hero-btn--snake {
-  background: #ffffff;
-  color: #1e293b;
-  border-color: #1e293b;
+  background: var(--bg);
+  color: var(--text);
+  border-color: var(--border);
 }
 
 /* ── BUTTONS ── */
@@ -399,8 +399,8 @@ a { color: inherit; }
 .sale_card_price { font-size: 0.72rem; color: var(--text); font-weight: 600; }
 .recent_sale_header { text-align: left; margin: 8px; height: 16px; }
 
-.frog_img { height: 128px; width: 128px; image-rendering: pixelated; }
-.recent_sale_img { height: 128px; width: 128px; image-rendering: pixelated; }
+.frog_img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+.recent_sale_img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
 
 .recent_sale_properties {
   border-top: 1px solid var(--border);
@@ -419,21 +419,18 @@ a { color: inherit; }
 
 .frog_img_cont {
   position: relative;
-  margin: 0 auto;
-  width: 128px;
-  height: 128px;
+  width: 100%;
+  aspect-ratio: 1;
   overflow: hidden;
   background-color: var(--bg-dark);
-  background-repeat: no-repeat;
-  background-size: 220% 220%;
-  background-position: bottom right;
+  image-rendering: pixelated;
 }
 
 .trait_overlay,
 .attribute_overlay {
   position: absolute;
   left: 0; top: 0;
-  width: 128px; height: 128px;
+  width: 100%; height: 100%;
   image-rendering: pixelated;
   pointer-events: auto;
   transition: transform 160ms ease-out, filter 160ms ease-out;
@@ -557,10 +554,10 @@ a { color: inherit; }
 .card-top .sale_card_price { color: var(--text); font-weight: 700; }
 
 .card-img-wrap {
-  display: flex;
-  justify-content: center;
-  padding: 14px 0;
+  display: block;
+  padding: 0;
   background: var(--bg-dark);
+  line-height: 0;
 }
 
 .recent_sale_traits {
