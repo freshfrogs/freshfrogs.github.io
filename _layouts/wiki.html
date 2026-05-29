@@ -603,37 +603,35 @@
 
             document.addEventListener("DOMContentLoaded", async () => {
 
-                // Pull Collection stats via OpenSea v2
-                var OS_KEY  = '48ffee972fc245fa965ecfe902b02ab4';
-                var OS_SLUG = 'fresh-frogs';
-                var OS_HEAD = { 'X-API-KEY': OS_KEY, 'Accept': 'application/json' };
+                var ALCHEMY_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+                var CONTRACT    = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
+                var ALQ_BASE    = 'https://eth-mainnet.g.alchemy.com/nft/v3/' + ALCHEMY_KEY;
 
-                Promise.all([
-                  fetch('https://api.opensea.io/api/v2/collections/' + OS_SLUG, { headers: OS_HEAD }).then(r => r.json()),
-                  fetch('https://api.opensea.io/api/v2/collections/' + OS_SLUG + '/stats', { headers: OS_HEAD }).then(r => r.json())
-                ]).then(function(results) {
-                  var info  = results[0];
-                  var stats = results[1].total || {};
-                  if (document.getElementById('name'))         document.getElementById('name').innerHTML         = info.name || 'Fresh Frogs NFT';
-                  if (document.getElementById('count'))        document.getElementById('count').innerHTML        = stats.supply ?? '—';
-                  if (document.getElementById('num_owners'))   document.getElementById('num_owners').innerHTML   = stats.num_owners ?? '—';
-                  if (document.getElementById('floor_price'))  document.getElementById('floor_price').innerHTML  = stats.floor_price != null ? Number(stats.floor_price).toFixed(4) + ' Ξ' : '—';
-                  if (document.getElementById('total_volume')) document.getElementById('total_volume').innerHTML = stats.volume != null ? Number(stats.volume).toFixed(2) + ' Ξ' : '—';
+                // Collection stats via Alchemy
+                fetch(ALQ_BASE + '/getContractMetadata?contractAddress=' + CONTRACT)
+                .then(r => r.json())
+                .then(data => {
+                  var meta = data.openSeaMetadata || {};
+                  if (document.getElementById('name'))         document.getElementById('name').innerHTML         = data.name || 'Fresh Frogs NFT';
+                  if (document.getElementById('count'))        document.getElementById('count').innerHTML        = data.totalSupply || '4040';
+                  if (document.getElementById('floor_price'))  document.getElementById('floor_price').innerHTML  = meta.floorPrice != null ? Number(meta.floorPrice).toFixed(4) + ' Ξ' : '—';
+                  if (document.getElementById('num_owners'))   document.getElementById('num_owners').innerHTML   = '—';
+                  if (document.getElementById('total_volume')) document.getElementById('total_volume').innerHTML = '—';
                 }).catch(e => console.error('Collection stats failed:', e));
 
-                // Get recent sales via OpenSea v2
-                fetch('https://api.opensea.io/api/v2/events/collection/' + OS_SLUG + '?event_type=sale&limit=10', { headers: OS_HEAD })
-                .then(res => res.json())
+                // Recent sales via Alchemy
+                fetch(ALQ_BASE + '/getNFTSales?contractAddress=' + CONTRACT + '&order=desc&limit=10')
+                .then(r => r.json())
                 .then(data => {
-                  var events = data.asset_events || [];
-                  events.forEach(sale => {
+                  var sales = data.nftSales || [];
+                  sales.forEach(function(sale) {
                     try {
-                      var nft    = sale.nft || {};
-                      var qty    = (sale.payment || {}).quantity || '0';
-                      var price  = (Number(qty) / 1e18).toFixed(4);
-                      var imgUrl = nft.image_url || nft.display_image_url || '';
-                      var name   = nft.name || ('Frog #' + nft.identifier);
-                      var osLink = 'https://opensea.io/assets/ethereum/0xBE4Bef8735107db540De269FF82c7dE9ef68C51b/' + nft.identifier;
+                      var tokenId = sale.tokenId;
+                      var wei     = sale.sellerFee ? Number(sale.sellerFee.amount) : 0;
+                      var price   = (wei / 1e18).toFixed(4);
+                      var imgUrl  = 'https://freshfrogs.github.io/frog/' + tokenId + '.png';
+                      var name    = 'Frog #' + tokenId;
+                      var osLink  = 'https://opensea.io/assets/ethereum/' + CONTRACT + '/' + tokenId;
 
                       var el = document.createElement('a');
                       el.className = 'recent_sale';

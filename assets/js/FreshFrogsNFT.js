@@ -308,40 +308,33 @@
         }
       }
 
-      // Render Frogs Held by Fetch Address
+      // Render Frogs Held by Fetch Address via Alchemy
       if (user_tokens >= 1) {
-        let pages = parseInt(user_tokens/50) + 1;
-        for (var i = 0; i < pages; i++) {
+        var ALQ = 'https://eth-mainnet.g.alchemy.com/nft/v3/C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+        var pageKey = null;
+        var fetched = 0;
 
-          // Fetch OpenSea Data
-          fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
-          .then((tokens) => tokens.json())
-          .then((tokens) => {
-            var { assets } = tokens
-            assets.forEach((frog) => {
+        async function fetchPage() {
+          var url = ALQ + '/getNFTsForOwner?owner=' + fetch_address +
+            '&contractAddresses[]=' + CONTRACT_ADDRESS + '&withMetadata=false&pageSize=100';
+          if (pageKey) url += '&pageKey=' + encodeURIComponent(pageKey);
 
-              try { var { token_id, last_sale: { payment_token: { decimals }, total_price }} = frog } catch (e) {}
-
-              if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
-                let sale_price = total_price / Math.pow(10, decimals);
-                render_token(token_id, sale_price);
-
-              } else {
-                render_token(token_id);
-
-              }
-            })
-          })
-          .catch(e => {
-            
-            consoleOutput(
-              '<div style="text-align: left;">'+
-                'Failed to fetch user data (partial). Try refreshing the page!<br>'+
-              '</div>'
-            );
-
-          })
+          try {
+            var res  = await fetch(url);
+            var data = await res.json();
+            (data.ownedNfts || []).forEach(function(nft) {
+              render_token(parseInt(nft.tokenId));
+            });
+            fetched += (data.ownedNfts || []).length;
+            if (data.pageKey && fetched < user_tokens) {
+              pageKey = data.pageKey;
+              fetchPage();
+            }
+          } catch(e) {
+            consoleOutput('<div style="text-align: left;">Failed to fetch user data. Try refreshing.<br></div>');
+          }
         }
+        fetchPage();
       }
 
     // Does not own atleast one Frog!
@@ -367,11 +360,11 @@
   async function render_display(tokenId) {
 
     // Update Display Image
-    document.getElementById('thisheader').style.backgroundImage = 'url('+'https://freshfrogs.io/frog/'+tokenId+'.png'+')';
+    document.getElementById('thisheader').style.backgroundImage = 'url('+'https://freshfrogs.github.io/frog/'+tokenId+'.png'+')';
     document.getElementById('thisheader').style.backgroundSize = "2048px 2048px";
     document.getElementById('frogContainer4').innerHTML = '';
 
-    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
+    var metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+tokenId+".json")).json();
     for (var i = 0; i < metadata.attributes.length; i++) {
       var attribute = metadata.attributes[i];
       loadTrait(attribute.trait_type, attribute.value, 'frogContainer4');
@@ -395,7 +388,7 @@
     let openseaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
     let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
     let gemxyzLink = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId;
-    let displayImg = 'https://freshfrogs.io/frog/'+tokenId+'.png'
+    let displayImg = 'https://freshfrogs.github.io/frog/'+tokenId+'.png'
     let displayName = 'Frog #'+tokenId
 
     // Morphing
@@ -448,7 +441,7 @@
       button_middle.target = '_blank';
 
       button_right.innerHTML = '<strong>Image</strong>View';
-      button_right.href = 'https://freshfrogs.io/frog/'+tokenId+'.png';
+      button_right.href = 'https://freshfrogs.github.io/frog/'+tokenId+'.png';
       button_right.target = '_blank';
 
     }
@@ -466,7 +459,7 @@
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
-    let frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
+    let frog_external = 'https://freshfrogs.github.io/frog/'+frog_id+'.png';
     let frog_name = 'Frog #'+frog_id;
 
     // <-- Begin Element
@@ -497,7 +490,7 @@
     document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
 
     // Update Metadata!
-    let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
+    let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+frog_id+".json")).json();
     for (let i = 0; i < metadata.attributes.length; i++) {
 
       // attribute.trait_type : attribute.value
@@ -567,7 +560,7 @@
   function loadTrait(trait, attribute, where) {
 
     newAttribute = document.createElement("img");
-    newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
+    newAttribute.src = "/the-pond/"+trait+"/"+attribute+".png";
     newAttribute.alt = attribute
 
     if (where.includes('cont_')) {
@@ -662,7 +655,7 @@
 
     // Begin Withdraw Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<img src="https://freshfrogs.github.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
@@ -675,7 +668,7 @@
 
     // Begin Withdraw Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<img src="https://freshfrogs.github.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Withdrawing Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
@@ -699,7 +692,7 @@
     if (!is_approved) {
 
       consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+        '<img src="https://freshfrogs.github.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
         '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
@@ -714,7 +707,7 @@
       if (set_approval !==true) {
 
         consoleOutput(
-          '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+          '<img src="https://freshfrogs.github.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
           '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
           'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
           '<br><div style="text-align: left;">'+
@@ -731,7 +724,7 @@
 
     // Begin Stake Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<img src="https://freshfrogs.github.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
@@ -744,7 +737,7 @@
 
     // Complete
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<img src="https://freshfrogs.github.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Staking Frog #'+tokenId+'...</strong>'+'<br>'+
       'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
       '<br><div style="text-align: left;">'+
@@ -832,7 +825,7 @@
 
     // Begin Withdraw Txn
     consoleOutput(
-      '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+      '<img src="https://freshfrogs.github.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
       '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
       '<input style="margin: 4px; width: 256px; padding: 4px; border: 1px solid black; border-radius: 5px;" id="receiver" placeholder="receiver address"><br>'+
       '<button id="receiver_button" class="frog_button" style="background: #7cc1ff; color: white; border: 1px solid black;">Send 🡥</button><br>'+
@@ -848,7 +841,7 @@
       let receiver = document.querySelector("#receiver").value
 
       consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+        '<img src="https://freshfrogs.github.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
         '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
@@ -860,7 +853,7 @@
       let transfer_txn = await safeTransferFrom(receiver, tokenId)
 
       consoleOutput(
-        '<img src="https://freshfrogs.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
+        '<img src="https://freshfrogs.github.io/frog/'+tokenId+'.png" class="recentMint"/><br>'+
         '<strong>Transferring Frog #'+tokenId+'...</strong>'+'<br>'+
         'Please sign the transaction and wait...<br>Do not leave or refresh the page!'+'<br>'+
         '<br><div style="text-align: left;">'+
@@ -1043,7 +1036,7 @@
     document.getElementById(build_loc).innerHTML = '';
 
     // <------ FETCH METADATA (baseId, subId) ------>
-    let baseMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseId+".json")).json();
+    let baseMetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+baseId+".json")).json();
     for (i = 0; i < baseMetadata.attributes.length; i++) {
 
       let attribute = baseMetadata.attributes[i];
@@ -1057,7 +1050,7 @@
 
     }
 
-    let subMetadata = await (await fetch("https://freshfrogs.io/frog/json/"+subId+".json")).json();
+    let subMetadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+subId+".json")).json();
     for (j = 0; j < subMetadata.attributes.length; j++) {
 
       let attribute = subMetadata.attributes[j];
@@ -1072,7 +1065,7 @@
     }
 
     // <------ DETERMINE NEW METADATA (baseId, subId) ------> //
-    // https://freshfrogs.io/frog/preset_/ [ trait_type/value ] .png
+    // https://freshfrogs.github.io/frog/preset_/ [ trait_type/value ] .png
 
     // Base Adaptative Frog
     //if (baseFrog == 'splendidLeafFrog' || baseFrog == 'stawberryDartFrog' || baseFrog == 'redEyedTreeFrog' && typeof subTrait !== 'undefined') { renderOverlay = baseFrog+'/'+baseTrait; } 
