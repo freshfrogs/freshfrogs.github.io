@@ -706,8 +706,8 @@
 
         fetch_opensea_data();
 
-        // Quantity controls via delegation (buttons created dynamically by display_token)
-        document.getElementById('mintingTray').addEventListener('click', function(e) {
+        // Quantity controls via delegation on document (buttons are inside ul.downloads2, not mintingTray)
+        document.addEventListener('click', function(e) {
           if (e.target.id === 'add_token') {
             if (mint_quantity >= 9) return;
             mint_quantity++;
