@@ -20,165 +20,70 @@
     <head>
         <script>
             document.addEventListener("DOMContentLoaded", async () => {
-                
-                CONTRACT_ADDRESS = "0xBE4Bef8735107db540De269FF82c7dE9ef68C51b";
 
-                var attributesTotal = {
+                const OS_KEY   = '48ffee972fc245fa965ecfe902b02ab4';
+                const OS_SLUG  = 'fresh-frogs';
+                const OS_HEADS = { 'X-API-KEY': OS_KEY, 'Accept': 'application/json' };
 
-                    'goldChain' : 0,
-                    'goldDollarChain' : 0,
-                    'silverChain' : 0,
-                    'silverEthChain' : 0,
-                    'circleGlasses' : 0,
-                    'circleNightVision' : 0,
-                    'circleShadesPurple' : 0,
-                    'circleShadesRed' : 0,
-                    'shades' : 0,
-                    'shadesPurple' : 0,
-                    'shadesThreeD' : 0,
-                    'shadesWhite' : 0,
-                    'blueDartFrog' : 0,
-                    'blueTreeFrog' : 0,
-                    'brownTreeFrog' : 0,
-                    'cyanTreeFrog' : 0,
-                    'goldenDartFrog' : 0,
-                    'goldenTreeFrog' : 0,
-                    'grayTreeFrog' : 0,
-                    'greenTreeFrog' : 0,
-                    'lightBrownTreeFrog' : 0,
-                    'natural' : 0,
-                    'orangeTreeFrog' : 0,
-                    'pinkTreeFrog' : 0,
-                    'purpleTreeFrog' : 0,
-                    'redEyedTreeFrog' : 0,
-                    'splendidLeafFrog' : 0,
-                    'stawberryDartFrog' : 0,
-                    'tomatoFrog' : 0,
-                    'treeFrog(1)' : 0,
-                    'treeFrog(2)' : 0,
-                    'treeFrog(3)' : 0,
-                    'treeFrog(4)' : 0,
-                    'treeFrog(5)' : 0,
-                    'treeFrog(6)' : 0,
-                    'treeFrog(7)' : 0,
-                    'treeFrog(8)' : 0,
-                    'unknown' : 0,
-                    'baseballCapBlue' : 0,
-                    'baseballCapRed' : 0,
-                    'baseballCapWhite' : 0,
-                    'cowboyHatBlack' : 0,
-                    'cowboyHatBrown' : 0,
-                    'cowboyHatTan' : 0,
-                    'cowboyHatWhite' : 0,
-                    'crown' : 0,
-                    'stockingCap' : 0,
-                    'topHatBlue' : 0,
-                    'topHatRed' : 0,
-                    'topHatYellow' : 0,
-                    'witchBlack' : 0,
-                    'witchBrown' : 0,
-                    'witchStraw' : 0,
-                    'bandannaBlue' : 0,
-                    'bandannaRed' : 0,
-                    'mask' : 0,
-                    'smoking' : 0,
-                    'smokingCigar' : 0,
-                    'smokingPipe' : 0,
-                    'tongue' : 0,
-                    'tongueFly' : 0,
-                    'tongueSpider' : 0,
-                    'tongueSpiderRed' : 0,
-                    'closedEyes' : 0,
-                    'croaking' : 0,
-                    'inversedEyes' : 0,
-                    'peace' : 0,
-                    'thirdEye' : 0,
-                    'blue(2)' : 0,
-                    'blue' : 0,
-                    'brown' : 0,
-                    'cyan' : 0,
-                    'darkGreen' : 0,
-                    'green' : 0,
-                    'orange(2)' : 0,
-                    'orange' : 0,
-                    'pink' : 0,
-                    'purple(2)' : 0,
-                    'purple' : 0,
-                    'red(2)' : 0,
-                    'red' : 0,
-                    'sand' : 0,
-                    'white(2)' : 0,
-                    'white' : 0,
-                    'yellow(2)' : 0,
-                    'yellow' : 0
-                }   // Start at 0
-                
-                // Pull Collection data from OpenSea
+                // Pull collection info + stats (OpenSea v2)
+                try {
+                    const [infoRes, statsRes] = await Promise.all([
+                        fetch('https://api.opensea.io/api/v2/collections/' + OS_SLUG, { headers: OS_HEADS }),
+                        fetch('https://api.opensea.io/api/v2/collections/' + OS_SLUG + '/stats', { headers: OS_HEADS })
+                    ]);
+                    const info  = await infoRes.json();
+                    const stats = await statsRes.json();
+                    const s     = stats.total || {};
 
-                const options = {method: 'GET', headers: {'X-API-KEY': '1b80881e422a49d393113ede33c81211'}};
+                    document.getElementById('banner_image').src  = info.banner_image_url || '';
+                    document.getElementById('name').innerHTML     = info.name || OS_SLUG;
+                    document.getElementById('count').innerHTML    = s.supply ?? info.total_supply ?? '—';
+                    document.getElementById('num_owners').innerHTML = s.num_owners ?? '—';
+                    document.getElementById('market_cap').innerHTML = s.market_cap != null ? Number(s.market_cap).toFixed(2) + ' Ξ' : '—';
+                    document.getElementById('floor_price').innerHTML = s.floor_price != null ? Number(s.floor_price).toFixed(4) + ' Ξ' : '—';
+                    document.getElementById('total_volume').innerHTML = s.volume != null ? Number(s.volume).toFixed(2) + ' Ξ' : '—';
+                    document.getElementById('description').innerHTML  = info.description || '';
+                    document.getElementById('created_date').innerHTML = info.created_date || '';
 
-                fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
-                .then(response => response.json())
-                .then(response => {
+                    const count = parseInt(s.supply || info.total_supply || 0);
+                    const initial_sales = (count - 3240) * 0.01;
+                    document.getElementById('initial_sales').innerHTML = initial_sales > 0 ? initial_sales.toFixed(2) + ' Ξ' : '—';
+                } catch (e) {
+                    console.error('Collection info failed:', e);
+                }
 
-                    var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = response
+                // Get recent sales (OpenSea v2 events)
+                try {
+                    const res  = await fetch(
+                        'https://api.opensea.io/api/v2/events/collection/' + OS_SLUG + '?event_type=sale&limit=7',
+                        { headers: OS_HEADS }
+                    );
+                    const data = await res.json();
+                    const events = data.asset_events || [];
 
-                    document.getElementById('banner_image').setAttribute('src', banner_image_url)
-                    document.getElementById('name').innerHTML = name
-                    document.getElementById('count').innerHTML = count
-                    document.getElementById('num_owners').innerHTML = num_owners
-                    document.getElementById('market_cap').innerHTML = market_cap.toFixed(2)+' Ξ'
-                    document.getElementById('floor_price').innerHTML = floor_price+' Ξ'
-                    document.getElementById('total_volume').innerHTML = total_volume.toFixed(2)+' Ξ'
-                    document.getElementById('description').innerHTML = description
-                    document.getElementById('created_date').innerHTML = created_date
-                    //document.getElementById('payout_address').innerHTML = payout_address+' [ 005058 ] '
-
-                    var initial_sales = (parseInt(count) - 3240) * 0.01
-
-                    document.getElementById('initial_sales').innerHTML = initial_sales+' Ξ'
-
-                })
-                .catch(err => console.error(err)); // End data pull / first paid Frog 3,236
-
-                // Get recent sales
-                
-                fetch('https://api.opensea.io/api/v1/events?collection_slug=fresh-frogs&event_type=successful&limit=7', options)
-                .then(res => res.json())
-                .then(res => {
-
-                    var { asset_events } = res
-
-                    console.log(asset_events)
-                    
-
-                    asset_events.forEach((sale) => {
-                        
-
+                    events.forEach(sale => {
                         try {
+                            const nft      = sale.nft || {};
+                            const payment  = sale.payment || {};
+                            const decimals = payment.decimals ?? 18;
+                            const qty      = payment.quantity ?? '0';
+                            const price    = (Number(qty) / Math.pow(10, decimals)).toFixed(4);
+                            const imgUrl   = nft.image_url || nft.display_image_url || '';
+                            const name     = nft.name || ('Frog #' + nft.identifier);
 
-                            var { asset: { image_url, name }, payment_token: { decimals }, total_price } = sale
-
-                            var sale_price = total_price / Math.pow(10, decimals)
-
-                            console.log('Sale found...'+sale.asset.name+' : '+sale_price)
-
-                            recent_sale = document.createElement('div')
-                            recent_sale.style.verticalAlign = 'center'
-                            recent_sale.style.textAlign = 'center'
-                            recent_sale.style.width = 'auto'
-                            recent_sale.innerHTML = 
-                                '<img class="recent_sale" src='+image_url+'>' +
-                                '<p>'+name+' | '+sale_price+' Ξ<p>';
-                            document.getElementById('recent_sales').appendChild(recent_sale)
-                        
-                        } catch (e) { console.log(e.message) }
-
-                    })
-
-
-                })
-                .catch(err => console.error(err));
+                            const el = document.createElement('div');
+                            el.style.verticalAlign = 'center';
+                            el.style.textAlign = 'center';
+                            el.style.width = 'auto';
+                            el.innerHTML =
+                                '<img class="recent_sale" src="' + imgUrl + '">' +
+                                '<p>' + name + ' | ' + price + ' Ξ</p>';
+                            document.getElementById('recent_sales').appendChild(el);
+                        } catch (e) { console.log(e.message); }
+                    });
+                } catch (e) {
+                    console.error('Recent sales failed:', e);
+                }
             })
         </script>
     </head>
