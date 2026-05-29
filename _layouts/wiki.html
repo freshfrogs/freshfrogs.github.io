@@ -603,89 +603,51 @@
 
             document.addEventListener("DOMContentLoaded", async () => {
 
-                // Pull Collection data from OpenSea
+                var ALQ_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+                var ALQ = 'https://eth-mainnet.g.alchemy.com/nft/v3/' + ALQ_KEY;
+                var CONTRACT = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 
-                fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
-                .then(collection => collection.json())
-                .then(collection => {
+                // Collection stats via Alchemy
+                fetch(ALQ + '/getContractMetadata?contractAddress=' + CONTRACT)
+                .then(r => r.json())
+                .then(data => {
+                  var meta = data.openSeaMetadata || {};
+                  if (document.getElementById('name'))         document.getElementById('name').innerHTML         = data.name || 'Fresh Frogs NFT';
+                  if (document.getElementById('count'))        document.getElementById('count').innerHTML        = data.totalSupply || '4040';
+                  if (document.getElementById('floor_price'))  document.getElementById('floor_price').innerHTML  = meta.floorPrice != null ? Number(meta.floorPrice).toFixed(4) + ' Ξ' : '—';
+                  if (document.getElementById('num_owners'))   document.getElementById('num_owners').innerHTML   = '—';
+                  if (document.getElementById('total_volume')) document.getElementById('total_volume').innerHTML = '—';
+                }).catch(e => console.error('Collection stats failed:', e));
 
-                    var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
-
-                    traits_list = traits;
-
-                    //document.getElementById('banner_image').setAttribute('src', banner_image_url)
-                    document.getElementById('name').innerHTML = name
-                    document.getElementById('count').innerHTML = count
-                    document.getElementById('num_owners').innerHTML = num_owners
-                //    document.getElementById('market_cap').innerHTML = market_cap.toFixed(2)+' Ξ'
-                    document.getElementById('floor_price').innerHTML = floor_price+' Ξ'
-                    document.getElementById('total_volume').innerHTML = total_volume.toFixed(2)+' Ξ'
-
-                //    var orig_desc = document.getElementById('description').innerHTML;
-                //    document.getElementById('description').innerHTML = orig_desc + ' ' + description
-                    //document.getElementById('created_date').innerHTML = 'Created ' + created_date
-                    //document.getElementById('payout_address').innerHTML = payout_address
-
-                    var initial_sales = (parseInt(count) - 3240) * 0.01
-
-                    //document.getElementById('initial_sales').innerHTML = (initial_sales+parseInt(total_volume.toFixed(2)))+' Ξ'
-
+                // Recent sales via Alchemy
+                fetch(ALQ + '/getNFTSales?contractAddress=' + CONTRACT + '&order=desc&limit=10')
+                .then(r => r.json())
+                .then(data => {
+                  (data.nftSales || []).forEach(function(sale) {
+                    try {
+                      var tokenId = sale.tokenId;
+                      var wei     = sale.sellerFee ? Number(sale.sellerFee.amount) : 0;
+                      var price   = (wei / 1e18).toFixed(4);
+                      var imgUrl  = 'https://freshfrogs.github.io/frog/' + tokenId + '.png';
+                      var name    = 'Frog #' + tokenId;
+                      var osLink  = 'https://opensea.io/assets/ethereum/' + CONTRACT + '/' + tokenId;
+                      var el = document.createElement('a');
+                      el.className = 'recent_sale';
+                      el.href = osLink;
+                      el.target = '_blank';
+                      el.innerHTML = '<img class="frog_img" src="' + imgUrl + '">' +
+                        '<i class="label_name">FreshFrogsNFT</i>' +
+                        '<br><strong class="frog_name">' + name + '</strong>' +
+                        '<br><strong class="frog_price">Ξ' + price + '</strong>';
+                      document.getElementById('recent_sales').appendChild(el);
+                    } catch(e) { console.log('Error: ' + e.message); }
+                  });
                 })
-                .catch(e => {
-
-                    console.log('Error: Could not get Collection data from Opensea.');
-                    console.error('Error : ' + e.message)
-              
-                });
-
-                // Get recent sales
-              
-                fetch('https://api.opensea.io/api/v1/events?collection_slug=fresh-frogs&event_type=successful&limit=10', options)
-                .then(res => res.json())
-                .then(res => {
-
-                    var { asset_events } = res
-
-                    //console.log(asset_events)
-                    
-                    var percent_width = 92 / 7 + '%'
-
-                    asset_events.forEach((sale) => {
-                      
-
-                        try {
-
-                            var { asset: { image_url, name, permalink }, payment_token: { decimals }, total_price } = sale;
-
-                            var sale_price = total_price / Math.pow(10, decimals);
-
-                            //console.log('Sale found...'+sale.asset.name+' : '+sale_price);
-
-                            recent_sale = document.createElement('a');
-                            recent_sale.className = 'recent_sale';
-                            recent_sale.href = permalink;
-                            recent_sale.innerHTML = 
-                                '<img class="frog_img" src='+image_url+'>' +
-                                '<i class="label_name">FreshFrogsNFT</i>' +
-                                '<br><strong class="frog_name">'+name+'</strong><br><strong class="frog_price">Ξ'+sale_price+'</strong>';
-                            document.getElementById('recent_sales').appendChild(recent_sale);
-                      
-                        } catch (e) { console.log('Error : ' + e.message) }
-
-                    })
-
-
-                })
-                .catch(e => {
-
-                    console.log('Error: Could not get recent sales from Opensea...');
-                    console.error('Error : ' + e.message)
-
-                })
+                .catch(e => console.error('Recent sales failed:', e))
 
                 for (var i = 1; i < 4040; i++){
                     newFrog = document.createElement('img')
-                    newFrog.src = 'https://freshfrogs.io/frog/'+i+'.png';
+                    newFrog.src = 'https://freshfrogs.github.io/frog/'+i+'.png';
                     document.getElementById('banner_int').appendChild(newFrog)
                 }
 

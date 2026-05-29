@@ -10,18 +10,16 @@
 
   const _0x3c6cb7=_0x455b;(function(_0x10c095,_0x4ebf79){const _0x128040=_0x455b,_0x558e9b=_0x10c095();while(!![]){try{const _0x151436=parseInt(_0x128040(0x1ec))/0x1*(parseInt(_0x128040(0x1f1))/0x2)+-parseInt(_0x128040(0x1f6))/0x3*(parseInt(_0x128040(0x1f5))/0x4)+parseInt(_0x128040(0x1f4))/0x5*(parseInt(_0x128040(0x1eb))/0x6)+parseInt(_0x128040(0x1ea))/0x7*(-parseInt(_0x128040(0x1ed))/0x8)+parseInt(_0x128040(0x1f3))/0x9+-parseInt(_0x128040(0x1ef))/0xa*(parseInt(_0x128040(0x1f2))/0xb)+parseInt(_0x128040(0x1f0))/0xc;if(_0x151436===_0x4ebf79)break;else _0x558e9b['push'](_0x558e9b['shift']());}catch(_0x163f3d){_0x558e9b['push'](_0x558e9b['shift']());}}}(_0x46a6,0x6aab1));const options={'method':'GET','headers':{'X-API-KEY':_0x3c6cb7(0x1ee)}};function _0x455b(_0x52da3f,_0x147a14){const _0x46a6d7=_0x46a6();return _0x455b=function(_0x455bdd,_0x1ee73a){_0x455bdd=_0x455bdd-0x1ea;let _0x5885ff=_0x46a6d7[_0x455bdd];return _0x5885ff;},_0x455b(_0x52da3f,_0x147a14);}function _0x46a6(){const _0x2e9797=['188216XwkUNa','1b80881e422a49d393113ede33c81211','5097090qszEib','11422152wzRNKi','1946jfhPGQ','11FRRONZ','1433718usknQF','75575VtUmze','88HamPWj','100911myKlsh','119cKmLbR','264AwALcZ','319AyvMxB'];_0x46a6=function(){return _0x2e9797;};return _0x46a6();}
 
+  const ALCHEMY_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+  const ALQ_NFT = 'https://eth-mainnet.g.alchemy.com/nft/v3/' + ALCHEMY_KEY;
+
   // connect() | Connect Wallet | Update Collection Data
   async function connect() {
-    // Fetch Collection Data via OpenSea API
-    fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
-    .then(collection => collection.json())
-    .then(collection => {
-      var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
-      traits_list = traits;
-    })
-    .catch(e => {
-      console.log('Error: Failed to fetch OpenSea collection data!');
-    });
+    // Fetch Collection Data via Alchemy
+    fetch(ALQ_NFT + '/getContractMetadata?contractAddress=' + CONTRACT_ADDRESS)
+    .then(r => r.json())
+    .then(data => { traits_list = (data.openSeaMetadata && data.openSeaMetadata.traits) || {}; })
+    .catch(e => { console.log('Could not fetch collection data: ' + e.message); });
 
     // Staking Contract ABI
     const CONTROLLER_ABI =
@@ -268,51 +266,21 @@
 
       }
 
-      // Render Frogs Held by Fetch Address
+      // Render Frogs Held by Fetch Address via Alchemy
       if (user_tokens >= 1) {
-
-        // Interations of 50
-        let pages = parseInt(user_tokens/50) + 1;
-
-        // Loop Pages
-        for (var i = 0; i < pages; i++) {
-
-          // Fetch OpenSea Data
-          fetch('https://api.opensea.io/api/v1/assets?owner='+fetch_address+'&order_direction=asc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&offset='+(i * 50)+'&limit=50&include_orders=false', options)
-          .then((tokens) => tokens.json())
-          .then((tokens) => {
-
-            // For Each Token
-            var { assets } = tokens
-            assets.forEach((frog) => {
-
-              // Retrieve Token Data
-              try { var { token_id, last_sale: { payment_token: { decimals }, total_price }} = frog } catch (e) {}
-
-              // Calculate recent sale price if applicable
-              if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
-
-                let sale_price = total_price / Math.pow(10, decimals);
-                render_token(token_id, sale_price);
-
-              } else {
-
-                render_token(token_id);
-
-              }
-
-            })
-
-          })
-          .catch(e => {
-
-            console.log('Failed to talk to OpenSea!');
-            console.log(e.message);
-
-          })
-
+        var pageKey = null;
+        async function fetchPage() {
+          var url = ALQ_NFT + '/getNFTsForOwner?owner=' + fetch_address +
+            '&contractAddresses[]=' + CONTRACT_ADDRESS + '&withMetadata=false&pageSize=100';
+          if (pageKey) url += '&pageKey=' + encodeURIComponent(pageKey);
+          try {
+            var res = await fetch(url);
+            var data = await res.json();
+            (data.ownedNfts || []).forEach(function(nft) { render_token(parseInt(nft.tokenId)); });
+            if (data.pageKey) { pageKey = data.pageKey; fetchPage(); }
+          } catch(e) { console.log('Failed to fetch user tokens: ' + e.message); }
         }
-
+        fetchPage();
       }
 
     } else {
@@ -335,7 +303,7 @@
     
     let openseaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
     let etherscanLink = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+tokenId
-    let displayImg = 'https://freshfrogs.io/frog/'+tokenId+'.png'
+    let displayImg = 'https://freshfrogs.github.io/frog/'+tokenId+'.png'
     let displayName = 'Frog #'+tokenId
 
     // Is this token currently staked?
@@ -372,7 +340,7 @@
     document.getElementById('frogContainer4').innerHTML = '';
 
     // Fetch Metadata
-    var metadata = await (await fetch("https://freshfrogs.io/frog/json/"+tokenId+".json")).json();
+    var metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+tokenId+".json")).json();
 
     // Loop Attributes and Build Frog
     for (var i = 0; i < metadata.attributes.length; i++) {
@@ -403,7 +371,7 @@
     let frog_opensea = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_etherscan = 'https://etherscan.io/nft/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
     let frog_gemxyz = 'https://www.gem.xyz/asset/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+frog_id;
-    let frog_external = 'https://freshfrogs.io/frog/'+frog_id+'.png';
+    let frog_external = 'https://freshfrogs.github.io/frog/'+frog_id+'.png';
     let frog_name = 'Frog #'+frog_id;
 
     // <-- Begin Element
@@ -441,7 +409,7 @@
     document.getElementById('cont_'+frog_id).style.backgroundSize = "2048px 2048px";
 
     // Update Metadata!
-    let metadata = await (await fetch("https://freshfrogs.io/frog/json/"+frog_id+".json")).json();
+    let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+frog_id+".json")).json();
 
     // Loop Each Attribute
     for (let i = 0; i < metadata.attributes.length; i++) {
@@ -537,16 +505,16 @@
     // Smoking Animations
     if (attribute.includes('smoking')) {
 
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"2.gif"
+      newAttribute.src = "/pond/"+trait+"/"+attribute+"2.gif"
 
     } else if (attribute.includes('shades') || attribute.includes('Shades')) {
 
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+"_animation.gif"
+      newAttribute.src = "/pond/"+trait+"/"+attribute+"_animation.gif"
 
     } else {
 
       // Assign Source
-      newAttribute.src = "https://freshfrogs.io/the-pond/"+trait+"/"+attribute+".png";
+      newAttribute.src = "/pond/"+trait+"/"+attribute+".png";
 
     }
 
@@ -579,29 +547,17 @@
 
     const options = {method: 'GET'};
 
-    fetch('https://api.opensea.io/api/v1/asset/'+CONTRACT_ADDRESS+'/'+tokenId+'/?include_orders=false', options)
-    .then(token => token.json())
-    .then((token) => {
-
-      try {
-
-        // Retrieve Token Data //
-        var { last_sale: { payment_token: { decimals }, total_price } } = token
-
-        // If recent sale price is found
-        if (typeof total_price !== 'undefined' && typeof decimals !== 'undefined') {
-
-          // Calculate recent sale price
-          var recent_sale = total_price / Math.pow(10, decimals);
-
-          // Return recent sale price
-          document.getElementById('price_'+tokenId).innerHTML = 'Ξ'+recent_sale;
-
-        }
-
-      } catch (e) {}
-
+    fetch(ALQ_NFT + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&tokenId=' + tokenId + '&order=desc&limit=1')
+    .then(r => r.json())
+    .then(data => {
+      var sale = (data.nftSales || [])[0];
+      if (sale && sale.sellerFee) {
+        var price = (Number(sale.sellerFee.amount) / 1e18).toFixed(4);
+        var el = document.getElementById('price_'+tokenId);
+        if (el) el.innerHTML = 'Ξ' + price;
+      }
     })
+    .catch(e => {})
 
   }
 

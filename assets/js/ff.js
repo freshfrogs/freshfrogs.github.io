@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         // AWAIT RESPONSE!
 
-        consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>'+mint_quantity+' FROG(s)</b> have successfully been minted! <a class="pointer" href="https://freshfrogs.io/the-pond"><b>View "FROG" Tokens</a></b></div><br>')
+        consoleOutput('<br><h3 class="h3">Congratulations!</h3> <b>'+mint_quantity+' FROG(s)</b> have successfully been minted! <a class="pointer" href="/pond/"><b>View "FROG" Tokens</a></b></div><br>')
         document.getElementById('pre').style.backgroundColor = '#99ffc5'
         return; // BREAK!
 
@@ -161,89 +161,42 @@ function truncateAddress(address) {
   Fetch OpenSea collection data
 */
 
+var ALQ_KEY = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+var ALQ_NFT = 'https://eth-mainnet.g.alchemy.com/nft/v3/' + ALQ_KEY;
+
 function fetch_opensea_data() {
 
-  const options = {
-    method: 'GET',
-    headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'} // 1b80881e422a49d393113ede33c81211
-  };
-
-  // Collection variables
-  // Trait list and rarities
-
-  fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
-  .then(collection => collection.json())
-  .then(collection => {
-
-    var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
-
-    traits_list = traits;
-
-  })
-  .catch(e => {
-
-      console.log('Error: Could not talk to Opensea. (1)');
-      console.error('Error : ' + e.message)
-
-  });
-  
-  // Pull next available token ID prior to web3 connection
-  //
-
-  fetch('https://api.opensea.io/api/v1/assets?order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=12&include_orders=false', options)
-  .then((assets) => assets.json())
-  .then((assets) => {
-
-    var { assets } = assets
-    var contract_id = mint_id = parseInt(assets[0].name.replace('Frog #', '')) + 1;
-
+  // Next available token ID via Alchemy
+  fetch(ALQ_NFT + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=1')
+  .then(r => r.json())
+  .then(data => {
+    var sales = data.nftSales || [];
+    if (!sales.length) throw new Error('no sales');
+    var contract_id = mint_id = parseInt(sales[0].tokenId) + 1;
     display_token(contract_id);
-    console.log('Nex token_id : ' + contract_id);
-
+    console.log('Next token_id : ' + contract_id);
   })
   .catch(e => {
-
     opensea_failed = true;
-    console.log('Error: Could not talk to Opensea. (2)');
-    console.error('Error : ' + e.message)
-
+    console.log('Could not fetch token ID: ' + e.message);
   });
 
-
-  // Get recent sales
-
-  fetch('https://api.opensea.io/api/v1/events?collection_slug=fresh-frogs&event_type=successful&limit=24', options)
-  .then(sales => sales.json())
-  .then(sales => {
-
-      var { asset_events } = sales
-
-      document.getElementById('recent_mints').innerHTML = '';
-
-      asset_events.forEach((sale) => {
-        
-        try {
-
-          var { asset: { image_url, name, permalink, token_id, external_link }, payment_token: { decimals }, total_price } = sale;
-
-          // for each recent mint...
-          recentMint = document.createElement('img')
-          recentMint.src = external_link
-          recentMint.className = 'recentMint'
-
-          document.getElementById('recent_mints').appendChild(recentMint);
-      
-        } catch (e) { console.log('Error : ' + e.message) }
-
-      })
-
+  // Recent sales via Alchemy
+  fetch(ALQ_NFT + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=24')
+  .then(r => r.json())
+  .then(data => {
+    var el = document.getElementById('recent_mints');
+    if (el) el.innerHTML = '';
+    (data.nftSales || []).forEach(function(sale) {
+      try {
+        var img = document.createElement('img');
+        img.src = 'https://freshfrogs.github.io/frog/' + sale.tokenId + '.png';
+        img.className = 'recentMint';
+        if (el) el.appendChild(img);
+      } catch(e) { console.log('Error: ' + e.message); }
+    });
   })
-  .catch(e => {
-
-      console.log('Error: Could not get recent sales from Opensea...');
-      console.error('Error : ' + e.message)
-
-  })
+  .catch(e => { console.log('Could not fetch recent sales: ' + e.message); })
 
 }
 
@@ -277,7 +230,7 @@ async function getInvites() {
 // Display Frog
 async function display_token(token){
 
-    token_img = 'https://freshfrogs.io/frog/'+token+'.png'
+    token_img = 'https://freshfrogs.github.io/frog/'+token+'.png'
     token_name = 'Frog #'+token
 
     document.getElementById('thisheader').style.backgroundImage = 'url('+token_img+')';
@@ -285,7 +238,7 @@ async function display_token(token){
     document.getElementById('previewImg').setAttribute('src', token_img)
 
     /*
-    let token_metadata = await (await fetch("https://freshfrogs.io/frog/json/"+token+".json")).json();
+    let token_metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token+".json")).json();
     for (var i = 0; i < token_metadata.attributes.length; i++){
         var data = token_metadata.attributes[i]
         //load_trait(data.trait_type, data.value, 'subDisplay')
