@@ -339,19 +339,18 @@ async function loadRecentActivity() {
         }
       }
 
-      // ✅ No OpenSea / Etherscan buttons anymore
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '',
+        headerLeft: `#${tokenId}`,
         headerRight,
         footerHtml: '',
-        actionHtml: '' // removed
+        actionHtml: ''
       });
 
       container.appendChild(card);
-
-      if (ownerAddress) ffSetOwnerLabel(card, ownerAddress);
+      ffPrepareSimpleCard(card);
+      if (ownerAddress) ffSetOwnerLabel(card, ownerAddress, 'sold to');
 
       if (card.dataset.imgContainerId) {
         ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
@@ -413,15 +412,15 @@ async function ffLoadRecentStakes() {
       const card = createFrogCard({
         tokenId,
         metadata,
-        headerLeft: '',
+        headerLeft: `#${tokenId}`,
         headerRight,
         footerHtml: '',
-        actionHtml: '' // no buttons in this mini list
+        actionHtml: ''
       });
 
       container.appendChild(card);
-
-      if (staker) ffSetOwnerLabel(card, staker);
+      ffPrepareSimpleCard(card);
+      if (staker) ffSetOwnerLabel(card, staker, 'staked by');
 
       if (card.dataset.imgContainerId) {
         ffBuildLayeredFrogImage(tokenId, card.dataset.imgContainerId);
@@ -525,15 +524,43 @@ function ffRefreshStakeMetaForAllCards() {
 // ------------------------
 // Owner label + OpenSea username everywhere
 // ------------------------
-function ffSetOwnerLabel(card, address) {
+function ffPrepareSimpleCard(card) {
+  // Hide the full traits section for simple recent-activity cards
+  const traitsEl = card.querySelector('.recent_sale_traits');
+  if (traitsEl) traitsEl.style.display = 'none';
+
+  // Insert a clean "sold to / staked by" line before the action buttons
+  const ownerEl = document.createElement('div');
+  ownerEl.className = 'ff-card-owner';
+  const actionsEl = card.querySelector('.frog-actions');
+  if (actionsEl) {
+    card.insertBefore(ownerEl, actionsEl);
+  } else {
+    card.appendChild(ownerEl);
+  }
+}
+
+function ffSetOwnerLabel(card, address, prefix) {
   if (!card || !address) return;
 
+  // Simple cards: update the dedicated owner line
+  const simpleEl = card.querySelector('.ff-card-owner');
+  if (simpleEl) {
+    const pre = prefix || 'sold to';
+    simpleEl.innerHTML = `${pre} ${formatOwnerLink(address, truncateAddress(address))}`;
+    ffResolveOpenSeaUsername(address).then((username) => {
+      if (!username) return;
+      simpleEl.innerHTML = `${pre} <b>${formatOwnerLink(address, username)}</b>`;
+    });
+    return;
+  }
+
+  // Other card types: original behavior — put address in first title slot
   const titleEls = card.querySelectorAll('.sale_card_title');
   const ownerEl = titleEls[0];
   if (!ownerEl) return;
 
   ownerEl.innerHTML = formatOwnerLink(address, truncateAddress(address));
-
   ffResolveOpenSeaUsername(address).then((username) => {
     if (!username) return;
     ownerEl.innerHTML = formatOwnerLink(address, username);

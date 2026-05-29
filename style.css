@@ -552,6 +552,30 @@ a { color: inherit; }
 .frog-actions .frog_action_btn:last-child { border-right: none; }
 .frog_action_btn:hover { background: var(--bg-hover); color: var(--text); }
 
+/* ── CARD OWNER LABEL ("sold to / staked by") ── */
+
+.ff-card-owner {
+  padding: 6px 10px 8px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+
+.ff-card-owner a {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ff-card-owner a:hover {
+  text-decoration: underline;
+}
+
+.ff-card-owner b {
+  font-weight: 600;
+  color: var(--text);
+}
+
 /* ── SEARCH ── */
 
 .search-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
