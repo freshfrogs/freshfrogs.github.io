@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fresh Frogs NFT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="/the-pad/Frog/greenTreeFrog.png" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+  <div class="page">
+
+    <header class="site-header">
+      <nav class="nav">
+        <div class="nav-left">
+          <span class="logo">🐸 freshfrogs</span>
+          <a href="/" data-view="collection">Collection</a>
+          <a href="/rarity/" data-view="rarity">Rarity</a>
+          <a href="/pond/" data-view="pond">Pond</a>
+          <a href="/morph/" data-view="morph">Morph</a>
+        </div>
+        <div class="nav-right">
+          <a href="#" id="header-connect-wallet-btn">Connect Wallet</a>
+          <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
+        </div>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-media">
+        <div class="hero-frog" id="hero-frog-16"></div>
+        <div class="hero-frog" id="hero-frog-3753"></div>
+        <div class="hero-frog" id="hero-frog-467"></div>
+        <div class="hero-frog" id="hero-frog-594"></div>
+      </div>
+      <h1 class="hero-title">Fresh Frogs NFT</h1>
+      <p class="hero-subtitle">
+        4,040 randomly generated frogs on Ethereum. Stake and earn rewards,
+        level up, unlock custom trait animations, and morph two frogs into one.
+      </p>
+      <div class="hero-actions">
+        <a href="#" id="landing-connect-btn" class="btn-primary">Connect Wallet</a>
+        <a href="https://opensea.io/collection/fresh-frogs" target="_blank" rel="noopener noreferrer" class="btn-secondary">OpenSea ⛵</a>
+        <a href="https://snakeesc.github.io" class="btn-secondary">Escape the Snake 🐍</a>
+      </div>
+    </section>
+
+    <main class="dashboard-main">
+
+      <section class="dashboard-section" id="recent-activity-panel">
+        <h2 class="section-heading">Largest Sales</h2>
+        <p class="dashboard-note" id="largest-sales-status">Loading...</p>
+        <div class="frog-grid" id="largest-sales-grid"></div>
+
+        <h2 class="section-heading" style="margin-top:2.5rem;">Recent Sales</h2>
+        <p class="dashboard-note" id="recent-sales-status">Loading recent sales...</p>
+        <div class="frog-grid" id="recent-sales"></div>
+        <button id="load-more-activity" class="btn-outline" type="button">Load More</button>
+
+        <h2 class="section-heading" style="margin-top:2.5rem;">Recent Stakes</h2>
+        <p class="dashboard-note" id="recent-stakes-status">Loading recent stakes...</p>
+        <div class="frog-grid" id="recent-stakes"></div>
+
+        <h2 class="section-heading" style="margin-top:2.5rem;">Recent Morphs</h2>
+        <p class="dashboard-note" id="recent-home-morphs-status">Loading recent morphs...</p>
+        <div class="frog-grid" id="recent-home-morphs-grid"></div>
+      </section>
+
+      <section class="dashboard-section" id="rarity-panel" style="display:none;">
+        <h2 class="section-heading">Rarity Rankings</h2>
+        <p class="dashboard-note" id="rarity-status">Top ranked Frogs — lower rank = rarer.</p>
+        <div id="rarity-grid" class="frog-grid"></div>
+        <button id="load-more-rarity" class="btn-outline" type="button">Load More</button>
+      </section>
+
+      <section class="dashboard-section" id="pond-panel" style="display:none;">
+        <h2 class="section-heading">The Pond</h2>
+        <p class="dashboard-note" id="pond-status">All Frogs currently staked by the community.</p>
+        <div id="pond-grid" class="frog-grid"></div>
+        <button id="load-more-pond" class="btn-outline" type="button">Load More</button>
+
+        <h2 class="section-heading" style="margin-top:2.5rem;">Recent Morphs</h2>
+        <p class="dashboard-note" id="recent-morphs-status">Loading recent morphs...</p>
+        <div id="recent-morphs-grid" class="frog-grid"></div>
+      </section>
+
+      <section class="dashboard-section" id="owned-panel" style="display:none;">
+        <h2 class="section-heading">Owned Frogs</h2>
+        <p class="dashboard-note" id="owned-frogs-status">Frogs in your wallet.</p>
+        <div id="owned-frogs-grid" class="frog-grid"></div>
+      </section>
+
+      <section class="dashboard-section" id="staked-panel" style="display:none;">
+        <h2 class="section-heading">Staked Frogs</h2>
+        <p class="dashboard-note" id="staked-frogs-status">Frogs staked in the FreshFrogs controller.</p>
+        <div id="staked-frogs-grid" class="frog-grid"></div>
+      </section>
+
+    </main>
+
+    <footer class="site-footer">
+      <span>🐸 freshfrogs.github.io</span>
+      <span>
+        <a href="https://opensea.io/collection/fresh-frogs" target="_blank" rel="noopener noreferrer">OpenSea</a>
+        &nbsp;·&nbsp;
+        <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" rel="noopener noreferrer">Etherscan</a>
+      </span>
+    </footer>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="/assets/collection_abi.js"></script>
+  <script src="/assets/controller_abi.js"></script>
+  <script src="/assets/ethereum-dapp.js"></script>
+  <script src="/assets/rarityrankings.js"></script>
+  <script>
+    // Build trait-layered hero frogs on load
+    const HERO_FROGS = [16, 3753, 467, 594];
+    async function buildHeroFrog(tokenId) {
+      const el = document.getElementById('hero-frog-' + tokenId);
+      if (!el) return;
+      try {
+        const res = await fetch('https://freshfrogs.github.io/frog/json/' + tokenId + '.json', { cache: 'force-cache' });
+        const meta = await res.json();
+        el.innerHTML = '';
+        el.style.position = 'relative';
+        for (const attr of (meta.attributes || [])) {
+          if (!attr.trait_type || attr.value == null) continue;
+          const img = new Image();
+          img.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none;';
+          img.src = '/the-pad/' + attr.trait_type + '/' + attr.value + '.png';
+          el.appendChild(img);
+        }
+      } catch {
+        el.innerHTML = '<img src="https://freshfrogs.github.io/frog/' + tokenId + '.png" style="width:100%;height:100%;image-rendering:pixelated;" />';
+      }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      HERO_FROGS.forEach(buildHeroFrog);
+    });
+  </script>
+  <script src="/assets/site.js"></script>
+
+</body>
+</html>

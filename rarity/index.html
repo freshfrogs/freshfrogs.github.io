@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fresh Frogs — Rarity</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="/the-pad/Frog/greenTreeFrog.png" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <nav class="nav">
+        <div class="nav-left">
+          <span class="logo">🐸 freshfrogs</span>
+          <a href="/" data-view="collection">Collection</a>
+          <a href="/rarity/" data-view="rarity" class="active">Rarity</a>
+          <a href="/pond/" data-view="pond">Pond</a>
+          <a href="/morph/" data-view="morph">Morph</a>
+        </div>
+        <div class="nav-right">
+          <a href="#" id="header-connect-wallet-btn">Connect Wallet</a>
+          <a href="#" data-view="wallet" id="wallet-nav-link" style="display:none;"></a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="dashboard-main" style="padding-top:1.5rem;">
+      <section class="dashboard-section" id="rarity-panel">
+        <h2 class="section-heading">Rarity Rankings</h2>
+        <p class="dashboard-note" id="rarity-status">Top ranked Frogs — lower rank = rarer.</p>
+        <div id="rarity-grid" class="frog-grid"></div>
+        <button id="load-more-rarity" class="btn-outline" type="button">Load More</button>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>🐸 freshfrogs.github.io</span>
+      <span>
+        <a href="https://opensea.io/collection/fresh-frogs" target="_blank" rel="noopener noreferrer">OpenSea</a>
+        &nbsp;·&nbsp;
+        <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" rel="noopener noreferrer">Etherscan</a>
+      </span>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="/assets/collection_abi.js"></script>
+  <script src="/assets/controller_abi.js"></script>
+  <script src="/assets/ethereum-dapp.js"></script>
+  <script src="/assets/rarityrankings.js"></script>
+  <script src="/assets/site.js"></script>
+</body>
+</html>
