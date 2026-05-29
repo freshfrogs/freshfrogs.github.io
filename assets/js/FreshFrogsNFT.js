@@ -26,17 +26,11 @@
       '</div>'
     );
 
-    // Fetch Collection Data via OpenSea API
-    fetch('https://api.opensea.io/api/v1/collection/fresh-frogs', options)
-    .then(collection => collection.json())
-    .then(collection => {
-      var { collection: { banner_image_url, created_date, description, dev_seller_fee_basis_points, external_url, featured_image_url, name, payout_address, traits, stats: { floor_price, market_cap, total_volume, count, num_owners } } } = collection
-      traits_list = traits;
-    })
-    .catch(e => {
-      console.log('Error: Failed to fetch OpenSea collection data!');
-      
-    });
+    // Fetch contract metadata via Alchemy
+    fetch('https://eth-mainnet.g.alchemy.com/nft/v3/C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ/getContractMetadata?contractAddress=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b')
+    .then(r => r.json())
+    .then(data => { traits_list = (data.openSeaMetadata && data.openSeaMetadata.traits) || {}; })
+    .catch(e => { console.log('Could not fetch collection data: ' + e.message); });
 
     // Staking Contract ABI
     const CONTROLLER_ABI =
@@ -221,8 +215,12 @@
     const f0 = new F0();
 
     // Connect Collection Smart Contract, Staking Smart Contract
+    var _abi = typeof token_abi !== 'undefined' ? token_abi :
+      [{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+       {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+       {"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"}];
     CONTROLLER = controller = new web3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-    COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);
+    COLLECTION = collection = new web3.eth.Contract(_abi, CONTRACT_ADDRESS);
 
     try { // Attempt to Connect!
       await f0.init({
