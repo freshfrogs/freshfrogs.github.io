@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fresh Frogs NFT</title>
+  <meta name="description" content="4,040 randomly generated pixel frogs on Ethereum. Mint, stake, and earn $FLYZ rewards.">
+  <link rel="icon" href="/assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+  <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+  <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+  <style>
+    :root {
+      --primary:       #7cc1ff;
+      --primary-dark:  #4a9de0;
+      --primary-deeper:#2d5f8a;
+      --bg:            #f0f7ff;
+      --card:          #ffffff;
+      --border:        #d0e8ff;
+      --text:          #1a2d3f;
+      --muted:         #6b8299;
+      --shadow:        0 2px 12px rgba(74,157,224,0.13);
+      --shadow-md:     0 6px 24px rgba(74,157,224,0.22);
+      --radius:        10px;
+      --radius-sm:     6px;
+      --green:         #20b2aa;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--primary);
+      height: 52px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    }
+
+    .nav-logo {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-logo img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      image-rendering: pixelated;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 2px;
+    }
+
+    .nav-tab {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.82);
+      font-family: inherit;
+      font-size: 0.88rem;
+      padding: 7px 11px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .nav-tab:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    .nav-tab.active { background: rgba(255,255,255,0.22); color: #fff; font-weight: 600; }
+
+    .wallet-btn {
+      background: #fff;
+      border: none;
+      color: var(--primary-dark);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 13px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+
+    .wallet-btn:hover { background: var(--bg); }
+    .wallet-btn.connected { background: #e4fff4; color: var(--green); }
+
+    /* ─── MOBILE NAV ─── */
+    #mobile-tabs-bar {
+      display: none;
+      overflow-x: auto;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 12px;
+      gap: 4px;
+      scrollbar-width: none;
+    }
+
+    #mobile-tabs-bar::-webkit-scrollbar { display: none; }
+
+    .m-tab {
+      flex-shrink: 0;
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: #fff;
+      font-family: inherit;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .m-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* ─── MAIN ─── */
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    section { display: none; }
+    section.active { display: block; }
+
+    /* ─── CARDS ─── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary-deeper);
+      margin-bottom: 12px;
+    }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      text-decoration: none;
+    }
+
+    .btn:hover { text-decoration: none; }
+
+    .btn-primary  { background: var(--primary);      color: #fff; }
+    .btn-primary:hover  { background: var(--primary-dark); box-shadow: var(--shadow); }
+
+    .btn-success  { background: var(--green);         color: #fff; }
+    .btn-success:hover  { background: #18a89f; }
+
+    .btn-danger   { background: #ff7875;              color: #fff; }
+    .btn-danger:hover   { background: #e05f5c; }
+
+    .btn-outline  { background: #fff; color: var(--primary-dark); border: 1px solid var(--border); }
+    .btn-outline:hover  { background: var(--bg); }
+
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+    /* ─── FROG GRID ─── */
+    .frog-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .frog-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      width: 158px;
+      box-shadow: var(--shadow);
+      transition: box-shadow .15s, transform .15s;
+      cursor: pointer;
+    }
+
+    .frog-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+
+    .frog-card img {
+      width: 158px;
+      height: 158px;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    .frog-card-info { padding: 8px 10px 10px; }
+    .frog-card-name { font-size: 0.82rem; font-weight: 700; color: var(--primary-deeper); }
+    .frog-card-sub  { font-size: 0.73rem; color: var(--muted); margin-top: 2px; }
+
+    .badge {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .badge-staked { background: #e4fff4; color: var(--green); }
+    .badge-level  { background: #fff3cd; color: #7a5f00; }
+
+    /* ─── HERO ─── */
+    .hero {
+      text-align: center;
+      padding: 40px 20px 32px;
+    }
+
+    .hero img.logo {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      margin-bottom: 14px;
+      image-rendering: pixelated;
+      border: 3px solid var(--primary);
+    }
+
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-deeper);
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 22px;
+      line-height: 1.65;
+      font-size: 0.93rem;
+    }
+
+    .hero-links {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .stat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 20px;
+      text-align: center;
+      min-width: 110px;
+    }
+
+    .stat-val   { font-size: 1.3rem; font-weight: 700; color: var(--primary-dark); }
+    .stat-label { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+    /* ─── RECENT SALES ─── */
+    .scroll-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .scroll-row img {
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-sm);
+      image-rendering: pixelated;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: transform .15s;
+    }
+
+    .scroll-row img:hover { transform: scale(1.08); }
+
+    /* ─── MINT ─── */
+    .mint-layout {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .mint-preview-box {
+      width: 256px;
+      height: 256px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      background: var(--bg);
+      flex-shrink: 0;
+      position: relative;
+      image-rendering: pixelated;
+    }
+
+    .mint-preview-box img {
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+    }
+
+    .mint-controls { flex: 1; min-width: 260px; }
+
+    .qty-row { display: flex; align-items: center; gap: 12px; margin: 14px 0; }
+
+    .qty-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 1.15rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+    }
+
+    .qty-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .qty-num { font-size: 1.3rem; font-weight: 700; min-width: 28px; text-align: center; }
+
+    .price-line { font-size: 1.1rem; font-weight: 600; color: var(--primary-deeper); margin-bottom: 14px; }
+
+    .status-box {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      min-height: 56px;
+      margin-top: 12px;
+    }
+
+    /* ─── STAKE ─── */
+    .stake-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .rewards-chip {
+      background: #e4fff4;
+      color: var(--green);
+      border: 1px solid #a8f0dc;
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 0.87rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-row {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    .tab-pill {
+      padding: 7px 16px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: #fff;
+      font-family: inherit;
+      font-size: 0.83rem;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .tab-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
+
+    /* ─── RARITY ─── */
+    .search-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    .search-input:focus { border-color: var(--primary); }
+
+    /* ─── CONNECT PROMPT ─── */
+    .connect-prompt {
+      text-align: center;
+      padding: 52px 24px;
+      color: var(--muted);
+    }
+
+    .connect-prompt .emoji { font-size: 2.8rem; margin-bottom: 10px; }
+
+    /* ─── PROGRESS BAR ─── */
+    .prog-wrap { height: 6px; background: var(--bg); border-radius: 4px; margin: 5px 0; overflow: hidden; }
+    .prog-fill { height: 100%; background: var(--primary); border-radius: 4px; }
+
+    /* ─── MODAL ─── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.48);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 22px 24px 24px;
+      max-width: 460px;
+      width: 92%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 12px 48px rgba(0,0,0,.2);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      cursor: pointer;
+      color: var(--muted);
+      line-height: 1;
+    }
+
+    .modal-img-wrap {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 14px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      image-rendering: pixelated;
+    }
+
+    .modal-img-wrap img {
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      display: block;
+    }
+
+    .trait-tag {
+      display: inline-block;
+      padding: 3px 9px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      font-size: 0.72rem;
+      color: var(--text);
+      margin: 2px;
+    }
+
+    .modal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+
+    /* ─── LOADING ANIMATION ─── */
+    .ldots::after {
+      content: '';
+      animation: ldots 1.2s steps(3,end) infinite;
+    }
+
+    @keyframes ldots {
+      0%   { content: '.'; }
+      33%  { content: '..'; }
+      66%  { content: '...'; }
+    }
+
+    /* ─── UTIL ─── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+    a  { color: var(--primary-dark); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .section-heading {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--primary-deeper);
+      margin-bottom: 18px;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 620px) {
+      .nav-tabs { display: none; }
+      #mobile-tabs-bar { display: flex; }
+      .hero h1 { font-size: 1.5rem; }
+      .frog-card { width: 140px; }
+      .frog-card img { width: 140px; height: 140px; }
+      .mint-preview-box { width: 200px; height: 200px; }
+      .mint-preview-box img { width: 200px; height: 200px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAVIGATION ─── -->
+<nav>
+  <div class="nav-logo">
+    <img src="/assets/logo.png" alt="🐸">
+    Fresh Frogs
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('home')">Home</button>
+    <button class="nav-tab" onclick="showSection('mint')">Mint</button>
+    <button class="nav-tab" onclick="showSection('my-frogs')">My Frogs</button>
+    <button class="nav-tab" onclick="showSection('stake')">Stake</button>
+    <button class="nav-tab" onclick="showSection('rarity')">Rarity</button>
+  </div>
+  <button class="wallet-btn" id="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
+</nav>
+
+<!-- Mobile tabs -->
+<div id="mobile-tabs-bar">
+  <button class="m-tab active" onclick="showSection('home')">Home</button>
+  <button class="m-tab" onclick="showSection('mint')">Mint</button>
+  <button class="m-tab" onclick="showSection('my-frogs')">My Frogs</button>
+  <button class="m-tab" onclick="showSection('stake')">Stake</button>
+  <button class="m-tab" onclick="showSection('rarity')">Rarity</button>
+</div>
+
+<main>
+
+  <!-- ═══════════════ HOME ═══════════════ -->
+  <section id="home-section" class="active">
+
+    <div class="hero">
+      <img src="/assets/logo.png" alt="Fresh Frogs logo" class="logo">
+      <h1>Fresh Frogs NFT</h1>
+      <p>4,040 randomly generated pixel frogs on Ethereum. Collect, stake, and earn <strong>$FLYZ</strong> rewards.</p>
+      <div class="hero-links">
+        <a href="https://opensea.io/collection/fresh-frogs" target="_blank" class="btn btn-primary">OpenSea ⛵</a>
+        <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" class="btn btn-outline">Etherscan</a>
+        <a href="https://discord.gg/xWMFWgpvd3" target="_blank" class="btn btn-outline">Discord</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-val">4,040</div>
+          <div class="stat-label">Total Supply</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="stat-floor">—</div>
+          <div class="stat-label">Floor Price</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="stat-owners">—</div>
+          <div class="stat-label">Owners</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">5%</div>
+          <div class="stat-label">Royalty</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Recent Sales</div>
+      <div id="recent-sales" class="scroll-row">
+        <span class="ldots" style="color:var(--muted);font-size:.85rem;">Loading</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">About Fresh Frogs</div>
+      <p style="line-height:1.7;color:var(--muted);font-size:.9rem;">
+        Fresh Frogs is an Ethereum NFT collection of 4,040 hand-crafted pixel frogs, each with unique body colors, eyes, accessories, and backgrounds. Holders can stake their frogs in the <strong>Pond</strong> to earn <strong>$FLYZ</strong> — the longer you stake, the higher your level (Level 1 → 2 → 3). You can also explore the rarity rankings to find the rarest frogs in the collection.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+        <button class="btn btn-primary" onclick="showSection('mint')">Mint a Frog</button>
+        <button class="btn btn-outline" onclick="showSection('stake')">Stake &amp; Earn</button>
+        <button class="btn btn-outline" onclick="showSection('rarity')">Browse Rarity</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════ MINT ═══════════════ -->
+  <section id="mint-section">
+    <h2 class="section-heading">Mint a Fresh Frog</h2>
+    <div class="mint-layout">
+
+      <div>
+        <div class="mint-preview-box">
+          <img id="mint-preview-img" src="https://freshfrogs.github.io/assets/frogs/FLY.gif" alt="Frog preview">
+        </div>
+        <p id="mint-frog-label" style="text-align:center;margin-top:6px;font-size:.78rem;color:var(--muted);">Loading next frog…</p>
+      </div>
+
+      <div class="mint-controls">
+        <div class="card">
+          <div class="card-title">Mint Details</div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="color:var(--muted)">Price per frog</span>
+            <strong>Ξ 0.01</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="color:var(--muted)">Max per transaction</span>
+            <strong>9</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="color:var(--muted)">Total supply</span>
+            <strong>4,040</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="color:var(--muted)">Contract</span>
+            <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" style="font-size:.8rem;">0xBE4B…C51b</a>
+          </div>
+          <hr>
+          <div class="qty-row">
+            <button class="qty-btn" onclick="changeMintQty(-1)">−</button>
+            <span class="qty-num" id="mint-qty">1</span>
+            <button class="qty-btn" onclick="changeMintQty(1)">+</button>
+            <span style="color:var(--muted);font-size:.83rem;">frogs</span>
+          </div>
+          <div class="price-line">Total: <span id="mint-total-price">Ξ 0.01</span> + gas</div>
+          <button class="btn btn-primary" id="mint-btn" style="width:100%;font-size:.95rem;padding:12px;" onclick="handleMintBtn()">
+            Connect Wallet to Mint
+          </button>
+        </div>
+        <div class="status-box" id="mint-status">Waiting for wallet connection…</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════ MY FROGS ═══════════════ -->
+  <section id="my-frogs-section">
+    <h2 class="section-heading">My Frogs</h2>
+    <div id="my-frogs-content">
+      <div class="connect-prompt">
+        <div class="emoji">🐸</div>
+        <p>Connect your wallet to view your frogs</p>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="connectWallet()">Connect Wallet</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ STAKE ═══════════════ -->
+  <section id="stake-section">
+    <div class="stake-topbar">
+      <h2 class="section-heading" style="margin-bottom:0;">Stake &amp; Earn $FLYZ</h2>
+      <div id="rewards-display" style="display:none;">
+        <div class="rewards-chip">
+          <span id="rewards-amount">0</span> $FLYZ available
+          <button class="btn btn-success" style="padding:4px 10px;font-size:.78rem;" onclick="claimRewards()">Claim</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <p style="font-size:.87rem;color:var(--muted);line-height:1.65;">
+        Stake your Fresh Frogs in the <strong>Pond</strong> to earn <strong>$FLYZ</strong> rewards. Levels increase the longer your frog is staked (1,000 hrs → Level 2, 2,000 hrs → Level 3). Unstake anytime to return your frog to your wallet.
+      </p>
+    </div>
+
+    <div class="tab-row">
+      <button class="tab-pill active" id="tab-unstaked" onclick="switchStakeTab('unstaked')">Unstaked Frogs</button>
+      <button class="tab-pill" id="tab-staked" onclick="switchStakeTab('staked')">Staked Frogs</button>
+    </div>
+
+    <div id="stake-content">
+      <div class="connect-prompt">
+        <div class="emoji">🐸</div>
+        <p>Connect your wallet to manage staking</p>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="connectWallet()">Connect Wallet</button>
+      </div>
+    </div>
+
+    <div class="status-box" id="stake-status" style="display:none;"></div>
+  </section>
+
+  <!-- ═══════════════ RARITY ═══════════════ -->
+  <section id="rarity-section">
+    <h2 class="section-heading">Rarity Gallery</h2>
+
+    <div class="card" style="padding:14px 16px;margin-bottom:14px;">
+      <p style="font-size:.85rem;color:var(--muted);">Browse or search the full collection of 4,040 Fresh Frogs. Click any frog to see its traits and links.</p>
+    </div>
+
+    <div class="search-bar">
+      <input type="number" class="search-input" id="rarity-search-input" placeholder="Jump to Frog # (1–4040)" min="1" max="4040">
+      <button class="btn btn-primary" onclick="searchFrog()">Go</button>
+    </div>
+
+    <div id="rarity-grid" class="frog-grid">
+      <span class="ldots" style="color:var(--muted);font-size:.85rem;">Loading</span>
+    </div>
+
+    <div style="text-align:center;margin-top:20px;" id="load-more-wrap">
+      <button class="btn btn-outline" onclick="loadMoreRarity()" id="load-more-btn">Load More Frogs</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════════ FROG MODAL ═══════════════ -->
+<div class="modal-overlay" id="frog-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <strong id="modal-frog-name" style="font-size:1.1rem;">Frog #?</strong>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-img-wrap">
+      <img id="modal-frog-img" src="" alt="Frog">
+    </div>
+    <div id="modal-staking-info"></div>
+    <div id="modal-frog-traits"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script>
+
+  // ── CONFIG ──
+  const CONTRACT_ADDRESS   = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
+  const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
+  const ALCHEMY_KEY        = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+  const ALQ                = 'https://eth-mainnet.g.alchemy.com/nft/v3/' + ALCHEMY_KEY;
+  const MINT_PRICE         = 0.01;
+  const NETWORK            = 'main';
+
+  const CONTROLLER_ABI = [
+    { inputs: [], name: 'claimRewards', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+    { inputs: [{ internalType: 'uint256', name: '_tokenId', type: 'uint256' }], name: 'stake', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+    { inputs: [{ internalType: 'uint256', name: '_tokenId', type: 'uint256' }], name: 'withdraw', outputs: [], stateMutability: 'nonpayable', type: 'function' },
+    { inputs: [{ internalType: 'address', name: '_staker', type: 'address' }], name: 'availableRewards', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], stateMutability: 'view', type: 'function' },
+    { inputs: [{ internalType: 'address', name: '_user', type: 'address' }], name: 'getStakedTokens', outputs: [{ components: [{ internalType: 'address', name: 'staker', type: 'address' }, { internalType: 'uint256', name: 'tokenId', type: 'uint256' }], internalType: 'struct FreshFrogsController.StakedToken[]', name: '', type: 'tuple[]' }], stateMutability: 'view', type: 'function' }
+  ];
+
+  const COLLECTION_ABI = [
+    { inputs: [{ internalType: 'address', name: 'owner', type: 'address' }], name: 'balanceOf', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], stateMutability: 'view', type: 'function' },
+    { inputs: [{ internalType: 'address', name: 'owner', type: 'address' }, { internalType: 'address', name: 'operator', type: 'address' }], name: 'isApprovedForAll', outputs: [{ internalType: 'bool', name: '', type: 'bool' }], stateMutability: 'view', type: 'function' },
+    { inputs: [{ internalType: 'address', name: 'operator', type: 'address' }, { internalType: 'bool', name: 'approved', type: 'bool' }], name: 'setApprovalForAll', outputs: [], stateMutability: 'nonpayable', type: 'function' }
+  ];
+
+  // ── STATE ──
+  let walletConnected = false;
+  let userAddress     = null;
+  let web3Instance    = null;
+  let f0Instance      = null;
+  let collectionCtx   = null;
+  let controllerCtx   = null;
+  let mintQty         = 1;
+  let ownedFrogs      = [];
+  let stakedFrogs     = [];
+  let stakeTabActive  = 'unstaked';
+  let stakeLoaded     = false;
+  let myFrogsLoaded   = false;
+  let rarityOffset    = 0;
+  const RARITY_BATCH  = 24;
+
+  // ── NAVIGATION ──
+  function showSection(name) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.getElementById(name + '-section').classList.add('active');
+
+    document.querySelectorAll('.nav-tab, .m-tab').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('onclick') === "showSection('" + name + "')");
+    });
+
+    if (name === 'my-frogs' && walletConnected && !myFrogsLoaded) loadMyFrogs();
+    if (name === 'stake'    && walletConnected && !stakeLoaded)   loadStakeSection();
+    if (name === 'rarity'   && rarityOffset === 0)                loadRarityBatch();
+  }
+
+  // ── WALLET ──
+  async function connectWallet() {
+    if (walletConnected) return;
+    if (!window.ethereum) {
+      alert('MetaMask not detected. Install MetaMask to mint and stake.');
+      return;
+    }
+
+    const btn = document.getElementById('wallet-btn');
+    btn.textContent = 'Connecting…';
+    btn.disabled = true;
+
+    try {
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      web3Instance = new Web3(window.ethereum);
+      f0Instance   = new F0();
+
+      const abi = typeof token_abi !== 'undefined' ? token_abi : COLLECTION_ABI;
+      collectionCtx  = new web3Instance.eth.Contract(abi, CONTRACT_ADDRESS);
+      controllerCtx  = new web3Instance.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+
+      await f0Instance.init({ web3: web3Instance, contract: CONTRACT_ADDRESS, network: NETWORK });
+
+      userAddress      = (await web3Instance.eth.getAccounts())[0];
+      walletConnected  = true;
+
+      btn.textContent = truncateAddr(userAddress);
+      btn.classList.add('connected');
+      btn.disabled = false;
+
+      onWalletReady();
+
+    } catch (e) {
+      btn.textContent = 'Connect Wallet';
+      btn.disabled    = false;
+      console.error('Connect failed:', e.message);
+    }
+  }
+
+  async function onWalletReady() {
+    // Update mint button
+    const mintBtn = document.getElementById('mint-btn');
+    mintBtn.textContent = 'Mint ' + mintQty + ' Frog' + (mintQty !== 1 ? 's' : '');
+    mintBtn.onclick = executeMint;
+
+    try {
+      const invites    = await f0Instance.myInvites();
+      const defaultKey = '0x0000000000000000000000000000000000000000000000000000000000000000';
+      const invite     = invites[defaultKey] ? defaultKey : Object.keys(invites)[0];
+      const price      = invites[invite]?.condition?.converted?.eth || MINT_PRICE;
+      const limit      = invites[invite]?.condition?.converted?.limit || 9;
+
+      document.getElementById('mint-status').innerHTML =
+        '<strong>Connected!</strong> [' + truncateAddr(userAddress) + ']<br>' +
+        'Price: Ξ' + price + ' each &nbsp;·&nbsp; Max ' + limit + ' per tx';
+    } catch (e) {
+      document.getElementById('mint-status').textContent = 'Connected: ' + truncateAddr(userAddress);
+    }
+
+    // Refresh visible section if it needs wallet
+    const activeSection = document.querySelector('section.active').id;
+    if (activeSection === 'my-frogs-section') loadMyFrogs();
+    if (activeSection === 'stake-section')    loadStakeSection();
+  }
+
+  // ── MINT ──
+  function changeMintQty(delta) {
+    mintQty = Math.max(1, Math.min(9, mintQty + delta));
+    document.getElementById('mint-qty').textContent = mintQty;
+    document.getElementById('mint-total-price').textContent = 'Ξ ' + (MINT_PRICE * mintQty).toFixed(2).replace(/\.?0+$/, '');
+    if (walletConnected) {
+      document.getElementById('mint-btn').textContent = 'Mint ' + mintQty + ' Frog' + (mintQty !== 1 ? 's' : '');
+    }
+  }
+
+  function handleMintBtn() {
+    if (!walletConnected) connectWallet();
+  }
+
+  async function executeMint() {
+    const btn    = document.getElementById('mint-btn');
+    const status = document.getElementById('mint-status');
+    btn.disabled = true;
+    status.style.background = '';
+    status.innerHTML = '<strong>Minting ' + mintQty + ' frog' + (mintQty !== 1 ? 's' : '') + '…</strong><br>Please confirm in MetaMask and wait.';
+
+    try {
+      const invites    = await f0Instance.myInvites();
+      const defaultKey = '0x0000000000000000000000000000000000000000000000000000000000000000';
+      const invite     = invites[defaultKey] ? defaultKey : Object.keys(invites)[0];
+
+      await f0Instance.mint(invite, mintQty);
+      status.style.background = '#e4fff4';
+      status.innerHTML = '<span style="color:var(--green);"><strong>Congratulations! 🎉</strong></span><br>' +
+        mintQty + ' frog' + (mintQty !== 1 ? 's' : '') + ' successfully minted!';
+    } catch (e) {
+      status.style.background = '#fff0f0';
+      status.innerHTML = '<span style="color:#c00;"><strong>Minting failed</strong></span><br>' + e.message;
+    }
+
+    btn.disabled = false;
+  }
+
+  // ── MY FROGS ──
+  async function loadMyFrogs() {
+    const container = document.getElementById('my-frogs-content');
+    myFrogsLoaded   = true;
+    container.innerHTML = '<p class="ldots" style="color:var(--muted);">Loading your frogs</p>';
+
+    try {
+      const [walletResp, stakedResult] = await Promise.all([
+        fetch(ALQ + '/getNFTsForOwner?owner=' + userAddress +
+          '&contractAddresses[]=' + CONTRACT_ADDRESS + '&withMetadata=false&pageSize=100').then(r => r.json()),
+        controllerCtx.methods.getStakedTokens(userAddress).call().catch(() => [])
+      ]);
+
+      const walletIds  = (walletResp.ownedNfts || []).map(n => parseInt(n.tokenId));
+      const stakedIds  = stakedResult.map(s => parseInt(s.tokenId));
+      const allIds     = [...walletIds, ...stakedIds];
+
+      if (!allIds.length) {
+        container.innerHTML =
+          '<div class="connect-prompt"><div class="emoji">🐸</div>' +
+          '<p>No Fresh Frogs found in this wallet.<br>' +
+          '<a href="https://opensea.io/collection/fresh-frogs" target="_blank">Get one on OpenSea!</a></p></div>';
+        return;
+      }
+
+      container.innerHTML =
+        '<p style="color:var(--muted);margin-bottom:12px;font-size:.83rem;">' +
+        walletIds.length + ' in wallet' + (stakedIds.length ? ' · ' + stakedIds.length + ' staked' : '') +
+        '</p><div class="frog-grid" id="mf-grid"></div>';
+
+      const grid = document.getElementById('mf-grid');
+      allIds.forEach(id => makeFrogCard(grid, id, { staked: stakedIds.includes(id) }));
+
+    } catch (e) {
+      container.innerHTML = '<p style="color:#c00;">Error loading frogs: ' + e.message + '</p>';
+    }
+  }
+
+  // ── STAKE ──
+  async function loadStakeSection() {
+    const container = document.getElementById('stake-content');
+    stakeLoaded = true;
+    container.innerHTML = '<p class="ldots" style="color:var(--muted);">Loading staking info</p>';
+
+    try {
+      const [stakedResult, rewardsRaw, walletResp] = await Promise.all([
+        controllerCtx.methods.getStakedTokens(userAddress).call(),
+        controllerCtx.methods.availableRewards(userAddress).call(),
+        fetch(ALQ + '/getNFTsForOwner?owner=' + userAddress +
+          '&contractAddresses[]=' + CONTRACT_ADDRESS + '&withMetadata=false&pageSize=100').then(r => r.json())
+      ]);
+
+      stakedFrogs = stakedResult.map(s => parseInt(s.tokenId));
+      ownedFrogs  = (walletResp.ownedNfts || []).map(n => parseInt(n.tokenId));
+
+      const rewards = (parseFloat(rewardsRaw) / 1e18).toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
+      if (stakedFrogs.length > 0 || parseFloat(rewards) > 0) {
+        document.getElementById('rewards-amount').textContent = rewards;
+        document.getElementById('rewards-display').style.display = 'block';
+      }
+
+      renderStakeTab(stakeTabActive);
+
+    } catch (e) {
+      container.innerHTML = '<p style="color:#c00;">Error loading staking info: ' + e.message + '</p>';
+    }
+  }
+
+  function switchStakeTab(tab) {
+    stakeTabActive = tab;
+    document.querySelectorAll('.tab-pill').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    renderStakeTab(tab);
+  }
+
+  function renderStakeTab(tab) {
+    const container = document.getElementById('stake-content');
+    const ids       = tab === 'staked' ? stakedFrogs : ownedFrogs;
+
+    if (!ids.length) {
+      container.innerHTML =
+        '<div class="connect-prompt"><div class="emoji">' +
+        (tab === 'staked' ? '🏊' : '🐸') + '</div>' +
+        '<p>' + (tab === 'staked' ? 'No frogs currently staked.' : 'No frogs in wallet to stake.') + '</p></div>';
+      return;
+    }
+
+    container.innerHTML = '<div class="frog-grid" id="stake-grid"></div>';
+    const grid = document.getElementById('stake-grid');
+    ids.forEach(id => makeFrogCard(grid, id, { staked: tab === 'staked', showStakeBtn: true }));
+  }
+
+  async function stakeToken(tokenId) {
+    const status = document.getElementById('stake-status');
+    status.style.display  = 'block';
+    status.style.background = '';
+    status.textContent    = 'Staking Frog #' + tokenId + '…';
+
+    try {
+      const approved = await collectionCtx.methods.isApprovedForAll(userAddress, CONTROLLER_ADDRESS).call({ from: userAddress });
+      if (!approved) {
+        status.textContent = 'Step 1/2: Approving contract (one-time gas fee)…';
+        await collectionCtx.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: userAddress });
+      }
+      status.textContent = 'Staking Frog #' + tokenId + '… Confirm in MetaMask.';
+      await controllerCtx.methods.stake(tokenId).send({ from: userAddress });
+      status.style.background = '#e4fff4';
+      status.innerHTML = '<span style="color:var(--green);"><strong>Frog #' + tokenId + ' staked! 🎉</strong></span>';
+      stakeLoaded = false;
+      myFrogsLoaded = false;
+      loadStakeSection();
+    } catch (e) {
+      status.style.background = '#fff0f0';
+      status.innerHTML = '<span style="color:#c00;">Staking failed: ' + e.message + '</span>';
+    }
+  }
+
+  async function unstakeToken(tokenId) {
+    const status = document.getElementById('stake-status');
+    status.style.display    = 'block';
+    status.style.background = '';
+    status.textContent      = 'Unstaking Frog #' + tokenId + '…';
+
+    try {
+      await controllerCtx.methods.withdraw(tokenId).send({ from: userAddress });
+      status.style.background = '#e4fff4';
+      status.innerHTML = '<span style="color:var(--green);"><strong>Frog #' + tokenId + ' returned to wallet! 🐸</strong></span>';
+      stakeLoaded = false;
+      myFrogsLoaded = false;
+      loadStakeSection();
+    } catch (e) {
+      status.style.background = '#fff0f0';
+      status.innerHTML = '<span style="color:#c00;">Unstaking failed: ' + e.message + '</span>';
+    }
+  }
+
+  async function claimRewards() {
+    const status = document.getElementById('stake-status');
+    status.style.display    = 'block';
+    status.style.background = '';
+    status.textContent      = 'Claiming $FLYZ rewards…';
+
+    try {
+      const approved = await collectionCtx.methods.isApprovedForAll(userAddress, CONTROLLER_ADDRESS).call({ from: userAddress });
+      if (!approved) {
+        status.textContent = 'Step 1/2: Approving contract (one-time)…';
+        await collectionCtx.methods.setApprovalForAll(CONTROLLER_ADDRESS, true).send({ from: userAddress });
+      }
+      await controllerCtx.methods.claimRewards().send({ from: userAddress });
+      status.style.background = '#e4fff4';
+      status.innerHTML = '<span style="color:var(--green);"><strong>$FLYZ claimed! 🎉</strong></span>';
+      document.getElementById('rewards-display').style.display = 'none';
+    } catch (e) {
+      status.style.background = '#fff0f0';
+      status.innerHTML = '<span style="color:#c00;">Claim failed: ' + e.message + '</span>';
+    }
+  }
+
+  // ── RARITY ──
+  function loadRarityBatch() {
+    const grid  = document.getElementById('rarity-grid');
+    if (rarityOffset === 0) grid.innerHTML = '';
+
+    const end = Math.min(rarityOffset + RARITY_BATCH, 4040);
+    for (let i = rarityOffset + 1; i <= end; i++) {
+      makeFrogCard(grid, i, {});
+    }
+    rarityOffset = end;
+
+    if (rarityOffset >= 4040) {
+      document.getElementById('load-more-wrap').style.display = 'none';
+    }
+  }
+
+  function loadMoreRarity() { loadRarityBatch(); }
+
+  function searchFrog() {
+    const val = parseInt(document.getElementById('rarity-search-input').value);
+    if (!val || val < 1 || val > 4040) return;
+    openFrogModal(val);
+  }
+
+  // ── FROG CARD ──
+  function makeFrogCard(container, tokenId, opts) {
+    const card = document.createElement('div');
+    card.className = 'frog-card';
+
+    const img = document.createElement('img');
+    img.src     = 'https://freshfrogs.github.io/frog/' + tokenId + '.png';
+    img.alt     = 'Frog #' + tokenId;
+    img.loading = 'lazy';
+
+    const info = document.createElement('div');
+    info.className = 'frog-card-info';
+    info.innerHTML = '<div class="frog-card-name">Frog #' + tokenId + '</div>' +
+      '<div class="frog-card-sub">' +
+      (opts.staked ? '<span class="badge badge-staked">Staked</span>' : '') +
+      '</div>';
+
+    if (opts.showStakeBtn) {
+      const btnWrap = document.createElement('div');
+      btnWrap.style.cssText = 'padding: 4px 8px 8px;';
+      if (opts.staked) {
+        btnWrap.innerHTML = '<button class="btn btn-danger" style="width:100%;padding:5px;font-size:.75rem;" onclick="event.stopPropagation();unstakeToken(' + tokenId + ')">Unstake</button>';
+      } else {
+        btnWrap.innerHTML = '<button class="btn btn-success" style="width:100%;padding:5px;font-size:.75rem;" onclick="event.stopPropagation();stakeToken(' + tokenId + ')">Stake 🐸</button>';
+      }
+      info.appendChild(btnWrap);
+    }
+
+    card.appendChild(img);
+    card.appendChild(info);
+    card.addEventListener('click', () => openFrogModal(tokenId, opts.staked));
+    container.appendChild(card);
+  }
+
+  // ── MODAL ──
+  async function openFrogModal(tokenId, isStaked) {
+    document.getElementById('modal-frog-name').textContent  = 'Frog #' + tokenId;
+    document.getElementById('modal-frog-img').src           = 'https://freshfrogs.github.io/frog/' + tokenId + '.png';
+    document.getElementById('modal-frog-traits').innerHTML  = '<p class="ldots" style="color:var(--muted);font-size:.83rem;">Loading traits</p>';
+    document.getElementById('modal-staking-info').innerHTML = '';
+    document.getElementById('modal-actions').innerHTML      = '';
+    document.getElementById('frog-modal').classList.add('open');
+
+    // Traits from local metadata JSON
+    try {
+      const meta = await fetch('https://freshfrogs.github.io/frog/json/' + tokenId + '.json').then(r => r.json());
+      let html = '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;">';
+      for (const attr of meta.attributes) {
+        html += '<span class="trait-tag"><strong>' + attr.trait_type + '</strong>: ' + attr.value + '</span>';
+      }
+      html += '</div>';
+      document.getElementById('modal-frog-traits').innerHTML = html;
+    } catch (e) {
+      document.getElementById('modal-frog-traits').innerHTML = '';
+    }
+
+    // Actions
+    const actions = document.getElementById('modal-actions');
+    actions.innerHTML =
+      '<a href="https://opensea.io/assets/ethereum/' + CONTRACT_ADDRESS.toLowerCase() + '/' + tokenId + '" target="_blank" class="btn btn-primary">OpenSea</a>' +
+      '<a href="https://etherscan.io/nft/' + CONTRACT_ADDRESS.toLowerCase() + '/' + tokenId + '" target="_blank" class="btn btn-outline">Etherscan</a>';
+
+    if (walletConnected) {
+      if (isStaked) {
+        actions.innerHTML += '<button class="btn btn-danger" onclick="closeModal();showSection(\'stake\');unstakeToken(' + tokenId + ')">Unstake</button>';
+      } else if (ownedFrogs.includes(tokenId)) {
+        actions.innerHTML += '<button class="btn btn-success" onclick="closeModal();showSection(\'stake\');stakeToken(' + tokenId + ')">Stake 🐸</button>';
+      }
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('frog-modal').classList.remove('open');
+  }
+
+  document.getElementById('frog-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ── HOME DATA ──
+  async function loadHomeData() {
+    // Recent sales
+    try {
+      const data  = await fetch(ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=20').then(r => r.json());
+      const sales = data.nftSales || [];
+      const box   = document.getElementById('recent-sales');
+      box.innerHTML = '';
+
+      if (!sales.length) {
+        box.innerHTML = '<span style="color:var(--muted);font-size:.83rem;">No recent sales data available</span>';
+        return;
+      }
+
+      for (const sale of sales) {
+        const img   = document.createElement('img');
+        img.src     = 'https://freshfrogs.github.io/frog/' + parseInt(sale.tokenId) + '.png';
+        img.alt     = 'Frog #' + sale.tokenId;
+        img.loading = 'lazy';
+        img.title   = 'Frog #' + sale.tokenId;
+        img.onclick = () => openFrogModal(parseInt(sale.tokenId));
+        box.appendChild(img);
+      }
+    } catch (e) {
+      document.getElementById('recent-sales').innerHTML =
+        '<span style="color:var(--muted);font-size:.83rem;">Could not load recent sales</span>';
+    }
+
+    // Collection stats
+    try {
+      const data = await fetch(ALQ + '/getContractMetadata?contractAddress=' + CONTRACT_ADDRESS).then(r => r.json());
+      const os   = data.openSeaMetadata || {};
+      if (os.floorPrice) document.getElementById('stat-floor').textContent  = 'Ξ' + os.floorPrice;
+      if (os.numOwners)  document.getElementById('stat-owners').textContent = os.numOwners.toLocaleString();
+    } catch (e) {}
+  }
+
+  // ── MINT PREVIEW ──
+  async function loadMintPreview() {
+    try {
+      const data  = await fetch(ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=1').then(r => r.json());
+      const sales = data.nftSales || [];
+      if (sales.length) {
+        const nextId = parseInt(sales[0].tokenId) + 1;
+        document.getElementById('mint-preview-img').src = 'https://freshfrogs.github.io/frog/' + nextId + '.png';
+        document.getElementById('mint-frog-label').textContent = 'Next: Frog #' + nextId;
+      }
+    } catch (e) {
+      document.getElementById('mint-frog-label').textContent = 'Next frog';
+    }
+  }
+
+  function truncateAddr(addr) {
+    return addr ? addr.slice(0, 6) + '…' + addr.slice(-4) : '';
+  }
+
+  // ── BOOT ──
+  document.addEventListener('DOMContentLoaded', function() {
+    loadHomeData();
+    loadMintPreview();
+    loadRarityBatch();
+  });
+
+</script>
+</body>
+</html>

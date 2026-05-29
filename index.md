@@ -1,4 +1,4 @@
 ---
-layout: default
+layout: none
+permalink: /old-index.html
 ---
-<title>freshfrogs.io</title>
