@@ -7,14 +7,14 @@
 }
 
 :root {
-  --bg: #ffffff;
+  --bg: #f8fafc;
   --bg-card: #ffffff;
-  --bg-dark: #f8fafc;
-  --bg-hover: #f8fafc;
-  --bg-progress: #e2e8f0;
+  --bg-dark: #f0fdf4;
+  --bg-hover: #f0fdf4;
+  --bg-progress: #dcfce7;
   --input-bg: #ffffff;
 
-  --text: #1e293b;
+  --text: #0f172a;
   --text-muted: #64748b;
   --text-muted2: #64748b;
   --text-prop: #64748b;
@@ -26,10 +26,10 @@
   --border: #e2e8f0;
   --shadow: transparent;
 
-  --progress-fill: #fbbf24;
+  --progress-fill: #16a34a;
   --stake-color: #b45309;
 
-  --btn-primary-bg: #1e293b;
+  --btn-primary-bg: #16a34a;
   --btn-primary-text: #ffffff;
 }
 
