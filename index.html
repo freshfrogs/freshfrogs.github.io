@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fresh Frogs NFT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Fresh Frogs NFT — 4,040 unique frogs on Ethereum. Stake, earn, morph.">
+  <link rel="icon" href="/the-pad/Frog/greenTreeFrog.png">
+  <link rel="stylesheet" href="/style.css">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-6PB0WKB4SH');
+  </script>
+
+  <!-- Web3 + Factoria F0 (minting) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+  <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
+  <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="site-nav">
+    <div class="nav-brand">
+      <img src="/the-pad/Frog/greenTreeFrog.png" alt="frog"> Fresh Frogs NFT
+    </div>
+    <div class="nav-links">
+      <a href="/" class="active">Home</a>
+      <a href="/the-pad/">The Pad</a>
+      <a href="https://opensea.io/collection/fresh-frogs" target="_blank" rel="noopener">OpenSea</a>
+      <a href="https://discord.gg/t84NyjpS3H" target="_blank" rel="noopener">Discord</a>
+      <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" rel="noopener">Etherscan</a>
+    </div>
+    <div class="nav-social">
+      <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" rel="noopener" title="Twitter">
+        <img src="/assets/twitter.png" alt="Twitter">
+      </a>
+      <a href="https://discord.gg/t84NyjpS3H" target="_blank" rel="noopener" title="Discord">
+        <img src="/assets/discord.png" alt="Discord">
+      </a>
+      <a href="https://opensea.io/collection/fresh-frogs" target="_blank" rel="noopener" title="OpenSea">
+        <img src="/assets/opensea.png" alt="OpenSea">
+      </a>
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- MINT MODULE -->
+    <div class="mint-module">
+
+      <div class="mint-preview-area">
+        <div class="mint-preview-grid" id="mintPreviewGrid">
+          <!-- Slots 1-9 filled by JS as user adds frogs; slot 1 always has preview -->
+          <div class="mint-preview-slot filled" id="mintSlot1">
+            <img id="previewImg" src="/assets/frogs/preview2.gif" alt="Next Frog">
+          </div>
+          <div class="mint-preview-slot" id="mintSlot2"></div>
+          <div class="mint-preview-slot" id="mintSlot3"></div>
+          <div class="mint-preview-slot" id="mintSlot4"></div>
+          <div class="mint-preview-slot" id="mintSlot5"></div>
+          <div class="mint-preview-slot" id="mintSlot6"></div>
+          <div class="mint-preview-slot" id="mintSlot7"></div>
+          <div class="mint-preview-slot" id="mintSlot8"></div>
+          <div class="mint-preview-slot" id="mintSlot9"></div>
+        </div>
+        <div class="supply-badge" id="supply">4,040 Total Supply</div>
+        <!-- Legacy containers kept so existing JS refs don't throw -->
+        <div id="frogContainer" style="display:none;"></div>
+        <div id="frogContainer2" style="display:none;"></div>
+        <div id="frogContainer3" style="display:none;"></div>
+      </div>
+
+      <div class="mint-controls">
+        <div class="mint-qty-row">
+          <button class="qty-btn" id="removeFrog" type="button">−</button>
+          <span class="qty-display" id="frogQuant">1</span>
+          <button class="qty-btn" id="addFrog" type="button">+</button>
+          <span class="qty-label">FROG</span>
+        </div>
+        <div class="mint-price" id="mintTotal">0 ΞETH + gas</div>
+        <a id="mintTransact" href="#" class="mint-btn">LINK WALLET</a>
+        <div id="netStatus" class="mint-status">
+          Connect an Ethereum wallet to mint.<br>
+          Don't have one? <a href="https://metamask.io/download/" target="_blank" rel="noopener">Download MetaMask 🦊</a>
+        </div>
+        <div id="pre" class="mint-console"></div>
+      </div>
+
+    </div>
+
+    <!-- RECENT MINTS / SALES -->
+    <section class="section" id="recent-section">
+      <h2 class="section-title">Recent Mints</h2>
+      <p class="section-note" id="recent-status">Loading recent mints...</p>
+      <div class="frog-grid" id="thePad"></div>
+    </section>
+
+    <!-- LARGEST SALES -->
+    <section class="section" id="largest-section">
+      <h2 class="section-title">Largest Sales</h2>
+      <p class="section-note" id="largest-status">Loading...</p>
+      <div class="frog-grid" id="largestSales"></div>
+    </section>
+
+    <!-- RECENT STAKES -->
+    <section class="section" id="stakes-section">
+      <h2 class="section-title">Recent Stakes</h2>
+      <p class="section-note" id="stakes-status">Loading...</p>
+      <div class="frog-grid" id="recentStakes"></div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section">
+      <h2 class="section-title">About Fresh Frogs NFT</h2>
+      <div class="about-grid">
+        <div class="about-card">
+          <h3>🐸 The Collection</h3>
+          <p>
+            Fresh Frogs NFT is a collection of 4,040 randomly generated frogs on Ethereum,
+            each unique with thousands of trait combinations. Stake to earn rewards, level up,
+            unlock animated traits, and morph two frogs into one.
+          </p>
+          <p style="margin-top:8px;">
+            <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" rel="noopener">
+              ERC-721 · 0xBE4B…C51b ↗
+            </a>
+          </p>
+        </div>
+        <div class="about-card">
+          <h3>🌿 Our Mission</h3>
+          <p>
+            Over 200,000 acres of rainforest are burned every day. A portion of every sale is
+            donated to <a href="https://rainforestfoundation.org/" target="_blank" rel="noopener">The Rainforest Foundation</a>
+            to help protect the natural habitat of real frogs around the world.
+          </p>
+        </div>
+      </div>
+      <div class="social-row" style="margin-top:1rem;">
+        <a class="social-btn" href="https://twitter.com/FreshFrogs_NFT" target="_blank" rel="noopener">
+          <img src="/assets/twitter.png" alt=""> Twitter
+        </a>
+        <a class="social-btn" href="https://discord.gg/t84NyjpS3H" target="_blank" rel="noopener">
+          <img src="/assets/discord.png" alt=""> Discord
+        </a>
+        <a class="social-btn" href="https://opensea.io/collection/fresh-frogs" target="_blank" rel="noopener">
+          <img src="/assets/opensea.png" alt=""> OpenSea
+        </a>
+        <a class="social-btn" href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" rel="noopener">
+          <img src="/assets/etherScan.png" alt=""> Etherscan
+        </a>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      🐸 Fresh Frogs NFT ·
+      <a href="https://opensea.io/collection/fresh-frogs" target="_blank" rel="noopener">OpenSea</a> ·
+      <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" rel="noopener">Etherscan</a>
+    </footer>
+
+  </div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const CONTRACT_ADDRESS  = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
+const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
+const ALCHEMY_KEY       = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+const ALCHEMY_BASE      = 'https://eth-mainnet.g.alchemy.com/nft/v3/' + ALCHEMY_KEY;
+const ALCHEMY_CORE      = 'https://eth-mainnet.g.alchemy.com/v2/' + ALCHEMY_KEY;
+const OS_COLLECTION     = 'fresh-frogs';
+const OS_API_KEY        = '48ffee972fc245fa965ecfe902b02ab4';
+
+// ── TRAIT LAYER BUILDER ─────────────────────────────────────────────────────
+
+// Animated trait overrides
+const ANIMATED = {
+  smoking2: true, smokingPipe2: true, smokingCigar2: true,
+  shadesAnimation: true, morphAnimation: true
+};
+
+function traitSrc(trait, value) {
+  if (ANIMATED[value]) {
+    if (value === 'morphAnimation') return '/the-pad/Frog/loadMorph.gif';
+    if (value === 'shadesAnimation') return '/the-pad/Eyes/shadesAnimation.gif';
+    return '/the-pad/' + trait + '/' + value + '.gif';
+  }
+  return '/the-pad/' + trait + '/' + value + '.png';
+}
+
+// Build a frog card DOM element (not yet in DOM).
+// After appending to DOM, call loadFrogTraits(tokenId, canvasEl) to layer the images.
+function buildFrogCard({ tokenId, label, price, osLink }) {
+  const osHref = osLink || ('https://opensea.io/assets/ethereum/' + CONTRACT_ADDRESS + '/' + tokenId);
+  const esHref = 'https://etherscan.io/token/' + CONTRACT_ADDRESS + '?a=' + tokenId;
+
+  const card = document.createElement('div');
+  card.className = 'frog-card';
+  card.dataset.tokenId = tokenId;
+
+  // Image area (click → OpenSea)
+  const imgWrap = document.createElement('a');
+  imgWrap.className = 'frog-canvas-wrap';
+  imgWrap.href = osHref;
+  imgWrap.target = '_blank';
+  imgWrap.rel = 'noopener noreferrer';
+
+  const canvas = document.createElement('div');
+  canvas.className = 'frog-canvas-inner';
+  // placeholder until traits load
+  const placeholder = document.createElement('img');
+  placeholder.src = 'https://freshfrogs.github.io/frog/' + tokenId + '.png';
+  placeholder.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;image-rendering:pixelated;';
+  placeholder.alt = 'Frog #' + tokenId;
+  canvas.appendChild(placeholder);
+
+  imgWrap.appendChild(canvas);
+  card.appendChild(imgWrap);
+
+  // Info card
+  const info = document.createElement('div');
+  info.className = 'frog-card-info';
+
+  const top = document.createElement('div');
+  top.className = 'frog-card-top';
+
+  const nameLink = document.createElement('a');
+  nameLink.className = 'frog-card-name';
+  nameLink.href = osHref;
+  nameLink.target = '_blank';
+  nameLink.rel = 'noopener noreferrer';
+  nameLink.textContent = 'Frog #' + tokenId;
+  top.appendChild(nameLink);
+
+  if (price) {
+    const priceEl = document.createElement('span');
+    priceEl.className = 'frog-card-price';
+    priceEl.textContent = price;
+    top.appendChild(priceEl);
+  }
+
+  info.appendChild(top);
+
+  if (label) {
+    const labelEl = document.createElement('div');
+    labelEl.className = 'frog-card-label';
+    labelEl.textContent = label;
+    info.appendChild(labelEl);
+  }
+
+  const traitsEl = document.createElement('div');
+  traitsEl.className = 'frog-traits';
+  info.appendChild(traitsEl);
+
+  card.appendChild(info);
+
+  // Action buttons
+  const actions = document.createElement('div');
+  actions.className = 'frog-card-actions';
+
+  const osBtn = document.createElement('a');
+  osBtn.className = 'card-action-btn opensea';
+  osBtn.href = osHref;
+  osBtn.target = '_blank';
+  osBtn.rel = 'noopener noreferrer';
+  osBtn.textContent = 'OpenSea';
+  actions.appendChild(osBtn);
+
+  const esBtn = document.createElement('a');
+  esBtn.className = 'card-action-btn';
+  esBtn.href = esHref;
+  esBtn.target = '_blank';
+  esBtn.rel = 'noopener noreferrer';
+  esBtn.textContent = 'Etherscan';
+  actions.appendChild(esBtn);
+
+  card.appendChild(actions);
+
+  return { card, canvas, traitsEl };
+}
+
+// Fetch JSON metadata and layer trait images into canvas element.
+// Replaces placeholder with stacked trait PNGs.
+async function loadFrogTraits(tokenId, canvas, traitsEl) {
+  try {
+    const res = await fetch(
+      'https://freshfrogs.github.io/frog/json/' + tokenId + '.json',
+      { cache: 'force-cache' }
+    );
+    if (!res.ok) return;
+    const meta = await res.json();
+    const attrs = Array.isArray(meta.attributes) ? meta.attributes : [];
+    if (!attrs.length) return;
+
+    // Clear placeholder, layer traits
+    canvas.innerHTML = '';
+    for (const attr of attrs) {
+      if (!attr.trait_type || attr.value == null) continue;
+      const img = document.createElement('img');
+      img.className = 'trait-layer';
+      img.alt = attr.trait_type + ': ' + attr.value;
+      img.src = traitSrc(attr.trait_type, attr.value);
+      canvas.appendChild(img);
+
+      // Trait tag
+      if (traitsEl) {
+        const tag = document.createElement('span');
+        tag.className = 'trait-tag tt-' + attr.trait_type.toLowerCase();
+        tag.textContent = attr.value;
+        traitsEl.appendChild(tag);
+      }
+    }
+  } catch (e) {
+    // keep placeholder
+  }
+}
+
+// Append a list of frog data objects into a grid container.
+async function renderFrogGrid(containerId, frogs, statusId) {
+  const container = document.getElementById(containerId);
+  const status = statusId ? document.getElementById(statusId) : null;
+  if (!container) return;
+
+  container.innerHTML = '';
+  if (!frogs.length) {
+    if (status) status.textContent = 'Nothing to show right now.';
+    return;
+  }
+  if (status) status.textContent = '';
+
+  for (const frog of frogs) {
+    const { card, canvas, traitsEl } = buildFrogCard(frog);
+    container.appendChild(card);
+    loadFrogTraits(frog.tokenId, canvas, traitsEl);
+  }
+}
+
+// ── DATA FETCHERS ────────────────────────────────────────────────────────────
+
+async function fetchRecentSales(limit) {
+  limit = limit || 24;
+  try {
+    // Try OpenSea v2
+    const res = await fetch(
+      'https://api.opensea.io/api/v2/events/collection/' + OS_COLLECTION + '?event_type=sale&limit=' + limit,
+      { headers: { 'X-API-KEY': OS_API_KEY, 'Accept': 'application/json' } }
+    );
+    if (!res.ok) throw new Error('opensea ' + res.status);
+    const data = await res.json();
+    const events = data.asset_events || data.events || [];
+    return events.map(function(e) {
+      const nft = e.nft || e.asset || {};
+      const tokenId = parseInt(nft.identifier || nft.token_id || '');
+      const payment = e.payment || {};
+      const qty = payment.quantity || e.sale_price || e.total_price || null;
+      let price = '';
+      if (qty) {
+        const amt = Number(qty) / 1e18;
+        if (isFinite(amt)) price = amt.toFixed(3).replace(/\.?0+$/, '') + 'Ξ';
+      }
+      return { tokenId: tokenId, price: price, ethAmt: price ? parseFloat(price) : 0 };
+    }).filter(function(x) { return !isNaN(x.tokenId); });
+  } catch (e) {
+    // Fallback: Alchemy getNFTSales
+    const res = await fetch(
+      ALCHEMY_BASE + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=' + limit
+    );
+    const data = await res.json();
+    return (data.nftSales || []).map(function(s) {
+      const tokenId = parseInt(s.tokenId);
+      const wei = s.sellerFee ? Number(s.sellerFee.amount) : 0;
+      const eth = wei / 1e18;
+      const price = (eth > 0) ? (eth.toFixed(3).replace(/\.?0+$/, '') + 'Ξ') : '';
+      return { tokenId: tokenId, price: price, ethAmt: eth };
+    }).filter(function(x) { return !isNaN(x.tokenId); });
+  }
+}
+
+async function fetchRecentMints(limit) {
+  limit = limit || 6;
+  const res = await fetch(ALCHEMY_CORE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0', id: 1, method: 'alchemy_getAssetTransfers',
+      params: [{
+        fromAddress: '0x0000000000000000000000000000000000000000',
+        contractAddresses: [CONTRACT_ADDRESS],
+        category: ['erc721'],
+        withMetadata: true,
+        order: 'desc',
+        maxCount: '0x' + limit.toString(16)
+      }]
+    })
+  });
+  const data = await res.json();
+  const transfers = (data.result && data.result.transfers) || [];
+  return transfers.map(function(t) {
+    const tokenId = t.erc721TokenId ? parseInt(t.erc721TokenId, 16) : parseInt(t.tokenId || '');
+    return { tokenId: tokenId, label: 'Minted' };
+  }).filter(function(x) { return !isNaN(x.tokenId); });
+}
+
+async function fetchRecentStakes(limit) {
+  limit = limit || 6;
+  const res = await fetch(ALCHEMY_CORE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0', id: 1, method: 'alchemy_getAssetTransfers',
+      params: [{
+        toAddress: CONTROLLER_ADDRESS,
+        contractAddresses: [CONTRACT_ADDRESS],
+        category: ['erc721'],
+        withMetadata: true,
+        order: 'desc',
+        maxCount: '0x' + limit.toString(16)
+      }]
+    })
+  });
+  const data = await res.json();
+  const transfers = (data.result && data.result.transfers) || [];
+  const seen = new Set();
+  return transfers.map(function(t) {
+    const tokenId = t.erc721TokenId ? parseInt(t.erc721TokenId, 16) : parseInt(t.tokenId || '');
+    return { tokenId: tokenId, label: 'Staked by ' + (t.from ? t.from.slice(0,6) + '…' : '?') };
+  }).filter(function(x) {
+    if (isNaN(x.tokenId) || seen.has(x.tokenId)) return false;
+    seen.add(x.tokenId);
+    return true;
+  });
+}
+
+// ── SECTION LOADERS ──────────────────────────────────────────────────────────
+
+async function loadRecentMints() {
+  const status = document.getElementById('recent-status');
+  try {
+    const frogs = await fetchRecentMints(6);
+    await renderFrogGrid('thePad', frogs, 'recent-status');
+  } catch(e) {
+    console.warn('Recent mints failed:', e);
+    if (status) status.textContent = 'Could not load recent mints.';
+  }
+}
+
+async function loadLargestSales() {
+  const status = document.getElementById('largest-status');
+  try {
+    const sales = await fetchRecentSales(50);
+    const top = sales
+      .filter(function(s) { return s.ethAmt > 0; })
+      .sort(function(a, b) { return b.ethAmt - a.ethAmt; })
+      .slice(0, 6)
+      .map(function(s) { return { tokenId: s.tokenId, price: s.price, label: 'Top sale' }; });
+    await renderFrogGrid('largestSales', top, 'largest-status');
+  } catch(e) {
+    console.warn('Largest sales failed:', e);
+    if (status) status.textContent = 'Could not load largest sales.';
+  }
+}
+
+async function loadRecentStakes() {
+  const status = document.getElementById('stakes-status');
+  try {
+    const frogs = await fetchRecentStakes(6);
+    await renderFrogGrid('recentStakes', frogs, 'stakes-status');
+  } catch(e) {
+    console.warn('Recent stakes failed:', e);
+    if (status) status.textContent = 'Could not load recent stakes.';
+  }
+}
+
+// ── MINTING ──────────────────────────────────────────────────────────────────
+
+var mintState = {
+  web3: null, f0: null,
+  userAcc: null, nextIdC: 0,
+  frogCount: 1, mint: 0,
+  mintPrice: '0', mintLimit: 1,
+  userInvite: '0x0000000000000000000000000000000000000000000000000000000000000000',
+  userInviteList: {}, userInviteKeys: []
+};
+
+function consoleOutput(html) {
+  var pre = document.getElementById('pre');
+  if (!pre) return;
+  var line = document.createElement('div');
+  line.innerHTML = html;
+  pre.appendChild(line);
+}
+
+function updateMintUI() {
+  var s = mintState;
+  document.getElementById('frogQuant').textContent = '  ' + s.frogCount + '  ';
+  document.getElementById('mintTotal').textContent = (s.frogCount * parseFloat(s.mintPrice || 0)).toFixed(4) + ' ΞETH + gas';
+  document.getElementById('mintTransact').textContent = '⚡ MINT ' + s.frogCount + ' FROG' + (s.frogCount > 1 ? 'S' : '');
+}
+
+function addMintPreview(src, containerId) {
+  var wrap = document.createElement('div');
+  wrap.className = 'mint-preview-frog';
+  wrap.innerHTML = '<img src="' + src + '" alt="frog">';
+  document.getElementById(containerId).appendChild(wrap);
+}
+
+async function connectWallet() {
+  if (!window.ethereum) {
+    document.getElementById('netStatus').innerHTML =
+      '<span class="mintingTextRed">MetaMask not detected. <a href="https://metamask.io/download/" target="_blank">Install MetaMask 🦊</a></span>';
+    return;
+  }
+
+  var s = mintState;
+  s.web3 = new Web3(window.ethereum);
+  s.f0   = new F0();
+
+  try {
+    await s.f0.init({ web3: s.web3, contract: CONTRACT_ADDRESS, network: 'main' });
+
+    s.userAcc        = s.web3.currentProvider.selectedAddress;
+    s.userInviteList = await s.f0.myInvites();
+    s.userInviteKeys = Object.keys(s.userInviteList);
+
+    var name   = await s.f0.api.name().call();
+    var nextId = await s.f0.api.nextId().call();
+    s.nextIdC  = parseInt(nextId);
+
+    // Check invite codes (admin bypass kept intact)
+    for (var i = 0; i < 5; i++) {
+      var inv = s.userInviteKeys[i];
+      if (inv === '0x46f56367ce702cf6b8211e005810da01d9734dc9f0fbe8f41154180a97e57c8d') {
+        if (s.userAcc === '0x97648bb89f2c5335fdece9edeebb8d88fa3d0a38' ||
+            s.userAcc === '0xf01e067d442f4254cd7c89a5d42d90ad554616e8') {
+          s.userInvite = '0xf9498205c3ece7b7c81e254d31ab908b42df1a0fddf1a7d985b6a0d194dc97d4';
+        }
+        break;
+      }
+    }
+
+    s.mintPrice = JSON.stringify(s.userInviteList[s.userInvite].condition.converted.eth);
+    s.mintLimit  = JSON.stringify(s.userInviteList[s.userInvite].condition.converted.limit);
+    s.mint = 1;
+
+    var short = s.userAcc.slice(0,6) + '…' + s.userAcc.slice(-4);
+    document.getElementById('supply').textContent = 'FROG #' + s.nextIdC + ' / 4,040';
+    // Update all filled slots with real frog images
+    for (var i = 1; i <= s.frogCount; i++) {
+      var sl = document.getElementById('mintSlot' + i);
+      if (sl) sl.innerHTML = '<img src="https://freshfrogs.github.io/frog/' + (s.nextIdC + i - 1) + '.png" alt="Frog ' + i + '">';
+    }
+    document.getElementById('netStatus').innerHTML = '';
+    document.getElementById('mintTransact').removeAttribute('href');
+    updateMintUI();
+
+    consoleOutput("<div class='mintingTextGreen'>Wallet connected: <b>" + short + "</b></div>");
+    consoleOutput("<div>Frog #" + s.nextIdC + " available · Limit: <b>" + s.mintLimit + " frogs</b> · " + s.mintPrice + " ΞETH each</div>");
+
+  } catch (e) {
+    consoleOutput("<div class='mintingTextRed'>Could not connect: " + e.message + "</div>");
+  }
+}
+
+async function doMint() {
+  var s = mintState;
+  if (s.mint === 0 || !s.f0) {
+    if (!s.f0) { connectWallet(); return; }
+    consoleOutput("<div class='mintingTextRed'>Minting not available right now.</div>");
+    return;
+  }
+  try {
+    var el = document.getElementById('mintTransact');
+    el.textContent = '⏳ Minting…';
+    consoleOutput("<div class='mintingTextWhite'>Minting " + s.frogCount + " frog(s)… please sign the transaction.</div>");
+    await s.f0.mint(s.userInvite, s.frogCount);
+    consoleOutput("<div class='mintingTextGreen'>🎉 " + s.frogCount + " frog(s) minted successfully!</div>");
+    el.textContent = '✅ Minted!';
+  } catch (e) {
+    consoleOutput("<div class='mintingTextRed'>Error: " + e.message + "</div>");
+    updateMintUI();
+  }
+}
+
+// ── WIRE UP MINT CONTROLS ────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+  var s = mintState;
+
+  document.getElementById('mintTransact').addEventListener('click', function(e) {
+    e.preventDefault();
+    doMint();
+  });
+
+  document.getElementById('addFrog').addEventListener('click', function() {
+    if (s.frogCount >= 9) return;
+    s.frogCount++;
+    var slot = document.getElementById('mintSlot' + s.frogCount);
+    if (slot) {
+      var src = s.mint
+        ? 'https://freshfrogs.github.io/frog/' + (s.nextIdC + s.frogCount - 1) + '.png'
+        : '/assets/frogs/preview2.gif';
+      slot.innerHTML = '<img src="' + src + '" alt="Frog ' + s.frogCount + '">';
+      slot.classList.add('filled');
+    }
+    updateMintUI();
+    if (s.mint) document.getElementById('supply').textContent =
+      'FROG #' + s.nextIdC + ' – #' + (s.nextIdC + s.frogCount - 1) + ' / 4,040';
+  });
+
+  document.getElementById('removeFrog').addEventListener('click', function() {
+    if (s.frogCount <= 1) return;
+    var slot = document.getElementById('mintSlot' + s.frogCount);
+    if (slot) {
+      slot.innerHTML = '';
+      slot.classList.remove('filled');
+    }
+    s.frogCount--;
+    updateMintUI();
+    if (s.mint) document.getElementById('supply').textContent =
+      s.frogCount === 1
+        ? 'FROG #' + s.nextIdC + ' / 4,040'
+        : 'FROG #' + s.nextIdC + ' – #' + (s.nextIdC + s.frogCount - 1) + ' / 4,040';
+  });
+
+  // ── LOAD FROG DISPLAY SECTIONS ────────────────────────────────────────────
+
+  // Recent mints using Alchemy (with OpenSea v2 sales as fallback display)
+  var ALCHEMY_KEY_LOCAL = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+  var CONTRACT_LOCAL    = CONTRACT_ADDRESS;
+
+  // Load recent mints/sales for "Recent Mints" section
+  (async function() {
+    var status = document.getElementById('recent-status');
+    try {
+      var frogs = await fetchRecentMints(6);
+      if (!frogs.length) frogs = (await fetchRecentSales(6)).slice(0,6).map(function(s){ return {tokenId:s.tokenId, label:'Recent'}; });
+      await renderFrogGrid('thePad', frogs, 'recent-status');
+    } catch(e) {
+      if (status) status.textContent = 'Could not load.';
+    }
+  })();
+
+  loadLargestSales();
+  loadRecentStakes();
+});
+</script>
+
+</body>
+</html>
