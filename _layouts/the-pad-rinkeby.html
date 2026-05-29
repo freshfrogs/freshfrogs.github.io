@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<style>
+  html{
+    background-image: url("/assets/background.png");
+  }
+  html,h1,h2,h3 {
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+  }
+  #myProgress {
+    width: 50%;
+    background: #7cc1ff;
+    margin-top: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid white;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  #myBar {
+    width: 1%;
+    height: 18px;
+    background-color: white;
+    border-radius: 1px;
+  }
+
+  .wrapper {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .bodyb {
+    background-color: transparent;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 8px;
+    margin-top: 5%;
+  }
+  .top {
+    margin: 0%;
+    image-rendering: pixelated;
+    text-align: center;
+  }
+  .smallContainer{
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: transparent;
+    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    width: 128px;
+  }
+  .smallContainer2 {
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: transparent;
+    width: 128px;
+    padding: 0px !important;
+    height: 128px !important;
+    display: inline-block !important;
+    position: relative;
+    image-rendering: pixelated;
+  }
+  .frogContainer {
+    border-radius: 200px;
+    overflow: hidden;
+    width: 256px;
+    padding-top: 0px !important;
+    height: 256px !important;
+    display: inline-block !important;
+    position: relative;
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    image-rendering: pixelated;
+    transition: .2s;
+  }
+  .smallContainer3 {
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: transparent;
+    width: 128px;
+    padding-top: 0px !important;
+    height: 128px !important;
+    display: inline-block !important;
+    position: relative;
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    image-rendering: pixelated;
+    transition: .2s;
+  }
+  .bigContainer{
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #7cc1ff;
+    margin: auto;
+    width: auto;
+    height: auto;
+    padding: 4px;
+    transition: transform .2s;
+    border: 0px solid white;
+    image-rendering: pixelated;
+  }
+  .headLine{
+    color: transparent;
+    image-rendering: crisp-edges;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2%;
+    margin-top: auto;
+    vertical-align: top;
+  }
+  .headLine2 {
+    margin-left: auto;
+    margin-right: auto;
+    image-rendering: crisp-edges;
+    margin-bottom: 2%;
+  }
+  .headLineImg {
+    float: none;
+    image-rendering: crisp-edges;
+    height: 18px;
+    vertical-align: middle;
+    border-radius: 100%;
+    padding: 0px;
+    transition: transform .2s;
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-bottom: 2%;
+    margin-top: 2%;
+    background-color: transparent;
+  }
+  .headLineImg:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+    box-shadow: none;
+    border: none;
+  }
+  .h1 {
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    image-rendering: pixelated;
+    padding: 0%;
+    font-size: xx-large;
+  }
+  .supply{
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    color: #333;
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+    padding: 5px;
+    background: #f4f4f4;
+    box-shadow: 6px 6px rgba(122, 122, 122, 0.20);
+    border-bottom: 0px solid #e0e0e0;
+    border-bottom-left-radius: 0%;
+    border-bottom-right-radius: 0%;
+    width: 270px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2%;
+    padding: 0px;
+  }
+  ul.downloads2 {
+    list-style: none;
+    height: 40px;
+    padding: 0;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid white;
+    width: 270px;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2%;
+    margin-bottom: 1%;
+    line-height: 1;
+    text-align: center;
+    vertical-align: middle;
+  }
+  section {
+    border-top: 0px solid #7cc1ff !important;
+    border: 4px solid #7cc1ff;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-size: auto;
+    color: white !important;
+    background-color: #7cc1ff;
+    text-align: center;
+    border-radius: 7px;
+    padding-top: 0px !important;
+    margin-top: 0px !important;
+    padding: 14px;
+    padding-bottom: 16px !important;
+    width: auto;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  header {
+    border: 4px solid #7cc1ff;
+    overflow: hidden;
+
+    background-color: #7cc1ff;
+    text-align: center;
+    border-radius: 7px;
+    padding: 14px;
+    width: auto;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-size: auto !important;
+
+    color: #333;
+  }
+  .desc {
+    position: relative;
+    background-color: inherit;
+    height: 0%;
+    width: 100%;
+    bottom: 32px;
+    margin-bottom: 0px;
+  }
+  .downloads {
+    margin-top: 0%;
+    margin-bottom: 4%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 14px;
+  }
+  .downloads a{
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-size: inherit !important;
+    color: inherit !important;
+  }
+  .pre h1{
+    margin-top: 8px;
+  }
+  .container {
+    height: 256px;
+    width: auto;
+    margin-bottom: auto;
+    margin-top: auto;
+    background-color: transparent;
+
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+
+    display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+
+    display: box;
+    box-orient: horizontal;
+    box-pack: center;
+    box-align: center;
+  }
+  .imgWrapper {
+    -webkit-box-flex: 13;
+    -moz-box-flex: 1;
+    box-flex: 1;
+  }
+  .frogImg {
+    transition: transform .2s;
+    height: auto;
+    width: auto;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+  }
+  .frogImg2:hover{
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Safari 3-8 */
+    transform: scale(1.5);
+    box-shadow: none;
+    border: none;
+  }
+  .frogImg2 {
+    transition: transform .2s;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    border-radius: 5px;
+  }
+  .frogImg3 {
+    transition: transform .2s;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
+    overflow: hidden;
+    position: absolute;
+    height: auto;
+    width: auto;
+  }
+  .smallContainer3:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+    box-shadow: none;
+    border: none;
+  }
+  .pointer {
+    transition: transform .2s;
+    cursor: pointer;
+  }
+  .pointer:hover{
+    -ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1);
+  }
+  .pre {
+    border-radius: 2%;
+    text-align: center;
+    padding: 0px;
+    margin-bottom: 8px;
+    width: 100%;
+    height: 100%;
+    box-shadow: none;
+  }
+  .frogType {
+    transition: transform .2s;
+    width: 128px;
+    display: block;
+    image-rendering: pixelated;
+    box-shadow: none;
+    border: none;
+    position: absolute;
+  }
+  .hr2{
+    width: 128px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1%;
+  }
+  .h2 {
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font-weight: 750;
+    text-align: center;
+    padding: 0%;
+    font-size: large;
+    font: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    margin-top: 8px;
+    margin-bottom: 0px;
+    line-height: 1.1;
+  }
+  .frogType2 {
+    border-radius: 5px;
+    border: 0px solid #e0e0e0;
+    overflow: hidden;
+    background-color: transparent;
+    width: 128px;
+    padding-top: 0px !important;
+    height: 100% !important;
+    display: inline-block !important;
+  }
+  .learnMoreFM {
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    background: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 5px;
+    color: #333
+  }
+  .myProgress {
+    width: 50%;
+    background: #f4f4f4;
+    margin-top: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #324d64;
+    border-radius: 5px;
+    height: 18px;
+    font-family: apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+    font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    vertical-align: middle;
+  }
+  .mintingTextGreen {
+    background-color: #99ffc5;
+    border-radius: 5px;
+    border: 0px solid white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    padding: 4px;
+  }
+  .mintingTextWhite {
+    background-color: #faff99;
+    border-radius: 5px;
+    border: 0px solid white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    padding: 4px;
+  }
+  .mintingTextRed {
+    background-color: #ff99b6;
+    border-radius: 5px;
+    border: 0px solid white;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.25);
+    padding: 4px;
+  }
+  .thePad {
+    border-radius: 5px;
+    padding: 4px;
+    background-color: #7cc1ff;
+    vertical-align: bottom;
+  }
+  .headerDiv {
+    border-bottom: 2px solid #7cc1ff;
+    padding: 4px;
+    border-radius: 5px;
+    color: white !important;
+  }
+  .frogPanel {
+    display: inline-block !important;
+    image-rendering: pixelated;
+    text-align: center;
+    border: 1px solid #7cc1ff;
+    border-radius: 5px;
+    padding: 10px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin: 2px;
+    background-color: #7cc1ff;
+  }
+  .attributeList {
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 4px;
+    overflow: hidden;
+    background-color: white;
+    color: #333;
+    box-shadow: 3px 3px rgba(122, 122, 122, 0.20);
+  }
+  .trait{
+    border-radius: 2px;
+    background: white;
+    color: rgba(126, 183, 128, 1);
+    font-size: x-small;
+    padding: 1px;
+  }
+</style>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <link rel="icon" href="../assets/logo.png">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ "../assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+    <script src="https://testnet.factoria.app/f0/token_abi.js"></script>
+    <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PB0WKB4SH"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-6PB0WKB4SH');
+      document.addEventListener("DOMContentLoaded", async () => {
+        const web3 = new Web3(window.ethereum);   // Open WEB3.0 Browsner Exentions Window
+        const f0 = new F0();    // Connect to Factoria
+        CONTRACT_ADDRESS = "0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524";    // Contract Address (Ethereum Mainnet) 0xBE4Bef8735107db540De269FF82c7dE9ef68C51b // Rinkeby: 0xc2203Ff7B9d1c65c8Cf0F6c776f6CF358af3c524
+        COLLECTION = collection = new web3.eth.Contract(token_abi, CONTRACT_ADDRESS);    // Token ABI; imported from Factoria
+        NETWORK = "rinkeby";   // Which Network?
+        consoleOutput('<b>🍄Morph FROGS</b><br>Fresh Frog NFT Combinations! <br>Select Frogs to combine their attributes!'+'<b><a onclick="learnMore();" class="pointer">Learn More!</a></b>'+'<p id="learnMoreFM"></p>')
+        consoleOutput('<hr class="hr2">'+'Mint from the collection...<a class="pointer" href="https://freshfrogs.io/"><b>🐸 Minting Terminal</b> ↗️</a>'+'<div id="thePad" class="thePad"></div>')
+        try {   // Connect
+          await f0.init({
+            web3: web3,
+            contract: CONTRACT_ADDRESS,
+            network: NETWORK
+          })
+
+          // Assign Variables (CONSTANTS)
+          // CONNECTED USER'S WALLET ADDRESS; AND INVITES
+          userAcc = web3.currentProvider.selectedAddress;
+          addressCut = userAcc.substring(0, 5)+"..."+userAcc.slice(-4);
+          userInviteList = await f0.myInvites();
+          userInviteKeys = Object.keys(userInviteList);
+
+          ownedFrogs = await collection.methods.balanceOf(userAcc).call();
+
+          // CONTRACT NAME, SYMBOL, NEXT ID
+          name = await f0.api.name().call();
+          symbol = await f0.api.symbol().call();
+          nextId = await f0.api.nextId().call();
+          nextIdC = parseInt(nextId);
+
+          // Other Function Variables
+          baseFrog = 'undefined';
+          subFrog = 'undefined';
+          morphed = 'false';
+
+          // Get two Frogs Ready
+          //applyFrogOwned(407);
+          //applyFrogOwned(67);
+
+          // Attribute Rarities
+          var attributesTotal = {
+            'goldChain' : 0,
+            'goldDollarChain' : 0,
+            'silverChain' : 0,
+            'silverEthChain' : 0,
+            'circleGlasses' : 0,
+            'circleNightVision' : 0,
+            'circleShadesPurple' : 0,
+            'circleShadesRed' : 0,
+            'shades' : 0,
+            'shadesPurple' : 0,
+            'shadesThreeD' : 0,
+            'shadesWhite' : 0,
+            'blueDartFrog' : 0,
+            'blueTreeFrog' : 0,
+            'brownTreeFrog' : 0,
+            'cyanTreeFrog' : 0,
+            'goldenDartFrog' : 0,
+            'goldenTreeFrog' : 0,
+            'grayTreeFrog' : 0,
+            'greenTreeFrog' : 0,
+            'lightBrownTreeFrog' : 0,
+            'natural' : 0,
+            'orangeTreeFrog' : 0,
+            'pinkTreeFrog' : 0,
+            'purpleTreeFrog' : 0,
+            'redEyedTreeFrog' : 0,
+            'splendidLeafFrog' : 0,
+            'stawberryDartFrog' : 0,
+            'tomatoFrog' : 0,
+            'treeFrog(1)' : 0,
+            'treeFrog(2)' : 0,
+            'treeFrog(3)' : 0,
+            'treeFrog(4)' : 0,
+            'treeFrog(5)' : 0,
+            'treeFrog(6)' : 0,
+            'treeFrog(7)' : 0,
+            'treeFrog(8)' : 0,
+            'unknown' : 0,
+            'baseballCapBlue' : 0,
+            'baseballCapRed' : 0,
+            'baseballCapWhite' : 0,
+            'cowboyHatBlack' : 0,
+            'cowboyHatBrown' : 0,
+            'cowboyHatTan' : 0,
+            'cowboyHatWhite' : 0,
+            'crown' : 0,
+            'stockingCap' : 0,
+            'topHatBlue' : 0,
+            'topHatRed' : 0,
+            'topHatYellow' : 0,
+            'witchBlack' : 0,
+            'witchBrown' : 0,
+            'witchStraw' : 0,
+            'bandannaBlue' : 0,
+            'bandannaRed' : 0,
+            'mask' : 0,
+            'smoking' : 0,
+            'smokingCigar' : 0,
+            'smokingPipe' : 0,
+            'tongue' : 0,
+            'tongueFly' : 0,
+            'tongueSpider' : 0,
+            'tongueSpiderRed' : 0,
+            'closedEyes' : 0,
+            'croaking' : 0,
+            'inversedEyes' : 0,
+            'peace' : 0,
+            'thirdEye' : 0,
+            'blue(2)' : 0,
+            'blue' : 0,
+            'brown' : 0,
+            'cyan' : 0,
+            'darkGreen' : 0,
+            'green' : 0,
+            'orange(2)' : 0,
+            'orange' : 0,
+            'pink' : 0,
+            'purple(2)' : 0,
+            'purple' : 0,
+            'red(2)' : 0,
+            'red' : 0,
+            'sand' : 0,
+            'white(2)' : 0,
+            'white' : 0,
+            'yellow(2)' : 0,
+            'yellow' : 0
+          } // Start at 0
+
+          // event listeners
+          document.querySelector("#morphFrogs").addEventListener("click", async (e) => {
+            if (baseFrog !== 'undefined' && subFrog !== 'undefined') { 
+              //alert("Morph "+baseFrog+" + "+subFrog);
+              combineTokens(baseFrog, subFrog);
+              //document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" / # "+subFrog+" 🍄"
+            }
+          })
+          document.querySelector("#selectBase").addEventListener("click", async (e) => {
+            if (typeof baseFrog !== 'undefined') { 
+              document.getElementById("Frog #"+baseFrog).scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'center'
+              });
+            }
+          })
+          document.querySelector("#selectSub").addEventListener("click", async (e) => {
+            if (typeof subFrog !== 'undefined') { 
+              document.getElementById("Frog #"+subFrog).scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'center'
+              });
+            }
+          })
+
+          // Connected! Begin loading Frogs!
+          // Display Two Random Frogs!
+          //combineTokens(baseFrog, subFrog);
+          if (ownedFrogs <= 0) { // ❌ No FROGS
+            document.getElementById("netStatus").innerHTML = "Connect to view 'FROG' tokens... <b><i>"+addressCut+' ✓</i></b>'+'<br>❌ It seems you do not own any FROGS!<br>\n<br>'
+            return; // BREAK
+          } else {
+            document.getElementById('netStatus').innerHTML = 'Loading Frogs from ΞEthereum... <b id="progress"></b><div id="myProgress"><div id="myBar"></div></div><br><br>';
+
+            // OPEN SEA API
+
+            const options = {
+              method: 'GET',
+              headers: {Accept: 'application/json', 'X-API-KEY': '1b80881e422a49d393113ede33c81211'}
+            };
+            
+            fetch('https://api.opensea.io/api/v1/assets?owner='+userAcc+'&order_direction=desc&asset_contract_address=0xBE4Bef8735107db540De269FF82c7dE9ef68C51b&limit=20&include_orders=false', options)
+            .then((res) => res.json())
+            .then((res) => {
+              console.log(res)
+              var { assets } = res
+              assets.forEach((frog) => { // For Each FROG
+                var { name, token_metadata, permalink, traits } = frog
+
+                // Attribute Rarities
+                console.log('Loading... '+name);
+                for (var i = 0; i < traits.length; i++) {
+                 attributesTotal[traits[i].value] = traits[i].trait_count
+                }
+
+                let thisToken = frog.name.replace('Frog #', '');
+                //
+                loadFreshFrog(thisToken);
+                openSeaLink = 'https://opensea.io/assets/0xbe4bef8735107db540de269ff82c7de9ef68c51b/'+thisToken
+                document.getElementById('Frog #'+thisToken+'Desc').innerHTML = '<a href="'+openSeaLink+'" target="_blank" style="image-rendering: auto !important; display: inline !important;">'+'<b><u>'+frog.name+'</u></b>'+'</a>';
+
+                // Progress Bar!
+                percent = parseInt((thisToken/ownedFrogs)*100);
+                document.getElementById("progress").innerHTML = percent+"%"
+                elem = document.getElementById("myBar");
+                width = percent
+                width++;
+                elem.style.width = width + "%";
+                
+                fetch(token_metadata)
+                .then((metadata) => metadata.json())
+                .then((metadata) => {
+                  // Loop Attributes
+                  for (var i = 0; i < metadata.attributes.length; i++){
+                    //console.log(metadata.attributes[i]);
+
+                    // Trait_Type : Value
+                    var attribute = metadata.attributes[i] // attribute.trait_type / attribute.value
+                    let trait_type = attribute.trait_type
+                    let value = attribute.value
+                    let trait_rarity = roundToTwo((attributesTotal[value]/nextIdC))
+
+                    // Build Fresh Frogs Attributes
+                    loadAttribute(trait_type, value, frog.name)
+                    newAttribute = document.createElement('text') // <b><i class="trait">'+rarity+'%</i></b>
+                    newAttribute.innerHTML = value + ' <b><i class="trait">'+trait_rarity+'%</i></b>';
+                    newAttribute.className = value;
+                    space = document.createElement('br')
+                    document.getElementById('Frog #'+thisToken+'Desc').appendChild(space)
+                    document.getElementById('Frog #'+thisToken+'Desc').appendChild(newAttribute) 
+                  }
+                })
+              })
+              // Finish Loading Bar
+              percent = 100;
+              document.getElementById("progress").innerHTML = percent+"%"
+              elem = document.getElementById("myBar");
+              width = percent
+              width++;
+              elem.style.width = width + "%";
+              document.getElementById('netStatus').innerHTML = "<div id='mintingText'>Connect to view 'FROG' tokens... <b><i>("+ownedFrogs+")</b> FROG(S)</i>"+'<br><b>'+userAcc.toUpperCase()+' ✓</b>'+'<br>\n<br>'
+              console.log(attributesTotal)
+            })
+          }
+        } catch (e) { // Failed; Send Error Code!
+          consoleOutput("<br>"+"<div class='mintingTextRed'>Error Linking Wallet: <br><strong><b>"+e.message+"</b></strong><a href='https://discord.gg/xWMFWgpvd3' target='_blank'><b><u>Discord #Support</u></b></a></div>");
+        }
+      })
+      function roundToTwo(num) {
+        let result = ((Math.round(num + "e+2")  + "e-2"))*100
+        if (result <= 1) { return '<1' } else { return result }
+      }
+      // Load Fresh Frog
+      function loadFreshFrog(tokenID) {
+        newFrog = document.createElement("div")
+        newFrog.onclick = function() {applyFrogOwned(tokenID)};
+        newFrog.id = tokenID
+        newFrog.className = 'frogPanel'
+        newFrog.innerHTML = '<a class="smallContainer2 pointer" id="Frog #'+tokenID+'"></a>'+'<p class="attributeList" id="Frog #'+tokenID+'Desc"></p>'
+        document.getElementById("thePad").appendChild(newFrog)
+      }
+      // Output to minting terminal
+      function consoleOutput(output) {
+        newLine = document.createElement("div")
+        newLine.innerHTML = output
+        document.getElementById("pre").appendChild(newLine)
+      }
+      // Function Learn More Frog Morph
+      function learnMore() {
+        document.getElementById("learnMoreFM").className = "learnMoreFM"
+        document.getElementById("learnMoreFM").innerHTML = "<b><u>Does this make a NEW NFT?</u></b>"+"<br><b>Not YET!</b> However, once the full collection has been minted, this will become a feature that DOES generate a (N)ew (F)rog (T)oken!"
+      }
+      // Function Scroll to Frog 
+      function frogIndexer() {
+        var frogID;
+        frogID = document.getElementById("frogIndex").value;
+        // FIND FROG
+        //alert(frogID);
+        document.getElementById("Frog #"+frogID).scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center'
+        });
+      }
+      // Function apply Owned Frog
+      function applyFrogOwned(ownedFrog) {
+        //alert(ownedFrog);
+        if (baseFrog == 'undefined') { // baseFrog 
+          document.getElementById("frogContainer").innerHTML = ""
+          selectBaseFrog(ownedFrog);
+          baseFrog = ownedFrog;
+          subFrog = 'undefined';
+          document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG";
+          //document.getElementById("morphFrogs").innerHTML = "<strong>Morph</strong>"+baseFrog+" 🍄 ?";
+          document.getElementById("twoFrogs").innerHTML = "";
+          //document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" / # "+" ? "+" 🍄";
+          //document.getElementById("supply").innerHTML = "# "+baseFrog+" 🍄 # "+subFrog
+        } else if (subFrog == 'undefined') { // subFrog
+          if (baseFrog !== ownedFrog) {
+            selectSubFrog(ownedFrog);
+            subFrog = ownedFrog;
+          }
+        } else {
+          // Reset Morph
+          document.getElementById("frogContainer").innerHTML = "";
+          selectBaseFrog(ownedFrog);
+          baseFrog = ownedFrog;
+          subFrog = 'undefined';
+          document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>Select FROG";
+          //document.getElementById("morphFrogs").innerHTML = "<strong>Morph</strong>"+baseFrog+" 🍄 ?";
+          document.getElementById("twoFrogs").innerHTML = "";
+          //document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" / # "+" ? "+" 🍄";
+        }
+      }
+      // Load attribute
+      function loadAttribute(trait, attribute, where) {
+        newAttribute = document.createElement("img")
+        newAttribute.href = "https://opensea.io/collection/fresh-frogs?search[sortAscending]=true&search[sortBy]=PRICE&search[stringTraits][0][name]="+trait+"&search[stringTraits][0][values][0]="+attribute
+        newAttribute.id = attribute
+        newAttribute.target = "_blank"
+        newAttribute.className = "frogImg2" //shadesAnimation
+        newAttribute.style.cursor = "pointer"
+        if (attribute === "smoking2" || attribute === "smokingPipe2" || attribute === "smokingCigar2") { 
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".gif"
+        } else if (attribute === "morphAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pad/Frog/loadMorph.gif"
+        } else if (attribute === "shadesAnimation") {
+          newAttribute.src = "https://freshfrogs.io/the-pad/Eyes/shadesAnimation.gif"
+        } else {
+          newAttribute.src = "https://freshfrogs.io/the-pad/"+trait+"/"+attribute+".png"
+        }
+        newAttribute.alt = attribute
+        document.getElementById(where).appendChild(newAttribute)
+      }
+      function getRandomArbitrary(min, max) {
+          return Math.random() * (max - min) + min;
+      }
+      // Select subFrog
+      async function selectSubFrog(selectedSub){
+        //
+        newFrog = document.createElement("div")
+        newFrog.className = "imgWrapper"
+        newFrog.id = 'subFrogDiv'
+        newFrog.innerHTML = "<div class='frogImg'><div style='float: right !important;' class='smallContainer2' id='subDisplay'></div></div>"
+        document.getElementById("frogContainer").appendChild(newFrog)
+        //
+        let subFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selectedSub+".json")).json();
+        for (var i = 0; i < subFrogmetadata.attributes.length; i++){
+          var data = subFrogmetadata.attributes[i]
+          loadAttribute(data.trait_type, data.value, 'subDisplay')
+        }
+        document.getElementById("selectSub").innerHTML = "<strong>Sub</strong>"+subFrogmetadata.name
+        //document.getElementById("morphFrogs").innerHTML = "<strong>Morph</strong><b>"+baseFrog+" + "+subFrog+"</b>"
+        morphed = 'false';
+        //alert(morphed)
+        //document.getElementById("supply").innerHTML = "FROG # "+baseFrog+" / # "+subFrog+" 🍄"
+      }
+      // Select baseFrog
+      async function selectBaseFrog(selectedBase){
+        //document.getElementById("twoFrogs").innerHTML = "";
+        newFrog = document.createElement("div")
+        newFrog.className = "imgWrapper"
+        newFrog.id = 'baseFrogDiv'
+        newFrog.innerHTML = "<div class='frogImg'><div style='float: left !important;' class='smallContainer2' id='baseDisplay'></div></div>"
+        document.getElementById("frogContainer").appendChild(newFrog)
+        //
+        let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+selectedBase+".json")).json();
+        for (var i = 0; i < baseFrogmetadata.attributes.length; i++){
+          var data = baseFrogmetadata.attributes[i]
+          loadAttribute(data.trait_type, data.value, 'baseDisplay')
+        }
+        document.getElementById("selectBase").innerHTML = "<strong>Base</strong>"+baseFrogmetadata.name
+        //document.getElementById("morphFrogs").innerHTML = "<strong>Morph</strong>"+baseFrog+" 🍄 ?"
+      }
+      // Select otherFrog
+      // Function combine tokens
+      async function combineTokens(baseFrog, otherFrog) {
+        if (morphed == "true"){
+          return false;
+        }
+        morphed = "true";
+        //displayFrog(baseFrog);
+        //displayFrog(otherFrog);
+        // baseFrog = Dominate trait(s)
+        // frogType, and attributes.
+        var useGIF = undefined;
+        var baseFrog_Frog, baseFrog_SpecialFrog, baseFrog_Trait, baseFrog_Accessory, baseFrog_Eyes, baseFrog_Hat, baseFrog_Mouth = undefined;
+        var otherFrog_Frog, otherFrog_SpecialFrog, otherFrog_Trait, otherFrog_Accessory, otherFrog_Eyes, otherFrog_Hat, otherFrog_Mouth = undefined;
+        // Inherits trait; and additional attirbutes from otherFrog
+        // 1. Get metadata from baseFrog
+        document.getElementById("subFrogDiv").style.opacity = '0.20';
+        document.getElementById("baseFrogDiv").style.opacity = '0.20';
+        let baseFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+baseFrog+".json")).json();
+        //consoleOutput("<img width='128px' src='https://freshfrogs.io/frog/"+baseFrog+".png'>");
+        //consoleOutput("<br>baseFrog: "+baseFrogmetadata.name)
+        for (var baseFrogi = 0; baseFrogi < baseFrogmetadata.attributes.length; baseFrogi++){
+          var data = baseFrogmetadata.attributes[baseFrogi]
+          //consoleOutput(data.trait_type+": "+data.value)
+          if (data.trait_type == "Frog") {
+            var baseFrog_Frog = data.value;
+          } else if (data.trait_type == "SpecialFrog") {
+            var baseFrog_SpecialFrog = data.value;
+          } else if (data.trait_type == "Trait") {
+            var baseFrog_Trait = data.value;
+          } else if (data.trait_type == "Accessory") {
+            var baseFrog_Accessory = data.value;
+          } else if (data.trait_type == "Eyes") {
+            var baseFrog_Eyes = data.value;
+          } else if (data.trait_type == "Hat") {
+            var baseFrog_Hat = data.value;
+          } else if (data.trait_type == "Mouth") {
+            if (data.value === "smoking" || data.value === "smokingPipe" || data.value === "smokingCigar") {
+              var baseFrog_Mouth = data.value+"2";
+            } else {
+              var baseFrog_Mouth = data.value;
+            }
+          }
+        }
+        // 2. Get metadata from otherFrog
+        // otherFrog MetaData
+        let otherFrogmetadata = await (await fetch("https://freshfrogs.io/frog/json/"+otherFrog+".json")).json();
+        //consoleOutput("<img width='128px' src='https://freshfrogs.io/frog/"+otherFrog+".png'>");
+        //consoleOutput("<br>otherFrog:"+otherFrogmetadata.name)
+        for (var otherFrogi = 0; otherFrogi < otherFrogmetadata.attributes.length; otherFrogi++){
+          var data2 = otherFrogmetadata.attributes[otherFrogi]
+          //consoleOutput(data2.trait_type+": "+data2.value)
+          if (data2.trait_type == "Frog") {
+            var otherFrog_Frog = data2.value;
+          } else if (data2.trait_type == "SpecialFrog") {
+            var otherFrog_SpecialFrog = data2.value;
+            if (data2.value == "thirdEye") {
+              if (typeof baseFrog_SpecialFrog !== "undefined") {
+                var otherFrog_Trait = "thirdEye/baseSpecial"
+              } else {
+                var otherFrog_Trait = "thirdEye/base"
+              }
+            } else if (typeof baseFrog_SpecialFrog !== "undefined") {
+              if (baseFrog_SpecialFrog == "thirdEye" && otherFrog_SpecialFrog == "inversedEyes") {
+                var otherFrog_Trait = baseFrog_SpecialFrog+"/baseInversed"
+              } else {
+                var otherFrog_Trait = "special/sand";
+              }
+            } else {
+              var otherFrog_Trait = "sand";
+            }
+            
+          } else if (data2.trait_type == "Trait") { // <--TRAITS
+            if (typeof baseFrog_SpecialFrog !== "undefined") { // Adapt trait for special Frogs
+              if (baseFrog_SpecialFrog === "inversedEyes") {
+                var otherFrog_Trait = "special/"+data2.value
+              } else if (baseFrog_SpecialFrog === "closedEyes") {
+                var otherFrog_Trait = "special/"+data2.value
+              } else { 
+                var otherFrog_Trait = baseFrog_SpecialFrog+"/"+data2.value
+              }
+              if (data2.value == "natural") {
+                if (baseFrog_SpecialFrog === "inversedEyes") {
+                  var otherFrog_Trait = "natural/special/"+otherFrog_Frog
+                } else if (baseFrog_SpecialFrog === "closedEyes") {
+                  var otherFrog_Trait = "natural/special/"+otherFrog_Frog
+                } else { //alert ("baseFrog_SpecialFrog")
+                  var otherFrog_Trait = "natural/"+baseFrog_SpecialFrog+"/"+otherFrog_Frog
+                }
+              }
+            } else if (typeof baseFrog_Frog !== "undefined") { // Regular Frog; continue
+              if (data2.value == "natural") {
+                var otherFrog_Trait = "natural/"+otherFrog_Frog
+              } else {
+                var otherFrog_Trait = data2.value;
+              }
+            }
+          } else if (data2.trait_type == "Accessory") {
+            var otherFrog_Accessory = data2.value;
+          } else if (data2.trait_type == "Eyes") { // shadesAnimation
+            //
+           // if (data2.value === "shades" || data2.value === "shadesPurple" || data2.value === "shadesThreeD" || data2.value === "shadesWhite") {
+            var otherFrog_Eyes = data2.value;
+            //
+          } else if (data2.trait_type == "Hat") {
+            var otherFrog_Hat = data2.value;
+          } else if (data2.trait_type == "Mouth") {
+            if (data2.value === "smoking" || data2.value === "smokingPipe" || data2.value === "smokingCigar") {
+              var otherFrog_Mouth = data2.value+"2";
+            } else {
+              var otherFrog_Mouth = data2.value;
+            }
+          }
+        }
+        // Check first attribute. Is it a Frog or specialFrog?
+        //consoleOutput("<div id='newFrog' class='smallContainer2'></div>");
+        thisPlace = 'frogContainer';
+        //consoleOutput("<br>\n<br>New Frog:<br>");
+        if (typeof baseFrog_Frog !== 'undefined') {                              // Load Frog Type
+          loadAttribute("Frog", baseFrog_Frog, thisPlace)       // Load Frog Type from baseFrog
+          //loadAttribute("Frog", "frog", thisPlace);
+          //consoleOutput("Frog: "+baseFrog_Frog); // Test Frog
+          // Trait
+          if (typeof otherFrog_Trait !== 'undefined') {                        // Check for trait from otherfrog
+            loadAttribute("Trait", otherFrog_Trait, thisPlace)  // Load Trait from otherFrog
+            //consoleOutput("Trait: "+otherFrog_Trait); // Test Trait
+          } else if (typeof baseFrog_Trait !== 'undefined') {                  // If otherFrog has no trait; check baseFrog
+            loadAttribute("Trait", baseFrog_Trait, thisPlace)   // Load trait from baseFrog
+            //consoleOutput("Trait: "+baseFrog_Trait); // Test Trait
+          }
+          // Accessory
+          if (typeof baseFrog_Accessory !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Accessory", baseFrog_Accessory, thisPlace)   // Load Accessory from baseFrog
+            //consoleOutput("Accessory: "+baseFrog_Accessory); // Test Accessory
+          } else if (typeof otherFrog_Accessory !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Accessory", otherFrog_Accessory, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Accessory: "+otherFrog_Accessory); // Test Trait
+          }
+          // Eyes
+          if (typeof baseFrog_Eyes !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Eyes", baseFrog_Eyes, thisPlace)        // Load Accessory from baseFrog
+            // shadesAnimation
+            if (baseFrog_Eyes === "shades" || baseFrog_Eyes === "shadesPurple" || baseFrog_Eyes === "shadesThreeD" || baseFrog_Eyes === "shadesWhite") {
+              loadAttribute("Eyes", "shadesAnimation", thisPlace)
+            }
+            //
+            //consoleOutput("Eyes: "+baseFrog_Eyes); // Test Trait
+          } else if (typeof otherFrog_Eyes !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Eyes", otherFrog_Eyes, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Eyes: "+otherFrog_Eyes);
+            if (otherFrog_Eyes === "shades" || otherFrog_Eyes === "shadesPurple" || otherFrog_Eyes === "shadesThreeD" || otherFrog_Eyes === "shadesWhite") {
+              loadAttribute("Eyes", "shadesAnimation", thisPlace)
+            }
+          }
+          // Hat
+          if (typeof baseFrog_Hat !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Hat", baseFrog_Hat, thisPlace)         // Load Accessory from baseFrog
+            //consoleOutput("Hat: "+baseFrog_Hat);
+          } else if (typeof otherFrog_Hat !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Hat", otherFrog_Hat, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Hat: "+otherFrog_Hat);
+          }
+          // Mouth
+          if (typeof baseFrog_Mouth !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Mouth", baseFrog_Mouth, thisPlace)       // Load Accessory from baseFrog
+            //consoleOutput("Mouth: "+baseFrog_Mouth);
+          } else if (typeof otherFrog_Mouth !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Mouth: "+otherFrog_Mouth);
+          }
+          //loadAttribute("Frog", "morphAnimation", thisPlace);
+          //loadAttribute("Frog", "loadMorph", thisPlace);
+        } else if (typeof baseFrog_SpecialFrog !== 'undefined') { // Load SpecialFrog Type
+          loadAttribute("SpecialFrog", baseFrog_SpecialFrog, thisPlace)
+          //loadAttribute("Frog", "frog", thisPlace);
+          //consoleOutput("SpecialFrog Found: "+baseFrog_SpecialFrog)
+          //
+          // Trait
+          if (typeof otherFrog_Trait !== 'undefined') {                        // Check for trait from otherfrog
+            loadAttribute("Trait", otherFrog_Trait, thisPlace)  // Load Trait from otherFrog
+            //consoleOutput("Trait: "+otherFrog_Trait); // Test Trait
+            //alert(otherFrog_Trait);
+          } else if (typeof baseFrog_Trait !== 'undefined') {                  // If otherFrog has no trait; check baseFrog
+            loadAttribute("Trait", baseFrog_Trait, thisPlace)   // Load trait from baseFrog
+            //consoleOutput("Trait: "+baseFrog_Trait); // Test Trait
+          }
+          // Accessory
+          if (typeof baseFrog_Accessory !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Accessory", baseFrog_Accessory, thisPlace)   // Load Accessory from baseFrog
+            //consoleOutput("Accessory: "+baseFrog_Accessory); // Test Accessory
+          } else if (typeof otherFrog_Accessory !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Accessory", otherFrog_Accessory, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Accessory: "+otherFrog_Accessory); // Test Trait
+          }
+          // Eyes
+          if (typeof baseFrog_Eyes !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Eyes", baseFrog_Eyes, thisPlace)        // Load Accessory from baseFrog
+            //consoleOutput("Eyes: "+baseFrog_Eyes); // Test Trait
+            if (baseFrog_Eyes === "shades" || baseFrog_Eyes === "shadesPurple" || baseFrog_Eyes === "shadesThreeD" || baseFrog_Eyes === "shadesWhite") {
+              loadAttribute("Eyes", "shadesAnimation", thisPlace)
+            }
+          } else if (typeof otherFrog_Eyes !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Eyes", otherFrog_Eyes, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Eyes: "+otherFrog_Eyes);
+            if (otherFrog_Eyes === "shades" || otherFrog_Eyes === "shadesPurple" || otherFrog_Eyes === "shadesThreeD" || otherFrog_Eyes === "shadesWhite") {
+              loadAttribute("Eyes", "shadesAnimation", thisPlace)
+            }
+          }
+          // Hat
+          if (typeof baseFrog_Hat !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Hat", baseFrog_Hat, thisPlace)         // Load Accessory from baseFrog
+            //consoleOutput("Hat: "+baseFrog_Hat);
+          } else if (typeof otherFrog_Hat !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Hat", otherFrog_Hat, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Hat: "+otherFrog_Hat);
+          }
+          // Mouth
+          if (typeof baseFrog_Mouth !== 'undefined') {                             // Check for Accessory from baseFrog
+            loadAttribute("Mouth", baseFrog_Mouth, thisPlace)       // Load Accessory from baseFrog
+            //consoleOutput("Mouth: "+baseFrog_Mouth);
+          } else if (typeof otherFrog_Mouth !== 'undefined') {                     // If baseFrog has no Accessory; check otherFrog
+            loadAttribute("Mouth", otherFrog_Mouth, thisPlace)      // Load Accessory from otherFrog
+            //consoleOutput("Mouth: "+otherFrog_Mouth);
+          }
+          //loadAttribute("Frog", "morphAnimation", thisPlace);
+        }
+      }
+    </script>
+  </head>
+  <body class="bodyb">
+    <div class="wrapper">
+      <header>
+        <div class="downloads pre">
+          <div id="bigContainer" class="bigContainer">
+            <div id="frogContainer" class="container"><div id="imgWrapper" class="imgWrapper"><img id="previewImg" class="frogImg" src="https://freshfrogs.io/assets/frogs/previewMorph.png"/></div></div>
+          </div>
+          <div id="twoFrogs" class="imgWrapper"></div>
+          <br>
+          <ul class="downloads2">
+            <li><a id="morphFrogs" class="pointer"><strong>Morph</strong>🐸 <b>+</b> 🐸</a></li>
+            <li><a id="selectBase" class="pointer"><strong>Base</strong>Select FROG</a></li>
+            <li><a id="selectSub" class="pointer"><strong>Sub</strong>Select FROG</a></li>
+          </ul>
+        </div>
+      </header>
+      <section>
+        <div class="top">{{ content }}<h2 style="color: white !important;"><b>freshfrogs.io/the-pad 🍀</b></h2></div>
+        <br>
+        <div class="downloads pre">
+          <div id="pre">
+            <div id="netStatus">
+              Connect to view 'FROG' tokens...
+              <b><a class="pointer" href="https://freshfrogs.io/the-pad">Connect Wallet</a></b><hr class="hr2">
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+  </body>
+  <footer>
+    © Copyright. All Rights Reserved
+  </footer>
+</html>
