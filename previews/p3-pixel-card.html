@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P3 — Pixel Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #1e1e2e;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0, rgba(255,255,255,.02) 1px, transparent 1px, transparent 8px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0, rgba(255,255,255,.02) 1px, transparent 1px, transparent 8px);
+    color: #f0f0f0;
+    min-height: 100vh;
+  }
+
+  nav {
+    background: #13131f;
+    border-bottom: 3px solid #ffd700;
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    font-family: 'Press Start 2P', monospace;
+    font-size: .65rem;
+    color: #ffd700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-shadow: 2px 2px 0 rgba(255,215,0,.3);
+  }
+
+  .logo img { width: 28px; height: 28px; image-rendering: pixelated; border: 2px solid #ffd700; }
+
+  .tabs { display: flex; gap: 1px; }
+
+  .tab {
+    background: none;
+    border: none;
+    border-left: 1px solid rgba(255,215,0,.15);
+    color: rgba(255,255,255,.45);
+    font-family: 'Press Start 2P', monospace;
+    font-size: .38rem;
+    letter-spacing: .04em;
+    padding: 0 12px;
+    height: 56px;
+    cursor: pointer;
+    transition: all .1s;
+    display: flex;
+    align-items: center;
+  }
+
+  .tab:hover, .tab.active { background: rgba(255,215,0,.08); color: #ffd700; }
+
+  .wallet {
+    background: #ffd700;
+    color: #13131f;
+    border: none;
+    font-family: 'Press Start 2P', monospace;
+    font-size: .38rem;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: all .1s;
+    letter-spacing: .04em;
+  }
+
+  .wallet:hover { background: #e6c200; }
+
+  /* HERO */
+  .hero {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 48px 24px 40px;
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-cards {
+    display: flex;
+    gap: -8px;
+    flex-shrink: 0;
+  }
+
+  /* Trading card style */
+  .tcard {
+    width: 130px;
+    background: linear-gradient(160deg, #2a2a40, #1a1a2e);
+    border: 3px solid #ffd700;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 4px 4px 0 rgba(0,0,0,.5), 0 0 20px rgba(255,215,0,.1);
+    margin-left: -16px;
+    transition: all .2s;
+    cursor: pointer;
+  }
+
+  .tcard:first-child { margin-left: 0; }
+  .tcard:hover { transform: translateY(-20px) rotate(-2deg); z-index: 5; box-shadow: 6px 6px 0 rgba(0,0,0,.5), 0 0 30px rgba(255,215,0,.25); }
+
+  .tcard-header {
+    background: #ffd700;
+    padding: 4px 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .tcard-header-name { font-family: 'Press Start 2P', monospace; font-size: .32rem; color: #13131f; }
+  .tcard-header-rarity { font-family: 'Press Start 2P', monospace; font-size: .32rem; color: #c8860a; }
+
+  .tcard img { width: 100%; aspect-ratio: 1; image-rendering: pixelated; display: block; border-top: 2px solid rgba(255,215,0,.3); border-bottom: 2px solid rgba(255,215,0,.3); }
+
+  .tcard-footer { padding: 5px 6px; }
+  .tcard-footer-name { font-family: 'Press Start 2P', monospace; font-size: .3rem; color: rgba(255,255,255,.7); margin-bottom: 2px; }
+  .tcard-stars { color: #ffd700; font-size: .6rem; }
+
+  .hero-text { flex: 1; min-width: 260px; }
+
+  .hero-eyebrow {
+    font-family: 'Press Start 2P', monospace;
+    font-size: .4rem;
+    color: #ffd700;
+    letter-spacing: .1em;
+    margin-bottom: 14px;
+  }
+
+  .hero-text h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: .9rem;
+    color: #fff;
+    line-height: 1.7;
+    margin-bottom: 14px;
+    text-shadow: 2px 2px 0 rgba(255,215,0,.2);
+  }
+
+  .hero-text h1 .gold { color: #ffd700; }
+
+  .hero-text p { font-size: .9rem; color: rgba(255,255,255,.6); line-height: 1.7; margin-bottom: 20px; font-weight: 600; }
+
+  .btn-gold {
+    display: inline-block;
+    background: #ffd700;
+    color: #13131f;
+    border: none;
+    font-family: 'Press Start 2P', monospace;
+    font-size: .42rem;
+    padding: 10px 18px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 4px 4px 0 rgba(0,0,0,.4);
+    transition: all .1s;
+    margin-right: 8px;
+  }
+
+  .btn-gold:hover { box-shadow: 2px 2px 0 rgba(0,0,0,.4); transform: translate(2px, 2px); }
+
+  .btn-outline {
+    display: inline-block;
+    background: transparent;
+    color: #ffd700;
+    border: 2px solid #ffd700;
+    font-family: 'Press Start 2P', monospace;
+    font-size: .42rem;
+    padding: 10px 18px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 4px 4px 0 rgba(255,215,0,.2);
+    transition: all .1s;
+  }
+
+  .btn-outline:hover { background: rgba(255,215,0,.08); }
+
+  /* STATS */
+  .stats {
+    background: #13131f;
+    border-top: 2px solid rgba(255,215,0,.2);
+    border-bottom: 2px solid rgba(255,215,0,.2);
+    display: flex;
+  }
+
+  .stat { flex: 1; text-align: center; padding: 18px 12px; border-right: 1px solid rgba(255,215,0,.1); }
+  .stat:last-child { border-right: none; }
+  .stat-val { font-family: 'Press Start 2P', monospace; font-size: .65rem; color: #ffd700; display: block; }
+  .stat-label { font-size: .8rem; color: rgba(255,255,255,.4); margin-top: 5px; font-weight: 700; }
+
+  /* GALLERY */
+  .section { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+
+  .section-title { font-family: 'Press Start 2P', monospace; font-size: .55rem; color: #ffd700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,215,0,.2); }
+
+  .gallery { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .gcard {
+    width: 152px;
+    background: #1e1e2e;
+    border: 2px solid rgba(255,215,0,.3);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all .15s;
+    box-shadow: 3px 3px 0 rgba(0,0,0,.4);
+  }
+
+  .gcard:hover { border-color: #ffd700; box-shadow: 3px 3px 0 rgba(255,215,0,.3); transform: translateY(-3px); }
+  .gcard img { width: 100%; aspect-ratio: 1; image-rendering: pixelated; display: block; border-bottom: 2px solid rgba(255,215,0,.2); }
+  .gcard-body { padding: 7px 9px 9px; }
+  .gcard-name { font-family: 'Press Start 2P', monospace; font-size: .33rem; color: rgba(255,255,255,.8); }
+  .badge { display: inline-block; font-size: .62rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-top: 4px; }
+  .badge-staked { background: rgba(100,220,255,.12); color: #64dcff; }
+  .badge-rare   { background: rgba(255,107,157,.12); color: #ff6b9d; }
+
+  /* MINT */
+  .mint-wrap {
+    background: #13131f;
+    border: 2px solid rgba(255,215,0,.3);
+    border-radius: 12px;
+    padding: 28px;
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 4px 4px 0 rgba(0,0,0,.4);
+  }
+
+  .mint-tcard {
+    flex-shrink: 0;
+    width: 180px;
+    background: linear-gradient(160deg, #2a2a40, #1a1a2e);
+    border: 3px solid #ffd700;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 6px 6px 0 rgba(0,0,0,.4), 0 0 24px rgba(255,215,0,.12);
+  }
+
+  .mint-tcard img { width: 100%; aspect-ratio: 1; image-rendering: pixelated; display: block; }
+
+  .mint-info { flex: 1; min-width: 240px; }
+  .mint-info h3 { font-family: 'Press Start 2P', monospace; font-size: .55rem; color: #ffd700; margin-bottom: 10px; line-height: 1.5; }
+  .mint-info p { font-size: .87rem; color: rgba(255,255,255,.55); line-height: 1.65; margin-bottom: 16px; font-weight: 600; }
+  .mint-price { font-family: 'Press Start 2P', monospace; font-size: .8rem; color: #ffd700; margin-bottom: 14px; }
+  .qty-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .qty-btn { width: 34px; height: 34px; background: rgba(255,215,0,.1); border: 2px solid rgba(255,215,0,.3); color: #ffd700; font-family: 'Press Start 2P', monospace; font-size: .5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .1s; }
+  .qty-btn:hover { background: #ffd700; color: #13131f; }
+  .qty-num { font-family: 'Press Start 2P', monospace; font-size: .7rem; color: #ffd700; min-width: 28px; text-align: center; }
+
+  .label { position: fixed; bottom: 14px; right: 14px; background: #13131f; border: 2px solid #ffd700; color: #ffd700; padding: 5px 10px; font-family: 'Press Start 2P', monospace; font-size: .35rem; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo"><img src="https://freshfrogs.github.io/assets/logo.png" alt="">FRESH FROGS</div>
+  <div class="tabs">
+    <button class="tab active">HOME</button>
+    <button class="tab">MINT</button>
+    <button class="tab">MY FROGS</button>
+    <button class="tab">STAKE</button>
+    <button class="tab">POND</button>
+    <button class="tab">RARITY</button>
+  </div>
+  <button class="wallet">CONNECT ▶</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-cards">
+    <div class="tcard">
+      <div class="tcard-header"><span class="tcard-header-name">FROG #1</span><span class="tcard-header-rarity">★★★</span></div>
+      <img src="https://freshfrogs.github.io/frog/1.png">
+      <div class="tcard-footer"><div class="tcard-footer-name">CYAN FROG</div><div class="tcard-stars">★★★☆☆</div></div>
+    </div>
+    <div class="tcard">
+      <div class="tcard-header"><span class="tcard-header-name">FROG #99</span><span class="tcard-header-rarity">★★★★</span></div>
+      <img src="https://freshfrogs.github.io/frog/99.png">
+      <div class="tcard-footer"><div class="tcard-footer-name">PINK FROG</div><div class="tcard-stars">★★★★☆</div></div>
+    </div>
+    <div class="tcard">
+      <div class="tcard-header"><span class="tcard-header-name">FROG #42</span><span class="tcard-header-rarity">★★★</span></div>
+      <img src="https://freshfrogs.github.io/frog/42.png">
+      <div class="tcard-footer"><div class="tcard-footer-name">TREE FROG</div><div class="tcard-stars">★★★☆☆</div></div>
+    </div>
+  </div>
+  <div class="hero-text">
+    <div class="hero-eyebrow">// ETHEREUM · 4040 CARDS</div>
+    <h1>COLLECT<br><span class="gold">FRESH</span><br>FROGS.</h1>
+    <p>4,040 unique pixel frogs — each one a collectible. Stake yours to level up and earn $FLYZ rewards over time.</p>
+    <a class="btn-gold">▶ MINT NOW</a>
+    <a class="btn-outline">VIEW CARDS</a>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><span class="stat-val">4,040</span><span class="stat-label">Cards</span></div>
+  <div class="stat"><span class="stat-val">Ξ0.01</span><span class="stat-label">Mint</span></div>
+  <div class="stat"><span class="stat-val">5%</span><span class="stat-label">Royalty</span></div>
+  <div class="stat"><span class="stat-val">$FLYZ</span><span class="stat-label">Reward</span></div>
+</div>
+
+<div class="section">
+  <div class="section-title">RECENT SALES</div>
+  <div class="gallery">
+    <div class="gcard"><img src="https://freshfrogs.github.io/frog/1.png"><div class="gcard-body"><div class="gcard-name">FROG #1</div><span class="badge badge-staked">STAKED</span></div></div>
+    <div class="gcard"><img src="https://freshfrogs.github.io/frog/2.png"><div class="gcard-body"><div class="gcard-name">FROG #2</div><span class="badge badge-rare">RARE</span></div></div>
+    <div class="gcard"><img src="https://freshfrogs.github.io/frog/3.png"><div class="gcard-body"><div class="gcard-name">FROG #3</div><span class="badge badge-staked">LVL 3</span></div></div>
+    <div class="gcard"><img src="https://freshfrogs.github.io/frog/100.png"><div class="gcard-body"><div class="gcard-name">FROG #100</div></div></div>
+    <div class="gcard"><img src="https://freshfrogs.github.io/frog/500.png"><div class="gcard-body"><div class="gcard-name">FROG #500</div><span class="badge badge-rare">RARE</span></div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="mint-wrap">
+    <div class="mint-tcard">
+      <div class="tcard-header"><span class="tcard-header-name">FROG #?</span><span class="tcard-header-rarity">???</span></div>
+      <img src="https://freshfrogs.github.io/frog/210.png">
+      <div class="tcard-footer"><div class="tcard-footer-name">YOUR FROG</div><div class="tcard-stars">★★★★★</div></div>
+    </div>
+    <div class="mint-info">
+      <h3>MINT YOUR CARD</h3>
+      <p>Connect MetaMask and mint up to 9 frogs at once. Each frog is randomized with unique traits — you might get a rare pink frog or legendary accessories!</p>
+      <div class="mint-price">Ξ 0.01 + GAS</div>
+      <div class="qty-row">
+        <button class="qty-btn">-</button>
+        <span class="qty-num">1</span>
+        <button class="qty-btn">+</button>
+      </div>
+      <a class="btn-gold">▶ CONNECT TO MINT</a>
+    </div>
+  </div>
+</div>
+
+<div class="label">P3 — PIXEL CARD</div>
+</body>
+</html>

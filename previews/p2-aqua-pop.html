@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P2 — Aqua Pop</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #0a1628;
+    color: #e8f4ff;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Underwater bubbles */
+  .bubbles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .bubble {
+    position: absolute;
+    bottom: -60px;
+    width: var(--w, 16px);
+    height: var(--w, 16px);
+    border-radius: 50%;
+    background: rgba(100,220,255,.08);
+    border: 1px solid rgba(100,220,255,.15);
+    animation: rise var(--dur, 8s) ease-in var(--delay, 0s) infinite;
+    left: var(--left, 50%);
+  }
+
+  @keyframes rise {
+    0% { transform: translateY(0) scale(1); opacity: .6; }
+    100% { transform: translateY(-110vh) scale(1.5); opacity: 0; }
+  }
+
+  nav {
+    background: rgba(10,22,40,.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(100,220,255,.2);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem;
+    color: #64dcff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-shadow: 0 0 16px rgba(100,220,255,.4);
+  }
+
+  .logo img { width: 32px; height: 32px; border-radius: 8px; image-rendering: pixelated; border: 2px solid rgba(100,220,255,.3); }
+
+  .tabs { display: flex; gap: 2px; }
+
+  .tab {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,.5);
+    font-family: 'Nunito', sans-serif;
+    font-size: .87rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .tab:hover, .tab.active { background: rgba(100,220,255,.12); color: #64dcff; }
+
+  .wallet {
+    background: rgba(100,220,255,.15);
+    border: 1px solid rgba(100,220,255,.3);
+    color: #64dcff;
+    font-family: inherit;
+    font-size: .82rem;
+    font-weight: 700;
+    padding: 7px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .wallet:hover { background: rgba(100,220,255,.25); }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 60px 24px 52px;
+    background: radial-gradient(ellipse at center top, rgba(100,220,255,.1), transparent 60%);
+  }
+
+  .frog-lineup {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .frog-lineup img {
+    width: 100px;
+    height: 100px;
+    image-rendering: pixelated;
+    border-radius: 12px;
+    border: 2px solid rgba(100,220,255,.25);
+    margin: 0 -6px;
+    transition: all .2s;
+    position: relative;
+  }
+
+  .frog-lineup img:hover { transform: translateY(-12px) scale(1.1); z-index: 5; border-color: #64dcff; box-shadow: 0 12px 28px rgba(100,220,255,.3); }
+  .frog-lineup img:nth-child(3) { transform: translateY(-10px) scale(1.08); z-index: 3; border-color: rgba(100,220,255,.5); }
+
+  .hero h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 3rem;
+    color: #64dcff;
+    text-shadow: 0 0 30px rgba(100,220,255,.3);
+    margin-bottom: 10px;
+    letter-spacing: .02em;
+  }
+
+  .hero p {
+    color: rgba(232,244,255,.65);
+    max-width: 480px;
+    margin: 0 auto 28px;
+    line-height: 1.7;
+    font-size: .95rem;
+    font-weight: 600;
+  }
+
+  .hero-btns { display: flex; gap: 10px; justify-content: center; }
+
+  .btn-aqua {
+    background: linear-gradient(135deg, #00c9ff, #64dcff);
+    color: #0a1628;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    padding: 11px 26px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(100,220,255,.35);
+    transition: all .15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-aqua:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(100,220,255,.5); }
+
+  .btn-ghost {
+    background: transparent;
+    color: #64dcff;
+    border: 1px solid rgba(100,220,255,.3);
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    padding: 11px 26px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all .15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-ghost:hover { background: rgba(100,220,255,.1); }
+
+  /* STATS */
+  .stats { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; padding: 0 24px; margin: -20px auto 44px; position: relative; z-index: 2; max-width: 600px; }
+
+  .stat-box {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(100,220,255,.15);
+    border-radius: 14px;
+    padding: 14px 20px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    flex: 1;
+    min-width: 100px;
+  }
+
+  .stat-val { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: #64dcff; }
+  .stat-label { font-size: .72rem; font-weight: 600; color: rgba(255,255,255,.4); margin-top: 2px; }
+
+  /* CARDS */
+  .section { max-width: 980px; margin: 0 auto; padding: 0 24px 48px; position: relative; z-index: 1; }
+
+  .section-title { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: #64dcff; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+
+  .frog-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  .frog-card {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(100,220,255,.15);
+    border-radius: 14px;
+    overflow: hidden;
+    width: 158px;
+    cursor: pointer;
+    transition: all .2s;
+    backdrop-filter: blur(4px);
+  }
+
+  .frog-card:hover { border-color: #64dcff; box-shadow: 0 0 24px rgba(100,220,255,.2); transform: translateY(-4px); }
+  .frog-card img { width: 100%; aspect-ratio: 1; image-rendering: pixelated; display: block; }
+  .frog-card-info { padding: 9px 12px 11px; }
+  .frog-card-name { font-size: .83rem; font-weight: 800; }
+  .badge { display: inline-block; font-size: .68rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-top: 3px; }
+  .badge-staked { background: rgba(100,220,255,.12); color: #64dcff; border: 1px solid rgba(100,220,255,.25); }
+  .badge-rare   { background: rgba(255,107,157,.12); color: #ff6b9d; border: 1px solid rgba(255,107,157,.25); }
+
+  /* MINT */
+  .mint-box {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(100,220,255,.2);
+    border-radius: 20px;
+    padding: 28px;
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    flex-wrap: wrap;
+    backdrop-filter: blur(8px);
+  }
+
+  .mint-img { width: 200px; height: 200px; image-rendering: pixelated; border-radius: 16px; border: 2px solid rgba(100,220,255,.25); flex-shrink: 0; box-shadow: 0 8px 32px rgba(100,220,255,.15); }
+  .mint-info { flex: 1; min-width: 240px; }
+  .mint-info h3 { font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: #64dcff; margin-bottom: 6px; }
+  .mint-info p { color: rgba(255,255,255,.55); font-size: .9rem; line-height: 1.65; margin-bottom: 18px; font-weight: 600; }
+  .mint-price { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: #64dcff; margin-bottom: 14px; }
+  .mint-price small { font-size: .85rem; color: rgba(255,255,255,.4); font-family: 'Nunito', sans-serif; }
+  .qty-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .qty-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(100,220,255,.3); background: rgba(100,220,255,.1); color: #64dcff; font-size: 1.2rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+  .qty-btn:hover { background: #64dcff; color: #0a1628; }
+  .qty-num { font-family: 'Fredoka One', cursive; font-size: 1.4rem; min-width: 28px; text-align: center; color: #64dcff; }
+
+  .label { position: fixed; bottom: 14px; right: 14px; background: rgba(100,220,255,.15); border: 1px solid #64dcff; color: #64dcff; padding: 5px 11px; border-radius: 12px; font-size: .74rem; font-weight: 800; backdrop-filter: blur(8px); }
+</style>
+</head>
+<body>
+<div class="bubbles">
+  <div class="bubble" style="--w:12px;--dur:7s;--delay:0s;--left:10%"></div>
+  <div class="bubble" style="--w:20px;--dur:9s;--delay:1s;--left:25%"></div>
+  <div class="bubble" style="--w:8px;--dur:6s;--delay:2s;--left:40%"></div>
+  <div class="bubble" style="--w:16px;--dur:11s;--delay:.5s;--left:60%"></div>
+  <div class="bubble" style="--w:24px;--dur:8s;--delay:3s;--left:75%"></div>
+  <div class="bubble" style="--w:10px;--dur:10s;--delay:1.5s;--left:90%"></div>
+</div>
+
+<nav>
+  <div class="logo"><img src="https://freshfrogs.github.io/assets/logo.png" alt="">Fresh Frogs</div>
+  <div class="tabs">
+    <button class="tab active">Home</button>
+    <button class="tab">Mint</button>
+    <button class="tab">My Frogs</button>
+    <button class="tab">Stake</button>
+    <button class="tab">The Pond</button>
+    <button class="tab">Rarity</button>
+  </div>
+  <button class="wallet">Connect Wallet</button>
+</nav>
+
+<div class="hero">
+  <div class="frog-lineup">
+    <img src="https://freshfrogs.github.io/frog/1.png">
+    <img src="https://freshfrogs.github.io/frog/99.png">
+    <img src="https://freshfrogs.github.io/frog/42.png">
+    <img src="https://freshfrogs.github.io/frog/210.png">
+    <img src="https://freshfrogs.github.io/frog/333.png">
+  </div>
+  <h1>Fresh Frogs NFT 🐸</h1>
+  <p>4,040 unique pixel frogs living on the Ethereum blockchain. Dive in, collect yours, and stake it in the Pond to earn $FLYZ rewards.</p>
+  <div class="hero-btns">
+    <a class="btn-aqua">Mint a Frog</a>
+    <a class="btn-ghost">Enter the Pond</a>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-box"><div class="stat-val">4,040</div><div class="stat-label">Supply</div></div>
+  <div class="stat-box"><div class="stat-val">Ξ0.01</div><div class="stat-label">Mint</div></div>
+  <div class="stat-box"><div class="stat-val">5%</div><div class="stat-label">Royalty</div></div>
+  <div class="stat-box"><div class="stat-val">$FLYZ</div><div class="stat-label">Reward</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">💧 Recent Sales</div>
+  <div class="frog-grid">
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/1.png"><div class="frog-card-info"><div class="frog-card-name">Frog #1</div><span class="badge badge-staked">Staked</span></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/2.png"><div class="frog-card-info"><div class="frog-card-name">Frog #2</div><span class="badge badge-rare">Pink</span></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/3.png"><div class="frog-card-info"><div class="frog-card-name">Frog #3</div><span class="badge badge-staked">Lvl 3</span></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/100.png"><div class="frog-card-info"><div class="frog-card-name">Frog #100</div></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/500.png"><div class="frog-card-info"><div class="frog-card-name">Frog #500</div><span class="badge badge-rare">Rare</span></div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="mint-box">
+    <img class="mint-img" src="https://freshfrogs.github.io/frog/42.png" alt="">
+    <div class="mint-info">
+      <h3>Mint a Fresh Frog</h3>
+      <p>Each frog is randomly generated with unique traits — cyan frogs, pink frogs, cowboy hats, chains, and more. Stake after minting to earn $FLYZ from day one.</p>
+      <div class="mint-price">Ξ 0.01 <small>+ gas</small></div>
+      <div class="qty-row">
+        <button class="qty-btn">−</button>
+        <span class="qty-num">1</span>
+        <button class="qty-btn">+</button>
+        <span style="color:rgba(255,255,255,.4);font-size:.85rem;font-weight:700;margin-left:4px;">frogs</span>
+      </div>
+      <a class="btn-aqua">Connect Wallet to Mint</a>
+    </div>
+  </div>
+</div>
+
+<div class="label">P2 — Aqua Pop</div>
+</body>
+</html>

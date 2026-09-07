@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P9 — Frogtopia</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Quicksand', sans-serif;
+    background: #e8faff;
+    color: #1a3a4a;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* WAVY HERO BG */
+  .wave-bg {
+    background: linear-gradient(180deg, #43d4f5 0%, #7ee8f8 50%, #e8faff 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .wave-bg::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60'%3E%3Cpath d='M0,30 C200,60 400,0 600,30 C800,60 1000,0 1200,30 L1200,60 L0,60 Z' fill='%23e8faff'/%3E%3C/svg%3E") no-repeat bottom;
+    background-size: 100% 100%;
+  }
+
+  nav {
+    background: rgba(255,255,255,.5);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,.6);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo { font-family: 'Pacifico', cursive; font-size: 1.1rem; color: #0a7a99; display: flex; align-items: center; gap: 8px; }
+  .logo img { width: 30px; height: 30px; border-radius: 50%; image-rendering: pixelated; border: 2px solid rgba(255,255,255,.8); }
+
+  .tabs { display: flex; gap: 2px; }
+
+  .tab { background: none; border: none; color: rgba(10,122,153,.6); font-family: 'Quicksand', sans-serif; font-size: .86rem; font-weight: 600; padding: 6px 12px; border-radius: 20px; cursor: pointer; transition: all .15s; }
+  .tab:hover, .tab.active { background: rgba(255,255,255,.5); color: #0a7a99; }
+
+  .wallet { background: #0a7a99; color: #fff; border: none; font-family: inherit; font-size: .84rem; font-weight: 700; padding: 8px 18px; border-radius: 20px; cursor: pointer; box-shadow: 0 3px 10px rgba(10,122,153,.3); transition: all .15s; }
+  .wallet:hover { background: #0989ad; transform: translateY(-1px); }
+
+  /* HERO */
+  .hero { padding: 52px 24px 72px; text-align: center; position: relative; z-index: 1; }
+
+  .big-frog-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 6px;
+    margin-bottom: 28px;
+  }
+
+  .big-frog-row img {
+    image-rendering: pixelated;
+    border-radius: 14px;
+    border: 3px solid rgba(255,255,255,.7);
+    box-shadow: 0 8px 24px rgba(0,0,0,.1);
+    display: block;
+    transition: all .2s;
+    cursor: pointer;
+  }
+
+  .big-frog-row img:nth-child(1) { width: 80px; height: 80px; margin-bottom: 20px; }
+  .big-frog-row img:nth-child(2) { width: 96px; height: 96px; margin-bottom: 8px; }
+  .big-frog-row img:nth-child(3) { width: 120px; height: 120px; }
+  .big-frog-row img:nth-child(4) { width: 96px; height: 96px; margin-bottom: 8px; }
+  .big-frog-row img:nth-child(5) { width: 80px; height: 80px; margin-bottom: 20px; }
+  .big-frog-row img:hover { transform: translateY(-10px) scale(1.05); box-shadow: 0 16px 32px rgba(0,0,0,.15); }
+
+  .hero h1 { font-family: 'Pacifico', cursive; font-size: 2.6rem; color: #fff; text-shadow: 0 2px 20px rgba(0,0,0,.15); margin-bottom: 10px; }
+
+  .hero p { color: rgba(255,255,255,.85); max-width: 480px; margin: 0 auto 24px; line-height: 1.7; font-size: .95rem; font-weight: 600; text-shadow: 0 1px 4px rgba(0,0,0,.1); }
+
+  .hero-btns { display: flex; gap: 10px; justify-content: center; }
+
+  .btn-white { background: #fff; color: #0a7a99; border: none; font-family: inherit; font-size: .92rem; font-weight: 700; padding: 12px 26px; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.12); transition: all .15s; text-decoration: none; display: inline-block; }
+  .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.15); }
+
+  .btn-outline { background: rgba(255,255,255,.2); color: #fff; border: 2px solid rgba(255,255,255,.5); font-family: inherit; font-size: .92rem; font-weight: 700; padding: 12px 26px; border-radius: 20px; cursor: pointer; transition: all .15s; text-decoration: none; display: inline-block; backdrop-filter: blur(4px); }
+  .btn-outline:hover { background: rgba(255,255,255,.3); }
+
+  /* STATS */
+  .stats { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; padding: 28px 24px 36px; }
+
+  .stat-bubble { background: #fff; border-radius: 16px; padding: 14px 22px; text-align: center; box-shadow: 0 4px 16px rgba(10,122,153,.1); border: 2px solid rgba(10,122,153,.08); min-width: 110px; }
+  .stat-val { font-family: 'Pacifico', cursive; font-size: 1.2rem; color: #0a7a99; }
+  .stat-label { font-size: .72rem; font-weight: 700; color: #88b8c8; margin-top: 2px; }
+
+  /* SECTION */
+  .section { max-width: 980px; margin: 0 auto; padding: 0 24px 48px; }
+
+  .section-title { font-family: 'Pacifico', cursive; font-size: 1rem; color: #0a7a99; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+
+  .frog-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  .frog-card { background: #fff; border: 2px solid rgba(10,122,153,.1); border-radius: 16px; overflow: hidden; width: 158px; cursor: pointer; transition: all .2s; box-shadow: 0 4px 12px rgba(10,122,153,.08); }
+  .frog-card:hover { box-shadow: 0 10px 28px rgba(10,122,153,.18); transform: translateY(-4px) rotate(-.5deg); border-color: rgba(10,122,153,.3); }
+  .frog-card img { width: 100%; aspect-ratio: 1; image-rendering: pixelated; display: block; }
+  .frog-card-info { padding: 9px 12px 11px; }
+  .frog-card-name { font-size: .84rem; font-weight: 700; color: #1a3a4a; }
+  .badge { display: inline-block; font-size: .68rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-top: 3px; }
+  .badge-staked { background: #e8f9ff; color: #0a7a99; border: 1px solid #b0e0f0; }
+  .badge-rare   { background: #fff5e8; color: #d4820a; border: 1px solid #f5d8a0; }
+
+  /* MINT */
+  .mint-zone {
+    background: linear-gradient(135deg, #0a7a99, #43d4f5);
+    border-radius: 20px;
+    padding: 32px;
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0 8px 32px rgba(10,122,153,.25);
+  }
+
+  .mint-img { width: 190px; height: 190px; image-rendering: pixelated; border-radius: 50%; border: 4px solid rgba(255,255,255,.7); box-shadow: 0 8px 24px rgba(0,0,0,.1); display: block; flex-shrink: 0; }
+  .mint-info { flex: 1; min-width: 240px; }
+  .mint-info h3 { font-family: 'Pacifico', cursive; font-size: 1.3rem; color: #fff; margin-bottom: 6px; }
+  .mint-info p { color: rgba(255,255,255,.8); font-size: .9rem; line-height: 1.65; margin-bottom: 18px; }
+  .mint-price { font-family: 'Pacifico', cursive; font-size: 1.7rem; color: #fff; margin-bottom: 14px; }
+  .mint-price small { font-family: 'Quicksand', sans-serif; font-size: .85rem; color: rgba(255,255,255,.6); font-weight: 600; }
+  .qty-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .qty-btn { width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(255,255,255,.5); background: rgba(255,255,255,.2); color: #fff; font-size: 1.2rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: all .15s; }
+  .qty-btn:hover { background: rgba(255,255,255,.35); }
+  .qty-num { font-family: 'Pacifico', cursive; font-size: 1.3rem; color: #fff; min-width: 28px; text-align: center; }
+
+  .label { position: fixed; bottom: 14px; right: 14px; background: #0a7a99; color: #fff; padding: 5px 12px; border-radius: 12px; font-family: 'Pacifico', cursive; font-size: .65rem; box-shadow: 0 3px 10px rgba(10,122,153,.4); }
+</style>
+</head>
+<body>
+
+<div class="wave-bg">
+  <nav>
+    <div class="logo"><img src="https://freshfrogs.github.io/assets/logo.png" alt="">Fresh Frogs</div>
+    <div class="tabs">
+      <button class="tab active">Home</button>
+      <button class="tab">Mint</button>
+      <button class="tab">My Frogs</button>
+      <button class="tab">Stake</button>
+      <button class="tab">The Pond</button>
+      <button class="tab">Rarity</button>
+    </div>
+    <button class="wallet">Connect 🔌</button>
+  </nav>
+
+  <div class="hero">
+    <div class="big-frog-row">
+      <img src="https://freshfrogs.github.io/frog/1.png">
+      <img src="https://freshfrogs.github.io/frog/99.png">
+      <img src="https://freshfrogs.github.io/frog/42.png">
+      <img src="https://freshfrogs.github.io/frog/210.png">
+      <img src="https://freshfrogs.github.io/frog/333.png">
+    </div>
+    <h1>Welcome to Frogtopia!</h1>
+    <p>4,040 unique pixel frogs splashing around on Ethereum. Collect yours, stake it in the Pond, and earn $FLYZ rewards while your frog levels up!</p>
+    <div class="hero-btns">
+      <a class="btn-white">Mint a Frog 🐸</a>
+      <a class="btn-outline">Enter the Pond 🏊</a>
+    </div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-bubble"><div class="stat-val">4,040</div><div class="stat-label">Frogs</div></div>
+  <div class="stat-bubble"><div class="stat-val">Ξ 0.01</div><div class="stat-label">Mint Price</div></div>
+  <div class="stat-bubble"><div class="stat-val">5%</div><div class="stat-label">Royalty</div></div>
+  <div class="stat-bubble"><div class="stat-val">$FLYZ</div><div class="stat-label">Stake Reward</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">🌊 Recent Sales</div>
+  <div class="frog-grid">
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/1.png"><div class="frog-card-info"><div class="frog-card-name">Frog #1</div><span class="badge badge-staked">Staked</span></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/2.png"><div class="frog-card-info"><div class="frog-card-name">Frog #2</div><span class="badge badge-rare">Pink!</span></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/3.png"><div class="frog-card-info"><div class="frog-card-name">Frog #3</div><span class="badge badge-staked">Lvl 3 🏆</span></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/100.png"><div class="frog-card-info"><div class="frog-card-name">Frog #100</div></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/500.png"><div class="frog-card-info"><div class="frog-card-name">Frog #500</div><span class="badge badge-rare">Rare</span></div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="mint-zone">
+    <img class="mint-img" src="https://freshfrogs.github.io/frog/42.png" alt="">
+    <div class="mint-info">
+      <h3>Mint Your Frog!</h3>
+      <p>Each frog is totally unique — random traits including cyan frogs, pink frogs, cowboy hats, cool accessories and more! Mint up to 9 at once.</p>
+      <div class="mint-price">Ξ 0.01 <small>per frog</small></div>
+      <div class="qty-row">
+        <button class="qty-btn">−</button>
+        <span class="qty-num">1</span>
+        <button class="qty-btn">+</button>
+        <span style="color:rgba(255,255,255,.6);font-size:.85rem;margin-left:4px;">frogs</span>
+      </div>
+      <a class="btn-white">Connect Wallet to Mint</a>
+    </div>
+  </div>
+</div>
+
+<div class="label">P9 — Frogtopia</div>
+</body>
+</html>

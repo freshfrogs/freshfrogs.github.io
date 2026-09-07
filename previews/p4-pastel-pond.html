@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P4 — Pastel Pond</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Baloo 2', cursive;
+    background: #fdf4ff;
+    color: #3a2a4a;
+    min-height: 100vh;
+  }
+
+  /* Soft dots */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(200,150,255,.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+  }
+
+  nav {
+    background: #fff;
+    border-bottom: 3px solid #e8c8ff;
+    padding: 0 24px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 0 rgba(200,150,255,.15);
+  }
+
+  .logo { font-size: 1.3rem; font-weight: 800; color: #9b59b6; display: flex; align-items: center; gap: 8px; }
+  .logo img { width: 32px; height: 32px; border-radius: 10px; image-rendering: pixelated; border: 2px solid #e8c8ff; }
+
+  .tabs { display: flex; gap: 2px; }
+
+  .tab { background: none; border: none; color: #b090c0; font-family: inherit; font-size: .88rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; cursor: pointer; transition: all .15s; }
+  .tab:hover, .tab.active { background: #f5e8ff; color: #9b59b6; }
+
+  .wallet { background: #9b59b6; color: #fff; border: none; font-family: inherit; font-size: .85rem; font-weight: 700; padding: 8px 18px; border-radius: 20px; cursor: pointer; box-shadow: 0 3px 10px rgba(155,89,182,.3); transition: all .15s; }
+  .wallet:hover { background: #8e44ad; transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(160deg, #f5e8ff 0%, #fce8ff 40%, #fdf4ff 100%);
+    padding: 52px 24px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '🐸';
+    position: absolute;
+    font-size: 8rem;
+    opacity: .04;
+    top: -20px;
+    left: -20px;
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '🐸';
+    position: absolute;
+    font-size: 8rem;
+    opacity: .04;
+    bottom: -20px;
+    right: -20px;
+    pointer-events: none;
+  }
+
+  .frog-bubble-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .frog-bubble {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    image-rendering: pixelated;
+    border: 3px solid #fff;
+    box-shadow: 0 6px 20px rgba(155,89,182,.15);
+    transition: all .2s;
+    cursor: pointer;
+    display: block;
+  }
+
+  .frog-bubble:hover { transform: scale(1.12) rotate(-4deg); box-shadow: 0 10px 28px rgba(155,89,182,.25); }
+
+  .hero h1 { font-size: 2.6rem; font-weight: 800; color: #6c2fa0; margin-bottom: 10px; line-height: 1.2; }
+
+  .hero h1 .pop { color: #e056aa; }
+
+  .hero p { color: #9070a0; max-width: 460px; margin: 0 auto 24px; line-height: 1.7; font-size: .95rem; }
+
+  .hero-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  .btn-purple { background: linear-gradient(135deg, #9b59b6, #e056aa); color: #fff; border: none; font-family: inherit; font-size: .95rem; font-weight: 700; padding: 12px 26px; border-radius: 20px; cursor: pointer; box-shadow: 0 5px 16px rgba(155,89,182,.35); transition: all .15s; text-decoration: none; display: inline-block; }
+  .btn-purple:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(155,89,182,.45); }
+
+  .btn-soft { background: #fff; color: #9b59b6; border: 2px solid #e8c8ff; font-family: inherit; font-size: .95rem; font-weight: 700; padding: 12px 26px; border-radius: 20px; cursor: pointer; transition: all .15s; text-decoration: none; display: inline-block; }
+  .btn-soft:hover { background: #f5e8ff; }
+
+  /* STATS */
+  .stats { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; padding: 0 24px; margin: -20px auto 40px; position: relative; z-index: 2; max-width: 560px; }
+
+  .stat-pill { background: #fff; border: 2px solid #e8c8ff; border-radius: 16px; padding: 14px 20px; text-align: center; box-shadow: 0 4px 14px rgba(155,89,182,.1); flex: 1; min-width: 100px; }
+  .stat-val { font-size: 1.3rem; font-weight: 800; color: #9b59b6; }
+  .stat-label { font-size: .72rem; font-weight: 700; color: #b090c0; margin-top: 2px; }
+
+  /* SECTION */
+  .section { max-width: 980px; margin: 0 auto; padding: 0 24px 48px; }
+
+  .section-title { font-size: 1.1rem; font-weight: 800; color: #6c2fa0; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+
+  .frog-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 40px; }
+
+  .frog-card { background: #fff; border: 2px solid #f0d8ff; border-radius: 16px; overflow: hidden; width: 158px; cursor: pointer; transition: all .2s; box-shadow: 0 3px 12px rgba(155,89,182,.08); }
+  .frog-card:hover { border-color: #9b59b6; box-shadow: 0 8px 24px rgba(155,89,182,.18); transform: translateY(-4px) rotate(-.5deg); }
+  .frog-card img { width: 100%; aspect-ratio: 1; image-rendering: pixelated; display: block; }
+  .frog-card-info { padding: 9px 12px 11px; }
+  .frog-card-name { font-size: .85rem; font-weight: 800; color: #3a2a4a; }
+  .badge { display: inline-block; font-size: .68rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-top: 3px; }
+  .badge-staked { background: #f0f8ff; color: #5babdf; border: 1px solid #c0dff5; }
+  .badge-rare   { background: #fff0fb; color: #e056aa; border: 1px solid #f5c0e8; }
+  .badge-level  { background: #fffbe8; color: #c4880a; border: 1px solid #f5dfa0; }
+
+  /* MINT */
+  .mint-card { background: #fff; border: 2px solid #f0d8ff; border-radius: 20px; padding: 28px; display: flex; gap: 28px; align-items: center; flex-wrap: wrap; box-shadow: 0 6px 24px rgba(155,89,182,.1); }
+  .mint-img { width: 200px; height: 200px; image-rendering: pixelated; border-radius: 50%; border: 3px solid #f0d8ff; box-shadow: 0 8px 28px rgba(155,89,182,.18); flex-shrink: 0; display: block; }
+  .mint-info { flex: 1; min-width: 240px; }
+  .mint-info h3 { font-size: 1.4rem; font-weight: 800; color: #6c2fa0; margin-bottom: 6px; }
+  .mint-info p { color: #9070a0; font-size: .9rem; line-height: 1.65; margin-bottom: 18px; }
+  .mint-price { font-size: 1.6rem; font-weight: 800; color: #9b59b6; margin-bottom: 14px; }
+  .mint-price small { font-size: .85rem; color: #b090c0; font-weight: 600; }
+  .qty-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .qty-btn { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #e8c8ff; background: #f5e8ff; color: #9b59b6; font-size: 1.2rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+  .qty-btn:hover { background: #9b59b6; color: #fff; border-color: #9b59b6; }
+  .qty-num { font-size: 1.3rem; font-weight: 800; min-width: 28px; text-align: center; color: #6c2fa0; }
+
+  .label { position: fixed; bottom: 14px; right: 14px; background: linear-gradient(135deg, #9b59b6, #e056aa); color: #fff; padding: 5px 12px; border-radius: 12px; font-size: .74rem; font-weight: 800; box-shadow: 0 3px 10px rgba(155,89,182,.4); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><img src="https://freshfrogs.github.io/assets/logo.png" alt="">Fresh Frogs</div>
+  <div class="tabs">
+    <button class="tab active">Home</button>
+    <button class="tab">Mint</button>
+    <button class="tab">My Frogs</button>
+    <button class="tab">Stake</button>
+    <button class="tab">The Pond</button>
+    <button class="tab">Rarity</button>
+  </div>
+  <button class="wallet">Connect 🔌</button>
+</nav>
+
+<div class="hero">
+  <div class="frog-bubble-row">
+    <img class="frog-bubble" src="https://freshfrogs.github.io/frog/1.png">
+    <img class="frog-bubble" src="https://freshfrogs.github.io/frog/99.png">
+    <img class="frog-bubble" src="https://freshfrogs.github.io/frog/42.png">
+    <img class="frog-bubble" src="https://freshfrogs.github.io/frog/210.png">
+    <img class="frog-bubble" src="https://freshfrogs.github.io/frog/333.png">
+    <img class="frog-bubble" src="https://freshfrogs.github.io/frog/7.png">
+  </div>
+  <h1>Meet the <span class="pop">Fresh Frogs!</span></h1>
+  <p>4,040 adorable pixel frogs on Ethereum. Collect, stake, and earn $FLYZ rewards. The longer you hold, the higher your frog's level grows!</p>
+  <div class="hero-btns">
+    <a class="btn-purple" href="#">Mint a Frog 🐸</a>
+    <a class="btn-soft" href="#">Visit the Pond</a>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-pill"><div class="stat-val">4,040</div><div class="stat-label">Total Supply</div></div>
+  <div class="stat-pill"><div class="stat-val">Ξ 0.01</div><div class="stat-label">Mint Price</div></div>
+  <div class="stat-pill"><div class="stat-val">5%</div><div class="stat-label">Royalty</div></div>
+  <div class="stat-pill"><div class="stat-val">$FLYZ</div><div class="stat-label">Stake Reward</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">💜 Recent Sales</div>
+  <div class="frog-grid">
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/1.png"><div class="frog-card-info"><div class="frog-card-name">Frog #1</div><span class="badge badge-staked">Staked</span></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/2.png"><div class="frog-card-info"><div class="frog-card-name">Frog #2</div><span class="badge badge-rare">Pink</span></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/3.png"><div class="frog-card-info"><div class="frog-card-name">Frog #3</div><span class="badge badge-level">Lvl 3 🌟</span></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/100.png"><div class="frog-card-info"><div class="frog-card-name">Frog #100</div></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/500.png"><div class="frog-card-info"><div class="frog-card-name">Frog #500</div><span class="badge badge-rare">Rare</span></div></div>
+  </div>
+
+  <div class="mint-card">
+    <img class="mint-img" src="https://freshfrogs.github.io/frog/42.png" alt="">
+    <div class="mint-info">
+      <h3>Mint Your Frog! 🎉</h3>
+      <p>Each frog is randomly generated with unique color variants, hats, accessories, and more! Connect your wallet and mint up to 9 frogs at once. Then stake them to earn $FLYZ rewards!</p>
+      <div class="mint-price">Ξ 0.01 <small>per frog + gas</small></div>
+      <div class="qty-row">
+        <button class="qty-btn">−</button>
+        <span class="qty-num">1</span>
+        <button class="qty-btn">+</button>
+        <span style="color:#b090c0;font-size:.85rem;margin-left:4px;">frogs</span>
+      </div>
+      <a class="btn-purple" href="#">Connect Wallet to Mint 🐸</a>
+    </div>
+  </div>
+</div>
+
+<div class="label">P4 — Pastel Pond</div>
+</body>
+</html>

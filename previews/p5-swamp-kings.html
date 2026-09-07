@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P5 — Swamp Kings</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Crimson Pro', serif;
+    background: #0d1a0d;
+    color: #d4e8c2;
+    min-height: 100vh;
+    font-size: 16px;
+    background-image: radial-gradient(ellipse at 50% 0%, rgba(60,120,40,.15) 0%, transparent 60%);
+  }
+
+  nav {
+    background: rgba(8,14,8,.95);
+    border-bottom: 1px solid rgba(180,150,40,.3);
+    padding: 0 28px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  nav::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(180,150,40,.5), transparent); }
+
+  .logo { font-family: 'Cinzel', serif; font-size: .85rem; color: #c9a84c; display: flex; align-items: center; gap: 10px; letter-spacing: .08em; }
+  .logo img { width: 32px; height: 32px; image-rendering: pixelated; border: 1px solid rgba(180,150,40,.4); border-radius: 4px; }
+
+  .tabs { display: flex; gap: 2px; }
+
+  .tab { background: none; border: none; color: rgba(180,220,140,.45); font-family: 'Cinzel', serif; font-size: .55rem; letter-spacing: .08em; padding: 6px 14px; border-radius: 4px; cursor: pointer; transition: all .15s; }
+  .tab:hover, .tab.active { color: #c9a84c; background: rgba(180,150,40,.08); }
+
+  .wallet { background: rgba(180,150,40,.15); border: 1px solid rgba(180,150,40,.4); color: #c9a84c; font-family: 'Cinzel', serif; font-size: .5rem; letter-spacing: .08em; padding: 7px 16px; cursor: pointer; transition: all .15s; }
+  .wallet:hover { background: rgba(180,150,40,.25); }
+
+  /* HERO */
+  .hero {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 64px 28px 52px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 52px;
+    align-items: center;
+  }
+
+  @media (max-width: 700px) { .hero { grid-template-columns: 1fr; } }
+
+  .hero-emblem {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .emblem-ring {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    border: 2px solid rgba(180,150,40,.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .emblem-ring::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    border: 1px solid rgba(180,150,40,.15);
+  }
+
+  .emblem-ring img {
+    width: 200px;
+    height: 200px;
+    image-rendering: pixelated;
+    border-radius: 50%;
+    border: 2px solid rgba(180,150,40,.4);
+    box-shadow: 0 0 40px rgba(180,150,40,.15), inset 0 0 20px rgba(0,0,0,.5);
+  }
+
+  .corner-frogs {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .corner-frogs img {
+    position: absolute;
+    width: 52px;
+    height: 52px;
+    image-rendering: pixelated;
+    border: 1px solid rgba(180,150,40,.3);
+    border-radius: 6px;
+    opacity: .8;
+  }
+
+  .cf1 { top: 10px; left: 10px; }
+  .cf2 { top: 10px; right: 10px; }
+  .cf3 { bottom: 10px; left: 10px; }
+  .cf4 { bottom: 10px; right: 10px; }
+
+  .hero-text {}
+
+  .hero-crest { font-family: 'Cinzel', serif; font-size: .6rem; color: rgba(180,150,40,.6); letter-spacing: .2em; text-transform: uppercase; margin-bottom: 16px; }
+
+  .hero-text h1 { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; line-height: 1.2; color: #c9a84c; margin-bottom: 14px; letter-spacing: .02em; text-shadow: 0 2px 20px rgba(180,150,40,.2); }
+
+  .hero-text h1 .green { color: #6ec66e; }
+
+  .hero-divider { width: 60px; height: 2px; background: linear-gradient(90deg, transparent, #c9a84c, transparent); margin: 14px 0; }
+
+  .hero-text p { font-size: 1rem; color: rgba(180,220,140,.7); line-height: 1.75; margin-bottom: 28px; }
+
+  .btn-gold { display: inline-block; background: linear-gradient(135deg, #c9a84c, #e6c560); color: #0d1a0d; font-family: 'Cinzel', serif; font-size: .58rem; letter-spacing: .1em; padding: 12px 24px; border: none; cursor: pointer; text-decoration: none; margin-right: 10px; box-shadow: 0 4px 14px rgba(180,150,40,.25); transition: all .15s; }
+  .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(180,150,40,.4); }
+
+  .btn-outline { display: inline-block; background: transparent; color: #c9a84c; border: 1px solid rgba(180,150,40,.4); font-family: 'Cinzel', serif; font-size: .58rem; letter-spacing: .1em; padding: 12px 24px; cursor: pointer; text-decoration: none; transition: all .15s; }
+  .btn-outline:hover { background: rgba(180,150,40,.08); }
+
+  /* STATS */
+  .stats-band { border-top: 1px solid rgba(180,150,40,.15); border-bottom: 1px solid rgba(180,150,40,.15); }
+  .stats-inner { max-width: 1000px; margin: 0 auto; padding: 0 28px; display: flex; }
+
+  .stat { flex: 1; text-align: center; padding: 20px 12px; border-right: 1px solid rgba(180,150,40,.1); }
+  .stat:last-child { border-right: none; }
+  .stat-val { font-family: 'Cinzel', serif; font-size: .95rem; color: #c9a84c; display: block; }
+  .stat-label { font-size: .82rem; color: rgba(180,220,140,.4); margin-top: 3px; letter-spacing: .06em; }
+
+  /* SECTION */
+  .section { max-width: 1000px; margin: 0 auto; padding: 48px 28px; }
+
+  .section-head { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+  .section-ornament { color: #c9a84c; font-size: 1rem; }
+  .section-title { font-family: 'Cinzel', serif; font-size: .8rem; color: #c9a84c; letter-spacing: .1em; }
+  .section-line { flex: 1; height: 1px; background: rgba(180,150,40,.15); }
+
+  .frog-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  .frog-card { background: rgba(20,35,15,.8); border: 1px solid rgba(180,150,40,.2); overflow: hidden; width: 158px; cursor: pointer; transition: all .2s; }
+  .frog-card:hover { border-color: rgba(180,150,40,.6); box-shadow: 0 0 20px rgba(180,150,40,.1); transform: translateY(-3px); }
+  .frog-card img { width: 100%; aspect-ratio: 1; image-rendering: pixelated; display: block; }
+  .frog-card-info { padding: 9px 12px 11px; }
+  .frog-card-name { font-family: 'Cinzel', serif; font-size: .5rem; color: #c9a84c; letter-spacing: .06em; }
+  .badge { display: inline-block; font-size: .65rem; padding: 2px 7px; margin-top: 4px; }
+  .badge-staked { background: rgba(110,198,110,.1); color: #6ec66e; border: 1px solid rgba(110,198,110,.25); }
+  .badge-rare   { background: rgba(201,168,76,.1); color: #c9a84c; border: 1px solid rgba(201,168,76,.25); }
+
+  /* MINT */
+  .mint-altar { background: rgba(10,20,8,.6); border: 1px solid rgba(180,150,40,.2); padding: 36px; display: flex; gap: 36px; align-items: center; flex-wrap: wrap; }
+  .mint-img-wrap { position: relative; flex-shrink: 0; }
+  .mint-img { width: 190px; height: 190px; image-rendering: pixelated; border: 2px solid rgba(180,150,40,.4); box-shadow: 0 0 30px rgba(180,150,40,.1); display: block; }
+  .mint-corners { position: absolute; inset: -6px; border: 1px solid rgba(180,150,40,.2); }
+  .mint-info { flex: 1; min-width: 240px; }
+  .mint-info h3 { font-family: 'Cinzel', serif; font-size: .75rem; color: #c9a84c; letter-spacing: .08em; margin-bottom: 10px; }
+  .mint-info p { color: rgba(180,220,140,.6); font-size: .95rem; line-height: 1.7; margin-bottom: 20px; }
+  .mint-price { font-family: 'Cinzel', serif; font-size: 1.4rem; color: #c9a84c; margin-bottom: 14px; }
+  .mint-price small { font-family: 'Crimson Pro', serif; font-size: .85rem; color: rgba(180,220,140,.4); }
+  .qty-row { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .qty-btn { width: 34px; height: 34px; border: 1px solid rgba(180,150,40,.3); background: transparent; color: #c9a84c; font-family: 'Cinzel', serif; font-size: .7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+  .qty-btn:hover { background: rgba(180,150,40,.15); }
+  .qty-num { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #c9a84c; min-width: 28px; text-align: center; }
+
+  .label { position: fixed; bottom: 14px; right: 14px; background: rgba(8,14,8,.9); border: 1px solid rgba(180,150,40,.4); color: #c9a84c; padding: 5px 11px; font-family: 'Cinzel', serif; font-size: .42rem; letter-spacing: .08em; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><img src="https://freshfrogs.github.io/assets/logo.png" alt="">FRESH FROGS</div>
+  <div class="tabs">
+    <button class="tab active">Home</button>
+    <button class="tab">Mint</button>
+    <button class="tab">My Frogs</button>
+    <button class="tab">Stake</button>
+    <button class="tab">The Pond</button>
+    <button class="tab">Rarity</button>
+  </div>
+  <button class="wallet">Connect Wallet</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-emblem">
+    <div class="emblem-ring">
+      <img src="https://freshfrogs.github.io/frog/42.png" alt="">
+      <div class="corner-frogs">
+        <img class="cf1" src="https://freshfrogs.github.io/frog/1.png">
+        <img class="cf2" src="https://freshfrogs.github.io/frog/99.png">
+        <img class="cf3" src="https://freshfrogs.github.io/frog/333.png">
+        <img class="cf4" src="https://freshfrogs.github.io/frog/210.png">
+      </div>
+    </div>
+  </div>
+  <div class="hero-text">
+    <div class="hero-crest">Ethereum · NFT Collection · 4,040 Unique</div>
+    <h1>The Lords of<br>the <span class="green">Fresh Pond</span></h1>
+    <div class="hero-divider"></div>
+    <p>4,040 pixel frog sovereigns, each unique, each powerful. Stake your frog in the Pond to earn $FLYZ — your frog grows in power with every passing hour.</p>
+    <a class="btn-gold">Mint a Frog</a>
+    <a class="btn-outline">Enter the Pond</a>
+  </div>
+</div>
+
+<div class="stats-band">
+  <div class="stats-inner">
+    <div class="stat"><span class="stat-val">4,040</span><span class="stat-label">Supply</span></div>
+    <div class="stat"><span class="stat-val">Ξ 0.01</span><span class="stat-label">Mint Price</span></div>
+    <div class="stat"><span class="stat-val">5%</span><span class="stat-label">Royalty</span></div>
+    <div class="stat"><span class="stat-val">$FLYZ</span><span class="stat-label">Staking Reward</span></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-head">
+    <span class="section-ornament">❧</span>
+    <span class="section-title">Recent Sales</span>
+    <div class="section-line"></div>
+  </div>
+  <div class="frog-grid">
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/1.png"><div class="frog-card-info"><div class="frog-card-name">Frog #1</div><span class="badge badge-staked">Staked</span></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/2.png"><div class="frog-card-info"><div class="frog-card-name">Frog #2</div><span class="badge badge-rare">Pink Frog</span></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/3.png"><div class="frog-card-info"><div class="frog-card-name">Frog #3</div><span class="badge badge-rare">Gold</span></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/100.png"><div class="frog-card-info"><div class="frog-card-name">Frog #100</div></div></div>
+    <div class="frog-card"><img src="https://freshfrogs.github.io/frog/500.png"><div class="frog-card-info"><div class="frog-card-name">Frog #500</div><span class="badge badge-rare">Rare</span></div></div>
+  </div>
+</div>
+
+<div class="section" style="padding-top:0;">
+  <div class="mint-altar">
+    <div class="mint-img-wrap">
+      <img class="mint-img" src="https://freshfrogs.github.io/frog/210.png" alt="">
+      <div class="mint-corners"></div>
+    </div>
+    <div class="mint-info">
+      <h3>Summon Your Frog</h3>
+      <p>Each frog is born from the blockchain, unique in its traits, colors, and accessories. Stake it in the Pond to let it grow in power and earn $FLYZ over time.</p>
+      <div class="mint-price">Ξ 0.01 <small>+ gas</small></div>
+      <div class="qty-row">
+        <button class="qty-btn">−</button>
+        <span class="qty-num">1</span>
+        <button class="qty-btn">+</button>
+        <span style="color:rgba(180,220,140,.4);font-size:.88rem;margin-left:6px;">frogs</span>
+      </div>
+      <a class="btn-gold">Connect Wallet to Mint</a>
+    </div>
+  </div>
+</div>
+
+<div class="label">P5 — Swamp Kings</div>
+</body>
+</html>

@@ -525,6 +525,32 @@
 
     .modal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
 
+    /* ─── POND ─── */
+    .pond-stat-chip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: .82rem;
+      color: var(--primary-deeper);
+      font-weight: 600;
+      box-shadow: var(--shadow);
+    }
+
+    .staker-tag {
+      display: inline-block;
+      font-size: .68rem;
+      color: var(--muted);
+      font-family: monospace;
+      margin-top: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 130px;
+    }
+
+    .level-bar-wrap { padding: 4px 10px 8px; }
+
     /* ─── LOADING ANIMATION ─── */
     .ldots::after {
       content: '';
@@ -574,6 +600,7 @@
     <button class="nav-tab" onclick="showSection('mint')">Mint</button>
     <button class="nav-tab" onclick="showSection('my-frogs')">My Frogs</button>
     <button class="nav-tab" onclick="showSection('stake')">Stake</button>
+    <button class="nav-tab" onclick="showSection('pond')">The Pond</button>
     <button class="nav-tab" onclick="showSection('rarity')">Rarity</button>
   </div>
   <button class="wallet-btn" id="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
@@ -585,6 +612,7 @@
   <button class="m-tab" onclick="showSection('mint')">Mint</button>
   <button class="m-tab" onclick="showSection('my-frogs')">My Frogs</button>
   <button class="m-tab" onclick="showSection('stake')">Stake</button>
+  <button class="m-tab" onclick="showSection('pond')">The Pond</button>
   <button class="m-tab" onclick="showSection('rarity')">Rarity</button>
 </div>
 
@@ -738,6 +766,33 @@
     <div class="status-box" id="stake-status" style="display:none;"></div>
   </section>
 
+  <!-- ═══════════════ THE POND ═══════════════ -->
+  <section id="pond-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
+      <h2 class="section-heading" style="margin-bottom:0;">The Pond 🏊</h2>
+      <div id="pond-stats" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+    </div>
+
+    <div class="card" style="padding:14px 16px;margin-bottom:14px;">
+      <p style="font-size:.87rem;color:var(--muted);line-height:1.65;">
+        All Fresh Frogs currently staked in the community pond. Staking earns <strong>$FLYZ</strong> rewards — levels increase at 1,000 and 2,000 hours staked. No wallet needed to browse.
+      </p>
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+      <input type="text" class="search-input" id="pond-search-input" placeholder="Filter by Frog # or staker address…" style="flex:1;min-width:200px;" oninput="filterPond()">
+      <button class="btn btn-outline" onclick="reloadPond()">↻ Refresh</button>
+    </div>
+
+    <div id="pond-grid" class="frog-grid">
+      <span class="ldots" style="color:var(--muted);font-size:.85rem;">Loading the pond</span>
+    </div>
+
+    <div style="text-align:center;margin-top:20px;" id="pond-load-more-wrap">
+      <button class="btn btn-outline" onclick="loadMorePond()" id="pond-load-more-btn">Load More</button>
+    </div>
+  </section>
+
   <!-- ═══════════════ RARITY ═══════════════ -->
   <section id="rarity-section">
     <h2 class="section-heading">Rarity Gallery</h2>
@@ -784,9 +839,23 @@
   // ── CONFIG ──
   const CONTRACT_ADDRESS   = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
   const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
-  const ALCHEMY_KEY        = 'C71cZZLIIjuEeWwP4s8zut6O3OGJGyoJ';
+  const ALCHEMY_KEY        = '__ALCHEMY_KEY__';
   const ALQ                = 'https://eth-mainnet.g.alchemy.com/nft/v3/' + ALCHEMY_KEY;
+  const OS_STATS_URL       = 'https://api.opensea.io/api/v2/collections/fresh-frogs/stats';
   const MINT_PRICE         = 0.01;
+
+  // Short-lived cache for public, read-only data (recent sales, floor price) so repeat
+  // page loads don't re-burn Alchemy's free-tier quota within the same browser session.
+  function cachedFetch(key, url, ttlMs) {
+    try {
+      const cached = JSON.parse(sessionStorage.getItem(key) || 'null');
+      if (cached && Date.now() - cached.t < ttlMs) return Promise.resolve(cached.v);
+    } catch (e) {}
+    return fetch(url).then(r => r.json()).then(v => {
+      try { sessionStorage.setItem(key, JSON.stringify({ t: Date.now(), v: v })); } catch (e) {}
+      return v;
+    });
+  }
   const NETWORK            = 'main';
 
   const CONTROLLER_ABI = [
@@ -830,6 +899,7 @@
 
     if (name === 'my-frogs' && walletConnected && !myFrogsLoaded) loadMyFrogs();
     if (name === 'stake'    && walletConnected && !stakeLoaded)   loadStakeSection();
+    if (name === 'pond'     && !pondLoaded)                       loadPond();
     if (name === 'rarity'   && rarityOffset === 0)                loadRarityBatch();
   }
 
@@ -1201,7 +1271,7 @@
   async function loadHomeData() {
     // Recent sales
     try {
-      const data  = await fetch(ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=20').then(r => r.json());
+      const data  = await cachedFetch('ff_recent_sales', ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=20', 5 * 60 * 1000);
       const sales = data.nftSales || [];
       const box   = document.getElementById('recent-sales');
       box.innerHTML = '';
@@ -1225,19 +1295,27 @@
         '<span style="color:var(--muted);font-size:.83rem;">Could not load recent sales</span>';
     }
 
-    // Collection stats
+    // Collection stats — OpenSea v2 /stats gives floor + owner count but now requires
+    // an API key we don't have; try it anyway (works free the moment a key is added),
+    // falling back to Alchemy's contract metadata (floor price only, no owner count).
     try {
-      const data = await fetch(ALQ + '/getContractMetadata?contractAddress=' + CONTRACT_ADDRESS).then(r => r.json());
-      const os   = data.openSeaMetadata || {};
-      if (os.floorPrice) document.getElementById('stat-floor').textContent  = 'Ξ' + os.floorPrice;
-      if (os.numOwners)  document.getElementById('stat-owners').textContent = os.numOwners.toLocaleString();
-    } catch (e) {}
+      const stats = await cachedFetch('ff_stats', OS_STATS_URL, 5 * 60 * 1000);
+      const total = stats.total || {};
+      if (total.floor_price != null) document.getElementById('stat-floor').textContent  = 'Ξ' + total.floor_price;
+      if (total.num_owners)          document.getElementById('stat-owners').textContent = total.num_owners.toLocaleString();
+    } catch (e) {
+      try {
+        const data = await cachedFetch('ff_contract_meta', ALQ + '/getContractMetadata?contractAddress=' + CONTRACT_ADDRESS, 5 * 60 * 1000);
+        const os   = data.openSeaMetadata || {};
+        if (os.floorPrice) document.getElementById('stat-floor').textContent = 'Ξ' + os.floorPrice;
+      } catch (e2) {}
+    }
   }
 
   // ── MINT PREVIEW ──
   async function loadMintPreview() {
     try {
-      const data  = await fetch(ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=1').then(r => r.json());
+      const data  = await cachedFetch('ff_last_sale', ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=1', 5 * 60 * 1000);
       const sales = data.nftSales || [];
       if (sales.length) {
         const nextId = parseInt(sales[0].tokenId) + 1;
@@ -1251,6 +1329,185 @@
 
   function truncateAddr(addr) {
     return addr ? addr.slice(0, 6) + '…' + addr.slice(-4) : '';
+  }
+
+  // ── COMMUNITY POND ──
+  let pondAllFrogs   = [];   // full list: [{tokenId, staker}]
+  let pondFiltered   = [];   // after search filter
+  let pondOffset     = 0;
+  const POND_BATCH   = 36;
+  let pondLoaded     = false;
+
+  async function loadPond() {
+    pondLoaded = true;
+    const grid = document.getElementById('pond-grid');
+    grid.innerHTML = '<span class="ldots" style="color:var(--muted);font-size:.85rem;">Loading the pond</span>';
+    document.getElementById('pond-stats').innerHTML = '';
+    pondAllFrogs = [];
+    pondFiltered = [];
+    pondOffset   = 0;
+
+    try {
+      // Fetch all NFTs held by the controller (= all staked frogs), up to 100 per page
+      let pageKey = null;
+      do {
+        const url = ALQ + '/getNFTsForOwner?owner=' + CONTROLLER_ADDRESS +
+          '&contractAddresses[]=' + CONTRACT_ADDRESS +
+          '&withMetadata=false&pageSize=100' +
+          (pageKey ? '&pageKey=' + encodeURIComponent(pageKey) : '');
+        const data = await fetch(url).then(r => r.json());
+        const nfts = data.ownedNfts || [];
+        for (const n of nfts) {
+          pondAllFrogs.push({ tokenId: parseInt(n.tokenId), staker: null });
+        }
+        pageKey = data.pageKey || null;
+      } while (pageKey);
+
+      // Stat chips
+      const statsEl = document.getElementById('pond-stats');
+      statsEl.innerHTML =
+        '<div class="pond-stat-chip">🐸 ' + pondAllFrogs.length + ' frogs staked</div>';
+
+      // Lazy-load staker addresses for visible cards (done per-card)
+      pondFiltered = [...pondAllFrogs];
+      renderPondBatch(true);
+
+    } catch (e) {
+      grid.innerHTML = '<p style="color:#c00;">Failed to load pond: ' + e.message + '</p>';
+    }
+  }
+
+  function filterPond() {
+    const q = document.getElementById('pond-search-input').value.trim().toLowerCase();
+    if (!q) {
+      pondFiltered = [...pondAllFrogs];
+    } else {
+      pondFiltered = pondAllFrogs.filter(f =>
+        String(f.tokenId).includes(q) ||
+        (f.staker && f.staker.toLowerCase().includes(q))
+      );
+    }
+    pondOffset = 0;
+    renderPondBatch(true);
+  }
+
+  function renderPondBatch(reset) {
+    const grid = document.getElementById('pond-grid');
+    if (reset) {
+      grid.innerHTML = '';
+      pondOffset = 0;
+    }
+    const end = Math.min(pondOffset + POND_BATCH, pondFiltered.length);
+    for (let i = pondOffset; i < end; i++) {
+      makePondCard(grid, pondFiltered[i]);
+    }
+    pondOffset = end;
+
+    const wrap = document.getElementById('pond-load-more-wrap');
+    wrap.style.display = pondOffset < pondFiltered.length ? 'block' : 'none';
+
+    if (!pondFiltered.length) {
+      grid.innerHTML = '<p style="color:var(--muted);font-size:.87rem;">No frogs match your search.</p>';
+    }
+  }
+
+  function loadMorePond() { renderPondBatch(false); }
+
+  function reloadPond() {
+    pondLoaded = false;
+    document.getElementById('pond-search-input').value = '';
+    loadPond();
+  }
+
+  function makePondCard(container, entry) {
+    const { tokenId } = entry;
+    const card = document.createElement('div');
+    card.className = 'frog-card';
+    card.dataset.tokenId = tokenId;
+
+    const img = document.createElement('img');
+    img.src     = 'https://freshfrogs.github.io/frog/' + tokenId + '.png';
+    img.alt     = 'Frog #' + tokenId;
+    img.loading = 'lazy';
+
+    const info = document.createElement('div');
+    info.className = 'frog-card-info';
+
+    const name = document.createElement('div');
+    name.className = 'frog-card-name';
+    name.textContent = 'Frog #' + tokenId;
+
+    const stakerEl = document.createElement('div');
+    stakerEl.className = 'staker-tag';
+    stakerEl.id = 'staker-' + tokenId;
+    stakerEl.textContent = 'staker: loading…';
+
+    const levelEl = document.createElement('div');
+    levelEl.id = 'level-' + tokenId;
+    levelEl.className = 'level-bar-wrap';
+
+    info.appendChild(name);
+    info.appendChild(stakerEl);
+    info.appendChild(levelEl);
+    card.appendChild(img);
+    card.appendChild(info);
+    card.addEventListener('click', () => openFrogModal(tokenId, true));
+    container.appendChild(card);
+
+    // Load staker + level lazily via IntersectionObserver
+    lazyLoadPondMeta(card, tokenId, stakerEl, levelEl, entry);
+  }
+
+  function lazyLoadPondMeta(card, tokenId, stakerEl, levelEl, entry) {
+    const obs = new IntersectionObserver(async (entries, observer) => {
+      if (!entries[0].isIntersecting) return;
+      observer.disconnect();
+      try {
+        // Get staker address from transfer history (token sent TO controller)
+        const txResp = await fetch(
+          'https://eth-mainnet.g.alchemy.com/v2/' + ALCHEMY_KEY +
+          '/getAssetTransfers?fromBlock=0x0&toBlock=latest' +
+          '&toAddress=' + CONTROLLER_ADDRESS +
+          '&contractAddresses[]=' + CONTRACT_ADDRESS +
+          '&tokenId=0x' + tokenId.toString(16).padStart(64,'0') +
+          '&category[]=erc721&order=desc&maxCount=1&withMetadata=false'
+        ).then(r => r.json());
+
+        const transfers = txResp?.result?.transfers || [];
+        if (transfers.length) {
+          const staker = transfers[0].from;
+          entry.staker = staker;
+          stakerEl.textContent = truncateAddr(staker);
+          stakerEl.title = staker;
+
+          // Level from staking block
+          const stakingBlock = parseInt(txResp.result.transfers[0].blockNum, 16);
+          const currentBlock  = await fetch(
+            'https://eth-mainnet.g.alchemy.com/v2/' + ALCHEMY_KEY,
+            { method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ jsonrpc:'2.0', method:'eth_blockNumber', params:[], id:1 }) }
+          ).then(r => r.json()).then(d => parseInt(d.result, 16));
+
+          const blocksStaked = currentBlock - stakingBlock;
+          const hoursStaked  = Math.floor(blocksStaked * 12 / 3600); // ~12s/block
+          let level = 1, pct = Math.min(100, Math.floor((hoursStaked / 1000) * 100));
+          if (hoursStaked >= 2000) { level = 3; pct = Math.min(100, Math.floor(((hoursStaked - 2000) / 1000) * 100)); }
+          else if (hoursStaked >= 1000) { level = 2; pct = Math.min(100, Math.floor(((hoursStaked - 1000) / 1000) * 100)); }
+
+          levelEl.innerHTML =
+            '<div style="font-size:.7rem;color:var(--muted);margin-bottom:2px;">Level ' + level +
+            ' &nbsp;<span class="badge badge-level">Lvl ' + level + '</span></div>' +
+            '<div class="prog-wrap"><div class="prog-fill" style="width:' + pct + '%;background:' +
+            (level === 3 ? '#f5c542' : level === 2 ? 'var(--green)' : 'var(--primary)') + ';"></div></div>' +
+            '<div style="font-size:.68rem;color:var(--muted);">' + hoursStaked + ' hrs staked</div>';
+        } else {
+          stakerEl.textContent = 'staker unknown';
+        }
+      } catch (e) {
+        stakerEl.textContent = 'staker unavailable';
+      }
+    }, { rootMargin: '200px' });
+    obs.observe(card);
   }
 
   // ── BOOT ──
