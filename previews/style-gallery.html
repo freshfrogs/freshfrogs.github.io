@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fresh Frogs — Style Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --shell-bg:#e9e9e4; --shell-ink:#1a1a1a; --shell-muted:#6b6b63; }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --shell-bg:#17181a; --shell-ink:#eee; --shell-muted:#9a9a94; }
+  }
+  :root[data-theme="dark"]{ --shell-bg:#17181a; --shell-ink:#eee; --shell-muted:#9a9a94; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--shell-bg); color:var(--shell-ink); font-family:'Inter',sans-serif; padding:28px 20px 60px; }
+  .intro{ max-width:920px; margin:0 auto 26px; }
+  .intro h1{ font-size:1.3rem; margin:0 0 6px; }
+  .intro p{ color:var(--shell-muted); font-size:.92rem; margin:0; }
+  .gallery{ max-width:1240px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(520px,1fr)); gap:22px; }
+  .panel{ background:#000; border-radius:10px; overflow:hidden; box-shadow:0 8px 30px -12px rgba(0,0,0,.35); }
+  .panel-label{ display:flex; align-items:baseline; justify-content:space-between; padding:12px 16px; background:var(--shell-ink); color:var(--shell-bg); font-size:.8rem; font-weight:700; }
+  .panel-label span{ font-weight:500; opacity:.65; font-size:.74rem; }
+  .frame{ height:520px; overflow:auto; }
+  @media (max-width:600px){ .gallery{ grid-template-columns:1fr; } .frame{ height:460px; } }
+
+  /* shared frog placeholder */
+  .frogph{ image-rendering:pixelated; display:block; }
+
+  /* ============ 1. PUNK GRID ============ */
+  .pg{ background:#fff; color:#111; font-family:'Inter',sans-serif; min-height:100%; }
+  .pg .nav{ display:flex; justify-content:space-between; align-items:center; padding:18px 24px; border-bottom:1px solid #111; }
+  .pg .nav b{ font-size:.82rem; letter-spacing:.06em; }
+  .pg .nav button{ background:#111; color:#fff; border:none; padding:9px 16px; font-size:.72rem; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+  .pg .hero{ padding:40px 24px 28px; }
+  .pg .eyebrow{ font-size:.7rem; letter-spacing:.12em; color:#8a8a8a; margin-bottom:10px; font-weight:600; }
+  .pg h1{ font-size:2.4rem; line-height:1.02; margin:0 0 16px; letter-spacing:-.02em; font-weight:800; text-transform:uppercase; }
+  .pg h1 em{ font-style:normal; background:#d4ff3f; padding:0 4px; }
+  .pg p.lede{ font-size:.92rem; color:#555; max-width:40ch; margin:0 0 22px; }
+  .pg .row{ display:flex; gap:10px; margin-bottom:34px; }
+  .pg .btn{ padding:12px 20px; font-size:.76rem; font-weight:700; letter-spacing:.03em; cursor:pointer; }
+  .pg .btn.solid{ background:#111; color:#fff; border:1px solid #111; }
+  .pg .btn.line{ background:#fff; color:#111; border:1px solid #111; }
+  .pg .grid{ display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid #111; border-left:1px solid #111; }
+  .pg .cell{ border-right:1px solid #111; border-bottom:1px solid #111; padding:0; position:relative; }
+  .pg .cell img{ width:100%; display:block; }
+  .pg .cell .no{ position:absolute; bottom:6px; left:6px; background:#fff; font-size:.6rem; font-weight:700; padding:2px 5px; }
+
+  /* ============ 2. SOFT ARCADE ============ */
+  .sa{ background:#fbf5e9; color:#3a3a2f; font-family:'Quicksand',sans-serif; min-height:100%; }
+  .sa *{ font-family:'Quicksand',sans-serif; }
+  .sa .nav{ display:flex; justify-content:space-between; align-items:center; padding:16px 22px; }
+  .sa .nav b{ font-size:.95rem; font-weight:700; color:#4c7a52; }
+  .sa .nav button{ background:#8fb996; color:#fff; border:none; border-radius:20px; padding:10px 18px; font-size:.78rem; font-weight:700; cursor:pointer; }
+  .sa .hero{ padding:8px 22px 26px; }
+  .sa .eyebrow{ display:inline-block; background:#f4a89a; color:#5c2c22; font-size:.68rem; font-weight:700; padding:5px 12px; border-radius:20px; margin-bottom:14px; }
+  .sa h1{ font-size:1.9rem; line-height:1.25; margin:0 0 14px; font-weight:700; color:#3a4a30; }
+  .sa p.lede{ font-size:.9rem; color:#6b7060; max-width:38ch; margin:0 0 20px; font-weight:500; }
+  .sa .row{ display:flex; gap:10px; margin-bottom:26px; }
+  .sa .btn{ padding:12px 20px; border-radius:20px; font-size:.8rem; font-weight:700; cursor:pointer; border:none; box-shadow:0 6px 16px -6px rgba(0,0,0,.25); }
+  .sa .btn.solid{ background:#f4a89a; color:#5c2c22; }
+  .sa .btn.line{ background:#fff; color:#4c7a52; }
+  .sa .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:0 22px; }
+  .sa .cell{ background:#fff; border-radius:16px; padding:10px; box-shadow:0 8px 18px -10px rgba(0,0,0,.2); text-align:center; }
+  .sa .cell img{ width:100%; border-radius:10px; background:#e4efe0; }
+  .sa .cell .no{ font-size:.66rem; margin-top:6px; font-weight:700; color:#6b7060; }
+
+  /* ============ 3. PRINT POSTER ============ */
+  .pp{ background:#f1ece0; color:#20301f; font-family:'Inter',sans-serif; min-height:100%; }
+  .pp .nav{ display:flex; justify-content:space-between; align-items:center; padding:16px 24px; }
+  .pp .nav b{ font-size:.85rem; letter-spacing:.03em; }
+  .pp .nav button{ background:none; border:1px solid #20301f; color:#20301f; padding:8px 16px; font-size:.72rem; font-weight:700; cursor:pointer; }
+  .pp .block{ background:#234d33; color:#f1ece0; padding:34px 24px 30px; }
+  .pp .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:.68rem; letter-spacing:.08em; color:#bcd6c0; margin-bottom:12px; }
+  .pp h1{ font-family:'Archivo Black',sans-serif; font-size:2.1rem; line-height:1.05; margin:0 0 6px; }
+  .pp h1 .pop{ color:#e9814f; }
+  .pp p.lede{ font-size:.88rem; color:#d7e6d9; max-width:40ch; margin:14px 0 22px; }
+  .pp .row{ display:flex; gap:10px; }
+  .pp .btn{ padding:12px 20px; font-size:.78rem; font-weight:700; cursor:pointer; border:none; }
+  .pp .btn.solid{ background:#e9814f; color:#20301f; }
+  .pp .btn.line{ background:transparent; color:#f1ece0; border:1px solid #f1ece0; }
+  .pp .strip{ display:flex; gap:2px; padding:2px; background:#20301f; }
+  .pp .cell{ flex:1; position:relative; background:#d8cfb5; }
+  .pp .cell img{ width:100%; display:block; }
+  .pp .cell .no{ position:absolute; top:6px; left:6px; background:#20301f; color:#f1ece0; font-family:'IBM Plex Mono',monospace; font-size:.6rem; padding:2px 6px; }
+  .pp .foot{ padding:20px 24px; font-family:'IBM Plex Mono',monospace; font-size:.7rem; color:#5c6b57; }
+
+  /* ============ 4. TERMINAL LEDGER ============ */
+  .tl{ background:#0d0f0d; color:#e8ede6; font-family:'IBM Plex Mono',monospace; min-height:100%; }
+  .tl .nav{ display:flex; justify-content:space-between; align-items:center; padding:14px 22px; border-bottom:1px solid #24281f; }
+  .tl .nav b{ font-size:.78rem; letter-spacing:.03em; }
+  .tl .nav button{ background:none; border:1px solid #7cffb2; color:#7cffb2; padding:7px 14px; font-size:.68rem; cursor:pointer; }
+  .tl .hero{ padding:26px 22px 20px; }
+  .tl .eyebrow{ font-size:.68rem; color:#7a8a7a; margin-bottom:10px; }
+  .tl .eyebrow::before{ content:'// '; color:#7cffb2; }
+  .tl h1{ font-size:1.35rem; font-weight:500; line-height:1.6; margin:0 0 14px; color:#f2f6ef; }
+  .tl h1 .acc{ color:#7cffb2; }
+  .tl p.lede{ font-size:.82rem; color:#9aa89c; max-width:44ch; margin:0 0 20px; line-height:1.7; }
+  .tl .row{ display:flex; gap:10px; margin-bottom:24px; }
+  .tl .btn{ background:none; border:1px solid #3a4238; color:#e8ede6; padding:10px 16px; font-size:.72rem; cursor:pointer; }
+  .tl .btn.solid{ border-color:#7cffb2; color:#7cffb2; }
+  .tl table{ width:100%; border-collapse:collapse; font-size:.72rem; }
+  .tl table th{ text-align:left; color:#7a8a7a; font-weight:500; padding:6px 22px; border-bottom:1px solid #24281f; }
+  .tl table td{ padding:8px 22px; border-bottom:1px solid #1a1e18; }
+  .tl table img{ width:26px; height:26px; vertical-align:middle; margin-right:8px; background:#141712; }
+  .tl .tag{ color:#7cffb2; }
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <h1>Four directions — none of them the old formula</h1>
+  <p>Same content (nav / hero / a few frogs), four completely different visual languages. No thick black borders, no hard drop-shadows, no yellow buttons. Tell me which lane to build out — or mix pieces from two.</p>
+</div>
+
+<div class="gallery">
+
+  <div class="panel">
+    <div class="panel-label">1 · Punk Grid <span>mono, gallery, art-forward</span></div>
+    <div class="frame">
+      <div class="pg">
+        <div class="nav"><b>FRESH FROGS</b><button>CONNECT</button></div>
+        <div class="hero">
+          <div class="eyebrow">4,040 PIXEL FROGS · ETHEREUM</div>
+          <h1>Mint the<br><em>pond.</em></h1>
+          <p class="lede">4,040 hand-pixeled frogs. Stake to earn. Part of every sale funds real conservation work.</p>
+          <div class="row"><button class="btn solid">Mint a frog</button><button class="btn line">View the pond</button></div>
+        </div>
+        <div class="grid" id="pg-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label">2 · Soft Arcade <span>pastel, rounded, friendly</span></div>
+    <div class="frame">
+      <div class="sa">
+        <div class="nav"><b>🐸 Fresh Frogs</b><button>Connect</button></div>
+        <div class="hero">
+          <div class="eyebrow">4,040 frogs on Ethereum</div>
+          <h1>A pond full of pixel frogs, ready to stake.</h1>
+          <p class="lede">Mint one, watch it grow, earn $FLYZ — and help real frogs while you're at it.</p>
+          <div class="row"><button class="btn solid">Mint a frog</button><button class="btn line">Enter the pond</button></div>
+        </div>
+        <div class="grid" id="sa-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label">3 · Print Poster <span>bold color blocks, confident type</span></div>
+    <div class="frame">
+      <div class="pp">
+        <div class="nav"><b>FRESH FROGS</b><button>CONNECT</button></div>
+        <div class="block">
+          <div class="eyebrow">EST. 4040 SUPPLY / ETH</div>
+          <h1>PIXEL FROGS.<br>REAL <span class="pop">IMPACT.</span></h1>
+          <p class="lede">Every mint helps fund rainforest &amp; amphibian conservation. Stake yours and earn $FLYZ.</p>
+          <div class="row"><button class="btn solid">Mint now</button><button class="btn line">See the pond</button></div>
+        </div>
+        <div class="strip" id="pp-grid"></div>
+        <div class="foot">3% OF ROYALTIES → CONSERVATION</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label">4 · Terminal Ledger <span>dark, monospace, on-chain feel</span></div>
+    <div class="frame">
+      <div class="tl">
+        <div class="nav"><b>fresh_frogs://</b><button>connect()</button></div>
+        <div class="hero">
+          <div class="eyebrow">contract 0xBE4B…8C51b</div>
+          <h1>4,040 frogs. <span class="acc">on-chain</span>, pixel-perfect, stakeable.</h1>
+          <p class="lede">mint up to 9 per tx · stake for $FLYZ · 3% of royalties routed to conservation</p>
+          <div class="row"><button class="btn solid">$ mint --qty 1</button><button class="btn">$ view --pond</button></div>
+        </div>
+        <table id="tl-table">
+          <thead><tr><th>token</th><th>trait</th><th>status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // shared pixel-frog placeholder icon
+  const FROG_SVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8' shape-rendering='crispEdges'>
+    <rect x='1' y='0' width='2' height='2' fill='%233f9418'/>
+    <rect x='7' y='0' width='2' height='2' fill='%233f9418'/>
+    <rect x='1.35' y='0.35' width='1.3' height='1.3' fill='%23ffffff'/>
+    <rect x='7.35' y='0.35' width='1.3' height='1.3' fill='%23ffffff'/>
+    <rect x='1.75' y='0.75' width='0.6' height='0.6' fill='%23111111'/>
+    <rect x='7.75' y='0.75' width='0.6' height='0.6' fill='%23111111'/>
+    <rect x='0' y='2' width='10' height='5' fill='%2363c132'/>
+    <rect x='0' y='2' width='10' height='1' fill='%237ad94a'/>
+    <rect x='2' y='6' width='6' height='1' fill='%233f9418'/>
+  </svg>`;
+  const FROG_URI = 'data:image/svg+xml;utf8,' + FROG_SVG.replace(/\s+/g,' ');
+  const IDS = [1,42,99,210];
+  const TRAITS = ['Pond Green','Cyan','Tree Frog','Splendid Leaf'];
+
+  document.getElementById('pg-grid').innerHTML = IDS.map(id =>
+    `<div class="cell"><img class="frogph" src="${FROG_URI}"><span class="no">#${String(id).padStart(4,'0')}</span></div>`).join('');
+
+  document.getElementById('sa-grid').innerHTML = IDS.map(id =>
+    `<div class="cell"><img class="frogph" src="${FROG_URI}"><div class="no">#${String(id).padStart(4,'0')}</div></div>`).join('');
+
+  document.getElementById('pp-grid').innerHTML = IDS.map(id =>
+    `<div class="cell"><img class="frogph" src="${FROG_URI}"><span class="no">${String(id).padStart(4,'0')}</span></div>`).join('');
+
+  document.querySelector('#tl-table tbody').innerHTML = IDS.map((id,i) =>
+    `<tr><td><img class="frogph" src="${FROG_URI}">#${String(id).padStart(4,'0')}</td><td>${TRAITS[i]}</td><td class="tag">staked</td></tr>`).join('');
+</script>
+</body>
+</html>
