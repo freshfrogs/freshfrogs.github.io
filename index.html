@@ -2,388 +2,607 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Fresh Frogs</title>
-<meta name="description" content="4,040 randomly generated pixel frogs on Ethereum. Mint, stake, and browse the collection.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fresh Frogs NFT</title>
+<meta name="description" content="Fresh Frogs NFT — 4,040 unique frogs on Ethereum. Collect, stake, earn, and level up.">
 <link rel="icon" href="/assets/logo.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
 <script src="https://ethereum.factoria.app/f0/token_abi.js"></script>
 <script src="https://unpkg.com/f0js/dist/f0.js"></script>
+
 <style>
-*{box-sizing:border-box}
-:root{
-  --paper:#f4f3eb;
-  --panel:#fbfbf6;
-  --ink:#172019;
-  --muted:#69726a;
-  --line:#c9d0c5;
-  --pond:#a8cfca;
-  --moss:#bccb9d;
-  --sun:#eadf86;
-  --clay:#d8b398;
-}
-html{scroll-behavior:smooth}
-body{
-  margin:0;
-  background:var(--paper);
-  color:var(--ink);
-  font-family:Inter,system-ui,sans-serif;
-}
-a{color:inherit;text-decoration:none}
-button,input{font:inherit}
-.shell{max-width:1220px;margin:auto;padding:0 28px}
-.mono{font-family:"Space Mono",monospace}
-.eyebrow{
-  font:700 10px "Space Mono",monospace;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  color:#657166;
-}
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:40px;
-  padding:10px 14px;
-  border:1px solid #9da89a;
-  border-radius:5px;
-  background:var(--panel);
-  color:var(--ink);
-  font:700 11px "Space Mono",monospace;
-  cursor:pointer;
-}
-.btn.primary{background:var(--sun)}
-.btn.dark{background:var(--ink);color:white;border-color:var(--ink)}
-.btn:disabled{opacity:.55;cursor:not-allowed}
+* { box-sizing: border-box; }
 
-/* NAV */
-.site-header{
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:rgba(244,243,235,.92);
-  backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--line);
-}
-.nav{
-  height:74px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:24px;
-}
-.brand img{height:43px;display:block}
-.nav-links{display:flex;align-items:center;gap:18px;font:700 10px "Space Mono",monospace}
-.nav-links a{opacity:.76}
-.nav-links a:hover{opacity:1}
-.wallet{white-space:nowrap}
-
-/* HERO */
-.hero{
-  position:relative;
-  padding:84px 0 46px;
-  text-align:center;
-  overflow:hidden;
-}
-.hero:before,
-.hero:after{
-  content:"";
-  position:absolute;
-  border-radius:50%;
-  border:1px solid rgba(75,122,113,.18);
-  pointer-events:none;
-}
-.hero:before{width:420px;height:420px;left:-190px;top:90px}
-.hero:after{width:560px;height:560px;right:-290px;top:10px}
-.hero-copy{position:relative;z-index:2}
-.hero h1{
-  margin:14px 0 18px;
-  font:700 clamp(76px,12vw,166px)/.76 "Space Mono",monospace;
-  letter-spacing:-.095em;
-}
-.hero .tagline{
-  max-width:660px;
-  margin:0 auto;
-  color:var(--muted);
-  font-size:17px;
-  line-height:1.65;
-}
-.hero-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:26px}
-
-/* FROG RAIL */
-.pond-rail{
-  margin-top:52px;
-  position:relative;
-  padding:26px 0 6px;
-}
-.pond-rail:before{
-  content:"";
-  position:absolute;
-  left:0;right:0;top:0;height:1px;background:var(--line);
-}
-.pond-rail-label{
-  position:absolute;
-  left:50%;top:0;
-  transform:translate(-50%,-50%);
-  background:var(--paper);
-  padding:0 12px;
-  font:700 10px "Space Mono",monospace;
-  letter-spacing:.14em;
-  color:#627067;
-}
-.frog-rail-grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:12px;
-}
-.rail-frog{
-  aspect-ratio:1;
-  border-radius:10px;
-  border:1px solid var(--line);
-  overflow:hidden;
-  background:var(--panel);
-}
-.rail-frog:nth-child(1){background:#d9e4cf}
-.rail-frog:nth-child(2){background:#cfe2df}
-.rail-frog:nth-child(3){background:#e7dfc6}
-.rail-frog:nth-child(4){background:#dcd4e5}
-.rail-frog:nth-child(5){background:#e7d4c9}
-.rail-frog img{width:100%;height:100%;object-fit:contain;display:block;image-rendering:pixelated}
-
-/* SECTION COMMON */
-.section{padding:74px 0}
-.section + .section{border-top:1px solid var(--line)}
-.section-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  gap:28px;
-  margin-bottom:28px;
-}
-.section-head h2{
-  margin:5px 0 0;
-  font:700 clamp(34px,4vw,54px)/.95 "Space Mono",monospace;
-  letter-spacing:-.045em;
-}
-.section-head p{max-width:470px;margin:0;color:var(--muted);line-height:1.6}
-
-/* COLLECTION */
-.collection-tools{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:16px;
-}
-.search{
-  flex:1;
-  min-width:220px;
-  border:1px solid var(--line);
-  border-radius:5px;
-  background:var(--panel);
-  padding:11px 12px;
-  color:var(--ink);
-}
-.filter-chip{
-  border:1px solid var(--line);
-  background:var(--panel);
-  border-radius:5px;
-  padding:10px 12px;
-  font:700 10px "Space Mono",monospace;
-  cursor:pointer;
-}
-.filter-chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
-.frog-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-}
-.frog-card{
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:var(--panel);
-  padding:8px;
-  cursor:pointer;
-}
-.frog-card img{
-  width:100%;
-  aspect-ratio:1;
-  object-fit:contain;
-  display:block;
-  image-rendering:pixelated;
-  background:#d8e2cf;
-  border-radius:6px;
-}
-.frog-meta{
-  padding:10px 3px 2px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-  font:700 10px "Space Mono",monospace;
-}
-.frog-meta span:last-child{color:#6c756d}
-.load-more-wrap{text-align:center;margin-top:22px}
-
-/* ACTIVITY + MY POND */
-.two-col{
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:14px;
-}
-.module{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:22px;
-}
-.module-title{
-  display:flex;
-  justify-content:space-between;
-  gap:14px;
-  align-items:center;
-  margin-bottom:14px;
-}
-.module h3{margin:0;font:700 21px "Space Mono",monospace}
-.pond-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.sale-list{display:grid}
-.sale-row{
-  display:grid;
-  grid-template-columns:46px 1fr auto;
-  gap:12px;
-  align-items:center;
-  padding:11px 0;
-  border-top:1px solid #dde2da;
-  cursor:pointer;
-}
-.sale-row:first-child{border-top:0}
-.sale-thumb{width:46px;height:46px;border-radius:5px;background:#d9e2d1;overflow:hidden}
-.sale-thumb img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
-.sale-name{font:700 11px "Space Mono",monospace}
-.sale-sub{font-size:12px;color:var(--muted);margin-top:3px}
-.sale-price{font:700 11px "Space Mono",monospace}
-.tabs{display:flex;gap:6px;margin-bottom:14px}
-.tab{
-  border:1px solid var(--line);
-  background:transparent;
-  border-radius:5px;
-  padding:8px 10px;
-  font:700 10px "Space Mono",monospace;
-  cursor:pointer;
-}
-.tab.active{background:var(--ink);color:white;border-color:var(--ink)}
-.wallet-state{
-  min-height:244px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-}
-.wallet-state p{color:var(--muted);line-height:1.6;margin:6px 0 0}
-.mini-frogs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
-.mini-frogs div{background:#dbe4d3;border-radius:6px;overflow:hidden;cursor:pointer}
-.mini-frogs img{width:100%;display:block;image-rendering:pixelated}
-
-/* MINT + GAME */
-.action-grid{
-  display:grid;
-  grid-template-columns:1.2fr .8fr;
-  gap:14px;
-}
-.mint-card{
-  background:var(--moss);
-  border:1px solid #9dad8b;
-  border-radius:12px;
-  padding:30px;
-  min-height:330px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-}
-.mint-card h3,
-.game-card h3{
-  margin:7px 0 12px;
-  font:700 clamp(32px,4vw,48px)/.95 "Space Mono",monospace;
-  letter-spacing:-.04em;
-}
-.mint-card p,.game-card p{color:#465047;line-height:1.6;max-width:520px}
-.mint-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.qty{display:flex;align-items:center;border:1px solid #8f9e82;border-radius:5px;background:rgba(255,255,255,.35);overflow:hidden}
-.qty button{border:0;background:transparent;padding:10px 13px;cursor:pointer}
-.qty span{min-width:38px;text-align:center;font:700 11px "Space Mono",monospace}
-.mint-status{margin-top:12px;font-size:12px;line-height:1.6;color:#3c4a3c}
-.game-card{
-  background:var(--clay);
-  border:1px solid #c39f87;
-  border-radius:12px;
-  padding:30px;
-  min-height:330px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
+:root {
+  --bg: #f3f3ec;
+  --surface: #fafaf6;
+  --surface-2: #eef1e9;
+  --ink: #172019;
+  --muted: #6a736b;
+  --line: #cdd4ca;
+  --accent: #e8df87;
+  --pond: #d7e4d3;
+  --water: #d4e5e2;
+  --mint: #c6d4a8;
+  --game: #dcb89e;
 }
 
-/* FOOTER */
-.footer{
-  border-top:1px solid var(--line);
-  padding:26px 0 42px;
-  display:flex;
-  justify-content:space-between;
-  gap:20px;
-  color:#687169;
-  font:700 10px "Space Mono",monospace;
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, system-ui, sans-serif;
 }
 
-/* FROG MODAL */
-.ff-modal-overlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(23,32,25,.55);
-  z-index:50;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
-.ff-modal-overlay.open{display:flex}
-.ff-modal{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:12px;
-  max-width:420px;
-  width:100%;
-  max-height:88vh;
-  overflow-y:auto;
-  padding:22px;
-}
-.ff-modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.ff-modal-head h3{margin:0;font:700 20px "Space Mono",monospace}
-.ff-modal-close{border:0;background:transparent;font-size:20px;cursor:pointer;color:var(--muted);line-height:1}
-.ff-modal-img{width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#d8e2cf;margin-bottom:14px}
-.ff-modal-img img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;display:block}
-.ff-trait{display:inline-block;border:1px solid var(--line);border-radius:5px;padding:4px 8px;font:700 10px "Space Mono",monospace;margin:0 6px 6px 0;background:var(--paper)}
-.ff-modal-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.ff-modal-status{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.5}
+a { color: inherit; text-decoration: none; }
+button, input { font: inherit; }
 
-/* MOBILE */
-@media(max-width:900px){
-  .nav-links a:not(.wallet){display:none}
-  .frog-rail-grid{grid-template-columns:repeat(3,1fr)}
-  .frog-rail-grid .rail-frog:nth-child(n+4){display:none}
-  .frog-grid{grid-template-columns:repeat(2,1fr)}
-  .two-col,.action-grid{grid-template-columns:1fr}
+.shell {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
 }
-@media(max-width:620px){
-  .shell{padding:0 18px}
-  .hero{padding-top:58px}
-  .section-head{align-items:flex-start;flex-direction:column}
-  .frog-grid{grid-template-columns:1fr 1fr}
-  .frog-rail-grid{grid-template-columns:repeat(2,1fr)}
-  .frog-rail-grid .rail-frog:nth-child(3){display:none}
+
+.mono {
+  font-family: "Space Mono", monospace;
+}
+
+.eyebrow {
+  font: 700 11px "Space Mono", monospace;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: #637064;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 9px 13px;
+  border: 1px solid #a4ada1;
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 700 10px "Space Mono", monospace;
+  cursor: pointer;
+}
+
+.btn.primary { background: var(--accent); }
+.btn.dark { background: var(--ink); border-color: var(--ink); color: #fff; }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+
+/* Shared frog image system */
+.frog-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--pond);
+}
+
+.frog-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  image-rendering: pixelated;
+}
+
+/* Header */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(243,243,236,.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav {
+  height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.brand img {
+  height: 38px;
+  display: block;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font: 700 10px "Space Mono", monospace;
+}
+
+.nav-links > a:not(.btn) { opacity: .75; }
+.nav-links > a:not(.btn):hover { opacity: 1; }
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 58px 0 34px;
+}
+
+.hero h1 {
+  margin: 10px 0 12px;
+  font-family: "Archivo Black", sans-serif;
+  font-size: clamp(62px, 8.5vw, 108px);
+  line-height: .84;
+  letter-spacing: -.06em;
+  text-transform: uppercase;
+}
+
+.hero-copy {
+  max-width: 620px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+
+.hero-frogs {
+  width: min(500px, 100%);
+  margin: 32px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.hero-frogs .frog-art {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.hero-frogs .frog-art:nth-child(2) { background: var(--water); }
+.hero-frogs .frog-art:nth-child(3) { background: #e6dfc9; }
+
+
+/* Sections */
+.section {
+  padding: 58px 0;
+}
+
+.section + .section {
+  border-top: 1px solid var(--line);
+}
+
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.section-head h2 {
+  margin: 4px 0 0;
+  font: 700 31px/1 "Space Mono", monospace;
+  letter-spacing: -.04em;
+}
+
+.section-head p {
+  max-width: 430px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Collection */
+.collection-tools {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.search {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 11px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.filter {
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface);
+  font: 700 9px "Space Mono", monospace;
+  cursor: pointer;
+}
+
+.filter.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+.frog-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 170px));
+  justify-content: center;
+  gap: 12px;
+}
+
+.frog-card {
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.collection-art {
+  border-radius: 5px;
+}
+
+.frog-card:nth-child(4n+2) .collection-art { background: var(--water); }
+.frog-card:nth-child(4n+3) .collection-art { background: #e6dfc9; }
+.frog-card:nth-child(4n+4) .collection-art { background: #ddd8e5; }
+
+.frog-card-foot {
+  padding: 10px 3px 3px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.frog-card-foot strong {
+  display: block;
+  font: 700 9px "Space Mono", monospace;
+}
+
+.frog-card-foot span,
+.frog-card-foot > a {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font: 700 10px "Space Mono", monospace;
+}
+
+.load-more-wrap { text-align: center; margin-top: 20px; }
+
+/* Community Pond cards */
+.pond-meta-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pond-staker { font: 700 9px "Space Mono", monospace; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 110px; }
+.pond-level-line { font: 700 9px "Space Mono", monospace; color: var(--muted); margin-bottom: 3px; }
+.pond-bar-wrap { height: 4px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+.pond-bar-fill { height: 100%; background: var(--ink); }
+.pond-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface);
+  font: 700 10px "Space Mono", monospace;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Activity */
+.activity-layout {
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap: 12px;
+}
+
+.panel {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.panel-head-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.panel h3 {
+  margin: 0;
+  font: 700 17px "Space Mono", monospace;
+}
+
+/* Compact Recent Sales list */
+.sales-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 7px;
+}
+
+.sale-card {
+  display: grid;
+  grid-template-columns: 68px 1fr;
+  gap: 11px;
+  align-items: center;
+  padding: 7px;
+  border: 1px solid #d8ddd5;
+  border-radius: 7px;
+  background: #fdfdf9;
+  cursor: pointer;
+}
+
+.sale-art {
+  width: 68px;
+  height: 68px;
+  aspect-ratio: 1;
+  border-radius: 5px;
+  background: var(--pond);
+}
+
+.sale-card:nth-child(2) .sale-art { background: var(--water); }
+.sale-card:nth-child(3) .sale-art { background: #e6dfc9; }
+
+.sale-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 0 3px 0 0;
+}
+
+.sale-info strong {
+  display: block;
+  font: 700 11px "Space Mono", monospace;
+}
+
+.sale-info span {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.sale-price {
+  text-align: right;
+}
+
+/* My Frogs / Pond wallet views */
+.tabs {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.tab {
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: transparent;
+  font: 700 9px "Space Mono", monospace;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.wallet-copy {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.wallet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.wallet-art {
+  width: 72px;
+  height: 72px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Mint / Game */
+.action-grid {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 12px;
+}
+
+.action-card {
+  min-height: 260px;
+  padding: 24px;
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mint-card {
+  background: var(--mint);
+  border: 1px solid #b1c092;
+}
+
+.game-card {
+  background: var(--game);
+  border: 1px solid #c7a38b;
+}
+
+.action-card h3 {
+  margin: 6px 0 10px;
+  font: 700 28px/1 "Space Mono", monospace;
+  letter-spacing: -.04em;
+}
+
+.action-card p {
+  max-width: 500px;
+  margin: 0;
+  color: #4f5950;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.mint-bottom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.qty {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #93a281;
+  border-radius: 5px;
+  background: rgba(255,255,255,.28);
+}
+
+.qty button {
+  border: 0;
+  background: transparent;
+  padding: 9px 11px;
+  cursor: pointer;
+}
+
+.qty span {
+  min-width: 34px;
+  text-align: center;
+  font: 700 10px "Space Mono", monospace;
+}
+
+.mint-status { margin-top: 10px; font-size: 11px; line-height: 1.6; color: #4f5950; }
+
+.more-link {
+  margin-top: 10px;
+  display: inline-block;
+  font: 700 9px "Space Mono", monospace;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* About */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.about-card {
+  padding: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.about-card h3 {
+  margin: 0 0 9px;
+  font: 700 16px "Space Mono", monospace;
+}
+
+.about-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--line);
+  padding: 23px 0 34px;
+}
+
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: #717971;
+  font: 700 9px "Space Mono", monospace;
+  flex-wrap: wrap;
+}
+
+.footer-row a:hover { color: var(--ink); }
+.footer-links { display: flex; gap: 14px; flex-wrap: wrap; }
+
+/* Frog detail modal */
+.ff-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(23,32,25,.55);
+  z-index: 50;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.ff-modal-overlay.open { display: flex; }
+
+.ff-modal {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  max-width: 420px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.ff-modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.ff-modal-head h3 { margin: 0; font: 700 18px "Space Mono", monospace; }
+.ff-modal-close { border: 0; background: transparent; font-size: 19px; cursor: pointer; color: var(--muted); line-height: 1; }
+.ff-modal-img { width: 100%; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--pond); margin-bottom: 12px; }
+.ff-modal-img img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; display: block; }
+.ff-trait { display: inline-block; border: 1px solid var(--line); border-radius: 5px; padding: 4px 8px; font: 700 9px "Space Mono", monospace; margin: 0 6px 6px 0; background: var(--bg); }
+.ff-modal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.ff-modal-status { margin-top: 10px; font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+/* Responsive */
+@media (max-width: 880px) {
+  .nav-links > a:not(.btn) { display: none; }
+  .activity-layout,
+  .action-grid,
+  .about-grid { grid-template-columns: 1fr; }
+  .frog-grid { grid-template-columns: repeat(3, minmax(0, 150px)); }
+}
+
+@media (max-width: 650px) {
+  .shell { width: min(100% - 28px, 1120px); }
+  .hero { padding-top: 46px; }
+  .hero-frogs { grid-template-columns: repeat(3, 1fr); }
+  .section-head { align-items: flex-start; flex-direction: column; }
+  .frog-grid { grid-template-columns: repeat(2, minmax(0, 150px)); }
+  .sales-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
+
 <body>
 
 <header class="site-header">
@@ -392,165 +611,230 @@ button,input{font:inherit}
     <nav class="nav-links">
       <a href="#collection">COLLECTION</a>
       <a href="#activity">RECENT SALES</a>
-      <a href="#mypond">MY POND</a>
+      <a href="#my-pond">MY FROGS</a>
+      <a href="#pond">THE POND</a>
       <a href="#mint">MINT</a>
       <a href="#game">GAME</a>
-      <a class="btn wallet" href="#mypond" id="navWalletBtn">CONNECT WALLET</a>
+      <a class="btn" href="#my-pond" id="navWalletBtn">CONNECT WALLET</a>
     </nav>
   </div>
 </header>
 
 <main>
-  <section class="hero">
-    <div class="shell hero-copy">
-      <div class="eyebrow">4,040 pixel frogs · Ethereum</div>
-      <h1>FRESH<br>FROGS</h1>
-      <p class="tagline">
-        4,040 randomly generated pixel frogs on Ethereum. Browse the collection, mint your own, and stake to earn $FLYZ.
-      </p>
-      <div class="hero-actions">
-        <a class="btn primary" href="#collection">BROWSE COLLECTION</a>
-        <a class="btn" href="#mint">MINT FROGS</a>
-        <a class="btn" href="https://opensea.io/collection/fresh-frogs" target="_blank" rel="noopener">OPENSEA ↗</a>
-      </div>
 
-      <div class="pond-rail">
-        <div class="pond-rail-label">FROM THE POND</div>
-        <div class="frog-rail-grid">
-          <div class="rail-frog"><img src="/frog/3.png" alt="Fresh Frog #3"></div><div class="rail-frog"><img src="/frog/12.png" alt="Fresh Frog #12"></div><div class="rail-frog"><img src="/frog/19.png" alt="Fresh Frog #19"></div><div class="rail-frog"><img src="/frog/31.png" alt="Fresh Frog #31"></div><div class="rail-frog"><img src="/frog/42.png" alt="Fresh Frog #42"></div>
-        </div>
+<section class="hero">
+  <div class="shell">
+    <div class="eyebrow">4,040 UNIQUE FROGS ON ETHEREUM</div>
+    <h1>FRESH<br>FROGS</h1>
+    <p class="hero-copy">
+      Collect, mint, and stake Fresh Frogs to earn $FLYZ rewards. The longer you stake,
+      the higher your level — and every staked frog is visible in the community Pond.
+    </p>
+
+    <div class="hero-actions">
+      <a class="btn primary" href="#collection">EXPLORE COLLECTION</a>
+      <a class="btn" href="#pond">VIEW THE POND</a>
+      <a class="btn" href="#mint">MINT</a>
+    </div>
+
+    <div class="hero-frogs">
+      <div class="frog-art"><img src="/frog/12.png" alt="Fresh Frog #12"></div>
+      <div class="frog-art"><img src="/frog/31.png" alt="Fresh Frog #31"></div>
+      <div class="frog-art"><img src="/frog/42.png" alt="Fresh Frog #42"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">ABOUT</div>
+        <h2>Fresh Frogs NFT</h2>
       </div>
     </div>
-  </section>
 
-  <section class="section" id="collection">
-    <div class="shell">
-      <div class="section-head">
+    <div class="about-grid">
+      <article class="about-card">
+        <h3>4,040 Unique Frogs</h3>
+        <p>
+          Fresh Frogs is an Ethereum NFT collection of 4,040 randomly generated frogs, each unique
+          across dozens of frog types and traits. Stake your frogs in The Pond to earn $FLYZ rewards —
+          the longer you stake, the higher your level.
+        </p>
+      </article>
+
+      <article class="about-card">
+        <h3>Protecting Real Frogs</h3>
+        <p>
+          A 5% royalty on every sale is split between <a href="https://twitter.com/RainforestUS" target="_blank" rel="noopener" style="text-decoration:underline;">RainforestUS</a>
+          and <a href="https://twitter.com/savethefrogs" target="_blank" rel="noopener" style="text-decoration:underline;">Save The Frogs</a>,
+          two nonprofits protecting rainforest habitat and amphibian populations, with the rest reinvested in the project.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="collection">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">THE COLLECTION</div>
+        <h2>Explore Fresh Frogs</h2>
+      </div>
+      <p>Browse the collection by token ID, filter by staked status, and click any frog for traits and links.</p>
+    </div>
+
+    <div class="collection-tools">
+      <input id="frogSearch" class="search" type="search" placeholder="Search by frog number">
+      <button class="filter active" data-filter="all">ALL FROGS</button>
+      <button class="filter" data-filter="available">AVAILABLE</button>
+      <button class="filter" data-filter="staked">STAKED</button>
+    </div>
+
+    <div class="frog-grid" id="frogGrid"></div>
+
+    <div class="load-more-wrap" id="collectionLoadMoreWrap">
+      <button class="btn" id="collectionLoadMore">LOAD MORE</button>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="activity">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">RECENT ACTIVITY</div>
+        <h2>Recent Sales</h2>
+      </div>
+      <p>See the latest Fresh Frogs sales across the collection.</p>
+    </div>
+
+    <div class="activity-layout">
+
+      <section class="panel">
+        <div class="panel-head">
+          <h3>Latest Sales</h3>
+          <a class="btn" href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank" rel="noopener">VIEW ALL</a>
+        </div>
+        <div class="sales-grid" id="salesGrid">
+          <span class="eyebrow">Loading recent sales…</span>
+        </div>
+      </section>
+
+      <section class="panel" id="my-pond">
+        <div class="panel-head">
+          <h3>My Frogs</h3>
+          <div class="panel-head-actions">
+            <button class="btn" id="claimBtn" style="display:none"></button>
+            <button class="btn" id="myFrogsConnectBtn">CONNECT WALLET</button>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" data-tab="owned">OWNED</button>
+          <button class="tab" data-tab="staked">STAKED</button>
+        </div>
+
+        <div id="ownedPanel">
+          <p class="wallet-copy" id="ownedCopy">Connect your wallet to view the Fresh Frogs you own.</p>
+          <div class="wallet-grid"></div>
+        </div>
+
+        <div id="stakedPanel" style="display:none">
+          <p class="wallet-copy" id="stakedCopy">Connect your wallet to view your staked frogs.</p>
+          <div class="wallet-grid"></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pond">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">COMMUNITY</div>
+        <h2>The Pond</h2>
+      </div>
+      <p>Every Fresh Frog currently staked by the community, updated live. No wallet needed to browse.</p>
+    </div>
+
+    <div class="collection-tools">
+      <input id="pondSearch" class="search" type="search" placeholder="Search by frog number or staker address">
+      <span class="pond-stat-chip" id="pondStat">Loading…</span>
+      <button class="filter" id="pondRefresh">REFRESH</button>
+    </div>
+
+    <div class="frog-grid" id="pondGrid"></div>
+
+    <div class="load-more-wrap" id="pondLoadMoreWrap">
+      <button class="btn" id="pondLoadMore">LOAD MORE</button>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mint">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">FRESH FROGS</div>
+        <h2>Mint & Play</h2>
+      </div>
+      <p>Mint Fresh Frogs, manage staking in The Pond, and jump into Escape the Snake.</p>
+    </div>
+
+    <div class="action-grid">
+
+      <section class="action-card mint-card">
         <div>
-          <div class="eyebrow">Collection</div>
-          <h2>Find your frog.</h2>
+          <div class="eyebrow">MINT FRESH FROGS</div>
+          <h3>Mint a Frog</h3>
+          <p>Choose a quantity, connect your wallet, and mint Fresh Frogs directly from the site.</p>
+          <a class="more-link" href="#pond">VIEW THE POND →</a>
         </div>
-        <p>Search by number, filter by staked status, and click any frog to see its traits and links.</p>
-      </div>
 
-      <div class="collection-tools">
-        <input id="frogSearch" class="search" placeholder="Search frog number…" aria-label="Search frog number">
-        <button class="filter-chip active" data-filter="all">ALL FROGS</button>
-        <button class="filter-chip" data-filter="available">AVAILABLE</button>
-        <button class="filter-chip" data-filter="staked">STAKED</button>
-      </div>
-
-      <div class="frog-grid" id="frogGrid"></div>
-
-      <div class="load-more-wrap" id="collectionLoadMoreWrap">
-        <button class="btn" id="collectionLoadMore">LOAD MORE</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="activity">
-    <div class="shell">
-      <div class="section-head">
         <div>
-          <div class="eyebrow">Pond activity</div>
-          <h2>Recent sales + your frogs.</h2>
-        </div>
-        <p>See what's selling across the collection, and check what's in your wallet and what's staked in the pond.</p>
-      </div>
-
-      <div class="two-col">
-        <div class="module">
-          <div class="module-title">
-            <h3>Recent Sales</h3>
-            <span class="eyebrow" id="salesStatus">LOADING</span>
-          </div>
-
-          <div class="sale-list" id="saleList">
-            <span class="eyebrow">Loading recent sales…</span>
-          </div>
-        </div>
-
-        <div class="module" id="mypond">
-          <div class="module-title">
-            <h3>My Pond</h3>
-            <div class="pond-actions">
-              <button class="btn" id="claimBtn" style="display:none"></button>
-              <a class="btn" href="#" id="pondConnectBtn">CONNECT</a>
+          <div class="mint-bottom">
+            <div class="qty">
+              <button id="minus" aria-label="Decrease quantity">−</button>
+              <span id="qty">1</span>
+              <button id="plus" aria-label="Increase quantity">+</button>
             </div>
+            <button class="btn dark" id="mintBtn">CONNECT TO MINT</button>
           </div>
-          <div class="tabs">
-            <button class="tab active" data-tab="owned">OWNED</button>
-            <button class="tab" data-tab="staked">STAKED</button>
-          </div>
-
-          <div class="wallet-state" id="ownedPanel">
-            <div>
-              <div class="eyebrow">Wallet view</div>
-              <p>Connect your wallet to see the frogs you own, with quick access to details, staking, and OpenSea.</p>
-            </div>
-            <div class="mini-frogs"></div>
-          </div>
-
-          <div class="wallet-state" id="stakedPanel" style="display:none">
-            <div>
-              <div class="eyebrow">Staking view</div>
-              <p>Connect your wallet to see frogs you have staked in the pond.</p>
-            </div>
-            <div class="mini-frogs"></div>
-          </div>
+          <p class="mint-status mono" id="mintStatus">Connect your wallet to see live price and supply.</p>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <section class="section" id="mint">
-    <div class="shell">
-      <div class="section-head">
+      <section class="action-card game-card" id="game">
         <div>
-          <div class="eyebrow">Get involved</div>
-          <h2>Mint or play.</h2>
+          <div class="eyebrow">FRESH FROGS GAME</div>
+          <h3>Escape the Snake</h3>
+          <p>Keep your frogs alive, build your run, and see how long you can survive.</p>
         </div>
-        <p>Mint a new frog to add to the pond, or take a break and play our frog-themed arcade game.</p>
-      </div>
-
-      <div class="action-grid">
-        <div class="mint-card">
-          <div>
-            <div class="eyebrow">Mint</div>
-            <h3>Bring a new frog into the pond.</h3>
-            <p>Live mint status, price, and transaction state appear here once you connect your wallet.</p>
-          </div>
-
-          <div>
-            <div class="mint-controls">
-              <div class="qty">
-                <button id="minus">−</button>
-                <span id="qty">1</span>
-                <button id="plus">+</button>
-              </div>
-              <button class="btn dark" id="mintBtn">CONNECT WALLET TO MINT</button>
-            </div>
-            <p class="mint-status mono" id="mintStatus">Connect your wallet to see live price and supply.</p>
-          </div>
+        <div>
+          <a class="btn dark" href="https://snakeesc.github.io" target="_blank" rel="noopener">PLAY NOW →</a>
         </div>
+      </section>
 
-        <div class="game-card" id="game">
-          <div>
-            <div class="eyebrow">Game</div>
-            <h3>Escape the Snake.</h3>
-            <p>Take a break from the pond and play our frog-themed take on the classic Snake game.</p>
-          </div>
-          <div><a class="btn dark" href="https://snakeesc.github.io" target="_blank" rel="noopener">PLAY NOW →</a></div>
-        </div>
-      </div>
     </div>
-  </section>
+  </div>
+</section>
+
 </main>
 
 <footer>
-  <div class="shell footer">
-    <span>FRESH FROGS</span>
-    <span>COLLECT · STAKE · MINT · PLAY</span>
+  <div class="shell footer-row">
+    <span>FRESH FROGS NFT</span>
+    <span class="footer-links">
+      <a href="https://opensea.io/collection/fresh-frogs" target="_blank" rel="noopener">OPENSEA</a>
+      <a href="https://etherscan.io/token/0xbe4bef8735107db540de269ff82c7de9ef68c51b" target="_blank" rel="noopener">ETHERSCAN</a>
+      <a href="https://discord.gg/xWMFWgpvd3" target="_blank" rel="noopener">DISCORD</a>
+      <a href="https://twitter.com/FreshFrogs_NFT" target="_blank" rel="noopener">TWITTER</a>
+    </span>
   </div>
 </footer>
 
@@ -574,6 +858,7 @@ const CONTRACT_ADDRESS   = '0xBE4Bef8735107db540De269FF82c7dE9ef68C51b';
 const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const ALCHEMY_KEY        = '__ALCHEMY_KEY__';
 const ALQ                = 'https://eth-mainnet.g.alchemy.com/nft/v3/' + ALCHEMY_KEY;
+const RPC                = 'https://eth-mainnet.g.alchemy.com/v2/' + ALCHEMY_KEY;
 const MINT_PRICE         = 0.01;
 const NETWORK            = 'main';
 const TOTAL_SUPPLY       = 4040;
@@ -591,6 +876,26 @@ function cachedFetch(key, url, ttlMs) {
 
 function truncateAddr(addr) {
   return addr ? addr.slice(0, 6) + '…' + addr.slice(-4) : '';
+}
+
+function formatAgo(blocksAgo) {
+  const secs = Math.max(0, blocksAgo) * 12;
+  if (secs < 60) return 'moments ago';
+  const mins = Math.floor(secs / 60);
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h ago';
+  return Math.floor(hrs / 24) + 'd ago';
+}
+
+let currentBlockPromise = null;
+function getCurrentBlock() {
+  if (currentBlockPromise) return currentBlockPromise;
+  currentBlockPromise = fetch(RPC, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 })
+  }).then(r => r.json()).then(d => parseInt(d.result, 16));
+  return currentBlockPromise;
 }
 
 const CONTROLLER_ABI = [
@@ -619,7 +924,7 @@ let mintLimit       = 9;
 let ownedFrogs      = [];
 let stakedFrogs     = [];
 let rewardsAmount   = 0;
-let stakedSetPromise = null;
+let stakedRosterPromise = null;
 
 // ── WALLET ──
 async function connectWallet() {
@@ -654,7 +959,7 @@ async function connectWallet() {
 }
 
 function setWalletButtons(text, disabled, connected) {
-  [document.getElementById('navWalletBtn'), document.getElementById('pondConnectBtn')].forEach(btn => {
+  [document.getElementById('navWalletBtn'), document.getElementById('myFrogsConnectBtn')].forEach(btn => {
     if (!btn) return;
     btn.textContent = text;
     btn.style.pointerEvents = disabled ? 'none' : '';
@@ -678,7 +983,7 @@ async function onWalletReady() {
     updateMintStatus('Connected: ' + truncateAddr(userAddress));
   }
 
-  loadMyPond();
+  loadMyFrogs();
   loadCollectionBatch(true);
 }
 
@@ -712,8 +1017,8 @@ document.getElementById('mintBtn').addEventListener('click', async () => {
     const invite     = invites[defaultKey] ? defaultKey : Object.keys(invites)[0];
 
     await f0Instance.mint(invite, mintQty);
-    updateMintStatus('Minted ' + mintQty + ' frog' + (mintQty !== 1 ? 's' : '') + '! Check My Pond below.');
-    loadMyPond();
+    updateMintStatus('Minted ' + mintQty + ' frog' + (mintQty !== 1 ? 's' : '') + '! Check My Frogs below.');
+    loadMyFrogs();
   } catch (e) {
     updateMintStatus('Mint failed: ' + e.message);
   }
@@ -721,11 +1026,11 @@ document.getElementById('mintBtn').addEventListener('click', async () => {
   btn.disabled = false;
 });
 
-// ── STAKED SET (for collection filters) ──
-function getStakedSet() {
-  if (stakedSetPromise) return stakedSetPromise;
-  stakedSetPromise = (async () => {
-    const set = new Set();
+// ── SHARED STAKED ROSTER (collection filters + The Pond) ──
+function getStakedRoster() {
+  if (stakedRosterPromise) return stakedRosterPromise;
+  stakedRosterPromise = (async () => {
+    const roster = [];
     let pageKey = null;
     try {
       do {
@@ -733,13 +1038,17 @@ function getStakedSet() {
           '&contractAddresses[]=' + CONTRACT_ADDRESS + '&withMetadata=false&pageSize=100' +
           (pageKey ? '&pageKey=' + encodeURIComponent(pageKey) : '');
         const data = await fetch(url).then(r => r.json());
-        (data.ownedNfts || []).forEach(n => set.add(parseInt(n.tokenId)));
+        (data.ownedNfts || []).forEach(n => roster.push({ tokenId: parseInt(n.tokenId), staker: null }));
         pageKey = data.pageKey || null;
       } while (pageKey);
-    } catch (e) { console.error('getStakedSet failed', e); }
-    return set;
+    } catch (e) { console.error('getStakedRoster failed', e); }
+    return roster;
   })();
-  return stakedSetPromise;
+  return stakedRosterPromise;
+}
+
+function getStakedSet() {
+  return getStakedRoster().then(roster => new Set(roster.map(r => r.tokenId)));
 }
 
 // ── COLLECTION GRID ──
@@ -753,8 +1062,9 @@ function makeFrogCard(container, id, opts) {
   card.className = 'frog-card';
   card.dataset.id = id;
   card.innerHTML =
-    '<img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy">' +
-    '<div class="frog-meta"><span>FROG #' + id + '</span><span>' + (opts.staked ? 'STAKED' : 'VIEW ↗') + '</span></div>';
+    '<div class="frog-art collection-art"><img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy"></div>' +
+    '<div class="frog-card-foot"><div><strong>Frog #' + id + '</strong><span>Fresh Frogs</span></div>' +
+    '<span>' + (opts.staked ? 'Staked ↗' : 'View ↗') + '</span></div>';
   card.addEventListener('click', () => openFrogModal(id, opts.staked));
   container.appendChild(card);
 }
@@ -787,9 +1097,9 @@ async function loadCollectionBatch(reset) {
 
 document.getElementById('collectionLoadMore').addEventListener('click', () => loadCollectionBatch(false));
 
-document.querySelectorAll('.filter-chip').forEach(chip => {
+document.querySelectorAll('#collection .filter').forEach(chip => {
   chip.addEventListener('click', () => {
-    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('#collection .filter').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     collectionFilter = chip.dataset.filter;
     document.getElementById('frogSearch').value = '';
@@ -826,42 +1136,42 @@ function saleTotalEth(sale) {
 }
 
 async function loadRecentSales() {
-  const list = document.getElementById('saleList');
-  const statusEl = document.getElementById('salesStatus');
+  const grid = document.getElementById('salesGrid');
   try {
-    const data  = await cachedFetch('ff_recent_sales', ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=6', 5 * 60 * 1000);
+    const [data, currentBlock] = await Promise.all([
+      cachedFetch('ff_recent_sales', ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=6', 5 * 60 * 1000),
+      getCurrentBlock().catch(() => null)
+    ]);
     const sales = data.nftSales || [];
 
     if (!sales.length) {
-      list.innerHTML = '<span style="color:var(--muted);font-size:13px;">No recent sales data available.</span>';
-      statusEl.textContent = 'LIVE';
+      grid.innerHTML = '<span style="color:var(--muted);font-size:13px;">No recent sales data available.</span>';
       return;
     }
 
-    list.innerHTML = sales.map(sale => {
-      const id  = parseInt(sale.tokenId);
-      const eth = saleTotalEth(sale);
-      return '<div class="sale-row" data-id="' + id + '">' +
-        '<div class="sale-thumb"><img src="/frog/' + id + '.png" loading="lazy"></div>' +
-        '<div><div class="sale-name">FRESH FROG #' + id + '</div><div class="sale-sub">' +
-        (sale.buyerAddress ? 'Sold to ' + truncateAddr(sale.buyerAddress) : 'Recent sale') +
-        '</div></div>' +
-        '<div class="sale-price">' + (eth != null ? 'Ξ ' + eth.toFixed(3) : 'Ξ —') + '</div>' +
-        '</div>';
+    grid.innerHTML = sales.map(sale => {
+      const id       = parseInt(sale.tokenId);
+      const eth      = saleTotalEth(sale);
+      const blockNum = parseInt(sale.blockNumber);
+      const ago      = (currentBlock && blockNum) ? formatAgo(currentBlock - blockNum) : 'Recent';
+      const market   = sale.marketplace ? sale.marketplace.charAt(0).toUpperCase() + sale.marketplace.slice(1) : 'OpenSea';
+      return '<article class="sale-card" data-id="' + id + '">' +
+        '<div class="frog-art sale-art"><img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy"></div>' +
+        '<div class="sale-info"><div><strong>Frog #' + id + '</strong><span>' + ago + '</span></div>' +
+        '<div class="sale-price"><strong>' + (eth != null ? 'Ξ ' + eth.toFixed(3) : 'Ξ —') + '</strong><span>' + market + '</span></div>' +
+        '</div></article>';
     }).join('');
 
-    list.querySelectorAll('.sale-row').forEach(row => {
-      row.addEventListener('click', () => openFrogModal(parseInt(row.dataset.id, 10)));
+    grid.querySelectorAll('.sale-card').forEach(card => {
+      card.addEventListener('click', () => openFrogModal(parseInt(card.dataset.id, 10)));
     });
-    statusEl.textContent = 'LIVE';
   } catch (e) {
-    list.innerHTML = '<span style="color:var(--muted);font-size:13px;">Could not load recent sales.</span>';
-    statusEl.textContent = 'OFFLINE';
+    grid.innerHTML = '<span style="color:var(--muted);font-size:13px;">Could not load recent sales.</span>';
   }
 }
 
-// ── MY POND ──
-async function loadMyPond() {
+// ── MY FROGS (personal wallet) ──
+async function loadMyFrogs() {
   if (!walletConnected) return;
   try {
     const [walletResp, stakedResult, rewardsRaw] = await Promise.all([
@@ -874,35 +1184,33 @@ async function loadMyPond() {
     stakedFrogs   = stakedResult.map(s => parseInt(s.tokenId));
     rewardsAmount = parseFloat(rewardsRaw) / 1e18;
 
-    renderPondPanel('owned');
-    renderPondPanel('staked');
+    renderMyFrogsPanel('owned');
+    renderMyFrogsPanel('staked');
     updateClaimUI();
   } catch (e) {
-    console.error('loadMyPond failed', e);
+    console.error('loadMyFrogs failed', e);
   }
 }
 
-function renderPondPanel(which) {
-  const panel   = document.getElementById(which + 'Panel');
-  const ids     = which === 'owned' ? ownedFrogs : stakedFrogs;
-  const label   = panel.querySelector('.eyebrow');
-  const p       = panel.querySelector('p');
-  const miniWrap = panel.querySelector('.mini-frogs');
-
-  label.textContent = (which === 'owned' ? 'Wallet · ' : 'Staking · ') + truncateAddr(userAddress);
+function renderMyFrogsPanel(which) {
+  const panel    = document.getElementById(which + 'Panel');
+  const ids      = which === 'owned' ? ownedFrogs : stakedFrogs;
+  const copy     = document.getElementById(which + 'Copy');
+  const miniWrap = panel.querySelector('.wallet-grid');
 
   if (!ids.length) {
-    p.textContent = which === 'owned'
+    copy.textContent = which === 'owned'
       ? 'No frogs in this wallet yet.'
       : 'Nothing staked yet — stake a frog from the collection or mint section.';
     miniWrap.innerHTML = '';
     return;
   }
 
-  p.textContent = ids.length + ' frog' + (ids.length !== 1 ? 's' : '') + (which === 'owned' ? ' ready to stake.' : ' earning $FLYZ.');
+  copy.textContent = ids.length + ' frog' + (ids.length !== 1 ? 's' : '') + (which === 'owned' ? ' ready to stake.' : ' earning $FLYZ.');
   miniWrap.innerHTML = '';
   ids.slice(0, 6).forEach(id => {
     const div = document.createElement('div');
+    div.className = 'frog-art wallet-art';
     div.innerHTML = '<img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy">';
     div.addEventListener('click', () => openFrogModal(id, which === 'staked'));
     miniWrap.appendChild(div);
@@ -936,22 +1244,16 @@ document.getElementById('claimBtn').addEventListener('click', async () => {
   btn.disabled = false;
 });
 
-document.getElementById('pondConnectBtn').addEventListener('click', (e) => {
-  e.preventDefault();
-  connectWallet();
-});
+document.getElementById('myFrogsConnectBtn').addEventListener('click', () => connectWallet());
+document.getElementById('navWalletBtn').addEventListener('click', () => connectWallet());
 
-document.getElementById('navWalletBtn').addEventListener('click', () => {
-  connectWallet();
-});
-
-document.querySelectorAll('.tab').forEach(tab => {
+document.querySelectorAll('#my-pond .tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('#my-pond .tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     const owned = tab.dataset.tab === 'owned';
-    document.getElementById('ownedPanel').style.display = owned ? 'flex' : 'none';
-    document.getElementById('stakedPanel').style.display = owned ? 'none' : 'flex';
+    document.getElementById('ownedPanel').style.display = owned ? 'block' : 'none';
+    document.getElementById('stakedPanel').style.display = owned ? 'none' : 'block';
   });
 });
 
@@ -968,9 +1270,10 @@ async function stakeFromModal(id) {
     statusEl.textContent = 'Confirm staking Frog #' + id + ' in MetaMask…';
     await controllerCtx.methods.stake(id).send({ from: userAddress });
     statusEl.textContent = 'Frog #' + id + ' staked!';
-    stakedSetPromise = null;
-    loadMyPond();
+    stakedRosterPromise = null;
+    loadMyFrogs();
     loadCollectionBatch(true);
+    reloadPond();
   } catch (e) {
     statusEl.textContent = 'Staking failed: ' + e.message;
   }
@@ -982,13 +1285,132 @@ async function unstakeFromModal(id) {
   try {
     await controllerCtx.methods.withdraw(id).send({ from: userAddress });
     statusEl.textContent = 'Frog #' + id + ' returned to wallet.';
-    stakedSetPromise = null;
-    loadMyPond();
+    stakedRosterPromise = null;
+    loadMyFrogs();
     loadCollectionBatch(true);
+    reloadPond();
   } catch (e) {
     statusEl.textContent = 'Unstaking failed: ' + e.message;
   }
 }
+
+// ── THE POND (community-wide staked frogs) ──
+let pondAllFrogs = [];
+let pondFiltered = [];
+let pondOffset   = 0;
+const POND_BATCH = 16;
+let pondLoaded   = false;
+
+async function loadPond() {
+  pondLoaded = true;
+  const grid = document.getElementById('pondGrid');
+  grid.innerHTML = '<span class="eyebrow">Loading the pond…</span>';
+  document.getElementById('pondStat').textContent = 'Loading…';
+
+  try {
+    pondAllFrogs = await getStakedRoster();
+    pondFiltered = [...pondAllFrogs];
+    document.getElementById('pondStat').textContent = '🐸 ' + pondAllFrogs.length + ' staked';
+    renderPondBatch(true);
+  } catch (e) {
+    grid.innerHTML = '<p style="color:#c0392b;">Failed to load the pond: ' + e.message + '</p>';
+  }
+}
+
+function reloadPond() {
+  if (!pondLoaded) return;
+  stakedRosterPromise = null;
+  loadPond();
+}
+
+function renderPondBatch(reset) {
+  const grid = document.getElementById('pondGrid');
+  if (reset) { grid.innerHTML = ''; pondOffset = 0; }
+
+  const end = Math.min(pondOffset + POND_BATCH, pondFiltered.length);
+  for (let i = pondOffset; i < end; i++) makePondCard(grid, pondFiltered[i]);
+  pondOffset = end;
+
+  document.getElementById('pondLoadMoreWrap').style.display = pondOffset < pondFiltered.length ? '' : 'none';
+
+  if (!pondFiltered.length) {
+    grid.innerHTML = '<p style="grid-column:1/-1;color:var(--muted);">No frogs match your search.</p>';
+  }
+}
+
+function makePondCard(container, entry) {
+  const { tokenId } = entry;
+  const card = document.createElement('article');
+  card.className = 'frog-card';
+  card.dataset.id = tokenId;
+  card.innerHTML =
+    '<div class="frog-art collection-art"><img src="/frog/' + tokenId + '.png" alt="Fresh Frog #' + tokenId + '" loading="lazy"></div>' +
+    '<div class="frog-card-foot" style="flex-direction:column;align-items:stretch;gap:6px;">' +
+    '<div class="pond-meta-row"><strong>Frog #' + tokenId + '</strong><span class="pond-staker" id="staker-' + tokenId + '">loading…</span></div>' +
+    '<div id="level-' + tokenId + '"></div>' +
+    '</div>';
+  card.addEventListener('click', () => openFrogModal(tokenId, true));
+  container.appendChild(card);
+  lazyLoadPondMeta(card, tokenId, entry);
+}
+
+function lazyLoadPondMeta(card, tokenId, entry) {
+  const stakerEl = document.getElementById('staker-' + tokenId);
+  const levelEl  = document.getElementById('level-' + tokenId);
+  const obs = new IntersectionObserver(async (entries, observer) => {
+    if (!entries[0].isIntersecting) return;
+    observer.disconnect();
+    try {
+      const txResp = await fetch(
+        ALQ.replace('/nft/v3/', '/v2/') + '/getAssetTransfers?fromBlock=0x0&toBlock=latest' +
+        '&toAddress=' + CONTROLLER_ADDRESS +
+        '&contractAddresses[]=' + CONTRACT_ADDRESS +
+        '&tokenId=0x' + tokenId.toString(16).padStart(64, '0') +
+        '&category[]=erc721&order=desc&maxCount=1&withMetadata=false'
+      ).then(r => r.json());
+
+      const transfers = txResp?.result?.transfers || [];
+      if (transfers.length) {
+        const staker = transfers[0].from;
+        entry.staker = staker;
+        stakerEl.textContent = truncateAddr(staker);
+        stakerEl.title = staker;
+
+        const stakingBlock = parseInt(transfers[0].blockNum, 16);
+        const currentBlock = await getCurrentBlock();
+        const blocksStaked = currentBlock - stakingBlock;
+        const hoursStaked  = Math.floor(blocksStaked * 12 / 3600);
+
+        let level = 1, pct = Math.min(100, Math.floor((hoursStaked / 1000) * 100));
+        if (hoursStaked >= 2000) { level = 3; pct = Math.min(100, Math.floor(((hoursStaked - 2000) / 1000) * 100)); }
+        else if (hoursStaked >= 1000) { level = 2; pct = Math.min(100, Math.floor(((hoursStaked - 1000) / 1000) * 100)); }
+
+        levelEl.innerHTML =
+          '<div class="pond-level-line">LEVEL ' + level + ' · ' + hoursStaked + 'H STAKED</div>' +
+          '<div class="pond-bar-wrap"><div class="pond-bar-fill" style="width:' + pct + '%;"></div></div>';
+      } else {
+        stakerEl.textContent = 'unknown';
+      }
+    } catch (e) {
+      stakerEl.textContent = 'unavailable';
+    }
+  }, { rootMargin: '200px' });
+  obs.observe(card);
+}
+
+document.getElementById('pondSearch').addEventListener('input', () => {
+  const q = document.getElementById('pondSearch').value.trim().toLowerCase();
+  pondFiltered = !q ? [...pondAllFrogs] : pondAllFrogs.filter(f =>
+    String(f.tokenId).includes(q) || (f.staker && f.staker.toLowerCase().includes(q))
+  );
+  renderPondBatch(true);
+});
+
+document.getElementById('pondLoadMore').addEventListener('click', () => renderPondBatch(false));
+document.getElementById('pondRefresh').addEventListener('click', () => {
+  document.getElementById('pondSearch').value = '';
+  reloadPond();
+});
 
 // ── FROG MODAL ──
 async function openFrogModal(id, isStakedHint) {
@@ -1036,6 +1458,7 @@ document.getElementById('ffModal').addEventListener('click', function (e) {
 document.addEventListener('DOMContentLoaded', function () {
   loadRecentSales();
   loadCollectionBatch(true);
+  loadPond();
 });
 </script>
 

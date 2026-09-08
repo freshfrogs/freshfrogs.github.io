@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fresh Frogs NFT</title>
+<meta name="description" content="Fresh Frogs NFT — 4,040 unique frogs on Ethereum. Collect, stake, earn, level up and morph.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; }
+
+:root {
+  --bg: #f3f3ec;
+  --surface: #fafaf6;
+  --surface-2: #eef1e9;
+  --ink: #172019;
+  --muted: #6a736b;
+  --line: #cdd4ca;
+  --accent: #e8df87;
+  --pond: #d7e4d3;
+  --water: #d4e5e2;
+  --mint: #c6d4a8;
+  --game: #dcb89e;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+a { color: inherit; text-decoration: none; }
+button, input { font: inherit; }
+
+.shell {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.mono {
+  font-family: "Space Mono", monospace;
+}
+
+.eyebrow {
+  font: 700 11px "Space Mono", monospace;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: #637064;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 9px 13px;
+  border: 1px solid #a4ada1;
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 700 10px "Space Mono", monospace;
+  cursor: pointer;
+}
+
+.btn.primary { background: var(--accent); }
+.btn.dark { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+/* Shared frog image system */
+.frog-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--pond);
+}
+
+.frog-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  image-rendering: pixelated;
+}
+
+/* Header */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(243,243,236,.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav {
+  height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.brand img {
+  height: 38px;
+  display: block;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font: 700 10px "Space Mono", monospace;
+}
+
+.nav-links > a:not(.btn) { opacity: .75; }
+.nav-links > a:not(.btn):hover { opacity: 1; }
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 58px 0 34px;
+}
+
+.hero h1 {
+  margin: 10px 0 12px;
+  font-family: "Archivo Black", sans-serif;
+  font-size: clamp(62px, 8.5vw, 108px);
+  line-height: .84;
+  letter-spacing: -.06em;
+  text-transform: uppercase;
+}
+
+.hero-copy {
+  max-width: 620px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+
+.hero-frogs {
+  width: min(500px, 100%);
+  margin: 32px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.hero-frogs .frog-art {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.hero-frogs .frog-art:nth-child(2) { background: var(--water); }
+.hero-frogs .frog-art:nth-child(3) { background: #e6dfc9; }
+
+
+/* Sections */
+.section {
+  padding: 58px 0;
+}
+
+.section + .section {
+  border-top: 1px solid var(--line);
+}
+
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.section-head h2 {
+  margin: 4px 0 0;
+  font: 700 31px/1 "Space Mono", monospace;
+  letter-spacing: -.04em;
+}
+
+.section-head p {
+  max-width: 430px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Collection */
+.collection-tools {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.search {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 11px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.filter {
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface);
+  font: 700 9px "Space Mono", monospace;
+}
+
+.frog-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 170px));
+  justify-content: center;
+  gap: 12px;
+}
+
+.frog-card {
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.collection-art {
+  border-radius: 5px;
+}
+
+.frog-card:nth-child(4n+2) .collection-art { background: var(--water); }
+.frog-card:nth-child(4n+3) .collection-art { background: #e6dfc9; }
+.frog-card:nth-child(4n+4) .collection-art { background: #ddd8e5; }
+
+.frog-card-foot {
+  padding: 10px 3px 3px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.frog-card-foot strong {
+  display: block;
+  font: 700 9px "Space Mono", monospace;
+}
+
+.frog-card-foot span,
+.frog-card-foot > a {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font: 700 10px "Space Mono", monospace;
+}
+
+/* Activity */
+.activity-layout {
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap: 12px;
+}
+
+.panel {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.panel h3 {
+  margin: 0;
+  font: 700 17px "Space Mono", monospace;
+}
+
+/* Compact Recent Sales list */
+.sales-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 7px;
+}
+
+.sale-card {
+  display: grid;
+  grid-template-columns: 68px 1fr;
+  gap: 11px;
+  align-items: center;
+  padding: 7px;
+  border: 1px solid #d8ddd5;
+  border-radius: 7px;
+  background: #fdfdf9;
+}
+
+.sale-art {
+  width: 68px;
+  height: 68px;
+  aspect-ratio: 1;
+  border-radius: 5px;
+  background: var(--pond);
+}
+
+.sale-card:nth-child(2) .sale-art { background: var(--water); }
+.sale-card:nth-child(3) .sale-art { background: #e6dfc9; }
+
+.sale-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 0 3px 0 0;
+}
+
+.sale-info strong {
+  display: block;
+  font: 700 11px "Space Mono", monospace;
+}
+
+.sale-info span {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.sale-price {
+  text-align: right;
+}
+
+/* My Pond */
+.tabs {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.tab {
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: transparent;
+  font: 700 9px "Space Mono", monospace;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.wallet-copy {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.wallet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.wallet-art {
+  width: 72px;
+  height: 72px;
+  border-radius: 5px;
+}
+
+/* Mint / Pad / Game */
+.action-grid {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 12px;
+}
+
+.action-card {
+  min-height: 260px;
+  padding: 24px;
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mint-card {
+  background: var(--mint);
+  border: 1px solid #b1c092;
+}
+
+.game-card {
+  background: var(--game);
+  border: 1px solid #c7a38b;
+}
+
+.action-card h3 {
+  margin: 6px 0 10px;
+  font: 700 28px/1 "Space Mono", monospace;
+  letter-spacing: -.04em;
+}
+
+.action-card p {
+  max-width: 500px;
+  margin: 0;
+  color: #4f5950;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.mint-bottom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.qty {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #93a281;
+  border-radius: 5px;
+  background: rgba(255,255,255,.28);
+}
+
+.qty button {
+  border: 0;
+  background: transparent;
+  padding: 9px 11px;
+  cursor: pointer;
+}
+
+.qty span {
+  min-width: 34px;
+  text-align: center;
+  font: 700 10px "Space Mono", monospace;
+}
+
+.pad-link {
+  margin-top: 10px;
+  font: 700 9px "Space Mono", monospace;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* About */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.about-card {
+  padding: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.about-card h3 {
+  margin: 0 0 9px;
+  font: 700 16px "Space Mono", monospace;
+}
+
+.about-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--line);
+  padding: 23px 0 34px;
+}
+
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: #717971;
+  font: 700 9px "Space Mono", monospace;
+}
+
+/* Responsive */
+@media (max-width: 880px) {
+  .nav-links > a:not(.btn) { display: none; }
+  .activity-layout,
+  .action-grid,
+  .about-grid { grid-template-columns: 1fr; }
+  .frog-grid { grid-template-columns: repeat(3, minmax(0, 150px)); }
+}
+
+@media (max-width: 650px) {
+  .shell { width: min(100% - 28px, 1120px); }
+  .hero { padding-top: 46px; }
+  .hero-frogs { grid-template-columns: repeat(3, 1fr); }
+  .section-head { align-items: flex-start; flex-direction: column; }
+  .frog-grid { grid-template-columns: repeat(2, minmax(0, 150px)); }
+  .sales-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="shell nav">
+    <a class="brand" href="#"><img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/logo.png" alt="Fresh Frogs"></a>
+    <nav class="nav-links">
+      <a href="#collection">COLLECTION</a>
+      <a href="#activity">RECENT SALES</a>
+      <a href="#my-pond">MY FROGS</a>
+      <a href="#mint">MINT</a>
+      <a href="#game">GAME</a>
+      <a class="btn" href="#my-pond">CONNECT WALLET</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="shell">
+    <div class="eyebrow">4,040 UNIQUE FROGS ON ETHEREUM</div>
+    <h1>FRESH<br>FROGS</h1>
+    <p class="hero-copy">
+      Collect, mint and stake Fresh Frogs. Use The Pad to earn rewards, level up,
+      unlock animated traits and morph your frogs.
+    </p>
+
+    <div class="hero-actions">
+      <a class="btn primary" href="#collection">EXPLORE COLLECTION</a>
+      <a class="btn" href="/the-pad/">ENTER THE PAD</a>
+      <a class="btn" href="#mint">MINT</a>
+    </div>
+
+    <div class="hero-frogs">
+      <div class="frog-art"><img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/12.png" alt="Fresh Frog #12"></div>
+      <div class="frog-art"><img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/31.png" alt="Fresh Frog #31"></div>
+      <div class="frog-art"><img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/42.png" alt="Fresh Frog #42"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="collection">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">THE COLLECTION</div>
+        <h2>Explore Fresh Frogs</h2>
+      </div>
+      <p>Browse the collection by token ID and open any Fresh Frog on OpenSea.</p>
+    </div>
+
+    <div class="collection-tools">
+      <input id="frogSearch" class="search" type="search" placeholder="Search by frog number">
+      <button class="filter">ALL FROGS</button>
+      <button class="filter">AVAILABLE</button>
+      <button class="filter">STAKED</button>
+    </div>
+
+    <div class="frog-grid" id="frogGrid">
+      
+    <article class="frog-card" data-id="3">
+      <a class="frog-art collection-art" href="#">
+        <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/3.png" alt="Fresh Frog #3">
+      </a>
+      <div class="frog-card-foot">
+        <div>
+          <strong>Frog #3</strong>
+          <span>Fresh Frogs</span>
+        </div>
+        <a href="#">View ↗</a>
+      </div>
+    </article>
+    
+    <article class="frog-card" data-id="8">
+      <a class="frog-art collection-art" href="#">
+        <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/8.png" alt="Fresh Frog #8">
+      </a>
+      <div class="frog-card-foot">
+        <div>
+          <strong>Frog #8</strong>
+          <span>Fresh Frogs</span>
+        </div>
+        <a href="#">View ↗</a>
+      </div>
+    </article>
+    
+    <article class="frog-card" data-id="12">
+      <a class="frog-art collection-art" href="#">
+        <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/12.png" alt="Fresh Frog #12">
+      </a>
+      <div class="frog-card-foot">
+        <div>
+          <strong>Frog #12</strong>
+          <span>Fresh Frogs</span>
+        </div>
+        <a href="#">View ↗</a>
+      </div>
+    </article>
+    
+    <article class="frog-card" data-id="19">
+      <a class="frog-art collection-art" href="#">
+        <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/19.png" alt="Fresh Frog #19">
+      </a>
+      <div class="frog-card-foot">
+        <div>
+          <strong>Frog #19</strong>
+          <span>Fresh Frogs</span>
+        </div>
+        <a href="#">View ↗</a>
+      </div>
+    </article>
+    
+    <article class="frog-card" data-id="23">
+      <a class="frog-art collection-art" href="#">
+        <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/23.png" alt="Fresh Frog #23">
+      </a>
+      <div class="frog-card-foot">
+        <div>
+          <strong>Frog #23</strong>
+          <span>Fresh Frogs</span>
+        </div>
+        <a href="#">View ↗</a>
+      </div>
+    </article>
+    
+    <article class="frog-card" data-id="31">
+      <a class="frog-art collection-art" href="#">
+        <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/31.png" alt="Fresh Frog #31">
+      </a>
+      <div class="frog-card-foot">
+        <div>
+          <strong>Frog #31</strong>
+          <span>Fresh Frogs</span>
+        </div>
+        <a href="#">View ↗</a>
+      </div>
+    </article>
+    
+    <article class="frog-card" data-id="42">
+      <a class="frog-art collection-art" href="#">
+        <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/42.png" alt="Fresh Frog #42">
+      </a>
+      <div class="frog-card-foot">
+        <div>
+          <strong>Frog #42</strong>
+          <span>Fresh Frogs</span>
+        </div>
+        <a href="#">View ↗</a>
+      </div>
+    </article>
+    
+    <article class="frog-card" data-id="67">
+      <a class="frog-art collection-art" href="#">
+        <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/67.png" alt="Fresh Frog #67">
+      </a>
+      <div class="frog-card-foot">
+        <div>
+          <strong>Frog #67</strong>
+          <span>Fresh Frogs</span>
+        </div>
+        <a href="#">View ↗</a>
+      </div>
+    </article>
+    
+    </div>
+  </div>
+</section>
+
+<section class="section" id="activity">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">RECENT ACTIVITY</div>
+        <h2>Recent Sales</h2>
+      </div>
+      <p>See the latest Fresh Frogs sales across the collection.</p>
+    </div>
+
+    <div class="activity-layout">
+
+      <section class="panel">
+        <div class="panel-head">
+          <h3>Latest Sales</h3>
+          <a class="btn" href="#">VIEW ALL</a>
+        </div>
+        <div class="sales-grid">
+          
+    <article class="sale-card">
+      <div class="frog-art sale-art">
+        <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/31.png" alt="Fresh Frog #31">
+      </div>
+      <div class="sale-info">
+        <div>
+          <strong>Frog #31</strong>
+          <span>1h ago</span>
+        </div>
+        <div class="sale-price">
+          <strong>Ξ —</strong>
+          <span>OpenSea</span>
+        </div>
+      </div>
+    </article>
+    
+    <article class="sale-card">
+      <div class="frog-art sale-art">
+        <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/12.png" alt="Fresh Frog #12">
+      </div>
+      <div class="sale-info">
+        <div>
+          <strong>Frog #12</strong>
+          <span>2h ago</span>
+        </div>
+        <div class="sale-price">
+          <strong>Ξ —</strong>
+          <span>OpenSea</span>
+        </div>
+      </div>
+    </article>
+    
+    <article class="sale-card">
+      <div class="frog-art sale-art">
+        <img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/42.png" alt="Fresh Frog #42">
+      </div>
+      <div class="sale-info">
+        <div>
+          <strong>Frog #42</strong>
+          <span>3h ago</span>
+        </div>
+        <div class="sale-price">
+          <strong>Ξ —</strong>
+          <span>OpenSea</span>
+        </div>
+      </div>
+    </article>
+    
+        </div>
+      </section>
+
+      <section class="panel" id="my-pond">
+        <div class="panel-head">
+          <h3>My Frogs</h3>
+          <button class="btn">CONNECT WALLET</button>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" data-tab="owned">OWNED</button>
+          <button class="tab" data-tab="staked">STAKED</button>
+        </div>
+
+        <div id="ownedPanel">
+          <p class="wallet-copy">Connect your wallet to view the Fresh Frogs you own.</p>
+          <div class="wallet-grid"><div class="frog-art wallet-art"><img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/3.png" alt="Fresh Frog #3"></div><div class="frog-art wallet-art"><img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/23.png" alt="Fresh Frog #23"></div><div class="frog-art wallet-art"><img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/67.png" alt="Fresh Frog #67"></div></div>
+        </div>
+
+        <div id="stakedPanel" style="display:none">
+          <p class="wallet-copy">View your staked frogs and staking activity in The Pad.</p>
+          <div class="wallet-grid"><div class="frog-art wallet-art"><img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/8.png" alt="Fresh Frog #8"></div><div class="frog-art wallet-art"><img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/19.png" alt="Fresh Frog #19"></div><div class="frog-art wallet-art"><img src="https://raw.githubusercontent.com/freshfrogs/freshfrogs.github.io/main/assets/frogs/31.png" alt="Fresh Frog #31"></div></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mint">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">FRESH FROGS</div>
+        <h2>Mint & Play</h2>
+      </div>
+      <p>Mint Fresh Frogs, manage staking in The Pad, and jump into Escape the Snake.</p>
+    </div>
+
+    <div class="action-grid">
+
+      <section class="action-card mint-card">
+        <div>
+          <div class="eyebrow">MINT FRESH FROGS</div>
+          <h3>Mint a Frog</h3>
+          <p>Choose a quantity, connect your wallet, and mint Fresh Frogs directly from the site.</p>
+          <a class="pad-link" href="/the-pad/">STAKING & MORPHING →</a>
+        </div>
+
+        <div class="mint-bottom">
+          <div class="qty">
+            <button id="minus" aria-label="Decrease quantity">−</button>
+            <span id="qty">1</span>
+            <button id="plus" aria-label="Increase quantity">+</button>
+          </div>
+          <button class="btn dark">CONNECT TO MINT</button>
+        </div>
+      </section>
+
+      <section class="action-card game-card" id="game">
+        <div>
+          <div class="eyebrow">FRESH FROGS GAME</div>
+          <h3>Escape the Snake</h3>
+          <p>Keep your frogs alive, build your run, and see how long you can survive.</p>
+        </div>
+        <div>
+          <a class="btn dark" href="/snake/">PLAY NOW →</a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">ABOUT</div>
+        <h2>Fresh Frogs NFT</h2>
+      </div>
+    </div>
+
+    <div class="about-grid">
+      <article class="about-card">
+        <h3>4,040 Unique Frogs</h3>
+        <p>
+          Fresh Frogs is an Ethereum NFT collection with thousands of trait combinations.
+          Stake frogs to earn rewards, level up, unlock animated traits, and morph two frogs into one.
+        </p>
+      </article>
+
+      <article class="about-card">
+        <h3>Protecting Real Frogs</h3>
+        <p>
+          A portion of every sale supports The Rainforest Foundation and its work protecting
+          rainforest habitat around the world.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="shell footer-row">
+    <span>FRESH FROGS NFT</span>
+    <span>OPENSEA · ETHERSCAN · DISCORD · TWITTER</span>
+  </div>
+</footer>
+
+<script>
+const search = document.getElementById('frogSearch');
+const cards = [...document.querySelectorAll('.frog-card')];
+
+search.addEventListener('input', () => {
+  const q = search.value.trim();
+  cards.forEach(card => {
+    card.style.display = !q || card.dataset.id.includes(q) ? '' : 'none';
+  });
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const owned = tab.dataset.tab === 'owned';
+    document.getElementById('ownedPanel').style.display = owned ? 'block' : 'none';
+    document.getElementById('stakedPanel').style.display = owned ? 'none' : 'block';
+  });
+});
+
+let qty = 1;
+const qtyEl = document.getElementById('qty');
+
+document.getElementById('minus').addEventListener('click', () => {
+  qty = Math.max(1, qty - 1);
+  qtyEl.textContent = qty;
+});
+
+document.getElementById('plus').addEventListener('click', () => {
+  qty = Math.min(9, qty + 1);
+  qtyEl.textContent = qty;
+});
+</script>
+
+</body>
+</html>
