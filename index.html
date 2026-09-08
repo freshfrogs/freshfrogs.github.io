@@ -898,6 +898,19 @@ function getCurrentBlock() {
   return currentBlockPromise;
 }
 
+let ethUsdRatePromise = null;
+function getEthUsdRate() {
+  if (ethUsdRatePromise) return ethUsdRatePromise;
+  ethUsdRatePromise = cachedFetch('ff_eth_usd', 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd', 5 * 60 * 1000)
+    .then(d => (d && d.ethereum && d.ethereum.usd) || null)
+    .catch(() => null);
+  return ethUsdRatePromise;
+}
+
+function formatUsd(n) {
+  return '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 const CONTROLLER_ABI = [
   { inputs: [], name: 'claimRewards', outputs: [], stateMutability: 'nonpayable', type: 'function' },
   { inputs: [{ internalType: 'uint256', name: '_tokenId', type: 'uint256' }], name: 'stake', outputs: [], stateMutability: 'nonpayable', type: 'function' },
@@ -978,7 +991,9 @@ async function onWalletReady() {
     const price      = invites[invite]?.condition?.converted?.eth || MINT_PRICE;
     const limit      = invites[invite]?.condition?.converted?.limit || 9;
     mintLimit = limit;
-    updateMintStatus('Connected ' + truncateAddr(userAddress) + ' · Ξ' + price + ' each · max ' + limit + ' per tx');
+    const ethUsd  = await getEthUsdRate();
+    const usdLine = ethUsd ? ' (≈' + formatUsd(price * ethUsd) + ')' : '';
+    updateMintStatus('Connected ' + truncateAddr(userAddress) + ' · Ξ' + price + usdLine + ' each · max ' + limit + ' per tx');
   } catch (e) {
     updateMintStatus('Connected: ' + truncateAddr(userAddress));
   }
@@ -1138,9 +1153,10 @@ function saleTotalEth(sale) {
 async function loadRecentSales() {
   const grid = document.getElementById('salesGrid');
   try {
-    const [data, currentBlock] = await Promise.all([
+    const [data, currentBlock, ethUsd] = await Promise.all([
       cachedFetch('ff_recent_sales', ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=6', 5 * 60 * 1000),
-      getCurrentBlock().catch(() => null)
+      getCurrentBlock().catch(() => null),
+      getEthUsdRate()
     ]);
     const sales = data.nftSales || [];
 
@@ -1152,13 +1168,15 @@ async function loadRecentSales() {
     grid.innerHTML = sales.map(sale => {
       const id       = parseInt(sale.tokenId);
       const eth      = saleTotalEth(sale);
+      const usd      = (eth != null && ethUsd) ? eth * ethUsd : null;
       const blockNum = parseInt(sale.blockNumber);
       const ago      = (currentBlock && blockNum) ? formatAgo(currentBlock - blockNum) : 'Recent';
       const market   = sale.marketplace ? sale.marketplace.charAt(0).toUpperCase() + sale.marketplace.slice(1) : 'OpenSea';
+      const subLine  = (usd != null ? formatUsd(usd) + ' · ' : '') + market;
       return '<article class="sale-card" data-id="' + id + '">' +
         '<div class="frog-art sale-art"><img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy"></div>' +
         '<div class="sale-info"><div><strong>Frog #' + id + '</strong><span>' + ago + '</span></div>' +
-        '<div class="sale-price"><strong>' + (eth != null ? 'Ξ ' + eth.toFixed(3) : 'Ξ —') + '</strong><span>' + market + '</span></div>' +
+        '<div class="sale-price"><strong>' + (eth != null ? 'Ξ ' + eth.toFixed(3) : 'Ξ —') + '</strong><span>' + subLine + '</span></div>' +
         '</div></article>';
     }).join('');
 
