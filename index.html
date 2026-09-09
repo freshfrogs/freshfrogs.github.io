@@ -1001,6 +1001,35 @@ function truncateAddr(addr) {
   return addr ? addr.slice(0, 6) + '…' + addr.slice(-4) : '';
 }
 
+// address (any case) -> Promise<username|null>, memoized for the session — the
+// same wallet often recurs across many cards/sales, so this caps it at one
+// network call per unique address. If OpenSea starts rate-limiting us, stop
+// trying for the rest of the session instead of piling up failed requests.
+const openSeaUsernameCache = {};
+let openSeaRateLimited = false;
+function getOpenSeaUsername(address) {
+  if (openSeaRateLimited || !address) return Promise.resolve(null);
+  const key = address.toLowerCase();
+  if (!openSeaUsernameCache[key]) {
+    openSeaUsernameCache[key] = fetch('https://api.opensea.io/api/v2/accounts/' + address, {
+      headers: { accept: 'application/json', 'x-api-key': OPENSEA_KEY }
+    }).then(r => {
+      if (r.status === 429) { openSeaRateLimited = true; return null; }
+      return r.json();
+    }).then(d => (d && (d.username || d.display_name)) || null).catch(() => null);
+  }
+  return openSeaUsernameCache[key];
+}
+
+// Patches an address-label element's text with the trader's OpenSea username
+// once resolved, keeping the truncated-address fallback until then.
+function decorateWithUsername(el, address, prefix) {
+  if (!el || !address) return;
+  getOpenSeaUsername(address).then(name => {
+    if (name) el.textContent = prefix + name;
+  });
+}
+
 function formatAgo(secsAgo) {
   const secs = Math.max(0, secsAgo);
   if (secs < 60) return 'moments ago';
@@ -1451,7 +1480,7 @@ function lazyLoadCollectionMeta(card, id, opts) {
       getReadControllerCtx().methods.stakerAddress(id).call()
         .then(staker => {
           ownerEl.textContent = staker && !/^0x0+$/.test(staker) ? 'Staked by: ' + truncateAddr(staker) : 'Staked by: unknown';
-          if (staker) ownerEl.title = staker;
+          if (staker) { ownerEl.title = staker; decorateWithUsername(ownerEl, staker, 'Staked by: '); }
         })
         .catch(() => { ownerEl.textContent = 'Staked by: unavailable'; });
     } else if (ownerEl) {
@@ -1460,7 +1489,7 @@ function lazyLoadCollectionMeta(card, id, opts) {
         .then(data => {
           const owner = (data.owners || [])[0];
           ownerEl.textContent = owner ? 'Owner: ' + truncateAddr(owner) : 'Owner unknown';
-          if (owner) ownerEl.title = owner;
+          if (owner) { ownerEl.title = owner; decorateWithUsername(ownerEl, owner, 'Owner: '); }
         })
         .catch(() => { ownerEl.textContent = 'Owner unavailable'; });
     }
@@ -1624,11 +1653,7 @@ function renderSalesGrid() {
   // truncated address already rendered above, so this is a progressive patch,
   // not something the initial render waits on.
   grid.querySelectorAll('.sale-addr[data-addr]').forEach(el => {
-    const addr = el.dataset.addr;
-    if (!addr) return;
-    getOpenSeaUsername(addr).then(name => {
-      if (name) el.textContent = (el.dataset.role === 'seller' ? 'From ' : 'To ') + name;
-    });
+    decorateWithUsername(el, el.dataset.addr, el.dataset.role === 'seller' ? 'From ' : 'To ');
   });
 }
 
@@ -1638,19 +1663,6 @@ function renderSalesGrid() {
 // missing the collection's actual highest sale entirely — while OpenSea's own
 // Events API (the marketplace where these sales actually happened) has it.
 // Memoized for the session — sales history only grows.
-// address (any case) -> Promise<username|null>, memoized for the session — the
-// same trader address often recurs across multiple sales.
-const openSeaUsernameCache = {};
-function getOpenSeaUsername(address) {
-  const key = address.toLowerCase();
-  if (!openSeaUsernameCache[key]) {
-    openSeaUsernameCache[key] = fetch('https://api.opensea.io/api/v2/accounts/' + address, {
-      headers: { accept: 'application/json', 'x-api-key': OPENSEA_KEY }
-    }).then(r => r.json()).then(d => d.username || d.display_name || null).catch(() => null);
-  }
-  return openSeaUsernameCache[key];
-}
-
 let allSalesPromise = null;
 function getAllSales() {
   if (allSalesPromise) return allSalesPromise;
@@ -1927,6 +1939,7 @@ function lazyLoadPondMeta(card, tokenId, entry) {
 
       entry.staker = staker;
       stakerEl.textContent = 'Staked by: ' + truncateAddr(staker);
+      decorateWithUsername(stakerEl, staker, 'Staked by: ');
 
       let stakedSince = await getStakedSince(tokenId);
       if (stakedSince == null) {
@@ -2053,17 +2066,19 @@ async function loadModalOwnerInfo(id, requestId) {
       else if (hoursStaked >= 1000) { level = 2; pct = Math.min(100, Math.floor(((hoursStaked - 1000) / 1000) * 100)); }
 
       el.innerHTML =
-        '<div class="pond-meta-row"><span class="pond-staker" title="' + staker + '">Staked by ' + truncateAddr(staker) + '</span><span class="pond-level-badge">LVL ' + level + '</span></div>' +
+        '<div class="pond-meta-row"><span class="pond-staker" id="modalAddrLabel" title="' + staker + '">Staked by ' + truncateAddr(staker) + '</span><span class="pond-level-badge">LVL ' + level + '</span></div>' +
         '<div class="pond-progress-line" style="margin-top:6px;"><span>' + formatDuration(hoursStaked) + '</span><span>' + pct + '%</span></div>' +
         '<div class="pond-bar-wrap"><div class="pond-bar-fill" style="width:' + pct + '%;"></div></div>';
+      decorateWithUsername(document.getElementById('modalAddrLabel'), staker, 'Staked by ');
       return;
     }
 
     const data  = await fetch(ALQ + '/getOwnersForNFT?contractAddress=' + CONTRACT_ADDRESS + '&tokenId=' + id).then(r => r.json());
     if (requestId !== modalRequestId) return;
     const owner = (data.owners || [])[0];
-    el.innerHTML = '<div class="pond-meta-row"><span class="pond-staker" title="' + (owner || '') + '">' +
+    el.innerHTML = '<div class="pond-meta-row"><span class="pond-staker" id="modalAddrLabel" title="' + (owner || '') + '">' +
       (owner ? 'Owner ' + truncateAddr(owner) : 'Owner unknown') + '</span><span class="pond-staker">Not staked</span></div>';
+    if (owner) decorateWithUsername(document.getElementById('modalAddrLabel'), owner, 'Owner ');
   } catch (e) {
     if (requestId !== modalRequestId) return;
     el.innerHTML = '<span class="pond-staker">Owner info unavailable</span>';
