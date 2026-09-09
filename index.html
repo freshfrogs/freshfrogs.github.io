@@ -63,13 +63,13 @@ button, input { font: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 38px;
-  padding: 9px 13px;
+  min-height: 40px;
+  padding: 10px 14px;
   border: 1px solid #a4ada1;
   border-radius: 5px;
   background: var(--surface);
   color: var(--ink);
-  font: 700 10px "Space Mono", monospace;
+  font: 700 11px "Space Mono", monospace;
   cursor: pointer;
 }
 
@@ -127,6 +127,11 @@ button, input { font: inherit; }
 
 .nav-links > a:not(.btn) { opacity: .75; }
 .nav-links > a:not(.btn):hover { opacity: 1; }
+.nav-links > a.active-link:not(.btn) { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+
+/* Pages */
+.page { display: none; }
+.page.active { display: block; }
 
 /* Hero */
 .hero {
@@ -147,7 +152,7 @@ button, input { font: inherit; }
   max-width: 620px;
   margin: 0 auto;
   color: var(--muted);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.65;
 }
 
@@ -160,21 +165,22 @@ button, input { font: inherit; }
 }
 
 .hero-frogs {
-  width: min(500px, 100%);
+  width: 100%;
   margin: 32px auto 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
   gap: 8px;
+  overflow: hidden;
 }
 
-.hero-frogs .frog-art {
+.hero-frog-tile {
+  width: 84px;
+  height: 84px;
+  flex: 0 0 auto;
   border: 1px solid var(--line);
   border-radius: 8px;
 }
-
-.hero-frogs .frog-art:nth-child(2) { background: var(--water); }
-.hero-frogs .frog-art:nth-child(3) { background: #e6dfc9; }
-
 
 /* Sections */
 .section {
@@ -203,7 +209,7 @@ button, input { font: inherit; }
   max-width: 430px;
   margin: 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
 }
 
@@ -219,20 +225,20 @@ button, input { font: inherit; }
 .search {
   flex: 1;
   min-width: 220px;
-  padding: 10px 11px;
+  padding: 11px 12px;
   border: 1px solid var(--line);
   border-radius: 5px;
   background: var(--surface);
   color: var(--ink);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .filter {
-  padding: 9px 11px;
+  padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 5px;
   background: var(--surface);
-  font: 700 9px "Space Mono", monospace;
+  font: 700 11px "Space Mono", monospace;
   cursor: pointer;
 }
 
@@ -240,13 +246,12 @@ button, input { font: inherit; }
 
 .frog-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 170px));
-  justify-content: center;
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
 }
 
 .frog-card {
-  padding: 7px;
+  padding: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
@@ -262,7 +267,7 @@ button, input { font: inherit; }
 .frog-card:nth-child(4n+4) .collection-art { background: #ddd8e5; }
 
 .frog-card-foot {
-  padding: 10px 3px 3px;
+  padding: 11px 3px 3px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -271,7 +276,7 @@ button, input { font: inherit; }
 
 .frog-card-foot strong {
   display: block;
-  font: 700 9px "Space Mono", monospace;
+  font: 700 12px "Space Mono", monospace;
 }
 
 .frog-card-foot span,
@@ -279,26 +284,26 @@ button, input { font: inherit; }
   display: block;
   margin-top: 2px;
   color: var(--muted);
-  font: 700 10px "Space Mono", monospace;
+  font: 700 12px "Space Mono", monospace;
 }
 
 .load-more-wrap { text-align: center; margin-top: 20px; }
 
 /* Community Pond cards */
 .pond-meta-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.pond-staker { font: 700 9px "Space Mono", monospace; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 110px; }
-.pond-level-line { font: 700 9px "Space Mono", monospace; color: var(--muted); margin-bottom: 3px; }
-.pond-bar-wrap { height: 4px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+.pond-staker { font: 700 11px "Space Mono", monospace; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
+.pond-level-line { font: 700 11px "Space Mono", monospace; color: var(--muted); margin-bottom: 4px; }
+.pond-bar-wrap { height: 5px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
 .pond-bar-fill { height: 100%; background: var(--ink); }
 .pond-stat-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 9px 12px;
+  padding: 10px 13px;
   border: 1px solid var(--line);
   border-radius: 5px;
   background: var(--surface);
-  font: 700 10px "Space Mono", monospace;
+  font: 700 11px "Space Mono", monospace;
   color: var(--muted);
   white-space: nowrap;
 }
@@ -329,22 +334,22 @@ button, input { font: inherit; }
 
 .panel h3 {
   margin: 0;
-  font: 700 17px "Space Mono", monospace;
+  font: 700 18px "Space Mono", monospace;
 }
 
 /* Compact Recent Sales list */
 .sales-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 7px;
+  gap: 8px;
 }
 
 .sale-card {
   display: grid;
-  grid-template-columns: 68px 1fr;
-  gap: 11px;
+  grid-template-columns: 88px 1fr;
+  gap: 12px;
   align-items: center;
-  padding: 7px;
+  padding: 9px;
   border: 1px solid #d8ddd5;
   border-radius: 7px;
   background: #fdfdf9;
@@ -352,8 +357,8 @@ button, input { font: inherit; }
 }
 
 .sale-art {
-  width: 68px;
-  height: 68px;
+  width: 88px;
+  height: 88px;
   aspect-ratio: 1;
   border-radius: 5px;
   background: var(--pond);
@@ -372,14 +377,14 @@ button, input { font: inherit; }
 
 .sale-info strong {
   display: block;
-  font: 700 11px "Space Mono", monospace;
+  font: 700 13px "Space Mono", monospace;
 }
 
 .sale-info span {
   display: block;
   margin-top: 3px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .sale-price {
@@ -394,11 +399,11 @@ button, input { font: inherit; }
 }
 
 .tab {
-  padding: 7px 9px;
+  padding: 8px 11px;
   border: 1px solid var(--line);
   border-radius: 5px;
   background: transparent;
-  font: 700 9px "Space Mono", monospace;
+  font: 700 11px "Space Mono", monospace;
   cursor: pointer;
 }
 
@@ -410,20 +415,19 @@ button, input { font: inherit; }
 
 .wallet-copy {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.55;
 }
 
 .wallet-grid {
   display: grid;
-  grid-template-columns: repeat(3, 72px);
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
   gap: 8px;
   margin-top: 15px;
 }
 
 .wallet-art {
-  width: 72px;
-  height: 72px;
+  width: 100%;
   border-radius: 5px;
   cursor: pointer;
 }
@@ -464,7 +468,7 @@ button, input { font: inherit; }
   max-width: 500px;
   margin: 0;
   color: #4f5950;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
 }
 
@@ -487,22 +491,23 @@ button, input { font: inherit; }
 .qty button {
   border: 0;
   background: transparent;
-  padding: 9px 11px;
+  padding: 10px 12px;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .qty span {
   min-width: 34px;
   text-align: center;
-  font: 700 10px "Space Mono", monospace;
+  font: 700 12px "Space Mono", monospace;
 }
 
-.mint-status { margin-top: 10px; font-size: 11px; line-height: 1.6; color: #4f5950; }
+.mint-status { margin-top: 10px; font-size: 12px; line-height: 1.6; color: #4f5950; }
 
 .more-link {
   margin-top: 10px;
   display: inline-block;
-  font: 700 9px "Space Mono", monospace;
+  font: 700 11px "Space Mono", monospace;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -521,13 +526,13 @@ button, input { font: inherit; }
 
 .about-card h3 {
   margin: 0 0 9px;
-  font: 700 16px "Space Mono", monospace;
+  font: 700 17px "Space Mono", monospace;
 }
 
 .about-card p {
   margin: 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.65;
 }
 
@@ -542,7 +547,7 @@ footer {
   justify-content: space-between;
   gap: 20px;
   color: #717971;
-  font: 700 9px "Space Mono", monospace;
+  font: 700 10px "Space Mono", monospace;
   flex-wrap: wrap;
 }
 
@@ -579,9 +584,9 @@ footer {
 .ff-modal-close { border: 0; background: transparent; font-size: 19px; cursor: pointer; color: var(--muted); line-height: 1; }
 .ff-modal-img { width: 100%; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--pond); margin-bottom: 12px; }
 .ff-modal-img img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; display: block; }
-.ff-trait { display: inline-block; border: 1px solid var(--line); border-radius: 5px; padding: 4px 8px; font: 700 9px "Space Mono", monospace; margin: 0 6px 6px 0; background: var(--bg); }
+.ff-trait { display: inline-block; border: 1px solid var(--line); border-radius: 5px; padding: 5px 9px; font: 700 11px "Space Mono", monospace; margin: 0 6px 6px 0; background: var(--bg); }
 .ff-modal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-.ff-modal-status { margin-top: 10px; font-size: 11px; color: var(--muted); line-height: 1.5; }
+.ff-modal-status { margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.5; }
 
 /* Responsive */
 @media (max-width: 880px) {
@@ -589,16 +594,13 @@ footer {
   .activity-layout,
   .action-grid,
   .about-grid { grid-template-columns: 1fr; }
-  .frog-grid { grid-template-columns: repeat(3, minmax(0, 150px)); }
 }
 
 @media (max-width: 650px) {
   .shell { width: min(100% - 28px, 1120px); }
   .hero { padding-top: 46px; }
-  .hero-frogs { grid-template-columns: repeat(3, 1fr); }
+  .hero-frog-tile { width: 64px; height: 64px; }
   .section-head { align-items: flex-start; flex-direction: column; }
-  .frog-grid { grid-template-columns: repeat(2, minmax(0, 150px)); }
-  .sales-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -607,20 +609,23 @@ footer {
 
 <header class="site-header">
   <div class="shell nav">
-    <a class="brand" href="#"><img src="/assets/logo.png" alt="Fresh Frogs"></a>
+    <a class="brand" href="#" data-page="home"><img src="/assets/logo.png" alt="Fresh Frogs"></a>
     <nav class="nav-links">
-      <a href="#collection">COLLECTION</a>
-      <a href="#activity">RECENT SALES</a>
-      <a href="#my-pond">MY FROGS</a>
-      <a href="#pond">THE POND</a>
-      <a href="#mint">MINT</a>
-      <a href="#game">GAME</a>
-      <a class="btn" href="#my-pond" id="navWalletBtn">CONNECT WALLET</a>
+      <a href="#" data-page="home">HOME</a>
+      <a href="#collection" data-page="collection">COLLECTION</a>
+      <a href="#activity" data-page="activity">RECENT SALES</a>
+      <a href="#activity" data-page="activity">MY FROGS</a>
+      <a href="#pond" data-page="pond">THE POND</a>
+      <a href="#mint" data-page="mint">MINT</a>
+      <a href="#mint" data-page="mint">GAME</a>
+      <a class="btn" href="#activity" id="navWalletBtn">CONNECT WALLET</a>
     </nav>
   </div>
 </header>
 
 <main>
+
+<div class="page active" id="page-home">
 
 <section class="hero">
   <div class="shell">
@@ -632,16 +637,12 @@ footer {
     </p>
 
     <div class="hero-actions">
-      <a class="btn primary" href="#collection">EXPLORE COLLECTION</a>
-      <a class="btn" href="#pond">VIEW THE POND</a>
-      <a class="btn" href="#mint">MINT</a>
+      <a class="btn primary" href="#collection" data-page="collection">EXPLORE COLLECTION</a>
+      <a class="btn" href="#pond" data-page="pond">VIEW THE POND</a>
+      <a class="btn" href="#mint" data-page="mint">MINT</a>
     </div>
 
-    <div class="hero-frogs">
-      <div class="frog-art"><img src="/frog/12.png" alt="Fresh Frog #12"></div>
-      <div class="frog-art"><img src="/frog/31.png" alt="Fresh Frog #31"></div>
-      <div class="frog-art"><img src="/frog/42.png" alt="Fresh Frog #42"></div>
-    </div>
+    <div class="hero-frogs" id="heroFrogs"></div>
   </div>
 </section>
 
@@ -676,6 +677,9 @@ footer {
   </div>
 </section>
 
+</div>
+
+<div class="page" id="page-collection">
 <section class="section" id="collection">
   <div class="shell">
     <div class="section-head">
@@ -700,7 +704,9 @@ footer {
     </div>
   </div>
 </section>
+</div>
 
+<div class="page" id="page-activity">
 <section class="section" id="activity">
   <div class="shell">
     <div class="section-head">
@@ -751,7 +757,9 @@ footer {
     </div>
   </div>
 </section>
+</div>
 
+<div class="page" id="page-pond">
 <section class="section" id="pond">
   <div class="shell">
     <div class="section-head">
@@ -775,7 +783,9 @@ footer {
     </div>
   </div>
 </section>
+</div>
 
+<div class="page" id="page-mint">
 <section class="section" id="mint">
   <div class="shell">
     <div class="section-head">
@@ -793,7 +803,7 @@ footer {
           <div class="eyebrow">MINT FRESH FROGS</div>
           <h3>Mint a Frog</h3>
           <p>Choose a quantity, connect your wallet, and mint Fresh Frogs directly from the site.</p>
-          <a class="more-link" href="#pond">VIEW THE POND →</a>
+          <a class="more-link" href="#pond" data-page="pond">VIEW THE POND →</a>
         </div>
 
         <div>
@@ -823,6 +833,7 @@ footer {
     </div>
   </div>
 </section>
+</div>
 
 </main>
 
@@ -888,6 +899,14 @@ function formatAgo(blocksAgo) {
   return Math.floor(hrs / 24) + 'd ago';
 }
 
+function formatDuration(hours) {
+  if (hours < 1) return 'just staked';
+  if (hours < 48) return hours + 'h staked';
+  const days = Math.floor(hours / 24);
+  if (days < 90) return days + 'd staked';
+  return Math.floor(days / 30) + 'mo staked';
+}
+
 let currentBlockPromise = null;
 function getCurrentBlock() {
   if (currentBlockPromise) return currentBlockPromise;
@@ -916,7 +935,13 @@ const CONTROLLER_ABI = [
   { inputs: [{ internalType: 'uint256', name: '_tokenId', type: 'uint256' }], name: 'stake', outputs: [], stateMutability: 'nonpayable', type: 'function' },
   { inputs: [{ internalType: 'uint256', name: '_tokenId', type: 'uint256' }], name: 'withdraw', outputs: [], stateMutability: 'nonpayable', type: 'function' },
   { inputs: [{ internalType: 'address', name: '_staker', type: 'address' }], name: 'availableRewards', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], stateMutability: 'view', type: 'function' },
-  { inputs: [{ internalType: 'address', name: '_user', type: 'address' }], name: 'getStakedTokens', outputs: [{ components: [{ internalType: 'address', name: 'staker', type: 'address' }, { internalType: 'uint256', name: 'tokenId', type: 'uint256' }], internalType: 'struct FreshFrogsController.StakedToken[]', name: '', type: 'tuple[]' }], stateMutability: 'view', type: 'function' }
+  { inputs: [{ internalType: 'address', name: '_user', type: 'address' }], name: 'getStakedTokens', outputs: [{ components: [{ internalType: 'address', name: 'staker', type: 'address' }, { internalType: 'uint256', name: 'tokenId', type: 'uint256' }], internalType: 'struct FreshFrogsController.StakedToken[]', name: '', type: 'tuple[]' }], stateMutability: 'view', type: 'function' },
+  { inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], name: 'stakerAddress', outputs: [{ internalType: 'address', name: '', type: 'address' }], stateMutability: 'view', type: 'function' },
+  { inputs: [{ internalType: 'address', name: '', type: 'address' }], name: 'stakers', outputs: [
+      { internalType: 'uint256', name: 'amountStaked', type: 'uint256' },
+      { internalType: 'uint256', name: 'timeOfLastUpdate', type: 'uint256' },
+      { internalType: 'uint256', name: 'unclaimedRewards', type: 'uint256' }
+    ], stateMutability: 'view', type: 'function' }
 ];
 
 const COLLECTION_ABI = [
@@ -938,6 +963,57 @@ let ownedFrogs      = [];
 let stakedFrogs     = [];
 let rewardsAmount   = 0;
 let stakedRosterPromise = null;
+
+// ── PAGE NAVIGATION ──
+const PAGES = ['home', 'collection', 'activity', 'pond', 'mint'];
+
+function showPage(name) {
+  if (!PAGES.includes(name)) name = 'home';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-links [data-page]').forEach(a => {
+    a.classList.toggle('active-link', a.dataset.page === name);
+  });
+  window.scrollTo({ top: 0 });
+  const target = name === 'home' ? location.pathname + location.search : '#' + name;
+  if (location.hash.replace('#', '') !== (name === 'home' ? '' : name)) {
+    history.replaceState(null, '', target);
+  }
+}
+
+function wireInternalNav() {
+  document.querySelectorAll('[data-page]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      showPage(el.dataset.page);
+    });
+  });
+}
+
+window.addEventListener('hashchange', () => showPage(location.hash.replace('#', '') || 'home'));
+
+// ── HERO FROGS (random + fit-to-width) ──
+function renderHeroFrogs() {
+  const wrap = document.getElementById('heroFrogs');
+  if (!wrap) return;
+  const containerWidth = wrap.parentElement.clientWidth;
+  const tile = window.innerWidth <= 650 ? 64 : 84;
+  const gap  = 8;
+  const count = Math.max(4, Math.min(24, Math.floor((containerWidth + gap) / (tile + gap))));
+  const ids = new Set();
+  while (ids.size < count && ids.size < TOTAL_SUPPLY) ids.add(1 + Math.floor(Math.random() * TOTAL_SUPPLY));
+  const palette = ['var(--pond)', 'var(--water)', '#e6dfc9', '#ddd8e5'];
+  wrap.innerHTML = [...ids].map((id, i) =>
+    '<div class="frog-art hero-frog-tile" style="background:' + palette[i % palette.length] + '">' +
+    '<img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy"></div>'
+  ).join('');
+}
+
+let heroResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(heroResizeTimer);
+  heroResizeTimer = setTimeout(renderHeroFrogs, 200);
+});
 
 // ── WALLET ──
 async function connectWallet() {
@@ -1032,7 +1108,7 @@ document.getElementById('mintBtn').addEventListener('click', async () => {
     const invite     = invites[defaultKey] ? defaultKey : Object.keys(invites)[0];
 
     await f0Instance.mint(invite, mintQty);
-    updateMintStatus('Minted ' + mintQty + ' frog' + (mintQty !== 1 ? 's' : '') + '! Check My Frogs below.');
+    updateMintStatus('Minted ' + mintQty + ' frog' + (mintQty !== 1 ? 's' : '') + '! Check My Frogs.');
     loadMyFrogs();
   } catch (e) {
     updateMintStatus('Mint failed: ' + e.message);
@@ -1064,6 +1140,16 @@ function getStakedRoster() {
 
 function getStakedSet() {
   return getStakedRoster().then(roster => new Set(roster.map(r => r.tokenId)));
+}
+
+// ── READ-ONLY CONTRACT ACCESS (no wallet needed, used for public Pond data) ──
+let readWeb3 = null;
+let readControllerCtx = null;
+function getReadControllerCtx() {
+  if (readControllerCtx) return readControllerCtx;
+  readWeb3 = new Web3(RPC);
+  readControllerCtx = new readWeb3.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
+  return readControllerCtx;
 }
 
 // ── COLLECTION GRID ──
@@ -1226,7 +1312,7 @@ function renderMyFrogsPanel(which) {
 
   copy.textContent = ids.length + ' frog' + (ids.length !== 1 ? 's' : '') + (which === 'owned' ? ' ready to stake.' : ' earning $FLYZ.');
   miniWrap.innerHTML = '';
-  ids.slice(0, 6).forEach(id => {
+  ids.slice(0, 9).forEach(id => {
     const div = document.createElement('div');
     div.className = 'frog-art wallet-art';
     div.innerHTML = '<img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy">';
@@ -1263,7 +1349,11 @@ document.getElementById('claimBtn').addEventListener('click', async () => {
 });
 
 document.getElementById('myFrogsConnectBtn').addEventListener('click', () => connectWallet());
-document.getElementById('navWalletBtn').addEventListener('click', () => connectWallet());
+document.getElementById('navWalletBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  showPage('activity');
+  connectWallet();
+});
 
 document.querySelectorAll('#my-pond .tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -1379,36 +1469,31 @@ function lazyLoadPondMeta(card, tokenId, entry) {
     if (!entries[0].isIntersecting) return;
     observer.disconnect();
     try {
-      const txResp = await fetch(
-        ALQ.replace('/nft/v3/', '/v2/') + '/getAssetTransfers?fromBlock=0x0&toBlock=latest' +
-        '&toAddress=' + CONTROLLER_ADDRESS +
-        '&contractAddresses[]=' + CONTRACT_ADDRESS +
-        '&tokenId=0x' + tokenId.toString(16).padStart(64, '0') +
-        '&category[]=erc721&order=desc&maxCount=1&withMetadata=false'
-      ).then(r => r.json());
+      const ctx    = getReadControllerCtx();
+      const staker = await ctx.methods.stakerAddress(tokenId).call();
 
-      const transfers = txResp?.result?.transfers || [];
-      if (transfers.length) {
-        const staker = transfers[0].from;
-        entry.staker = staker;
-        stakerEl.textContent = truncateAddr(staker);
-        stakerEl.title = staker;
-
-        const stakingBlock = parseInt(transfers[0].blockNum, 16);
-        const currentBlock = await getCurrentBlock();
-        const blocksStaked = currentBlock - stakingBlock;
-        const hoursStaked  = Math.floor(blocksStaked * 12 / 3600);
-
-        let level = 1, pct = Math.min(100, Math.floor((hoursStaked / 1000) * 100));
-        if (hoursStaked >= 2000) { level = 3; pct = Math.min(100, Math.floor(((hoursStaked - 2000) / 1000) * 100)); }
-        else if (hoursStaked >= 1000) { level = 2; pct = Math.min(100, Math.floor(((hoursStaked - 1000) / 1000) * 100)); }
-
-        levelEl.innerHTML =
-          '<div class="pond-level-line">LEVEL ' + level + ' · ' + hoursStaked + 'H STAKED</div>' +
-          '<div class="pond-bar-wrap"><div class="pond-bar-fill" style="width:' + pct + '%;"></div></div>';
-      } else {
+      if (!staker || /^0x0+$/.test(staker)) {
         stakerEl.textContent = 'unknown';
+        return;
       }
+
+      entry.staker = staker;
+      stakerEl.textContent = truncateAddr(staker);
+
+      const info       = await ctx.methods.stakers(staker).call();
+      const lastUpdate = parseInt(info.timeOfLastUpdate ?? info[1]);
+      const nowSec     = Math.floor(Date.now() / 1000);
+      const hoursStaked = Math.max(0, Math.floor((nowSec - lastUpdate) / 3600));
+
+      stakerEl.title = staker + (lastUpdate ? ' · since ' + new Date(lastUpdate * 1000).toLocaleDateString() : '');
+
+      let level = 1, pct = Math.min(100, Math.floor((hoursStaked / 1000) * 100));
+      if (hoursStaked >= 2000) { level = 3; pct = Math.min(100, Math.floor(((hoursStaked - 2000) / 1000) * 100)); }
+      else if (hoursStaked >= 1000) { level = 2; pct = Math.min(100, Math.floor(((hoursStaked - 1000) / 1000) * 100)); }
+
+      levelEl.innerHTML =
+        '<div class="pond-level-line">LEVEL ' + level + ' · ' + formatDuration(hoursStaked) + '</div>' +
+        '<div class="pond-bar-wrap"><div class="pond-bar-fill" style="width:' + pct + '%;"></div></div>';
     } catch (e) {
       stakerEl.textContent = 'unavailable';
     }
@@ -1474,6 +1559,9 @@ document.getElementById('ffModal').addEventListener('click', function (e) {
 
 // ── BOOT ──
 document.addEventListener('DOMContentLoaded', function () {
+  wireInternalNav();
+  showPage(location.hash.replace('#', '') || 'home');
+  renderHeroFrogs();
   loadRecentSales();
   loadCollectionBatch(true);
   loadPond();
