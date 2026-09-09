@@ -80,12 +80,15 @@ button, input { font: inherit; }
 
 /* Shared frog image system */
 .frog-art {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   aspect-ratio: 1;
   overflow: hidden;
   background: var(--pond);
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .frog-art img {
@@ -96,9 +99,7 @@ button, input { font: inherit; }
   image-rendering: pixelated;
 }
 
-/* Layered trait composite (frog cards only — not the hero strip) */
-.frog-layers { position: relative; width: 100%; height: 100%; }
-
+/* Layered trait composite (.frog-card grids only — not the hero strip, sales, or wallet tiles) */
 .frog-layer {
   position: absolute;
   inset: 0;
@@ -931,7 +932,7 @@ footer {
       <h3 id="modalTitle">FROG #?</h3>
       <button class="ff-modal-close" id="modalClose">✕</button>
     </div>
-    <div class="ff-modal-img" id="modalImg"></div>
+    <div class="ff-modal-img"><img id="modalImg" src="" alt="Frog"></div>
     <div id="modalTraits"></div>
     <div class="ff-modal-actions" id="modalActions"></div>
     <div class="ff-modal-status" id="modalStatus"></div>
@@ -1005,12 +1006,15 @@ function formatUsd(n) {
   return '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// ── LAYERED TRAIT COMPOSITE (frog cards only) ──
+// ── LAYERED TRAIT COMPOSITE (.frog-card grids only — Collection + The Pond) ──
 // Rebuilds each frog from its individual trait-layer artwork (same source
 // assets/approach as the old site's /pond/{Trait}/{value}.png layering),
-// instead of the single flattened /frog/{id}.png, so rare animated trait
-// values (shades, smoking, etc.) actually animate on the cards.
+// instead of the single flattened /frog/{id}.png. The flattened image is
+// also used, zoomed into a corner, as the card's background so the frog's
+// real background color shows behind the layers (same trick used on the
+// old site: crop in on the flattened art until only background is visible).
 const TRAIT_LAYER_ORDER = ['Frog', 'SpecialFrog', 'Trait', 'Accessory', 'Eyes', 'Hat', 'Mouth'];
+const TRAITS_ANIMATED = false; // temporarily disabled per request — layering stays on, animated gif variants are off
 const frogMetaCache = {};
 
 function getFrogMeta(id) {
@@ -1021,14 +1025,19 @@ function getFrogMeta(id) {
 }
 
 function traitLayerSrc(traitType, value) {
-  if (/smoking/i.test(value)) return '/pond/' + traitType + '/' + value + '2.gif';
-  if (/shades/i.test(value)) return '/pond/' + traitType + '/' + value + '_animation.gif';
-  if (/tonguefly/i.test(value)) return '/pond/' + traitType + '/' + value + '.gif';
+  if (TRAITS_ANIMATED) {
+    if (/smoking/i.test(value)) return '/pond/' + traitType + '/' + value + '2.gif';
+    if (/shades/i.test(value)) return '/pond/' + traitType + '/' + value + '_animation.gif';
+    if (/tonguefly/i.test(value)) return '/pond/' + traitType + '/' + value + '.gif';
+  }
   return '/pond/' + traitType + '/' + value + '.png';
 }
 
 async function renderFrogLayers(container, id) {
-  container.classList.add('frog-layers');
+  container.style.backgroundImage = "url('/frog/" + id + ".png')";
+  container.style.backgroundSize = '500%';
+  container.style.backgroundPosition = '0% 100%';
+
   try {
     const meta = await getFrogMeta(id);
     const byType = {};
@@ -1043,6 +1052,7 @@ async function renderFrogLayers(container, id) {
         '" onerror="this.onerror=null;this.src=\'/pond/' + type + '/' + value + '.png\';">';
     }).join('');
   } catch (e) {
+    container.style.backgroundImage = '';
     container.innerHTML = '<img class="frog-layer" src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy">';
   }
 }
@@ -1450,14 +1460,13 @@ async function loadRecentSales() {
       const market   = sale.marketplace ? sale.marketplace.charAt(0).toUpperCase() + sale.marketplace.slice(1) : 'OpenSea';
       const subLine  = (usd != null ? formatUsd(usd) + ' · ' : '') + market;
       return '<article class="sale-card" data-id="' + id + '">' +
-        '<div class="frog-art sale-art"></div>' +
+        '<div class="frog-art sale-art"><img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy"></div>' +
         '<div class="sale-info"><div><strong>Frog #' + id + '</strong><span>' + ago + '</span></div>' +
         '<div class="sale-price"><strong>' + (eth != null ? 'Ξ ' + eth.toFixed(3) : 'Ξ —') + '</strong><span>' + subLine + '</span></div>' +
         '</div></article>';
     }).join('');
 
     grid.querySelectorAll('.sale-card').forEach(card => {
-      renderFrogLayers(card.querySelector('.frog-art'), parseInt(card.dataset.id, 10));
       card.addEventListener('click', () => openFrogModal(parseInt(card.dataset.id, 10)));
     });
   } catch (e) {
@@ -1506,9 +1515,9 @@ function renderMyFrogsPanel(which) {
   ids.slice(0, 9).forEach(id => {
     const div = document.createElement('div');
     div.className = 'frog-art wallet-art';
+    div.innerHTML = '<img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy">';
     div.addEventListener('click', () => openFrogModal(id, which === 'staked'));
     miniWrap.appendChild(div);
-    renderFrogLayers(div, id);
   });
 }
 
@@ -1710,7 +1719,7 @@ document.getElementById('pondRefresh').addEventListener('click', () => {
 // ── FROG MODAL ──
 async function openFrogModal(id, isStakedHint) {
   document.getElementById('modalTitle').textContent = 'FROG #' + id;
-  renderFrogLayers(document.getElementById('modalImg'), id);
+  document.getElementById('modalImg').src = '/frog/' + id + '.png';
   document.getElementById('modalTraits').innerHTML = '<span class="eyebrow">Loading traits…</span>';
   document.getElementById('modalStatus').textContent = '';
 
