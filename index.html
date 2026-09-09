@@ -32,6 +32,7 @@
 }
 
 html { scroll-behavior: smooth; }
+html.drawer-locked, html.drawer-locked body { overflow: hidden; height: 100%; }
 
 body {
   margin: 0;
@@ -1034,6 +1035,7 @@ function openDrawer(name) {
   document.getElementById('drawerOverlay').classList.add('open');
   document.getElementById('main').classList.add('dimmed');
   document.body.classList.add('drawer-open');
+  document.documentElement.classList.add('drawer-locked');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (location.hash.replace('#', '') !== name) history.replaceState(null, '', '#' + name);
 }
@@ -1043,6 +1045,7 @@ function closeDrawer() {
   document.getElementById('drawerOverlay').classList.remove('open');
   document.getElementById('main').classList.remove('dimmed');
   document.body.classList.remove('drawer-open');
+  document.documentElement.classList.remove('drawer-locked');
   setActiveNav(null);
   if (location.hash) history.replaceState(null, '', location.pathname + location.search);
 }
