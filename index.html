@@ -250,7 +250,6 @@ main.dimmed {
   width: 160px;
   height: 160px;
   flex: 0 0 auto;
-  border: 1px solid var(--line);
   border-radius: 8px;
 }
 
@@ -672,7 +671,7 @@ footer {
 .ff-modal-close { border: 0; background: transparent; font-size: 19px; cursor: pointer; color: var(--muted); line-height: 1; }
 /* Capped by vh (not just width) so the image can't force the modal past the viewport */
 .ff-modal-img { width: min(100%, 40vh); aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--pond); margin: 0 auto 12px; }
-.ff-modal-img img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; display: block; }
+.ff-modal-img .frog-art { width: 100%; height: 100%; }
 .ff-modal-owner { margin-bottom: 12px; padding: 10px 11px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
 .ff-modal-owner .pond-staker { max-width: none; }
 .ff-trait { display: inline-block; border: 1px solid var(--line); border-radius: 5px; padding: 5px 9px; font: 700 11px "Space Mono", monospace; margin: 0 6px 6px 0; background: var(--bg); }
@@ -789,6 +788,7 @@ footer {
         <option value="id">SORT: TOKEN ID</option>
         <option value="rarity">SORT: RARITY (RAREST FIRST)</option>
       </select>
+      <a class="btn" href="#pond" data-page="pond" style="margin-left:auto;">VIEW FROGS STAKED IN THE POND ↗</a>
     </div>
 
     <div class="frog-grid" id="frogGrid"></div>
@@ -965,7 +965,7 @@ footer {
       </div>
       <button class="ff-modal-close" id="modalClose">✕</button>
     </div>
-    <div class="ff-modal-img"><img id="modalImg" src="" alt="Frog"></div>
+    <div class="ff-modal-img"><div class="frog-art" id="modalArt"></div></div>
     <div class="ff-modal-owner" id="modalOwnerInfo"></div>
     <div id="modalTraits"></div>
     <div class="ff-modal-actions" id="modalActions"></div>
@@ -1109,12 +1109,7 @@ const CONTROLLER_ABI = [
 const COLLECTION_ABI = [
   { inputs: [{ internalType: 'address', name: 'owner', type: 'address' }], name: 'balanceOf', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], stateMutability: 'view', type: 'function' },
   { inputs: [{ internalType: 'address', name: 'owner', type: 'address' }, { internalType: 'address', name: 'operator', type: 'address' }], name: 'isApprovedForAll', outputs: [{ internalType: 'bool', name: '', type: 'bool' }], stateMutability: 'view', type: 'function' },
-  { inputs: [{ internalType: 'address', name: 'operator', type: 'address' }, { internalType: 'bool', name: 'approved', type: 'bool' }], name: 'setApprovalForAll', outputs: [], stateMutability: 'nonpayable', type: 'function' },
-  { anonymous: false, inputs: [
-      { indexed: true, internalType: 'address', name: 'from', type: 'address' },
-      { indexed: true, internalType: 'address', name: 'to', type: 'address' },
-      { indexed: true, internalType: 'uint256', name: 'tokenId', type: 'uint256' }
-    ], name: 'Transfer', type: 'event' }
+  { inputs: [{ internalType: 'address', name: 'operator', type: 'address' }, { internalType: 'bool', name: 'approved', type: 'bool' }], name: 'setApprovalForAll', outputs: [], stateMutability: 'nonpayable', type: 'function' }
 ];
 
 // ── STATE ──
@@ -1366,35 +1361,56 @@ function getReadControllerCtx() {
   return readControllerCtx;
 }
 
-let readCollectionCtx = null;
-function getReadCollectionCtx() {
-  if (readCollectionCtx) return readCollectionCtx;
-  if (!readWeb3) readWeb3 = new Web3(RPC);
-  readCollectionCtx = new readWeb3.eth.Contract(COLLECTION_ABI, CONTRACT_ADDRESS);
-  return readCollectionCtx;
-}
-
 // stakers(staker).timeOfLastUpdate is a per-STAKER aggregate that resets on every
 // stake/unstake/claim that wallet makes — it is NOT a per-token stake time, so using
 // it for one frog's level/progress made every frog a wallet owns report the same
-// (usually maxed-out) duration. The real per-token stake time comes from the
-// Transfer(to: controller) event for that specific tokenId.
-const stakedSinceCache = {}; // tokenId -> Promise<unix seconds | null>
-function getStakedSince(tokenId) {
-  if (!stakedSinceCache[tokenId]) {
-    stakedSinceCache[tokenId] = (async () => {
-      try {
-        const events = await getReadCollectionCtx().getPastEvents('Transfer', {
-          filter: { to: CONTROLLER_ADDRESS, tokenId: tokenId },
-          fromBlock: 0, toBlock: 'latest'
+// (usually maxed-out) duration. The real per-token stake time comes from Transfer
+// events into the controller. A raw eth_getLogs scan per token (fromBlock 0) turned
+// out to be unreliable across RPC providers for a full-history range, so instead
+// this makes one paginated alchemy_getAssetTransfers call for ALL stake transfers
+// at once — it comes with a block timestamp already attached (no extra eth_getBlock
+// round trips), and is far cheaper on quota than a scan per card.
+let stakedSinceMapPromise = null;
+function getStakedSinceMap() {
+  if (stakedSinceMapPromise) return stakedSinceMapPromise;
+  stakedSinceMapPromise = (async () => {
+    const map = {};
+    let pageKey = null;
+    try {
+      do {
+        const params = {
+          fromBlock: '0x0', toBlock: 'latest',
+          contractAddresses: [CONTRACT_ADDRESS],
+          toAddress: CONTROLLER_ADDRESS,
+          category: ['erc721'],
+          withMetadata: true,
+          maxCount: '0x3e8'
+        };
+        if (pageKey) params.pageKey = pageKey;
+        const resp = await fetch(RPC, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'alchemy_getAssetTransfers', params: [params] })
+        }).then(r => r.json());
+        const result = resp.result || {};
+        (result.transfers || []).forEach(t => {
+          const hex = t.erc721TokenId || t.tokenId;
+          const iso = t.metadata && t.metadata.blockTimestamp;
+          if (!hex || !iso) return;
+          const id = parseInt(hex, 16);
+          const ts = Math.floor(new Date(iso).getTime() / 1000);
+          if (!map[id] || ts > map[id]) map[id] = ts; // keep the most recent stake event per token
         });
-        if (!events.length) return null;
-        const block = await readWeb3.eth.getBlock(events[events.length - 1].blockNumber);
-        return parseInt(block.timestamp);
-      } catch (e) { return null; }
-    })();
-  }
-  return stakedSinceCache[tokenId];
+        pageKey = result.pageKey || null;
+      } while (pageKey);
+    } catch (e) { console.error('getStakedSinceMap failed', e); }
+    return map;
+  })();
+  return stakedSinceMapPromise;
+}
+
+async function getStakedSince(tokenId) {
+  const map = await getStakedSinceMap();
+  return map[tokenId] ?? null;
 }
 
 // ── COLLECTION GRID ──
@@ -1415,7 +1431,7 @@ function makeFrogCard(container, id, opts) {
     '</div>';
   card.addEventListener('click', () => openFrogModal(id, opts.staked));
   container.appendChild(card);
-  renderFrogLayers(card.querySelector('.frog-art'), id, opts.staked);
+  renderFrogLayers(card.querySelector('.frog-art'), id); // animation is Pond-only
   lazyLoadCollectionMeta(card, id, opts);
 }
 
@@ -1618,16 +1634,33 @@ document.querySelectorAll('[data-sales-sort]').forEach(btn => {
 });
 
 // ── MY FROGS (personal wallet) ──
+// getNFTsForOwner pages at 100 per call — a wallet holding more than 100 frogs
+// (e.g. the project wallet) needs every page walked, or ownedFrogs silently
+// truncates at 100.
+async function getAllOwnedTokens(owner) {
+  const ids = [];
+  let pageKey = null;
+  do {
+    const url = ALQ + '/getNFTsForOwner?owner=' + owner +
+      '&contractAddresses[]=' + CONTRACT_ADDRESS + '&withMetadata=false&pageSize=100' +
+      (pageKey ? '&pageKey=' + encodeURIComponent(pageKey) : '');
+    const data = await fetch(url).then(r => r.json());
+    (data.ownedNfts || []).forEach(n => ids.push(parseInt(n.tokenId)));
+    pageKey = data.pageKey || null;
+  } while (pageKey);
+  return ids;
+}
+
 async function loadMyFrogs() {
   if (!walletConnected) return;
   try {
-    const [walletResp, stakedResult, rewardsRaw] = await Promise.all([
-      fetch(ALQ + '/getNFTsForOwner?owner=' + userAddress + '&contractAddresses[]=' + CONTRACT_ADDRESS + '&withMetadata=false&pageSize=100').then(r => r.json()),
+    const [ownedIds, stakedResult, rewardsRaw] = await Promise.all([
+      getAllOwnedTokens(userAddress),
       controllerCtx.methods.getStakedTokens(userAddress).call().catch(() => []),
       controllerCtx.methods.availableRewards(userAddress).call().catch(() => '0')
     ]);
 
-    ownedFrogs    = (walletResp.ownedNfts || []).map(n => parseInt(n.tokenId));
+    ownedFrogs    = ownedIds;
     stakedFrogs   = stakedResult.map(s => parseInt(s.tokenId));
     rewardsAmount = parseFloat(rewardsRaw) / 1e18;
 
@@ -1722,7 +1755,7 @@ async function stakeFromModal(id) {
     await controllerCtx.methods.stake(id).send({ from: userAddress });
     statusEl.textContent = 'Frog #' + id + ' staked!';
     stakedRosterPromise = null;
-    delete stakedSinceCache[id];
+    stakedSinceMapPromise = null; // a new "to controller" transfer just happened, refetch to pick it up
     loadMyFrogs();
     loadCollectionBatch(true);
     reloadPond();
@@ -1737,8 +1770,7 @@ async function unstakeFromModal(id) {
   try {
     await controllerCtx.methods.withdraw(id).send({ from: userAddress });
     statusEl.textContent = 'Frog #' + id + ' returned to wallet.';
-    stakedRosterPromise = null;
-    delete stakedSinceCache[id];
+    stakedRosterPromise = null; // unstaking doesn't affect the "transferred to controller" history, no need to refetch that map
     loadMyFrogs();
     loadCollectionBatch(true);
     reloadPond();
@@ -1890,7 +1922,7 @@ async function openFrogModal(id, isStakedHint) {
   const requestId = ++modalRequestId;
 
   document.getElementById('modalTitle').textContent = 'FROG #' + id;
-  document.getElementById('modalImg').src = '/frog/' + id + '.png';
+  renderFrogLayers(document.getElementById('modalArt'), id, isStakedHint === true);
   document.getElementById('modalTraits').innerHTML = '<span class="eyebrow">Loading traits…</span>';
   document.getElementById('modalOwnerInfo').innerHTML = '<span class="eyebrow">Loading owner…</span>';
   document.getElementById('modalStatus').textContent = '';
@@ -1936,6 +1968,7 @@ async function loadModalOwnerInfo(id, requestId) {
     const staker = await ctx.methods.stakerAddress(id).call();
     const isStaked = staker && !/^0x0+$/.test(staker);
     if (requestId !== modalRequestId) return;
+    renderFrogLayers(document.getElementById('modalArt'), id, !!isStaked);
 
     if (isStaked) {
       let stakedSince = await getStakedSince(id);
