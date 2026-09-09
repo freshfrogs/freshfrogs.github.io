@@ -96,6 +96,27 @@ button, input { font: inherit; }
   image-rendering: pixelated;
 }
 
+/* Layered trait composite (frog cards only — not the hero strip) */
+.frog-layers { position: relative; width: 100%; height: 100%; }
+
+.frog-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  display: block;
+  transition: transform .2s ease;
+}
+
+.frog-art:hover .frog-layer { transform: scale(1.07); }
+.frog-art:hover .frog-layer:nth-child(2) { transition-delay: .02s; }
+.frog-art:hover .frog-layer:nth-child(3) { transition-delay: .04s; }
+.frog-art:hover .frog-layer:nth-child(4) { transition-delay: .06s; }
+.frog-art:hover .frog-layer:nth-child(5) { transition-delay: .08s; }
+.frog-art:hover .frog-layer:nth-child(6) { transition-delay: .1s; }
+
 /* Header */
 .site-header {
   position: sticky;
@@ -910,7 +931,7 @@ footer {
       <h3 id="modalTitle">FROG #?</h3>
       <button class="ff-modal-close" id="modalClose">✕</button>
     </div>
-    <div class="ff-modal-img"><img id="modalImg" src="" alt="Frog"></div>
+    <div class="ff-modal-img" id="modalImg"></div>
     <div id="modalTraits"></div>
     <div class="ff-modal-actions" id="modalActions"></div>
     <div class="ff-modal-status" id="modalStatus"></div>
@@ -982,6 +1003,48 @@ function getEthUsdRate() {
 
 function formatUsd(n) {
   return '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// ── LAYERED TRAIT COMPOSITE (frog cards only) ──
+// Rebuilds each frog from its individual trait-layer artwork (same source
+// assets/approach as the old site's /pond/{Trait}/{value}.png layering),
+// instead of the single flattened /frog/{id}.png, so rare animated trait
+// values (shades, smoking, etc.) actually animate on the cards.
+const TRAIT_LAYER_ORDER = ['Frog', 'SpecialFrog', 'Trait', 'Accessory', 'Eyes', 'Hat', 'Mouth'];
+const frogMetaCache = {};
+
+function getFrogMeta(id) {
+  if (!frogMetaCache[id]) {
+    frogMetaCache[id] = fetch('/frog/json/' + id + '.json').then(r => r.json()).catch(() => null);
+  }
+  return frogMetaCache[id];
+}
+
+function traitLayerSrc(traitType, value) {
+  if (/smoking/i.test(value)) return '/pond/' + traitType + '/' + value + '2.gif';
+  if (/shades/i.test(value)) return '/pond/' + traitType + '/' + value + '_animation.gif';
+  if (/tonguefly/i.test(value)) return '/pond/' + traitType + '/' + value + '.gif';
+  return '/pond/' + traitType + '/' + value + '.png';
+}
+
+async function renderFrogLayers(container, id) {
+  container.classList.add('frog-layers');
+  try {
+    const meta = await getFrogMeta(id);
+    const byType = {};
+    (meta && meta.attributes || []).forEach(a => { byType[a.trait_type] = a.value; });
+
+    const layers = TRAIT_LAYER_ORDER.filter(t => byType[t] && !/^none$/i.test(byType[t]));
+    if (!layers.length) throw new Error('no traits');
+
+    container.innerHTML = layers.map(type => {
+      const value = byType[type];
+      return '<img class="frog-layer" loading="lazy" alt="' + type + ': ' + value + '" src="' + traitLayerSrc(type, value) +
+        '" onerror="this.onerror=null;this.src=\'/pond/' + type + '/' + value + '.png\';">';
+    }).join('');
+  } catch (e) {
+    container.innerHTML = '<img class="frog-layer" src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy">';
+  }
 }
 
 const CONTROLLER_ABI = [
@@ -1243,14 +1306,15 @@ function makeFrogCard(container, id, opts) {
   card.className = 'frog-card';
   card.dataset.id = id;
   card.innerHTML =
-    '<div class="frog-art collection-art"><img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy"></div>' +
+    '<div class="frog-art collection-art"></div>' +
     '<div class="frog-card-foot" style="flex-direction:column;align-items:stretch;gap:5px;">' +
     '<div class="pond-meta-row"><strong>Frog #' + id + '</strong><span>' + (opts.staked ? 'STAKED' : 'View ↗') + '</span></div>' +
-    '<div class="pond-staker" id="owner-' + id + '">' + (opts.staked ? 'Held in The Pond' : 'Owner: loading…') + '</div>' +
+    '<div class="pond-staker" id="owner-' + id + '">' + (opts.staked ? 'Staked by: loading…' : 'Owner: loading…') + '</div>' +
     '<div class="pond-staker" id="sale-' + id + '"></div>' +
     '</div>';
   card.addEventListener('click', () => openFrogModal(id, opts.staked));
   container.appendChild(card);
+  renderFrogLayers(card.querySelector('.frog-art'), id);
   lazyLoadCollectionMeta(card, id, opts);
 }
 
@@ -1261,7 +1325,14 @@ function lazyLoadCollectionMeta(card, id, opts) {
     if (!entries[0].isIntersecting) return;
     observer.disconnect();
 
-    if (!opts.staked && ownerEl) {
+    if (ownerEl && opts.staked) {
+      getReadControllerCtx().methods.stakerAddress(id).call()
+        .then(staker => {
+          ownerEl.textContent = staker && !/^0x0+$/.test(staker) ? 'Staked by: ' + truncateAddr(staker) : 'Staked by: unknown';
+          if (staker) ownerEl.title = staker;
+        })
+        .catch(() => { ownerEl.textContent = 'Staked by: unavailable'; });
+    } else if (ownerEl) {
       fetch(ALQ + '/getOwnersForNFT?contractAddress=' + CONTRACT_ADDRESS + '&tokenId=' + id)
         .then(r => r.json())
         .then(data => {
@@ -1379,13 +1450,14 @@ async function loadRecentSales() {
       const market   = sale.marketplace ? sale.marketplace.charAt(0).toUpperCase() + sale.marketplace.slice(1) : 'OpenSea';
       const subLine  = (usd != null ? formatUsd(usd) + ' · ' : '') + market;
       return '<article class="sale-card" data-id="' + id + '">' +
-        '<div class="frog-art sale-art"><img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy"></div>' +
+        '<div class="frog-art sale-art"></div>' +
         '<div class="sale-info"><div><strong>Frog #' + id + '</strong><span>' + ago + '</span></div>' +
         '<div class="sale-price"><strong>' + (eth != null ? 'Ξ ' + eth.toFixed(3) : 'Ξ —') + '</strong><span>' + subLine + '</span></div>' +
         '</div></article>';
     }).join('');
 
     grid.querySelectorAll('.sale-card').forEach(card => {
+      renderFrogLayers(card.querySelector('.frog-art'), parseInt(card.dataset.id, 10));
       card.addEventListener('click', () => openFrogModal(parseInt(card.dataset.id, 10)));
     });
   } catch (e) {
@@ -1434,9 +1506,9 @@ function renderMyFrogsPanel(which) {
   ids.slice(0, 9).forEach(id => {
     const div = document.createElement('div');
     div.className = 'frog-art wallet-art';
-    div.innerHTML = '<img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy">';
     div.addEventListener('click', () => openFrogModal(id, which === 'staked'));
     miniWrap.appendChild(div);
+    renderFrogLayers(div, id);
   });
 }
 
@@ -1571,13 +1643,14 @@ function makePondCard(container, entry) {
   card.className = 'frog-card';
   card.dataset.id = tokenId;
   card.innerHTML =
-    '<div class="frog-art collection-art"><img src="/frog/' + tokenId + '.png" alt="Fresh Frog #' + tokenId + '" loading="lazy"></div>' +
+    '<div class="frog-art collection-art"></div>' +
     '<div class="frog-card-foot" style="flex-direction:column;align-items:stretch;gap:6px;">' +
     '<div class="pond-meta-row"><strong>Frog #' + tokenId + '</strong><span class="pond-staker" id="staker-' + tokenId + '">loading…</span></div>' +
     '<div id="level-' + tokenId + '"></div>' +
     '</div>';
   card.addEventListener('click', () => openFrogModal(tokenId, true));
   container.appendChild(card);
+  renderFrogLayers(card.querySelector('.frog-art'), tokenId);
   lazyLoadPondMeta(card, tokenId, entry);
 }
 
@@ -1637,7 +1710,7 @@ document.getElementById('pondRefresh').addEventListener('click', () => {
 // ── FROG MODAL ──
 async function openFrogModal(id, isStakedHint) {
   document.getElementById('modalTitle').textContent = 'FROG #' + id;
-  document.getElementById('modalImg').src = '/frog/' + id + '.png';
+  renderFrogLayers(document.getElementById('modalImg'), id);
   document.getElementById('modalTraits').innerHTML = '<span class="eyebrow">Loading traits…</span>';
   document.getElementById('modalStatus').textContent = '';
 
