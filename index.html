@@ -362,9 +362,13 @@ main.dimmed {
 .load-more-wrap { text-align: center; margin-top: 20px; }
 
 /* Community Pond cards */
+.pond-card-foot { padding: 11px 3px 3px; display: flex; flex-direction: column; gap: 7px; }
+.pond-card-title-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pond-card-title-row strong { font: 700 12px "Space Mono", monospace; }
+.pond-level-badge { display: inline-flex; align-items: center; flex: 0 0 auto; padding: 3px 7px; border-radius: 4px; background: var(--mint); font: 700 10px "Space Mono", monospace; color: #2c3a26; white-space: nowrap; }
 .pond-meta-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.pond-staker { font: 700 11px "Space Mono", monospace; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
-.pond-level-line { font: 700 11px "Space Mono", monospace; color: var(--muted); margin-bottom: 4px; }
+.pond-staker { display: block; font: 700 11px "Space Mono", monospace; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.pond-progress-line { display: flex; justify-content: space-between; gap: 8px; font: 700 10px "Space Mono", monospace; color: var(--muted); margin-bottom: 4px; }
 .pond-bar-wrap { height: 5px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
 .pond-bar-fill { height: 100%; background: var(--ink); }
 .pond-stat-chip {
@@ -435,26 +439,44 @@ main.dimmed {
 
 .sale-info {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
   padding: 0 3px 0 0;
+  min-width: 0;
 }
 
-.sale-info strong {
-  display: block;
+.sale-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.sale-row strong {
   font: 700 13px "Space Mono", monospace;
+  white-space: nowrap;
 }
 
-.sale-info span {
-  display: block;
-  margin-top: 3px;
+.sale-row > span {
   color: var(--muted);
   font-size: 12px;
+  white-space: nowrap;
 }
 
-.sale-price {
-  text-align: right;
+.sale-addrs {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font: 700 11px "Space Mono", monospace;
+}
+
+.sale-addrs span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 /* My Frogs / Pond wallet views */
@@ -640,7 +662,7 @@ footer {
   border-radius: 10px;
   max-width: 420px;
   width: 100%;
-  max-height: 88vh;
+  max-height: 94vh;
   overflow-y: auto;
   padding: 20px;
 }
@@ -648,8 +670,11 @@ footer {
 .ff-modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .ff-modal-head h3 { margin: 0; font: 700 18px "Space Mono", monospace; }
 .ff-modal-close { border: 0; background: transparent; font-size: 19px; cursor: pointer; color: var(--muted); line-height: 1; }
-.ff-modal-img { width: 100%; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--pond); margin-bottom: 12px; }
+/* Capped by vh (not just width) so the image can't force the modal past the viewport */
+.ff-modal-img { width: min(100%, 40vh); aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--pond); margin: 0 auto 12px; }
 .ff-modal-img img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; display: block; }
+.ff-modal-owner { margin-bottom: 12px; padding: 10px 11px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+.ff-modal-owner .pond-staker { max-width: none; }
 .ff-trait { display: inline-block; border: 1px solid var(--line); border-radius: 5px; padding: 5px 9px; font: 700 11px "Space Mono", monospace; margin: 0 6px 6px 0; background: var(--bg); }
 .ff-modal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
 .ff-modal-status { margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.5; }
@@ -763,6 +788,10 @@ footer {
       <button class="filter active" data-filter="all">ALL FROGS</button>
       <button class="filter" data-filter="available">AVAILABLE</button>
       <button class="filter" data-filter="staked">STAKED</button>
+      <select id="collectionSort" class="filter sort-select" aria-label="Sort collection">
+        <option value="id">SORT: TOKEN ID</option>
+        <option value="rarity">SORT: RARITY (RAREST FIRST)</option>
+      </select>
     </div>
 
     <div class="frog-grid" id="frogGrid"></div>
@@ -786,7 +815,11 @@ footer {
     <section class="panel">
       <div class="panel-head">
         <h3>Latest Sales</h3>
-        <a class="btn" href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank" rel="noopener">VIEW ALL</a>
+        <div class="panel-head-actions">
+          <button class="filter active" id="salesSortPrice" data-sales-sort="price">PRICE ↓</button>
+          <button class="filter" id="salesSortRecent" data-sales-sort="recent">MOST RECENT</button>
+          <a class="btn" href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank" rel="noopener">VIEW ALL</a>
+        </div>
       </div>
       <div class="sales-grid" id="salesGrid">
         <span class="eyebrow">Loading recent sales…</span>
@@ -933,6 +966,7 @@ footer {
       <button class="ff-modal-close" id="modalClose">✕</button>
     </div>
     <div class="ff-modal-img"><img id="modalImg" src="" alt="Frog"></div>
+    <div class="ff-modal-owner" id="modalOwnerInfo"></div>
     <div id="modalTraits"></div>
     <div class="ff-modal-actions" id="modalActions"></div>
     <div class="ff-modal-status" id="modalStatus"></div>
@@ -1181,13 +1215,10 @@ async function connectWallet() {
   try {
     await window.ethereum.request({ method: 'eth_requestAccounts' });
     web3Instance = new Web3(window.ethereum);
-    f0Instance   = new F0();
 
     const abi = typeof token_abi !== 'undefined' ? token_abi : COLLECTION_ABI;
     collectionCtx = new web3Instance.eth.Contract(abi, CONTRACT_ADDRESS);
     controllerCtx = new web3Instance.eth.Contract(CONTROLLER_ABI, CONTROLLER_ADDRESS);
-
-    await f0Instance.init({ web3: web3Instance, contract: CONTRACT_ADDRESS, network: NETWORK });
 
     userAddress     = (await web3Instance.eth.getAccounts())[0];
     walletConnected = true;
@@ -1197,6 +1228,32 @@ async function connectWallet() {
   } catch (e) {
     setWalletButtons('CONNECT WALLET', false, false);
     console.error('Connect failed:', e.message);
+    return;
+  }
+
+  // Mint-invite setup is separate from basic connection: it scans the
+  // contract's full event history and can fail on some RPC providers.
+  // That must not undo an otherwise-successful wallet connection.
+  initMintInvites();
+}
+
+async function initMintInvites() {
+  try {
+    f0Instance = new F0();
+    await f0Instance.init({ web3: web3Instance, contract: CONTRACT_ADDRESS, network: NETWORK });
+
+    const invites    = await f0Instance.myInvites();
+    const defaultKey = '0x' + '0'.repeat(64);
+    const invite     = invites[defaultKey] ? defaultKey : Object.keys(invites)[0];
+    const price      = invites[invite]?.condition?.converted?.eth || MINT_PRICE;
+    const limit      = invites[invite]?.condition?.converted?.limit || 9;
+    mintLimit = limit;
+    const ethUsd  = await getEthUsdRate();
+    const usdLine = ethUsd ? ' (≈' + formatUsd(price * ethUsd) + ')' : '';
+    updateMintStatus('Connected ' + truncateAddr(userAddress) + ' · Ξ' + price + usdLine + ' each · max ' + limit + ' per tx');
+  } catch (e) {
+    f0Instance = null;
+    console.error('Mint init failed:', e.message);
   }
 }
 
@@ -1209,23 +1266,10 @@ function setWalletButtons(text, disabled, connected) {
   });
 }
 
-async function onWalletReady() {
+function onWalletReady() {
   const mintBtn = document.getElementById('mintBtn');
   mintBtn.textContent = 'MINT ' + mintQty + ' FROG' + (mintQty !== 1 ? 'S' : '');
-
-  try {
-    const invites    = await f0Instance.myInvites();
-    const defaultKey = '0x' + '0'.repeat(64);
-    const invite     = invites[defaultKey] ? defaultKey : Object.keys(invites)[0];
-    const price      = invites[invite]?.condition?.converted?.eth || MINT_PRICE;
-    const limit      = invites[invite]?.condition?.converted?.limit || 9;
-    mintLimit = limit;
-    const ethUsd  = await getEthUsdRate();
-    const usdLine = ethUsd ? ' (≈' + formatUsd(price * ethUsd) + ')' : '';
-    updateMintStatus('Connected ' + truncateAddr(userAddress) + ' · Ξ' + price + usdLine + ' each · max ' + limit + ' per tx');
-  } catch (e) {
-    updateMintStatus('Connected: ' + truncateAddr(userAddress));
-  }
+  updateMintStatus('Connected: ' + truncateAddr(userAddress));
 
   loadMyFrogs();
   loadCollectionBatch(true);
@@ -1253,6 +1297,17 @@ document.getElementById('mintBtn').addEventListener('click', async () => {
 
   const btn = document.getElementById('mintBtn');
   btn.disabled = true;
+
+  if (!f0Instance) {
+    updateMintStatus('Reconnecting to mint contract…');
+    await initMintInvites();
+  }
+  if (!f0Instance) {
+    updateMintStatus('Mint is temporarily unavailable — try again in a moment.');
+    btn.disabled = false;
+    return;
+  }
+
   updateMintStatus('Minting ' + mintQty + ' frog' + (mintQty !== 1 ? 's' : '') + '… confirm in MetaMask and wait.');
 
   try {
@@ -1318,7 +1373,7 @@ function makeFrogCard(container, id, opts) {
   card.innerHTML =
     '<div class="frog-art collection-art"></div>' +
     '<div class="frog-card-foot" style="flex-direction:column;align-items:stretch;gap:5px;">' +
-    '<div class="pond-meta-row"><strong>Frog #' + id + '</strong><span>' + (opts.staked ? 'STAKED' : 'View ↗') + '</span></div>' +
+    '<div class="pond-meta-row"><strong>Frog #' + id + '</strong><span>' + (opts.rank ? 'RANK #' + opts.rank : (opts.staked ? 'STAKED' : 'View ↗')) + '</span></div>' +
     '<div class="pond-staker" id="owner-' + id + '">' + (opts.staked ? 'Staked by: loading…' : 'Owner: loading…') + '</div>' +
     '<div class="pond-staker" id="sale-' + id + '"></div>' +
     '</div>';
@@ -1370,25 +1425,51 @@ function lazyLoadCollectionMeta(card, id, opts) {
   obs.observe(card);
 }
 
+// Rarity is precomputed offline (see assets/data/rarity.json) from full trait
+// frequency across all 4,040 frogs — computing it client-side would mean
+// fetching every frog's metadata JSON on every page load.
+let collectionSort = 'id';
+let rarityData = null;       // id (string) -> { score, rank }; rank 1 = rarest
+let rarityOrderIds = null;   // ids sorted rank ascending (rarest first)
+let sequentialIds = null;    // ids 1..TOTAL_SUPPLY
+
+function loadRarityData() {
+  if (rarityData) return Promise.resolve(rarityData);
+  return fetch('/assets/data/rarity.json').then(r => r.json()).then(d => {
+    rarityData = d;
+    rarityOrderIds = Object.keys(d).map(Number).sort((a, b) => d[a].rank - d[b].rank);
+    return d;
+  }).catch(() => { rarityData = null; rarityOrderIds = null; });
+}
+
+function collectionOrderIds() {
+  if (collectionSort === 'rarity' && rarityOrderIds) return rarityOrderIds;
+  if (!sequentialIds) sequentialIds = Array.from({ length: TOTAL_SUPPLY }, (_, i) => i + 1);
+  return sequentialIds;
+}
+
 async function loadCollectionBatch(reset) {
   const grid = document.getElementById('frogGrid');
   if (reset) { grid.innerHTML = ''; collectionOffset = 0; }
 
+  if (collectionSort === 'rarity') await loadRarityData();
+  const order = collectionOrderIds();
   const staked = await getStakedSet();
 
   let added = 0;
-  let id = collectionOffset + 1;
-  while (added < COLLECTION_BATCH && id <= TOTAL_SUPPLY) {
+  let idx = collectionOffset;
+  while (added < COLLECTION_BATCH && idx < order.length) {
+    const id = order[idx];
     const isStaked = staked.has(id);
-    if (collectionFilter === 'staked' && !isStaked) { id++; continue; }
-    if (collectionFilter === 'available' && isStaked) { id++; continue; }
-    makeFrogCard(grid, id, { staked: isStaked });
-    added++; id++;
+    if (collectionFilter === 'staked' && !isStaked) { idx++; continue; }
+    if (collectionFilter === 'available' && isStaked) { idx++; continue; }
+    makeFrogCard(grid, id, { staked: isStaked, rank: rarityData ? rarityData[id]?.rank : null });
+    added++; idx++;
   }
-  collectionOffset = id - 1;
+  collectionOffset = idx;
 
   const wrap = document.getElementById('collectionLoadMoreWrap');
-  wrap.style.display = collectionOffset >= TOTAL_SUPPLY ? 'none' : '';
+  wrap.style.display = collectionOffset >= order.length ? 'none' : '';
 
   if (!grid.children.length) {
     grid.innerHTML = '<p style="grid-column:1/-1;color:var(--muted);">No frogs match this filter.</p>';
@@ -1397,14 +1478,20 @@ async function loadCollectionBatch(reset) {
 
 document.getElementById('collectionLoadMore').addEventListener('click', () => loadCollectionBatch(false));
 
-document.querySelectorAll('#collection .filter').forEach(chip => {
+document.querySelectorAll('#collection .filter:not(.sort-select)').forEach(chip => {
   chip.addEventListener('click', () => {
-    document.querySelectorAll('#collection .filter').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('#collection .filter:not(.sort-select)').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     collectionFilter = chip.dataset.filter;
     document.getElementById('frogSearch').value = '';
     loadCollectionBatch(true);
   });
+});
+
+document.getElementById('collectionSort').addEventListener('change', (e) => {
+  collectionSort = e.target.value;
+  document.getElementById('frogSearch').value = '';
+  loadCollectionBatch(true);
 });
 
 document.getElementById('frogSearch').addEventListener('input', async () => {
@@ -1423,7 +1510,7 @@ document.getElementById('frogSearch').addEventListener('input', async () => {
 
   const staked = await getStakedSet();
   grid.innerHTML = '';
-  makeFrogCard(grid, id, { staked: staked.has(id) });
+  makeFrogCard(grid, id, { staked: staked.has(id), rank: rarityData ? rarityData[id]?.rank : null });
   wrap.style.display = 'none';
 });
 
@@ -1436,43 +1523,80 @@ function saleTotalEth(sale) {
   return total / Math.pow(10, decimals);
 }
 
+let salesCache = null; // { sales, currentBlock, ethUsd } — fetched once, re-sorted client-side
+let salesSort  = 'price'; // 'price' | 'recent'
+
+function renderSalesGrid() {
+  const grid = document.getElementById('salesGrid');
+  if (!salesCache) return;
+  const { sales, currentBlock, ethUsd } = salesCache;
+
+  if (!sales.length) {
+    grid.innerHTML = '<span style="color:var(--muted);font-size:13px;">No recent sales data available.</span>';
+    return;
+  }
+
+  const ordered = [...sales].sort((a, b) => {
+    if (salesSort === 'price') return (b._eth ?? -1) - (a._eth ?? -1);
+    return b._blockNum - a._blockNum;
+  });
+
+  grid.innerHTML = ordered.map(sale => {
+    const id      = sale._id;
+    const eth     = sale._eth;
+    const usd     = (eth != null && ethUsd) ? eth * ethUsd : null;
+    const ago     = (currentBlock && sale._blockNum) ? formatAgo(currentBlock - sale._blockNum) : 'Recent';
+    const market  = sale.marketplace ? sale.marketplace.charAt(0).toUpperCase() + sale.marketplace.slice(1) : 'OpenSea';
+    const subLine = (usd != null ? formatUsd(usd) + ' · ' : '') + market;
+    const seller  = sale.sellerAddress;
+    const buyer   = sale.buyerAddress || sale.taker;
+    return '<article class="sale-card" data-id="' + id + '">' +
+      '<div class="frog-art sale-art"><img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy"></div>' +
+      '<div class="sale-info">' +
+      '<div class="sale-row"><strong>Frog #' + id + '</strong><strong>' + (eth != null ? 'Ξ ' + eth.toFixed(3) : 'Ξ —') + '</strong></div>' +
+      '<div class="sale-row"><span>' + ago + '</span><span>' + subLine + '</span></div>' +
+      '<div class="sale-addrs">' +
+      '<span title="' + (seller || '') + '">' + (seller ? 'From ' + truncateAddr(seller) : 'Seller unknown') + '</span>' +
+      '<span title="' + (buyer || '') + '">' + (buyer ? 'To ' + truncateAddr(buyer) : 'Buyer unknown') + '</span>' +
+      '</div></div></article>';
+  }).join('');
+
+  grid.querySelectorAll('.sale-card').forEach(card => {
+    card.addEventListener('click', () => openFrogModal(parseInt(card.dataset.id, 10)));
+  });
+}
+
 async function loadRecentSales() {
   const grid = document.getElementById('salesGrid');
   try {
     const [data, currentBlock, ethUsd] = await Promise.all([
-      cachedFetch('ff_recent_sales', ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=6', 5 * 60 * 1000),
+      cachedFetch('ff_recent_sales', ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=12', 5 * 60 * 1000),
       getCurrentBlock().catch(() => null),
       getEthUsdRate()
     ]);
-    const sales = data.nftSales || [];
 
-    if (!sales.length) {
-      grid.innerHTML = '<span style="color:var(--muted);font-size:13px;">No recent sales data available.</span>';
-      return;
-    }
+    const sales = (data.nftSales || []).map(sale => ({
+      ...sale,
+      _id: parseInt(sale.tokenId),
+      _eth: saleTotalEth(sale),
+      _blockNum: parseInt(sale.blockNumber)
+    }));
 
-    grid.innerHTML = sales.map(sale => {
-      const id       = parseInt(sale.tokenId);
-      const eth      = saleTotalEth(sale);
-      const usd      = (eth != null && ethUsd) ? eth * ethUsd : null;
-      const blockNum = parseInt(sale.blockNumber);
-      const ago      = (currentBlock && blockNum) ? formatAgo(currentBlock - blockNum) : 'Recent';
-      const market   = sale.marketplace ? sale.marketplace.charAt(0).toUpperCase() + sale.marketplace.slice(1) : 'OpenSea';
-      const subLine  = (usd != null ? formatUsd(usd) + ' · ' : '') + market;
-      return '<article class="sale-card" data-id="' + id + '">' +
-        '<div class="frog-art sale-art"><img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy"></div>' +
-        '<div class="sale-info"><div><strong>Frog #' + id + '</strong><span>' + ago + '</span></div>' +
-        '<div class="sale-price"><strong>' + (eth != null ? 'Ξ ' + eth.toFixed(3) : 'Ξ —') + '</strong><span>' + subLine + '</span></div>' +
-        '</div></article>';
-    }).join('');
-
-    grid.querySelectorAll('.sale-card').forEach(card => {
-      card.addEventListener('click', () => openFrogModal(parseInt(card.dataset.id, 10)));
-    });
+    salesCache = { sales, currentBlock, ethUsd };
+    renderSalesGrid();
   } catch (e) {
     grid.innerHTML = '<span style="color:var(--muted);font-size:13px;">Could not load recent sales.</span>';
   }
 }
+
+document.querySelectorAll('[data-sales-sort]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-sales-sort]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    salesSort = btn.dataset.salesSort;
+    renderSalesGrid();
+  });
+});
 
 // ── MY FROGS (personal wallet) ──
 async function loadMyFrogs() {
@@ -1653,8 +1777,9 @@ function makePondCard(container, entry) {
   card.dataset.id = tokenId;
   card.innerHTML =
     '<div class="frog-art collection-art"></div>' +
-    '<div class="frog-card-foot" style="flex-direction:column;align-items:stretch;gap:6px;">' +
-    '<div class="pond-meta-row"><strong>Frog #' + tokenId + '</strong><span class="pond-staker" id="staker-' + tokenId + '">loading…</span></div>' +
+    '<div class="pond-card-foot">' +
+    '<div class="pond-card-title-row"><strong>Frog #' + tokenId + '</strong><span class="pond-level-badge" id="badge-' + tokenId + '">···</span></div>' +
+    '<div class="pond-staker" id="staker-' + tokenId + '">loading…</div>' +
     '<div id="level-' + tokenId + '"></div>' +
     '</div>';
   card.addEventListener('click', () => openFrogModal(tokenId, true));
@@ -1666,6 +1791,7 @@ function makePondCard(container, entry) {
 function lazyLoadPondMeta(card, tokenId, entry) {
   const stakerEl = document.getElementById('staker-' + tokenId);
   const levelEl  = document.getElementById('level-' + tokenId);
+  const badgeEl  = document.getElementById('badge-' + tokenId);
   const obs = new IntersectionObserver(async (entries, observer) => {
     if (!entries[0].isIntersecting) return;
     observer.disconnect();
@@ -1674,12 +1800,13 @@ function lazyLoadPondMeta(card, tokenId, entry) {
       const staker = await ctx.methods.stakerAddress(tokenId).call();
 
       if (!staker || /^0x0+$/.test(staker)) {
-        stakerEl.textContent = 'unknown';
+        stakerEl.textContent = 'Staked by: unknown';
+        badgeEl.textContent = '—';
         return;
       }
 
       entry.staker = staker;
-      stakerEl.textContent = truncateAddr(staker);
+      stakerEl.textContent = 'Staked by: ' + truncateAddr(staker);
 
       const info       = await ctx.methods.stakers(staker).call();
       const lastUpdate = parseInt(info.timeOfLastUpdate ?? info[1]);
@@ -1692,11 +1819,15 @@ function lazyLoadPondMeta(card, tokenId, entry) {
       if (hoursStaked >= 2000) { level = 3; pct = Math.min(100, Math.floor(((hoursStaked - 2000) / 1000) * 100)); }
       else if (hoursStaked >= 1000) { level = 2; pct = Math.min(100, Math.floor(((hoursStaked - 1000) / 1000) * 100)); }
 
+      badgeEl.textContent = 'LVL ' + level;
+      badgeEl.title = hoursStaked + 'h staked';
+
       levelEl.innerHTML =
-        '<div class="pond-level-line">LEVEL ' + level + ' · ' + formatDuration(hoursStaked) + '</div>' +
+        '<div class="pond-progress-line"><span>' + formatDuration(hoursStaked) + '</span><span>' + pct + '%</span></div>' +
         '<div class="pond-bar-wrap"><div class="pond-bar-fill" style="width:' + pct + '%;"></div></div>';
     } catch (e) {
-      stakerEl.textContent = 'unavailable';
+      stakerEl.textContent = 'Staked by: unavailable';
+      badgeEl.textContent = '—';
     }
   }, { rootMargin: '200px' });
   obs.observe(card);
@@ -1717,10 +1848,15 @@ document.getElementById('pondRefresh').addEventListener('click', () => {
 });
 
 // ── FROG MODAL ──
+let modalRequestId = 0;
+
 async function openFrogModal(id, isStakedHint) {
+  const requestId = ++modalRequestId;
+
   document.getElementById('modalTitle').textContent = 'FROG #' + id;
   document.getElementById('modalImg').src = '/frog/' + id + '.png';
   document.getElementById('modalTraits').innerHTML = '<span class="eyebrow">Loading traits…</span>';
+  document.getElementById('modalOwnerInfo').innerHTML = '<span class="eyebrow">Loading owner…</span>';
   document.getElementById('modalStatus').textContent = '';
 
   const actions = document.getElementById('modalActions');
@@ -1730,11 +1866,15 @@ async function openFrogModal(id, isStakedHint) {
 
   document.getElementById('ffModal').classList.add('open');
 
+  loadModalOwnerInfo(id, requestId);
+
   try {
     const meta = await fetch('/frog/json/' + id + '.json').then(r => r.json());
+    if (requestId !== modalRequestId) return;
     document.getElementById('modalTraits').innerHTML =
       (meta.attributes || []).map(a => '<span class="ff-trait">' + String(a.trait_type).toUpperCase() + ': ' + a.value + '</span>').join('');
   } catch (e) {
+    if (requestId !== modalRequestId) return;
     document.getElementById('modalTraits').innerHTML = '';
   }
 
@@ -1746,6 +1886,45 @@ async function openFrogModal(id, isStakedHint) {
     } else if (owned) {
       actions.innerHTML += '<button class="btn dark" onclick="stakeFromModal(' + id + ')">STAKE 🐸</button>';
     }
+  }
+}
+
+// Shows current owner, or staker + level/duration if the frog is staked
+// (staked frogs are held by the controller contract, not the original owner).
+async function loadModalOwnerInfo(id, requestId) {
+  const el = document.getElementById('modalOwnerInfo');
+  try {
+    const ctx    = getReadControllerCtx();
+    const staker = await ctx.methods.stakerAddress(id).call();
+    const isStaked = staker && !/^0x0+$/.test(staker);
+    if (requestId !== modalRequestId) return;
+
+    if (isStaked) {
+      const info        = await ctx.methods.stakers(staker).call();
+      if (requestId !== modalRequestId) return;
+      const lastUpdate   = parseInt(info.timeOfLastUpdate ?? info[1]);
+      const nowSec       = Math.floor(Date.now() / 1000);
+      const hoursStaked  = Math.max(0, Math.floor((nowSec - lastUpdate) / 3600));
+
+      let level = 1, pct = Math.min(100, Math.floor((hoursStaked / 1000) * 100));
+      if (hoursStaked >= 2000) { level = 3; pct = Math.min(100, Math.floor(((hoursStaked - 2000) / 1000) * 100)); }
+      else if (hoursStaked >= 1000) { level = 2; pct = Math.min(100, Math.floor(((hoursStaked - 1000) / 1000) * 100)); }
+
+      el.innerHTML =
+        '<div class="pond-meta-row"><span class="pond-staker" title="' + staker + '">Staked by ' + truncateAddr(staker) + '</span><span class="pond-level-badge">LVL ' + level + '</span></div>' +
+        '<div class="pond-progress-line" style="margin-top:6px;"><span>' + formatDuration(hoursStaked) + '</span><span>' + pct + '%</span></div>' +
+        '<div class="pond-bar-wrap"><div class="pond-bar-fill" style="width:' + pct + '%;"></div></div>';
+      return;
+    }
+
+    const data  = await fetch(ALQ + '/getOwnersForNFT?contractAddress=' + CONTRACT_ADDRESS + '&tokenId=' + id).then(r => r.json());
+    if (requestId !== modalRequestId) return;
+    const owner = (data.owners || [])[0];
+    el.innerHTML = '<div class="pond-meta-row"><span class="pond-staker" title="' + (owner || '') + '">' +
+      (owner ? 'Owner ' + truncateAddr(owner) : 'Owner unknown') + '</span><span class="pond-staker">Not staked</span></div>';
+  } catch (e) {
+    if (requestId !== modalRequestId) return;
+    el.innerHTML = '<span class="pond-staker">Owner info unavailable</span>';
   }
 }
 
