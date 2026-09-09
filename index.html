@@ -113,25 +113,74 @@ button, input { font: inherit; }
   gap: 20px;
 }
 
-.brand img {
-  height: 38px;
-  display: block;
+.brand {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 19px;
+  letter-spacing: -.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
   gap: 16px;
-  font: 700 10px "Space Mono", monospace;
+  font: 700 11px "Space Mono", monospace;
 }
 
-.nav-links > a:not(.btn) { opacity: .75; }
+.nav-links > a:not(.btn) { display: none; opacity: .75; }
 .nav-links > a:not(.btn):hover { opacity: 1; }
 .nav-links > a.active-link:not(.btn) { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+body.drawer-open .nav-links > a:not(.btn) { display: inline-flex; }
 
-/* Pages */
-.page { display: none; }
-.page.active { display: block; }
+/* Drawer */
+.drawer-overlay {
+  position: fixed;
+  inset: 66px 0 0 0;
+  background: rgba(23,32,25,.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+  z-index: 25;
+}
+
+.drawer-overlay.open { opacity: 1; pointer-events: auto; }
+
+.drawer {
+  position: fixed;
+  top: 66px;
+  left: 0;
+  right: 0;
+  z-index: 26;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 18px 40px rgba(0,0,0,.14);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .45s cubic-bezier(.2,.8,.2,1);
+}
+
+.drawer.open { max-height: calc(100vh - 66px); overflow-y: auto; }
+
+.drawer-topbar { display: flex; justify-content: flex-end; padding-top: 16px; }
+
+.drawer-close {
+  border: 0;
+  background: transparent;
+  font: 700 11px "Space Mono", monospace;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 8px 0;
+}
+
+.drawer-panel { display: none; }
+.drawer-panel.active { display: block; }
+
+main.dimmed {
+  filter: blur(2px) brightness(.85);
+  pointer-events: none;
+  transition: filter .35s ease;
+}
 
 /* Hero */
 .hero {
@@ -175,8 +224,8 @@ button, input { font: inherit; }
 }
 
 .hero-frog-tile {
-  width: 84px;
-  height: 84px;
+  width: 160px;
+  height: 160px;
   flex: 0 0 auto;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -309,12 +358,6 @@ button, input { font: inherit; }
 }
 
 /* Activity */
-.activity-layout {
-  display: grid;
-  grid-template-columns: 1.15fr .85fr;
-  gap: 12px;
-}
-
 .panel {
   padding: 18px;
   border: 1px solid var(--line);
@@ -591,7 +634,6 @@ footer {
 /* Responsive */
 @media (max-width: 880px) {
   .nav-links > a:not(.btn) { display: none; }
-  .activity-layout,
   .action-grid,
   .about-grid { grid-template-columns: 1fr; }
 }
@@ -599,7 +641,7 @@ footer {
 @media (max-width: 650px) {
   .shell { width: min(100% - 28px, 1120px); }
   .hero { padding-top: 46px; }
-  .hero-frog-tile { width: 64px; height: 64px; }
+  .hero-frog-tile { width: 100px; height: 100px; }
   .section-head { align-items: flex-start; flex-direction: column; }
 }
 </style>
@@ -609,23 +651,19 @@ footer {
 
 <header class="site-header">
   <div class="shell nav">
-    <a class="brand" href="#" data-page="home"><img src="/assets/logo.png" alt="Fresh Frogs"></a>
+    <a class="brand" href="#" data-page="home">Fresh Frogs</a>
     <nav class="nav-links">
       <a href="#" data-page="home">HOME</a>
       <a href="#collection" data-page="collection">COLLECTION</a>
-      <a href="#activity" data-page="activity">RECENT SALES</a>
-      <a href="#activity" data-page="activity">MY FROGS</a>
+      <a href="#my-frogs" data-page="my-frogs">MY FROGS</a>
       <a href="#pond" data-page="pond">THE POND</a>
       <a href="#mint" data-page="mint">MINT</a>
-      <a href="#mint" data-page="mint">GAME</a>
-      <a class="btn" href="#activity" id="navWalletBtn">CONNECT WALLET</a>
+      <a class="btn" href="#my-frogs" id="navWalletBtn">CONNECT WALLET</a>
     </nav>
   </div>
 </header>
 
-<main>
-
-<div class="page active" id="page-home">
+<main id="main">
 
 <section class="hero">
   <div class="shell">
@@ -640,6 +678,7 @@ footer {
       <a class="btn primary" href="#collection" data-page="collection">EXPLORE COLLECTION</a>
       <a class="btn" href="#pond" data-page="pond">VIEW THE POND</a>
       <a class="btn" href="#mint" data-page="mint">MINT</a>
+      <a class="btn" href="https://opensea.io/collection/fresh-frogs" target="_blank" rel="noopener">SHOP ON OPENSEA ↗</a>
     </div>
 
     <div class="hero-frogs" id="heroFrogs"></div>
@@ -677,9 +716,15 @@ footer {
   </div>
 </section>
 
-</div>
+</main>
 
-<div class="page" id="page-collection">
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="drawer">
+  <div class="shell drawer-topbar">
+    <button class="drawer-close" id="drawerClose">✕ CLOSE</button>
+  </div>
+
+<div class="drawer-panel" id="panel-collection">
 <section class="section" id="collection">
   <div class="shell">
     <div class="section-head">
@@ -704,10 +749,8 @@ footer {
     </div>
   </div>
 </section>
-</div>
 
-<div class="page" id="page-activity">
-<section class="section" id="activity">
+<section class="section">
   <div class="shell">
     <div class="section-head">
       <div>
@@ -717,49 +760,59 @@ footer {
       <p>See the latest Fresh Frogs sales across the collection.</p>
     </div>
 
-    <div class="activity-layout">
-
-      <section class="panel">
-        <div class="panel-head">
-          <h3>Latest Sales</h3>
-          <a class="btn" href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank" rel="noopener">VIEW ALL</a>
-        </div>
-        <div class="sales-grid" id="salesGrid">
-          <span class="eyebrow">Loading recent sales…</span>
-        </div>
-      </section>
-
-      <section class="panel" id="my-pond">
-        <div class="panel-head">
-          <h3>My Frogs</h3>
-          <div class="panel-head-actions">
-            <button class="btn" id="claimBtn" style="display:none"></button>
-            <button class="btn" id="myFrogsConnectBtn">CONNECT WALLET</button>
-          </div>
-        </div>
-
-        <div class="tabs">
-          <button class="tab active" data-tab="owned">OWNED</button>
-          <button class="tab" data-tab="staked">STAKED</button>
-        </div>
-
-        <div id="ownedPanel">
-          <p class="wallet-copy" id="ownedCopy">Connect your wallet to view the Fresh Frogs you own.</p>
-          <div class="wallet-grid"></div>
-        </div>
-
-        <div id="stakedPanel" style="display:none">
-          <p class="wallet-copy" id="stakedCopy">Connect your wallet to view your staked frogs.</p>
-          <div class="wallet-grid"></div>
-        </div>
-      </section>
-
-    </div>
+    <section class="panel">
+      <div class="panel-head">
+        <h3>Latest Sales</h3>
+        <a class="btn" href="https://opensea.io/collection/fresh-frogs?tab=activity" target="_blank" rel="noopener">VIEW ALL</a>
+      </div>
+      <div class="sales-grid" id="salesGrid">
+        <span class="eyebrow">Loading recent sales…</span>
+      </div>
+    </section>
   </div>
 </section>
 </div>
 
-<div class="page" id="page-pond">
+<div class="drawer-panel" id="panel-my-frogs">
+<section class="section">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">YOUR WALLET</div>
+        <h2>My Frogs</h2>
+      </div>
+      <p>Connect your wallet to see what you own, what's staked, and claim $FLYZ rewards.</p>
+    </div>
+
+    <section class="panel" id="my-pond">
+      <div class="panel-head">
+        <h3>My Frogs</h3>
+        <div class="panel-head-actions">
+          <button class="btn" id="claimBtn" style="display:none"></button>
+          <button class="btn" id="myFrogsConnectBtn">CONNECT WALLET</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="owned">OWNED</button>
+        <button class="tab" data-tab="staked">STAKED</button>
+      </div>
+
+      <div id="ownedPanel">
+        <p class="wallet-copy" id="ownedCopy">Connect your wallet to view the Fresh Frogs you own.</p>
+        <div class="wallet-grid"></div>
+      </div>
+
+      <div id="stakedPanel" style="display:none">
+        <p class="wallet-copy" id="stakedCopy">Connect your wallet to view your staked frogs.</p>
+        <div class="wallet-grid"></div>
+      </div>
+    </section>
+  </div>
+</section>
+</div>
+
+<div class="drawer-panel" id="panel-pond">
 <section class="section" id="pond">
   <div class="shell">
     <div class="section-head">
@@ -785,7 +838,7 @@ footer {
 </section>
 </div>
 
-<div class="page" id="page-mint">
+<div class="drawer-panel" id="panel-mint">
 <section class="section" id="mint">
   <div class="shell">
     <div class="section-head">
@@ -835,7 +888,7 @@ footer {
 </section>
 </div>
 
-</main>
+</div>
 
 <footer>
   <div class="shell footer-row">
@@ -964,42 +1017,66 @@ let stakedFrogs     = [];
 let rewardsAmount   = 0;
 let stakedRosterPromise = null;
 
-// ── PAGE NAVIGATION ──
-const PAGES = ['home', 'collection', 'activity', 'pond', 'mint'];
+// ── DRAWER NAVIGATION ──
+const DRAWER_PANELS = ['collection', 'my-frogs', 'pond', 'mint'];
 
-function showPage(name) {
-  if (!PAGES.includes(name)) name = 'home';
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
+function setActiveNav(name) {
   document.querySelectorAll('.nav-links [data-page]').forEach(a => {
     a.classList.toggle('active-link', a.dataset.page === name);
   });
-  window.scrollTo({ top: 0 });
-  const target = name === 'home' ? location.pathname + location.search : '#' + name;
-  if (location.hash.replace('#', '') !== (name === 'home' ? '' : name)) {
-    history.replaceState(null, '', target);
-  }
+}
+
+function openDrawer(name) {
+  if (!DRAWER_PANELS.includes(name)) return;
+  document.querySelectorAll('.drawer-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+  setActiveNav(name);
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('main').classList.add('dimmed');
+  document.body.classList.add('drawer-open');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (location.hash.replace('#', '') !== name) history.replaceState(null, '', '#' + name);
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('main').classList.remove('dimmed');
+  document.body.classList.remove('drawer-open');
+  setActiveNav(null);
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
 }
 
 function wireInternalNav() {
   document.querySelectorAll('[data-page]').forEach(el => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
-      showPage(el.dataset.page);
+      if (el.dataset.page === 'home') {
+        closeDrawer();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        openDrawer(el.dataset.page);
+      }
     });
   });
 }
 
-window.addEventListener('hashchange', () => showPage(location.hash.replace('#', '') || 'home'));
+document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
+
+window.addEventListener('hashchange', () => {
+  const name = location.hash.replace('#', '');
+  if (DRAWER_PANELS.includes(name)) openDrawer(name); else closeDrawer();
+});
 
 // ── HERO FROGS (random + fit-to-width) ──
 function renderHeroFrogs() {
   const wrap = document.getElementById('heroFrogs');
   if (!wrap) return;
   const containerWidth = wrap.parentElement.clientWidth;
-  const tile = window.innerWidth <= 650 ? 64 : 84;
+  const tile = window.innerWidth <= 650 ? 100 : 160;
   const gap  = 8;
-  const count = Math.max(4, Math.min(24, Math.floor((containerWidth + gap) / (tile + gap))));
+  const count = Math.max(3, Math.min(8, Math.floor((containerWidth + gap) / (tile + gap))));
   const ids = new Set();
   while (ids.size < count && ids.size < TOTAL_SUPPLY) ids.add(1 + Math.floor(Math.random() * TOTAL_SUPPLY));
   const palette = ['var(--pond)', 'var(--water)', '#e6dfc9', '#ddd8e5'];
@@ -1164,23 +1241,61 @@ function makeFrogCard(container, id, opts) {
   card.dataset.id = id;
   card.innerHTML =
     '<div class="frog-art collection-art"><img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy"></div>' +
-    '<div class="frog-card-foot"><div><strong>Frog #' + id + '</strong><span>Fresh Frogs</span></div>' +
-    '<span>' + (opts.staked ? 'Staked ↗' : 'View ↗') + '</span></div>';
+    '<div class="frog-card-foot" style="flex-direction:column;align-items:stretch;gap:5px;">' +
+    '<div class="pond-meta-row"><strong>Frog #' + id + '</strong><span>' + (opts.staked ? 'STAKED' : 'View ↗') + '</span></div>' +
+    '<div class="pond-staker" id="owner-' + id + '">' + (opts.staked ? 'Held in The Pond' : 'Owner: loading…') + '</div>' +
+    '<div class="pond-staker" id="sale-' + id + '"></div>' +
+    '</div>';
   card.addEventListener('click', () => openFrogModal(id, opts.staked));
   container.appendChild(card);
+  lazyLoadCollectionMeta(card, id, opts);
+}
+
+function lazyLoadCollectionMeta(card, id, opts) {
+  const ownerEl = document.getElementById('owner-' + id);
+  const saleEl  = document.getElementById('sale-' + id);
+  const obs = new IntersectionObserver((entries, observer) => {
+    if (!entries[0].isIntersecting) return;
+    observer.disconnect();
+
+    if (!opts.staked && ownerEl) {
+      fetch(ALQ + '/getOwnersForNFT?contractAddress=' + CONTRACT_ADDRESS + '&tokenId=' + id)
+        .then(r => r.json())
+        .then(data => {
+          const owner = (data.owners || [])[0];
+          ownerEl.textContent = owner ? 'Owner: ' + truncateAddr(owner) : 'Owner unknown';
+          if (owner) ownerEl.title = owner;
+        })
+        .catch(() => { ownerEl.textContent = 'Owner unavailable'; });
+    }
+
+    if (saleEl) {
+      Promise.all([
+        fetch(ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&tokenId=' + id + '&order=desc&limit=1').then(r => r.json()),
+        getEthUsdRate()
+      ]).then(([data, ethUsd]) => {
+        const sale = (data.nftSales || [])[0];
+        if (!sale) return;
+        const eth = saleTotalEth(sale);
+        if (eth == null) return;
+        const usd = ethUsd ? ' (' + formatUsd(eth * ethUsd) + ')' : '';
+        saleEl.textContent = 'Last sale: Ξ ' + eth.toFixed(3) + usd;
+      }).catch(() => {});
+    }
+  }, { rootMargin: '200px' });
+  obs.observe(card);
 }
 
 async function loadCollectionBatch(reset) {
   const grid = document.getElementById('frogGrid');
   if (reset) { grid.innerHTML = ''; collectionOffset = 0; }
 
-  let staked = null;
-  if (collectionFilter !== 'all') staked = await getStakedSet();
+  const staked = await getStakedSet();
 
   let added = 0;
   let id = collectionOffset + 1;
   while (added < COLLECTION_BATCH && id <= TOTAL_SUPPLY) {
-    const isStaked = staked ? staked.has(id) : null;
+    const isStaked = staked.has(id);
     if (collectionFilter === 'staked' && !isStaked) { id++; continue; }
     if (collectionFilter === 'available' && isStaked) { id++; continue; }
     makeFrogCard(grid, id, { staked: isStaked });
@@ -1208,7 +1323,7 @@ document.querySelectorAll('#collection .filter').forEach(chip => {
   });
 });
 
-document.getElementById('frogSearch').addEventListener('input', () => {
+document.getElementById('frogSearch').addEventListener('input', async () => {
   const q    = document.getElementById('frogSearch').value.trim();
   const grid = document.getElementById('frogGrid');
   const wrap = document.getElementById('collectionLoadMoreWrap');
@@ -1222,8 +1337,9 @@ document.getElementById('frogSearch').addEventListener('input', () => {
     return;
   }
 
+  const staked = await getStakedSet();
   grid.innerHTML = '';
-  makeFrogCard(grid, id, {});
+  makeFrogCard(grid, id, { staked: staked.has(id) });
   wrap.style.display = 'none';
 });
 
@@ -1351,7 +1467,7 @@ document.getElementById('claimBtn').addEventListener('click', async () => {
 document.getElementById('myFrogsConnectBtn').addEventListener('click', () => connectWallet());
 document.getElementById('navWalletBtn').addEventListener('click', (e) => {
   e.preventDefault();
-  showPage('activity');
+  openDrawer('my-frogs');
   connectWallet();
 });
 
@@ -1560,7 +1676,8 @@ document.getElementById('ffModal').addEventListener('click', function (e) {
 // ── BOOT ──
 document.addEventListener('DOMContentLoaded', function () {
   wireInternalNav();
-  showPage(location.hash.replace('#', '') || 'home');
+  const initial = location.hash.replace('#', '');
+  if (DRAWER_PANELS.includes(initial)) openDrawer(initial);
   renderHeroFrogs();
   loadRecentSales();
   loadCollectionBatch(true);

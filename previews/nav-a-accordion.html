@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nav idea A — Accordion reveal below About</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+:root {
+  --bg: #f3f3ec; --surface: #fafaf6; --surface-2: #eef1e9; --ink: #172019;
+  --muted: #6a736b; --line: #cdd4ca; --accent: #e8df87; --pond: #d7e4d3;
+  --water: #d4e5e2; --mint: #c6d4a8; --game: #dcb89e;
+}
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+a { color: inherit; text-decoration: none; }
+.shell { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+.eyebrow { font: 700 11px "Space Mono", monospace; letter-spacing: .15em; text-transform: uppercase; color: #637064; }
+.note { position: fixed; bottom: 14px; right: 14px; background: var(--ink); color: #fff; font: 700 11px "Space Mono", monospace; padding: 10px 14px; border-radius: 6px; max-width: 260px; line-height: 1.5; z-index: 99; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 10px 14px;
+  border: 1px solid #a4ada1; border-radius: 5px; background: var(--surface); color: var(--ink);
+  font: 700 11px "Space Mono", monospace; cursor: pointer;
+}
+.btn.primary { background: var(--accent); }
+.btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.site-header { position: sticky; top: 0; z-index: 20; background: rgba(243,243,236,.94); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.nav { height: 66px; display: flex; align-items: center; justify-content: space-between; }
+.brand { font-family: "Archivo Black", sans-serif; font-size: 19px; letter-spacing: -.02em; text-transform: uppercase; }
+.hero { text-align: center; padding: 58px 0 34px; }
+.hero h1 { margin: 10px 0 12px; font-family: "Archivo Black", sans-serif; font-size: clamp(52px, 7vw, 90px); line-height: .84; letter-spacing: -.06em; text-transform: uppercase; }
+.hero-copy { max-width: 620px; margin: 0 auto; color: var(--muted); font-size: 16px; line-height: 1.65; }
+.hero-actions { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
+.frog-tile { width: 160px; height: 160px; border: 1px solid var(--line); border-radius: 8px; background: var(--pond); display: inline-flex; align-items: center; justify-content: center; font: 700 11px "Space Mono", monospace; color: var(--muted); }
+.hero-frogs { display: flex; justify-content: center; gap: 8px; margin: 32px auto 0; }
+.section { padding: 48px 0; }
+.section + .section { border-top: 1px solid var(--line); }
+.section-head h2 { margin: 4px 0 0; font: 700 28px/1 "Space Mono", monospace; letter-spacing: -.04em; }
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+.about-card { padding: 20px; border-top: 1px solid var(--line); }
+.about-card h3 { margin: 0 0 9px; font: 700 17px "Space Mono", monospace; }
+.about-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+
+/* THE ACCORDION MECHANISM */
+.reveal-nav { display: flex; gap: 8px; flex-wrap: wrap; padding: 28px 0 0; border-top: 1px solid var(--line); margin-top: 10px; }
+.reveal-panel {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height .5s ease, opacity .4s ease .05s;
+}
+.reveal-panel.open { max-height: 900px; opacity: 1; }
+.reveal-inner { padding: 32px 0 12px; }
+.placeholder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 16px; }
+.placeholder-card { aspect-ratio: 1; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); display: flex; align-items: center; justify-content: center; font: 700 10px "Space Mono", monospace; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="note">IDEA A — Accordion reveal<br>Hero+About never leave. Clicking a button opens a panel right below, page auto-scrolls to it. Click again (or another button) to switch.</div>
+
+<header class="site-header">
+  <div class="shell nav">
+    <span class="brand">Fresh Frogs</span>
+    <a class="btn">CONNECT WALLET</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="shell">
+      <div class="eyebrow">4,040 UNIQUE FROGS ON ETHEREUM</div>
+      <h1>FRESH<br>FROGS</h1>
+      <p class="hero-copy">Collect, mint, and stake Fresh Frogs to earn $FLYZ rewards.</p>
+      <div class="hero-actions">
+        <button class="btn primary" data-target="collection">EXPLORE COLLECTION</button>
+        <button class="btn" data-target="pond">VIEW THE POND</button>
+        <button class="btn" data-target="mint">MINT</button>
+        <a class="btn" href="#">SHOP ON OPENSEA ↗</a>
+      </div>
+      <div class="hero-frogs">
+        <div class="frog-tile">frog</div><div class="frog-tile">frog</div><div class="frog-tile">frog</div><div class="frog-tile">frog</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <div class="section-head"><div class="eyebrow">ABOUT</div><h2>Fresh Frogs NFT</h2></div>
+      <div class="about-grid">
+        <div class="about-card"><h3>4,040 Unique Frogs</h3><p>Randomly generated frogs on Ethereum, each unique across dozens of traits.</p></div>
+        <div class="about-card"><h3>Protecting Real Frogs</h3><p>A 5% royalty is split between two nonprofits protecting rainforest and amphibian habitats.</p></div>
+      </div>
+
+      <div class="reveal-nav">
+        <button class="btn nav-btn" data-target="collection">COLLECTION</button>
+        <button class="btn nav-btn" data-target="my-frogs">MY FROGS</button>
+        <button class="btn nav-btn" data-target="pond">THE POND</button>
+        <button class="btn nav-btn" data-target="mint">MINT</button>
+      </div>
+
+      <div class="reveal-panel" id="panel-collection">
+        <div class="reveal-inner">
+          <div class="eyebrow">THE COLLECTION</div>
+          <h2 style="margin:4px 0 14px;font:700 26px 'Space Mono',monospace;">Explore Fresh Frogs</h2>
+          <div class="placeholder-grid">
+            <div class="placeholder-card">Frog #12</div><div class="placeholder-card">Frog #88</div><div class="placeholder-card">Frog #340</div>
+            <div class="placeholder-card">Frog #1201</div><div class="placeholder-card">Frog #2044</div><div class="placeholder-card">Frog #3910</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal-panel" id="panel-my-frogs">
+        <div class="reveal-inner">
+          <div class="eyebrow">YOUR WALLET</div>
+          <h2 style="margin:4px 0 14px;font:700 26px 'Space Mono',monospace;">My Frogs</h2>
+          <p style="color:var(--muted);">Connect your wallet to see what you own and what's staked.</p>
+        </div>
+      </div>
+
+      <div class="reveal-panel" id="panel-pond">
+        <div class="reveal-inner">
+          <div class="eyebrow">COMMUNITY</div>
+          <h2 style="margin:4px 0 14px;font:700 26px 'Space Mono',monospace;">The Pond</h2>
+          <div class="placeholder-grid">
+            <div class="placeholder-card">Staked #204</div><div class="placeholder-card">Staked #77</div><div class="placeholder-card">Staked #1990</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal-panel" id="panel-mint">
+        <div class="reveal-inner">
+          <div class="eyebrow">FRESH FROGS</div>
+          <h2 style="margin:4px 0 14px;font:700 26px 'Space Mono',monospace;">Mint &amp; Play</h2>
+          <p style="color:var(--muted);">Mint a frog, or play Escape the Snake.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const panels = document.querySelectorAll('.reveal-panel');
+const buttons = document.querySelectorAll('[data-target]');
+function openPanel(name) {
+  const alreadyOpen = document.getElementById('panel-' + name).classList.contains('open');
+  panels.forEach(p => p.classList.remove('open'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.target === name));
+  if (alreadyOpen) return; // clicking the open one again just closes it
+  const panel = document.getElementById('panel-' + name);
+  panel.classList.add('open');
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+}
+buttons.forEach(b => b.addEventListener('click', () => openPanel(b.dataset.target)));
+</script>
+
+</body>
+</html>

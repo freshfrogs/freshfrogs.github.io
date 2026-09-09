@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nav idea B — Slide-down drawer</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+:root {
+  --bg: #f3f3ec; --surface: #fafaf6; --surface-2: #eef1e9; --ink: #172019;
+  --muted: #6a736b; --line: #cdd4ca; --accent: #e8df87; --pond: #d7e4d3;
+}
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+a { color: inherit; text-decoration: none; }
+.shell { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+.eyebrow { font: 700 11px "Space Mono", monospace; letter-spacing: .15em; text-transform: uppercase; color: #637064; }
+.note { position: fixed; bottom: 14px; right: 14px; background: var(--ink); color: #fff; font: 700 11px "Space Mono", monospace; padding: 10px 14px; border-radius: 6px; max-width: 260px; line-height: 1.5; z-index: 99; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 10px 14px;
+  border: 1px solid #a4ada1; border-radius: 5px; background: var(--surface); color: var(--ink);
+  font: 700 11px "Space Mono", monospace; cursor: pointer;
+}
+.btn.primary { background: var(--accent); }
+.site-header { position: sticky; top: 0; z-index: 30; background: rgba(243,243,236,.94); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.nav { height: 66px; display: flex; align-items: center; justify-content: space-between; }
+.brand { font-family: "Archivo Black", sans-serif; font-size: 19px; letter-spacing: -.02em; text-transform: uppercase; }
+.hero { text-align: center; padding: 58px 0 34px; transition: filter .35s ease; }
+.hero h1 { margin: 10px 0 12px; font-family: "Archivo Black", sans-serif; font-size: clamp(52px, 7vw, 90px); line-height: .84; letter-spacing: -.06em; text-transform: uppercase; }
+.hero-copy { max-width: 620px; margin: 0 auto; color: var(--muted); font-size: 16px; line-height: 1.65; }
+.hero-actions { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
+.frog-tile { width: 160px; height: 160px; border: 1px solid var(--line); border-radius: 8px; background: var(--pond); display: inline-flex; align-items: center; justify-content: center; font: 700 11px "Space Mono", monospace; color: var(--muted); }
+.hero-frogs { display: flex; justify-content: center; gap: 8px; margin: 32px auto 0; }
+.section { padding: 48px 0; transition: filter .35s ease; }
+.section + .section { border-top: 1px solid var(--line); }
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+.about-card { padding: 20px; border-top: 1px solid var(--line); }
+.about-card h3 { margin: 0 0 9px; font: 700 17px "Space Mono", monospace; }
+.about-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+main.dimmed .hero, main.dimmed .home-section { filter: blur(2px) brightness(.85); pointer-events: none; }
+
+/* THE DRAWER MECHANISM */
+.drawer-overlay {
+  position: fixed; inset: 66px 0 0 0; background: rgba(23,32,25,.25);
+  opacity: 0; pointer-events: none; transition: opacity .3s ease; z-index: 25;
+}
+.drawer-overlay.open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 66px; left: 0; right: 0; z-index: 26;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  box-shadow: 0 18px 40px rgba(0,0,0,.12);
+  max-height: 0; overflow: hidden;
+  transition: max-height .45s cubic-bezier(.2,.8,.2,1);
+}
+.drawer.open { max-height: 70vh; overflow-y: auto; }
+.drawer-inner { padding: 30px 0 34px; }
+.drawer-head { display: flex; justify-content: space-between; align-items: center; }
+.drawer-close { border: 0; background: transparent; font-size: 20px; cursor: pointer; color: var(--muted); }
+.placeholder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 16px; }
+.placeholder-card { aspect-ratio: 1; border: 1px solid var(--line); border-radius: 8px; background: #fff; display: flex; align-items: center; justify-content: center; font: 700 10px "Space Mono", monospace; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="note">IDEA B — Slide-down drawer<br>Clicking a button drops a panel from under the header, dimming the page behind it. Click the ✕ or click outside to close.</div>
+
+<header class="site-header">
+  <div class="shell nav">
+    <span class="brand">Fresh Frogs</span>
+    <a class="btn">CONNECT WALLET</a>
+  </div>
+</header>
+
+<div class="drawer-overlay" id="overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="shell drawer-inner">
+    <div class="drawer-head">
+      <div>
+        <div class="eyebrow" id="drawerEyebrow">THE COLLECTION</div>
+        <h2 style="margin:4px 0 0;font:700 28px 'Space Mono',monospace;" id="drawerTitle">Explore Fresh Frogs</h2>
+      </div>
+      <button class="drawer-close" id="drawerClose">✕</button>
+    </div>
+    <div id="drawerBody" style="margin-top:18px;"></div>
+  </div>
+</div>
+
+<main id="main">
+  <section class="hero">
+    <div class="shell">
+      <div class="eyebrow">4,040 UNIQUE FROGS ON ETHEREUM</div>
+      <h1>FRESH<br>FROGS</h1>
+      <p class="hero-copy">Collect, mint, and stake Fresh Frogs to earn $FLYZ rewards.</p>
+      <div class="hero-actions">
+        <button class="btn primary" data-target="collection">EXPLORE COLLECTION</button>
+        <button class="btn" data-target="pond">VIEW THE POND</button>
+        <button class="btn" data-target="mint">MINT</button>
+        <a class="btn" href="#">SHOP ON OPENSEA ↗</a>
+      </div>
+      <div class="hero-frogs">
+        <div class="frog-tile">frog</div><div class="frog-tile">frog</div><div class="frog-tile">frog</div><div class="frog-tile">frog</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section home-section">
+    <div class="shell">
+      <div class="eyebrow">ABOUT</div>
+      <h2 style="margin:4px 0 0;font:700 28px 'Space Mono',monospace;">Fresh Frogs NFT</h2>
+      <div class="about-grid">
+        <div class="about-card"><h3>4,040 Unique Frogs</h3><p>Randomly generated frogs on Ethereum, each unique across dozens of traits.</p></div>
+        <div class="about-card"><h3>Protecting Real Frogs</h3><p>A 5% royalty is split between two nonprofits protecting rainforest and amphibian habitats.</p></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:24px;padding-top:24px;border-top:1px solid var(--line);">
+        <button class="btn" data-target="collection">COLLECTION</button>
+        <button class="btn" data-target="my-frogs">MY FROGS</button>
+        <button class="btn" data-target="pond">THE POND</button>
+        <button class="btn" data-target="mint">MINT</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const content = {
+  collection: { eyebrow: 'THE COLLECTION', title: 'Explore Fresh Frogs',
+    body: '<div class="placeholder-grid"><div class="placeholder-card">Frog #12</div><div class="placeholder-card">Frog #88</div><div class="placeholder-card">Frog #340</div><div class="placeholder-card">Frog #1201</div></div>' },
+  'my-frogs': { eyebrow: 'YOUR WALLET', title: 'My Frogs',
+    body: '<p style="color:var(--muted);">Connect your wallet to see what you own and what\'s staked.</p>' },
+  pond: { eyebrow: 'COMMUNITY', title: 'The Pond',
+    body: '<div class="placeholder-grid"><div class="placeholder-card">Staked #204</div><div class="placeholder-card">Staked #77</div><div class="placeholder-card">Staked #1990</div></div>' },
+  mint: { eyebrow: 'FRESH FROGS', title: 'Mint & Play',
+    body: '<p style="color:var(--muted);">Mint a frog, or play Escape the Snake.</p>' }
+};
+
+const drawer = document.getElementById('drawer');
+const overlay = document.getElementById('overlay');
+const main = document.getElementById('main');
+
+function openDrawer(name) {
+  const c = content[name];
+  document.getElementById('drawerEyebrow').textContent = c.eyebrow;
+  document.getElementById('drawerTitle').textContent = c.title;
+  document.getElementById('drawerBody').innerHTML = c.body;
+  drawer.classList.add('open');
+  overlay.classList.add('open');
+  main.classList.add('dimmed');
+}
+function closeDrawer() {
+  drawer.classList.remove('open');
+  overlay.classList.remove('open');
+  main.classList.remove('dimmed');
+}
+
+document.querySelectorAll('[data-target]').forEach(b => b.addEventListener('click', () => openDrawer(b.dataset.target)));
+document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+overlay.addEventListener('click', closeDrawer);
+</script>
+
+</body>
+</html>
