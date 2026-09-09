@@ -1611,13 +1611,24 @@ function renderSalesGrid() {
       '<div class="sale-row"><strong>Frog #' + id + '</strong><strong>' + (eth != null ? 'Ξ ' + eth.toFixed(3) : 'Ξ —') + '</strong></div>' +
       '<div class="sale-row"><span>' + ago + '</span><span>' + subLine + '</span></div>' +
       '<div class="sale-addrs">' +
-      '<span title="' + (seller || '') + '">' + (seller ? 'From ' + truncateAddr(seller) : 'Seller unknown') + '</span>' +
-      '<span title="' + (buyer || '') + '">' + (buyer ? 'To ' + truncateAddr(buyer) : 'Buyer unknown') + '</span>' +
+      '<span class="sale-addr" data-addr="' + (seller || '') + '" data-role="seller" title="' + (seller || '') + '">' + (seller ? 'From ' + truncateAddr(seller) : 'Seller unknown') + '</span>' +
+      '<span class="sale-addr" data-addr="' + (buyer || '') + '" data-role="buyer" title="' + (buyer || '') + '">' + (buyer ? 'To ' + truncateAddr(buyer) : 'Buyer unknown') + '</span>' +
       '</div></div></article>';
   }).join('');
 
   grid.querySelectorAll('.sale-card').forEach(card => {
     card.addEventListener('click', () => openFrogModal(parseInt(card.dataset.id, 10)));
+  });
+
+  // Swap in OpenSea usernames where the trader has one set — falls back to the
+  // truncated address already rendered above, so this is a progressive patch,
+  // not something the initial render waits on.
+  grid.querySelectorAll('.sale-addr[data-addr]').forEach(el => {
+    const addr = el.dataset.addr;
+    if (!addr) return;
+    getOpenSeaUsername(addr).then(name => {
+      if (name) el.textContent = (el.dataset.role === 'seller' ? 'From ' : 'To ') + name;
+    });
   });
 }
 
@@ -1627,6 +1638,19 @@ function renderSalesGrid() {
 // missing the collection's actual highest sale entirely — while OpenSea's own
 // Events API (the marketplace where these sales actually happened) has it.
 // Memoized for the session — sales history only grows.
+// address (any case) -> Promise<username|null>, memoized for the session — the
+// same trader address often recurs across multiple sales.
+const openSeaUsernameCache = {};
+function getOpenSeaUsername(address) {
+  const key = address.toLowerCase();
+  if (!openSeaUsernameCache[key]) {
+    openSeaUsernameCache[key] = fetch('https://api.opensea.io/api/v2/accounts/' + address, {
+      headers: { accept: 'application/json', 'x-api-key': OPENSEA_KEY }
+    }).then(r => r.json()).then(d => d.username || d.display_name || null).catch(() => null);
+  }
+  return openSeaUsernameCache[key];
+}
+
 let allSalesPromise = null;
 function getAllSales() {
   if (allSalesPromise) return allSalesPromise;
