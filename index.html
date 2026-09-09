@@ -980,6 +980,8 @@ const CONTROLLER_ADDRESS = '0xCB1ee125CFf4051a10a55a09B10613876C4Ef199';
 const ALCHEMY_KEY        = '__ALCHEMY_KEY__';
 const ALQ                = 'https://eth-mainnet.g.alchemy.com/nft/v3/' + ALCHEMY_KEY;
 const RPC                = 'https://eth-mainnet.g.alchemy.com/v2/' + ALCHEMY_KEY;
+const OPENSEA_KEY        = '__OPENSEA_KEY__';
+const OPENSEA_SLUG       = 'fresh-frogs';
 const MINT_PRICE         = 0.01;
 const NETWORK            = 'main';
 const TOTAL_SUPPLY       = 4040;
@@ -999,14 +1001,18 @@ function truncateAddr(addr) {
   return addr ? addr.slice(0, 6) + '…' + addr.slice(-4) : '';
 }
 
-function formatAgo(blocksAgo) {
-  const secs = Math.max(0, blocksAgo) * 12;
+function formatAgo(secsAgo) {
+  const secs = Math.max(0, secsAgo);
   if (secs < 60) return 'moments ago';
   const mins = Math.floor(secs / 60);
   if (mins < 60) return mins + 'm ago';
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return hrs + 'h ago';
-  return Math.floor(hrs / 24) + 'd ago';
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return days + 'd ago';
+  const months = Math.floor(days / 30);
+  if (months < 12) return months + 'mo ago';
+  return Math.floor(months / 12) + 'y ago';
 }
 
 function formatDuration(hours) {
@@ -1015,16 +1021,6 @@ function formatDuration(hours) {
   const days = Math.floor(hours / 24);
   if (days < 90) return days + 'd staked';
   return Math.floor(days / 30) + 'mo staked';
-}
-
-let currentBlockPromise = null;
-function getCurrentBlock() {
-  if (currentBlockPromise) return currentBlockPromise;
-  currentBlockPromise = fetch(RPC, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 })
-  }).then(r => r.json()).then(d => parseInt(d.result, 16));
-  return currentBlockPromise;
 }
 
 let ethUsdRatePromise = null;
@@ -1559,6 +1555,8 @@ document.getElementById('frogSearch').addEventListener('input', async () => {
 });
 
 // ── RECENT SALES ──
+// Used for the per-card "last sale" lookup on collection cards (still Alchemy —
+// see lazyLoadCollectionMeta), which uses Alchemy's fee-breakdown sale shape.
 function saleTotalEth(sale) {
   const parts = [sale.sellerFee, sale.protocolFee, sale.royaltyFee].filter(p => p && p.amount);
   if (!parts.length) return null;
@@ -1567,14 +1565,21 @@ function saleTotalEth(sale) {
   return total / Math.pow(10, decimals);
 }
 
-let salesCache = null; // { sales, currentBlock, ethUsd } — fetched once (full history), re-sorted client-side
+// Used for the Recent Sales module below — OpenSea's Events API payment shape.
+function openSeaSaleEth(sale) {
+  const p = sale.payment;
+  if (!p || p.quantity == null) return null;
+  return parseFloat(p.quantity) / Math.pow(10, p.decimals || 18);
+}
+
+let salesCache = null; // { sales, ethUsd } — fetched once (full history), re-sorted client-side
 let salesSort  = 'price'; // 'price' | 'recent'
 const SALES_DISPLAY_COUNT = 12;
 
 function renderSalesGrid() {
   const grid = document.getElementById('salesGrid');
   if (!salesCache) return;
-  const { sales, currentBlock, ethUsd } = salesCache;
+  const { sales, ethUsd } = salesCache;
 
   if (!sales.length) {
     grid.innerHTML = '<span style="color:var(--muted);font-size:13px;">No recent sales data available.</span>';
@@ -1587,18 +1592,19 @@ function renderSalesGrid() {
   // sale) could never surface even though it was genuinely the highest ever.
   const ordered = [...sales].sort((a, b) => {
     if (salesSort === 'price') return (b._eth ?? -1) - (a._eth ?? -1);
-    return b._blockNum - a._blockNum;
+    return b._ts - a._ts;
   }).slice(0, SALES_DISPLAY_COUNT);
+
+  const nowSec = Math.floor(Date.now() / 1000);
 
   grid.innerHTML = ordered.map(sale => {
     const id      = sale._id;
     const eth     = sale._eth;
     const usd     = (eth != null && ethUsd) ? eth * ethUsd : null;
-    const ago     = (currentBlock && sale._blockNum) ? formatAgo(currentBlock - sale._blockNum) : 'Recent';
-    const market  = sale.marketplace ? sale.marketplace.charAt(0).toUpperCase() + sale.marketplace.slice(1) : 'OpenSea';
-    const subLine = (usd != null ? formatUsd(usd) + ' · ' : '') + market;
-    const seller  = sale.sellerAddress;
-    const buyer   = sale.buyerAddress || sale.taker;
+    const ago     = sale._ts ? formatAgo(nowSec - sale._ts) : 'Recent';
+    const subLine = (usd != null ? formatUsd(usd) + ' · ' : '') + 'OpenSea';
+    const seller  = sale.seller;
+    const buyer   = sale.buyer;
     return '<article class="sale-card" data-id="' + id + '">' +
       '<div class="frog-art sale-art"><img src="/frog/' + id + '.png" alt="Fresh Frog #' + id + '" loading="lazy"></div>' +
       '<div class="sale-info">' +
@@ -1615,22 +1621,25 @@ function renderSalesGrid() {
   });
 }
 
-// Walks every page of sales history for the collection (not just the most recent
-// batch) so "highest price" can genuinely mean highest ever, not just highest
-// among the last page fetched. Memoized for the session — sales history only grows.
+// Walks every page of OpenSea's sale-event history for the collection (not just
+// the most recent batch) so "highest price" can genuinely mean highest ever.
+// Alchemy's getNFTSales turned out to have gaps for this contract — it was
+// missing the collection's actual highest sale entirely — while OpenSea's own
+// Events API (the marketplace where these sales actually happened) has it.
+// Memoized for the session — sales history only grows.
 let allSalesPromise = null;
 function getAllSales() {
   if (allSalesPromise) return allSalesPromise;
   allSalesPromise = (async () => {
     const sales = [];
-    let pageKey = null;
+    let cursor = null;
     do {
-      const url = ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=100' +
-        (pageKey ? '&pageKey=' + encodeURIComponent(pageKey) : '');
-      const data = await fetch(url).then(r => r.json());
-      (data.nftSales || []).forEach(sale => sales.push(sale));
-      pageKey = data.pageKey || null;
-    } while (pageKey);
+      const url = 'https://api.opensea.io/api/v2/events/collection/' + OPENSEA_SLUG +
+        '?event_type=sale&limit=50' + (cursor ? '&next=' + encodeURIComponent(cursor) : '');
+      const data = await fetch(url, { headers: { accept: 'application/json', 'x-api-key': OPENSEA_KEY } }).then(r => r.json());
+      (data.asset_events || []).forEach(e => sales.push(e));
+      cursor = data.next || null;
+    } while (cursor);
     return sales;
   })();
   return allSalesPromise;
@@ -1639,20 +1648,19 @@ function getAllSales() {
 async function loadRecentSales() {
   const grid = document.getElementById('salesGrid');
   try {
-    const [rawSales, currentBlock, ethUsd] = await Promise.all([
+    const [rawSales, ethUsd] = await Promise.all([
       getAllSales(),
-      getCurrentBlock().catch(() => null),
       getEthUsdRate()
     ]);
 
     const sales = rawSales.map(sale => ({
       ...sale,
-      _id: parseInt(sale.tokenId),
-      _eth: saleTotalEth(sale),
-      _blockNum: parseInt(sale.blockNumber)
+      _id: parseInt(sale.nft && sale.nft.identifier, 10),
+      _eth: openSeaSaleEth(sale),
+      _ts: sale.event_timestamp
     }));
 
-    salesCache = { sales, currentBlock, ethUsd };
+    salesCache = { sales, ethUsd };
     renderSalesGrid();
   } catch (e) {
     grid.innerHTML = '<span style="color:var(--muted);font-size:13px;">Could not load recent sales.</span>';

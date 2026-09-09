@@ -23,6 +23,9 @@ jobs:
       - name: Inject Alchemy API key
         run: sed -i "s/__ALCHEMY_KEY__/${{ secrets.ALCHEMY_KEY }}/" index.html
 
+      - name: Inject OpenSea API key
+        run: sed -i "s/__OPENSEA_KEY__/${{ secrets.OPENSEA_KEY }}/" index.html
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
