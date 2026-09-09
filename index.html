@@ -1057,14 +1057,25 @@ function getFrogMeta(id) {
   return frogMetaCache[id];
 }
 
-// animated: only staked frogs render their animated gif trait variants (smoking/shades/tonguefly) —
-// everyone else gets the static png so the collection/pond grids aren't all gif-heavy.
+// The exact list of trait values that have an animated gif variant, pulled from
+// this project's own original `var animated = [...]` list (source/ethereum-dapp.js) —
+// every value below has a matching /pond/{TraitType}/{value}_animation.gif asset.
+// Values that were commented out in that original list (witchStraw/Brown/Black,
+// bare 'tongue', baseballCap*, treeFrog(4)) were never finished/shipped and stay static.
+const ANIMATED_TRAIT_VALUES = new Set([
+  'goldenDartFrog', 'blueDartFrog', 'blueTreeFrog', 'brownTreeFrog', 'redEyedTreeFrog',
+  'tongueSpiderRed', 'tongueSpider', 'tongueFly',
+  'croaking', 'peace', 'inversedEyes', 'closedEyes', 'thirdEye',
+  'mask', 'smoking', 'smokingCigar', 'smokingPipe',
+  'circleShadesRed', 'circleShadesPurple', 'shades', 'shadesPurple', 'shadesThreeD', 'shadesWhite', 'circleNightVision',
+  'yellow', 'blue(2)', 'blue', 'cyan', 'brown',
+  'silverEthChain', 'goldDollarChain'
+]);
+
+// animated: only staked frogs render animated gif trait variants — everyone else
+// gets the static png so the collection/pond grids aren't all gif-heavy.
 function traitLayerSrc(traitType, value, animated) {
-  if (animated) {
-    if (/smoking/i.test(value)) return '/pond/' + traitType + '/' + value + '2.gif';
-    if (/shades/i.test(value)) return '/pond/' + traitType + '/' + value + '_animation.gif';
-    if (/tonguefly/i.test(value)) return '/pond/' + traitType + '/' + value + '.gif';
-  }
+  if (animated && ANIMATED_TRAIT_VALUES.has(value)) return '/pond/' + traitType + '/' + value + '_animation.gif';
   return '/pond/' + traitType + '/' + value + '.png';
 }
 
