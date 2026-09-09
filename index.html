@@ -1569,8 +1569,9 @@ function saleTotalEth(sale) {
   return total / Math.pow(10, decimals);
 }
 
-let salesCache = null; // { sales, currentBlock, ethUsd } — fetched once, re-sorted client-side
+let salesCache = null; // { sales, currentBlock, ethUsd } — fetched once (full history), re-sorted client-side
 let salesSort  = 'price'; // 'price' | 'recent'
+const SALES_DISPLAY_COUNT = 12;
 
 function renderSalesGrid() {
   const grid = document.getElementById('salesGrid');
@@ -1582,10 +1583,14 @@ function renderSalesGrid() {
     return;
   }
 
+  // Sort the FULL sales history, then take the top slice — sorting a window that
+  // was already capped to "most recent N" made "highest price" only ever reorder
+  // that recent window, so a big sale from further back (e.g. an early mint-era
+  // sale) could never surface even though it was genuinely the highest ever.
   const ordered = [...sales].sort((a, b) => {
     if (salesSort === 'price') return (b._eth ?? -1) - (a._eth ?? -1);
     return b._blockNum - a._blockNum;
-  });
+  }).slice(0, SALES_DISPLAY_COUNT);
 
   grid.innerHTML = ordered.map(sale => {
     const id      = sale._id;
@@ -1612,16 +1617,37 @@ function renderSalesGrid() {
   });
 }
 
+// Walks every page of sales history for the collection (not just the most recent
+// batch) so "highest price" can genuinely mean highest ever, not just highest
+// among the last page fetched. Memoized for the session — sales history only grows.
+let allSalesPromise = null;
+function getAllSales() {
+  if (allSalesPromise) return allSalesPromise;
+  allSalesPromise = (async () => {
+    const sales = [];
+    let pageKey = null;
+    do {
+      const url = ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=100' +
+        (pageKey ? '&pageKey=' + encodeURIComponent(pageKey) : '');
+      const data = await fetch(url).then(r => r.json());
+      (data.nftSales || []).forEach(sale => sales.push(sale));
+      pageKey = data.pageKey || null;
+    } while (pageKey);
+    return sales;
+  })();
+  return allSalesPromise;
+}
+
 async function loadRecentSales() {
   const grid = document.getElementById('salesGrid');
   try {
-    const [data, currentBlock, ethUsd] = await Promise.all([
-      cachedFetch('ff_recent_sales', ALQ + '/getNFTSales?contractAddress=' + CONTRACT_ADDRESS + '&order=desc&limit=12', 5 * 60 * 1000),
+    const [rawSales, currentBlock, ethUsd] = await Promise.all([
+      getAllSales(),
       getCurrentBlock().catch(() => null),
       getEthUsdRate()
     ]);
 
-    const sales = (data.nftSales || []).map(sale => ({
+    const sales = rawSales.map(sale => ({
       ...sale,
       _id: parseInt(sale.tokenId),
       _eth: saleTotalEth(sale),
