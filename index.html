@@ -151,10 +151,12 @@ button, input { font: inherit; }
   font: 700 11px "Space Mono", monospace;
 }
 
-.nav-links > a:not(.btn) { display: none; opacity: .75; }
-.nav-links > a:not(.btn):hover { opacity: 1; }
-.nav-links > a.active-link:not(.btn) { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
-body.drawer-open .nav-links > a:not(.btn) { display: inline-flex; }
+.nav-toggle { display: none; border: 0; background: transparent; font-size: 20px; line-height: 1; cursor: pointer; padding: 4px 8px; color: inherit; }
+
+.nav-dropdown { display: flex; align-items: center; gap: 16px; }
+.nav-dropdown > a { opacity: .75; }
+.nav-dropdown > a:hover { opacity: 1; }
+.nav-dropdown > a.active-link { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
 
 /* Drawer */
 .drawer-overlay {
@@ -680,7 +682,31 @@ footer {
 
 /* Responsive */
 @media (max-width: 880px) {
-  .nav-links > a:not(.btn) { display: none; }
+  .nav-toggle { display: inline-flex; align-items: center; }
+  .nav-dropdown {
+    display: none;
+    position: fixed;
+    top: 66px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 18px 40px rgba(0,0,0,.14);
+    max-height: calc(100vh - 66px);
+    overflow-y: auto;
+    z-index: 30;
+    padding: 8px 20px 16px;
+  }
+  .nav-dropdown.open { display: flex; }
+  .nav-dropdown > a {
+    opacity: 1;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-dropdown > a:last-child { border-bottom: 0; }
   .action-grid,
   .about-grid { grid-template-columns: 1fr; }
 }
@@ -700,12 +726,15 @@ footer {
 <header class="site-header">
   <div class="shell nav">
     <a class="brand" href="#" data-page="home">Fresh Frogs</a>
-    <nav class="nav-links">
-      <a href="#" data-page="home">HOME</a>
-      <a href="#collection" data-page="collection">COLLECTION</a>
-      <a href="#my-frogs" data-page="my-frogs">MY FROGS</a>
-      <a href="#pond" data-page="pond">THE POND</a>
-      <a href="#mint" data-page="mint">MINT</a>
+    <nav class="nav-links" id="navLinks">
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+      <div class="nav-dropdown" id="navDropdown">
+        <a href="#" data-page="home">HOME</a>
+        <a href="#collection" data-page="collection">COLLECTION</a>
+        <a href="#my-frogs" data-page="my-frogs">MY FROGS</a>
+        <a href="#pond" data-page="pond">THE POND</a>
+        <a href="#mint" data-page="mint">MINT</a>
+      </div>
       <a class="btn" href="#my-frogs" id="navWalletBtn">CONNECT WALLET</a>
     </nav>
   </div>
@@ -1195,6 +1224,7 @@ function wireInternalNav() {
   document.querySelectorAll('[data-page]').forEach(el => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
+      closeNavDropdown();
       if (el.dataset.page === 'home') {
         closeDrawer();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1207,6 +1237,21 @@ function wireInternalNav() {
 
 document.getElementById('drawerClose').addEventListener('click', closeDrawer);
 document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
+
+// ── MOBILE NAV DROPDOWN (independent of the content drawer above) ──
+function closeNavDropdown() {
+  document.getElementById('navDropdown').classList.remove('open');
+  document.getElementById('navToggle').setAttribute('aria-expanded', 'false');
+}
+document.getElementById('navToggle').addEventListener('click', () => {
+  const open = document.getElementById('navDropdown').classList.toggle('open');
+  document.getElementById('navToggle').setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+document.addEventListener('click', (e) => {
+  const navLinks = document.getElementById('navLinks');
+  if (navLinks.contains(e.target)) return;
+  closeNavDropdown();
+});
 
 window.addEventListener('hashchange', () => {
   const name = location.hash.replace('#', '');
