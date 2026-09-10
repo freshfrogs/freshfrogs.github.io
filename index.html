@@ -688,7 +688,8 @@ footer {
 @media (max-width: 650px) {
   .shell { width: min(100% - 28px, 1120px); }
   .hero { padding-top: 46px; }
-  .hero-frog-tile { width: 100px; height: 100px; }
+  .hero-frogs { display: grid; grid-template-columns: repeat(3, 1fr); flex-wrap: unset; overflow: visible; }
+  .hero-frog-tile { width: auto; height: auto; }
   .section-head { align-items: flex-start; flex-direction: column; }
 }
 </style>
@@ -1216,10 +1217,16 @@ window.addEventListener('hashchange', () => {
 function renderHeroFrogs() {
   const wrap = document.getElementById('heroFrogs');
   if (!wrap) return;
-  const containerWidth = wrap.parentElement.clientWidth;
-  const tile = window.innerWidth <= 650 ? 100 : 160;
-  const gap  = 8;
-  const count = Math.max(3, Math.min(8, Math.floor((containerWidth + gap) / (tile + gap))));
+  const isMobile = window.innerWidth <= 650;
+  let count;
+  if (isMobile) {
+    count = 9; // 3x3 grid
+  } else {
+    const containerWidth = wrap.parentElement.clientWidth;
+    const tile = 160;
+    const gap  = 8;
+    count = Math.max(3, Math.min(8, Math.floor((containerWidth + gap) / (tile + gap))));
+  }
   const ids = new Set();
   while (ids.size < count && ids.size < TOTAL_SUPPLY) ids.add(1 + Math.floor(Math.random() * TOTAL_SUPPLY));
   const palette = ['var(--pond)', 'var(--water)', '#e6dfc9', '#ddd8e5'];
