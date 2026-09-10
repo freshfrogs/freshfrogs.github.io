@@ -366,7 +366,7 @@ main.dimmed {
 .pond-card-title-row strong { font: 700 12px "Space Mono", monospace; }
 .pond-level-badge { display: inline-flex; align-items: center; flex: 0 0 auto; padding: 3px 7px; border-radius: 4px; background: var(--mint); font: 700 10px "Space Mono", monospace; color: #2c3a26; white-space: nowrap; }
 .pond-meta-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.pond-staker { display: block; font: 700 11px "Space Mono", monospace; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.pond-staker { display: block; min-height: 14px; font: 700 11px "Space Mono", monospace; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 .pond-progress-line { display: flex; justify-content: space-between; gap: 8px; font: 700 10px "Space Mono", monospace; color: var(--muted); margin-bottom: 4px; }
 .pond-bar-wrap { height: 5px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
 .pond-bar-fill { height: 100%; background: var(--ink); }
@@ -1232,7 +1232,13 @@ function renderHeroFrogs() {
 }
 
 let heroResizeTimer = null;
+let heroLastWidth = window.innerWidth;
 window.addEventListener('resize', () => {
+  // Mobile browsers fire 'resize' when the address bar hides/shows during
+  // scroll (viewport height changes, width doesn't) — ignore those so the
+  // hero frogs aren't re-randomized every time the user scrolls.
+  if (window.innerWidth === heroLastWidth) return;
+  heroLastWidth = window.innerWidth;
   clearTimeout(heroResizeTimer);
   heroResizeTimer = setTimeout(renderHeroFrogs, 200);
 });
