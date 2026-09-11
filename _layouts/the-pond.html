@@ -709,6 +709,11 @@
       text-align: right;
       float: right;
     }
+    .pond_sort_bar {
+      text-align: center;
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
   </style>
 <html lang="{{ site.lang | default: "en-US" }}">
   <link rel="icon" href="../assets/logo.png">
@@ -782,6 +787,10 @@
             <div id="pre" class="mintingTextWhite2"><strong></strong><br>Waiting to Connect Web3...<a class="pointer" href="/pond/"><b id="connected">Connect Wallet 🔌</b></a></div>
           </div>
           <br>
+          <div id="pond_sort_bar" class="pond_sort_bar" style="display: none;">
+            <button class="frog_button" onclick="sortPond('rarity')">Sort: Rarity 🡥</button>
+            <button class="frog_button" onclick="sortPond('staked')">Sort: Time Staked 🡥</button>
+          </div>
           <div id="thePad" class="thePad"></div>
         </div>
       </section>

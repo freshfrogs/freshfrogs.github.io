@@ -246,6 +246,9 @@ async function connect() {
 
         Output('<br><button onclick="claim_rewards()" style="list-style: none; height: 40px; padding: 0; border-radius: 5px; border: 1px solid black; width: 270px; box-shadow: 3px 3px rgb(122 122 122 / 20%); margin: 16px; margin-left: auto; margin-right: auto; line-height: 1; text-align: center; vertical-align: middle;" class="frog_button">'+'<strong>Connected!</strong> <acc style="color: #333 !important;">[ '+truncateAddress(user_address)+' ]</acc><br>'+staked_frogs+' Frog(s) Staked '+''+stakers_rewards+' $FLYZ 🡥</button>'+'<br><hr style="background: black;">'+'<div class="console_pre" id="console-pre"></div>'); // '[ '+stakers_rewards+' $FLYZ ] Rewards available <br>'
 
+        let sort_bar = document.getElementById('pond_sort_bar');
+        if (sort_bar) { sort_bar.style.display = 'block'; }
+
         console.log(owned_frogs)
         fetch_user_tokens(0);
 
@@ -442,6 +445,8 @@ async function connect() {
           let staked_duration = Date.now() - staked_date;
           let staked_hours = Math.floor(staked_duration/1000/60/60);
 
+          frog_token.dataset.stakedHours = staked_hours;
+
           //console.log('Frog #'+token_id+' Staked: '+staked_date.toUTCString()+' ('+staked_hours+' Hrs)');
 
           if (staked_hours >= 2000) {
@@ -468,19 +473,31 @@ async function connect() {
       
       let metadata = await (await fetch("https://freshfrogs.github.io/frog/json/"+token_id+".json")).json();
 
+      let rarity_score = 0;
+
       for (var i = 0; i < metadata.attributes.length; i++) {
 
         var data = metadata.attributes[i]
+        var trait_freq;
 
-        try { var trait_rarity = ((traits_list[data.trait_type][data.value.toLowerCase()] / 4040) * 100).toFixed(0); } catch (e) {trait_rarity = 'e'; console.log(e); }
-                  
-        if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
+        try { trait_freq = traits_list[data.trait_type][data.value.toLowerCase()] / 4040; } catch (e) { trait_freq = null; console.log(e); }
+
+        var trait_rarity;
+        if (trait_freq === null) {
+          trait_rarity = 'e';
+        } else {
+          if (trait_freq > 0) { rarity_score += 1 / trait_freq; }
+          trait_rarity = (trait_freq * 100).toFixed(0);
+          if (trait_rarity < 1) { trait_rarity = '<1%' } else { trait_rarity = trait_rarity+'%' }
+        }
 
         let trait_text = document.createElement('i')
         trait_text.innerHTML = data.trait_type+': '+data.value+' <b class="trait" style="font-size: smaller;"><i>('+trait_rarity+')</i></b><br>';
         document.getElementById('prop_'+token_id).appendChild(trait_text);
 
       }
+
+      frog_token.dataset.rarity = rarity_score;
 
       let button_b = document.createElement('div');
 
@@ -497,6 +514,30 @@ async function connect() {
       document.getElementById('traits_'+token_id).appendChild(button_b);
 
     } catch (e) { console.log(e.message); }
+
+  }
+
+  // sortPond(mode) - reorders the frog cards in #thePad by rarity or time staked
+  function sortPond(mode) {
+
+    let pad = document.getElementById('thePad');
+    let tokens = Array.from(pad.getElementsByClassName('frog_token'));
+
+    tokens.sort(function(a, b) {
+
+      if (mode === 'rarity') {
+        return parseFloat(b.dataset.rarity || 0) - parseFloat(a.dataset.rarity || 0); // rarest first
+      } else if (mode === 'staked') {
+        let a_hours = a.dataset.stakedHours !== undefined ? parseFloat(a.dataset.stakedHours) : -1;
+        let b_hours = b.dataset.stakedHours !== undefined ? parseFloat(b.dataset.stakedHours) : -1;
+        return b_hours - a_hours; // longest staked first
+      }
+
+      return 0;
+
+    });
+
+    tokens.forEach(function(token) { pad.appendChild(token); });
 
   }
 
