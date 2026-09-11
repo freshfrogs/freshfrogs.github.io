@@ -906,6 +906,11 @@ footer {
 
     <div class="collection-tools">
       <input id="pondSearch" class="search" type="search" placeholder="Search by frog number or staker address">
+      <select id="pondSort" class="filter sort-select" aria-label="Sort the pond">
+        <option value="id">SORT: TOKEN ID</option>
+        <option value="rarity">SORT: RARITY (RAREST FIRST)</option>
+        <option value="staked">SORT: TIME STAKED (LONGEST FIRST)</option>
+      </select>
       <span class="pond-stat-chip" id="pondStat">Loading…</span>
       <button class="filter" id="pondRefresh">REFRESH</button>
     </div>
@@ -1920,6 +1925,36 @@ let pondFiltered = [];
 let pondOffset   = 0;
 const POND_BATCH = 16;
 let pondLoaded   = false;
+let pondSort     = 'id';
+let pondStakedSinceMap = {};
+
+function pondSortCompare(a, b) {
+  if (pondSort === 'rarity' && rarityData) {
+    const ra = rarityData[a.tokenId] ? rarityData[a.tokenId].rank : Infinity; // rank 1 = rarest
+    const rb = rarityData[b.tokenId] ? rarityData[b.tokenId].rank : Infinity;
+    return ra - rb;
+  }
+  if (pondSort === 'staked') {
+    const sa = pondStakedSinceMap[a.tokenId] ?? Infinity; // no known stake time sinks to the end
+    const sb = pondStakedSinceMap[b.tokenId] ?? Infinity;
+    return sa - sb; // earliest stake timestamp (longest staked) first
+  }
+  return a.tokenId - b.tokenId;
+}
+
+function applyPondFilter() {
+  const q = document.getElementById('pondSearch').value.trim().toLowerCase();
+  const base = !q ? [...pondAllFrogs] : pondAllFrogs.filter(f =>
+    String(f.tokenId).includes(q) || (f.staker && f.staker.toLowerCase().includes(q))
+  );
+  pondFiltered = base.sort(pondSortCompare);
+  renderPondBatch(true);
+}
+
+async function loadPondSortData() {
+  if (pondSort === 'rarity') await loadRarityData();
+  if (pondSort === 'staked') pondStakedSinceMap = await getStakedSinceMap();
+}
 
 async function loadPond() {
   pondLoaded = true;
@@ -1929,9 +1964,9 @@ async function loadPond() {
 
   try {
     pondAllFrogs = await getStakedRoster();
-    pondFiltered = [...pondAllFrogs];
+    await loadPondSortData();
     document.getElementById('pondStat').textContent = '🐸 ' + pondAllFrogs.length + ' staked';
-    renderPondBatch(true);
+    applyPondFilter();
   } catch (e) {
     grid.innerHTML = '<p style="color:#c0392b;">Failed to load the pond: ' + e.message + '</p>';
   }
@@ -2025,12 +2060,12 @@ function lazyLoadPondMeta(card, tokenId, entry) {
   obs.observe(card);
 }
 
-document.getElementById('pondSearch').addEventListener('input', () => {
-  const q = document.getElementById('pondSearch').value.trim().toLowerCase();
-  pondFiltered = !q ? [...pondAllFrogs] : pondAllFrogs.filter(f =>
-    String(f.tokenId).includes(q) || (f.staker && f.staker.toLowerCase().includes(q))
-  );
-  renderPondBatch(true);
+document.getElementById('pondSearch').addEventListener('input', applyPondFilter);
+
+document.getElementById('pondSort').addEventListener('change', async (e) => {
+  pondSort = e.target.value;
+  await loadPondSortData();
+  applyPondFilter();
 });
 
 document.getElementById('pondLoadMore').addEventListener('click', () => renderPondBatch(false));
